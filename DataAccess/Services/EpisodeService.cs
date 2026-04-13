@@ -1,4 +1,5 @@
-﻿using DataAccess.DTOs;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +38,7 @@ public class EpisodeService : IEpisodeService
 
     public async Task CreateEpisodeAsync(EpisodeDto dto, UserSession session)
     {
-        SecurityHelper.EnsureRole(session, "Coordination");
+        SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage);
         using var context = await _contextFactory.CreateDbContextAsync();
         var episode = new Episode
         {
@@ -55,9 +56,9 @@ public class EpisodeService : IEpisodeService
     public async Task UpdateStatusAsync(int episodeId, byte newStatus, UserSession session)
     {
         // التحقق من الصلاحيات
-        if (newStatus == 1) SecurityHelper.EnsurePermission(session, "EPISODE_EXECUTE");
+        if (newStatus == 1) SecurityHelper.EnsurePermission(session, AppPermissions.EpisodeExecute);
 
-        if (newStatus == 2) SecurityHelper.EnsurePermission(session, "EPISODE_PUBLISH");
+        if (newStatus == 2) SecurityHelper.EnsurePermission(session, AppPermissions.EpisodePublish);
 
 
         using var context = await _contextFactory.CreateDbContextAsync();

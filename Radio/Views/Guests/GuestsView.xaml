@@ -10,67 +10,70 @@
     d:DesignWidth="800"
     Style="{StaticResource UserControlStyle}"
     mc:Ignorable="d">
-    <Grid Margin="16">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  Header & Search  -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+        <DockPanel Grid.Row="0" Margin="10,0,10,20">
             <TextBlock
-                Margin="0,0,0,10"
-                Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                Text="إدارة الضيوف" />
-            <DockPanel>
-                <Button
-                    x:Name="BtnAddGuest"
-                    Click="BtnAddGuest_Click"
-                    Content="إضافة ضيف جديد"
-                    DockPanel.Dock="Left"
-                    Style="{StaticResource MaterialDesignRaisedButton}" />
-
+                VerticalAlignment="Center"
+                FontSize="26"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="قاعدة بيانات الضيوف" />
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                 <TextBox
                     x:Name="TxtSearch"
-                    Width="300"
+                    Width="250"
                     Margin="20,0,0,0"
-                    HorizontalAlignment="Left"
+                    materialDesign:HintAssist.Foreground="Gray"
                     materialDesign:HintAssist.Hint="بحث بالاسم أو الهاتف..."
                     materialDesign:TextFieldAssist.HasLeadingIcon="True"
                     materialDesign:TextFieldAssist.LeadingIcon="Search"
+                    Foreground="White"
                     TextChanged="TxtSearch_TextChanged" />
-            </DockPanel>
-        </StackPanel>
+                <Button
+                    x:Name="BtnAddGuest"
+                    Margin="20,0,0,0"
+                    materialDesign:ButtonAssist.CornerRadius="5"
+                    Background="#8BCAEC"
+                    BorderBrush="#9ED3DC"
+                    Click="BtnAddGuest_Click"
+                    Content="إضافة ضيف"
+                    Foreground="White" />
+            </StackPanel>
+        </DockPanel>
 
-        <!--  DataGrid  -->
-        <materialDesign:Card Grid.Row="1" materialDesign:ElevationAssist.Elevation="Dp2">
+        <materialDesign:Card
+            Grid.Row="1"
+            Background="#1E1E1E"
+            UniformCornerRadius="10">
             <DataGrid
                 x:Name="DgGuests"
-                Margin="0"
-                Padding="0"
-                AlternatingRowBackground="{DynamicResource MaterialDesignPaper}"
+                AlternatingRowBackground="#252526"
                 AutoGenerateColumns="False"
-                Background="{DynamicResource MaterialDesignPaper}"
-                BorderThickness="1"
+                Background="Transparent"
                 CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                EnableColumnVirtualization="True"
-                EnableRowVirtualization="True"
-                GridLinesVisibility="All"
-                HorizontalGridLinesBrush="{DynamicResource AccentColorBrush}"
+                Foreground="White"
                 IsReadOnly="True"
-                RowBackground="{DynamicResource MaterialDesignPaper}"
-                SelectionMode="Single"
-                SnapsToDevicePixels="True"
-                UseLayoutRounding="True"
-                VerticalGridLinesBrush="{DynamicResource MaterialDesignDivider}">
+                RowBackground="#1E1E1E">
+                <!--  تخصيص ترويسة الجدول بلون المديول  -->
+                <DataGrid.ColumnHeaderStyle>
+                    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#8BCAEC" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="FontSize" Value="15" />
+                        <Setter Property="Padding" Value="10" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding FullName}"
                         CellStyle="{StaticResource LeftCellAligned}"
                         Header="الاسم الكامل" />
-
                     <DataGridTextColumn
                         Width="150"
                         Binding="{Binding Organization}"
@@ -81,32 +84,33 @@
                         Binding="{Binding PhoneNumber}"
                         CellStyle="{StaticResource CenterCellAligned}"
                         Header="رقم الهاتف" />
-                    <DataGridTextColumn
-                        Width="200"
-                        Binding="{Binding EmailAddress}"
-                        CellStyle="{StaticResource LeftCellAligned}"
-                        Header="البريد الإلكتروني" />
-                    <DataGridTemplateColumn Width="150" Header="إجراءات">
+                    <DataGridTemplateColumn Width="120" Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                     <Button
                                         x:Name="BtnEdit"
-                                        Padding="4"
+                                        Width="30"
+                                        Height="30"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
                                         Click="BtnEdit_Click"
-                                        Style="{StaticResource MaterialDesignFlatButton}"
-                                        ToolTip="تعديل"
-                                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=CoordinationOnlyVisibility}">
-                                        <materialDesign:PackIcon Foreground="Blue" Kind="Pencil" />
+                                        Foreground="#03A9F4"
+                                        Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                        ToolTip="تعديل">
+                                        <materialDesign:PackIcon Kind="Pencil" />
                                     </Button>
                                     <Button
                                         x:Name="BtnDelete"
-                                        Padding="4"
+                                        Width="30"
+                                        Height="30"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
                                         Click="BtnDelete_Click"
-                                        Style="{StaticResource MaterialDesignFlatButton}"
-                                        ToolTip="حذف"
-                                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=CoordinationOnlyVisibility}">
-                                        <materialDesign:PackIcon Foreground="Red" Kind="Delete" />
+                                        Foreground="#FF5252"
+                                        Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                        ToolTip="حذف">
+                                        <materialDesign:PackIcon Kind="Delete" />
                                     </Button>
                                 </StackPanel>
                             </DataTemplate>

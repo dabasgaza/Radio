@@ -36,6 +36,7 @@
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding ProgramName}"
+                        CellStyle="{StaticResource LeftCellAligned}"
                         Header="اسم البرنامج" />
                     <DataGridTextColumn
                         Width="200"
@@ -45,7 +46,11 @@
                     <DataGridTemplateColumn Width="100" Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Click="BtnEdit_Click" Style="{StaticResource MaterialDesignFlatButton}">
+                                <Button
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Click="BtnEdit_Click"
+                                    Style="{StaticResource MaterialDesignFlatButton}">
                                     <materialDesign:PackIcon Kind="Pencil" />
                                 </Button>
                             </DataTemplate>

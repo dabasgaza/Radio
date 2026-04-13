@@ -1,4 +1,5 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Services.Messaging;
 using Domain.Models;
 using System.Windows;
 using System.Windows.Controls;
@@ -60,22 +61,27 @@ namespace Radio.Views.Guests
         {
             if (sender is Button btn && btn.DataContext is Guest guest)
             {
-                var result = MessageBox.Show($"هل أنت متأكد من حذف الضيف: {guest.FullName}؟", "تأكيد الحذف",
-                                            MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                // 👈 استدعاء رسالة التأكيد بأسلوب أنيق جداً (ينتظر رد المستخدم)
+                bool isConfirmed = await MessageService.Current.ShowConfirmationAsync(
+                    $"هل أنت متأكد من رغبتك بحذف الضيف: {guest.FullName}؟\nلا يمكن التراجع عن هذا الإجراء.",
+                    "تأكيد الحذف");
 
-                if (result == MessageBoxResult.Yes)
+                if (isConfirmed)
                 {
                     try
                     {
                         await _guestService.SoftDeleteGuestAsync(guest.GuestId, _session);
                         await LoadDataAsync();
+
+                        // لن نرسل رسالة نجاح هنا، لأن الـ Service نفسه سيتولى إرسالها!
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.Message, "خطأ في الحذف", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageService.Current.ShowError(ex.Message);
                     }
                 }
             }
+
         }
     }
 }

@@ -10,28 +10,54 @@
     d:DesignWidth="800"
     Style="{StaticResource UserControlStyle}"
     mc:Ignorable="d">
-    <Grid Margin="16">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" Text="إدارة مستخدمي النظام والصلاحيات" />
+        <DockPanel
+            Grid.Row="0"
+            Margin="10,0,10,20"
+            VerticalAlignment="Center">
+            <TextBlock
+                VerticalAlignment="Center"
+                FontSize="26"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="إدارة مستخدمي النظام" />
             <Button
                 x:Name="BtnAddUser"
                 Margin="20,0,0,0"
                 HorizontalAlignment="Left"
+                materialDesign:ButtonAssist.CornerRadius="5"
+                Background="#1F6F5F"
+                BorderBrush="#1F6F5F"
                 Click="BtnAddUser_Click"
-                Content="إضافة مستخدم جديد" />
+                Content="إضافة مستخدم"
+                Foreground="White" />
         </DockPanel>
 
-        <materialDesign:Card Grid.Row="1">
+        <materialDesign:Card
+            Grid.Row="1"
+            Background="#1E1E1E"
+            UniformCornerRadius="10">
             <DataGrid
                 x:Name="DgUsers"
+                AlternatingRowBackground="#252526"
                 AutoGenerateColumns="False"
+                Background="Transparent"
                 CanUserAddRows="False"
-                IsReadOnly="True">
+                Foreground="White"
+                IsReadOnly="True"
+                RowBackground="#1E1E1E">
+                <DataGrid.ColumnHeaderStyle>
+                    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#1F6F5F" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Padding" Value="15" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Width="*"
@@ -40,27 +66,38 @@
                     <DataGridTextColumn
                         Width="150"
                         Binding="{Binding Username}"
+                        FontWeight="Bold"
+                        Foreground="#9C27B0"
                         Header="اسم المستخدم" />
                     <DataGridTextColumn
                         Width="150"
                         Binding="{Binding Role.RoleName}"
-                        Header="الدور / الصلاحية" />
+                        Header="الدور" />
 
-                    <DataGridTemplateColumn Width="100" Header="الحالة">
+                    <DataGridTemplateColumn Width="100" Header="حالة الحساب">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
+                                <!--  Toggle Button بلمسة عصرية  -->
                                 <ToggleButton
                                     Click="Status_Click"
+                                    Foreground="#9C27B0"
                                     IsChecked="{Binding IsActive}"
+                                    Style="{StaticResource MaterialDesignSwitchToggleButton}"
                                     ToolTip="تفعيل/تعطيل" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="100" Header="إجراءات">
+                    <DataGridTemplateColumn Width="80" Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Click="BtnEdit_Click" Style="{StaticResource MaterialDesignFlatButton}">
+                                <Button
+                                    x:Name="BtnEdit"
+                                    Width="30"
+                                    Height="30"
+                                    Click="BtnEdit_Click"
+                                    Foreground="#03A9F4"
+                                    Style="{StaticResource MaterialDesignIconForegroundButton}">
                                     <materialDesign:PackIcon Kind="Pencil" />
                                 </Button>
                             </DataTemplate>

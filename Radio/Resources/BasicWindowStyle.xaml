@@ -4,7 +4,7 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls">
 
     <Style x:Key="BasicWindowStyle" TargetType="{x:Type mah:MetroWindow}">
-        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+        <Setter Property="Background" Value="#303030" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
 
@@ -19,7 +19,7 @@
     </Style>
 
     <Style x:Key="UserControlStyle" TargetType="{x:Type UserControl}">
-        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+        <Setter Property="Background" Value="#303030" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
@@ -94,10 +94,10 @@
         <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="RowBackground" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="AlternatingRowBackground" Value="{DynamicResource MaterialDesignPaper}" />
-        <Setter Property="GridLinesVisibility" Value="All" />
-        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource MaterialDesignDivider}" />
+        <Setter Property="GridLinesVisibility" Value="None" />
+        <!--<Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource MaterialDesignDivider}" />
         <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource MaterialDesignDivider}" />
-        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />-->
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>

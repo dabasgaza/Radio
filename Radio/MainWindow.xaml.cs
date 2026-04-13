@@ -1,7 +1,10 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Common;
 using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Forms;
+using Radio.Messaging;
 using Radio.Views.Correspondents;
 using Radio.Views.Episodes;
 using Radio.Views.Guests;
@@ -41,6 +44,10 @@ namespace Radio
             TxtUserFullName.Text = _session.FullName;
             ChipRole.Content = TranslateRole(_session.RoleName);
 
+            // 👈 تهيئة نظام الإشعارات المركزي وربطه بالـ Snackbar الخاص بهذه النافذة
+            var wpfMessaging = new WpfMessageService(MainSnackbar.MessageQueue!);
+            MessageService.Initialize(wpfMessaging);
+
             InitializeUI();
         }
 
@@ -60,25 +67,22 @@ namespace Radio
         // 1. تحديث دالة تصفية القوائم بناءً على الصلاحيات الديناميكية
         private void ApplyPermissionSecurity()
         {
-            // صلاحية إدارة النظام (المستخدمين والصلاحيات)
-            bool canManageUsers = _session.HasPermission("USER_MANAGE");
+            // إدارة النظام
+            bool canManageUsers = _session.HasPermission(AppPermissions.UserManage);
             MenuUsers.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
-
             MenuPermissions.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
 
-            // صلاحية إدارة البرامج
-            MenuPrograms.Visibility = _session.HasPermission("PROGRAM_MANAGE") ? Visibility.Visible : Visibility.Collapsed;
+            // البرامج والمراسلين
+            MenuPrograms.Visibility = _session.HasPermission(AppPermissions.ProgramManage) ? Visibility.Visible : Visibility.Collapsed;
+            MenuCorrespondents.Visibility = _session.HasPermission(AppPermissions.CoordinationManage) ? Visibility.Visible : Visibility.Collapsed;
 
-            // صلاحية إدارة المراسلين
-            MenuCorrespondents.Visibility = _session.HasPermission("CORR_MANAGE") ? Visibility.Visible : Visibility.Collapsed;
+            // التقارير
+            MenuReports.Visibility = _session.HasPermission(AppPermissions.ViewReports) ? Visibility.Visible : Visibility.Collapsed;
 
-            // صلاحية عرض التقارير
-            MenuReports.Visibility = _session.HasPermission("VIEW_REPORTS") ? Visibility.Visible : Visibility.Collapsed;
-
-            // ملاحظة: الضيوف والحلقات عادة تظهر للكل، ولكن الأزرار بداخلها 
-            // يتم التحكم بها داخل الـ UserControl الخاص بكل منها.
+            // الحلقات والضيوف تظهر للجميع عادةً (والتحكم بالأزرار يكون داخلياً)
+            MenuEpisodes.Visibility = Visibility.Visible;
+            MenuGuests.Visibility = Visibility.Visible;
         }
-
 
         private string TranslateRole(string roleName) => roleName switch
         {
@@ -88,8 +92,6 @@ namespace Radio
             "النشر الرقمي" => "قسم النشر الرقمي",
             _ => roleName
         };
-
-        private void BtnMenu_Click(object sender, RoutedEventArgs e) => NavDrawer.IsLeftDrawerOpen = true;
 
         private void MenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -145,8 +147,6 @@ namespace Radio
                         break;
                 }
             }
-            NavDrawer.IsLeftDrawerOpen = false;
-
         }
 
         private void NavigateTo(UserControl view)
@@ -160,17 +160,6 @@ namespace Radio
             loginWindow.Show();
             this.Close();
         }
-
-        private void ApplyRoleSecurity()
-        {
-            if (!string.Equals(_session.RoleName, "Coordination", StringComparison.OrdinalIgnoreCase))
-            {
-                MenuPrograms.Visibility = Visibility.Collapsed;
-                MenuCorrespondents.Visibility = Visibility.Collapsed;
-                MenuUsers.Visibility = Visibility.Collapsed;
-            }
-        }
-
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,7 @@ namespace DataAccess.Services
 
         public async Task CreateProgramAsync(ProgramDto dto, UserSession session)
         {
-            SecurityHelper.EnsureRole(session, "Coordination");
+            SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage);
             using var context = await _contextFactory.CreateDbContextAsync();
             context.Programs.Add(new Program
             {
@@ -39,7 +40,7 @@ namespace DataAccess.Services
 
         public async Task UpdateProgramAsync(ProgramDto dto, UserSession session)
         {
-            SecurityHelper.EnsureRole(session, "Coordination");
+            SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage);
             using var context = await _contextFactory.CreateDbContextAsync();
             var prog = await context.Programs.FindAsync(dto.ProgramId);
             if (prog == null) return;

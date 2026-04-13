@@ -1,4 +1,5 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Common;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,7 @@ namespace DataAccess.Services
 
         public async Task LogPublishingAsync(PublishingLog log, UserSession session)
         {
-            SecurityHelper.EnsureRole(session, "Coordination", "Publishing");
+            SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage, AppPermissions.EpisodeManage);
             using var context = await _contextFactory.CreateDbContextAsync();
             using var transaction = await context.Database.BeginTransactionAsync();
 

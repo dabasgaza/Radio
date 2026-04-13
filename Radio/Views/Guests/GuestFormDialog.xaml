@@ -10,61 +10,67 @@
     Title="إضافة الضيوف"
     Width="800"
     Height="550"
-    Background="{DynamicResource MaterialDesignShadowBrush}"
     Style="{StaticResource BasicWindowStyle}"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <Grid Margin="20">
+    <Grid Margin="25">
         <StackPanel>
             <TextBlock
                 x:Name="TxtTitle"
-                Margin="0,0,0,20"
-                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                Text="إضافة ضيف جديد" />
-
+                Margin="0,0,0,25"
+                FontSize="22"
+                FontWeight="Bold"
+                Foreground="#4CAF50"
+                Text="ملف الضيف" />
             <TextBox
                 x:Name="TxtName"
                 Margin="0,0,0,15"
                 materialDesign:HintAssist.Hint="الاسم الكامل *"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                Foreground="White"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
             <TextBox
                 x:Name="TxtOrg"
                 Margin="0,0,0,15"
                 materialDesign:HintAssist.Hint="المؤسسة / الجهة"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                Foreground="White"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
             <TextBox
                 x:Name="TxtPhone"
                 Margin="0,0,0,15"
                 materialDesign:HintAssist.Hint="رقم الهاتف"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                Foreground="White"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
             <TextBox
                 x:Name="TxtEmail"
                 Margin="0,0,0,15"
                 materialDesign:HintAssist.Hint="البريد الإلكتروني"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                Foreground="White"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
             <TextBox
                 x:Name="TxtBio"
                 Height="80"
-                VerticalContentAlignment="Top"
+                Margin="0,0,0,25"
                 materialDesign:HintAssist.Hint="نبذة تعريفية"
                 AcceptsReturn="True"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                Foreground="White"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                 TextWrapping="Wrap" />
 
-            <StackPanel
-                Margin="0,20,0,0"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                 <Button
                     Margin="0,0,10,0"
+                    BorderBrush="Gray"
                     Content="إلغاء"
+                    Foreground="White"
                     IsCancel="True"
                     Style="{StaticResource MaterialDesignOutlinedButton}" />
                 <Button
                     x:Name="BtnSave"
+                    Background="#4CAF50"
+                    BorderBrush="#4CAF50"
                     Click="BtnSave_Click"
-                    Content="حفظ"
-                    Style="{StaticResource MaterialDesignRaisedButton}" />
+                    Content="حفظ البيانات"
+                    Foreground="White" />
             </StackPanel>
         </StackPanel>
     </Grid>

@@ -1,5 +1,8 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Common;
+using DataAccess.Data;
 using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Radio.Forms;
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Radio
 {
@@ -35,8 +39,12 @@ namespace Radio
         {
             // 1. Database Context Factory
             string connectionString = Configuration.GetConnectionString("DefaultConnection")!;
-            services.AddDbContextFactory<BroadcastWorkflowDBContext>(options =>
-                options.UseSqlServer(connectionString));
+            services.AddDbContextFactory<BroadcastWorkflowDBContext>((serviceProvider, options) =>
+            {
+                var interceptor = serviceProvider.GetRequiredService<AuditInterceptor>();
+                options.UseSqlServer(connectionString)
+                       .AddInterceptors(interceptor); // 👈 ربط المعترض
+            });
 
             // 2. Services (To be implemented in Phase 3)
             services.AddTransient<IAuditService, AuditService>();
@@ -51,6 +59,9 @@ namespace Radio
             services.AddTransient<IReportsService, ReportsService>();
             services.AddTransient<IUserService, UserService>();
 
+            // تسجيل مزود الجلسة ليكون متاحاً في كل مكان
+            services.AddSingleton<CurrentSessionProvider>();
+            services.AddSingleton<AuditInterceptor>();
 
 
             // 3. Windows (To be implemented in Phase 4+)
@@ -64,10 +75,37 @@ namespace Radio
             //var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
             //mainWindow.Show();
 
+            // 1. اصطياد أخطاء واجهة المستخدم (UI Thread Exceptions)
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+
+            // 2. اصطياد أخطاء المهام الخلفية (Background Task Exceptions)
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
             var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
             loginWindow.Show();
             base.OnStartup(e);
         }
+
+        /// <summary>
+        /// يتم استدعاؤها عند حدوث خطأ مفاجئ في واجهة المستخدم لمنع انهيار البرنامج
+        /// </summary>
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            MessageService.Current.ShowError($"حدث خطأ في النظام: {e.Exception.Message}");
+
+            // إخبار النظام بأننا تعاملنا مع الخطأ، فلا تقم بإغلاق البرنامج
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// يتم استدعاؤها عند حدوث خطأ في مهام الـ Async التي لم يتم عمل await لها
+        /// </summary>
+        private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+        {
+            MessageService.Current.ShowError($"خطأ خلفي: {e.Exception?.Message}");
+            e.SetObserved();
+        }
+
 
     }
 

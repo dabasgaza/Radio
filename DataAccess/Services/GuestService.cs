@@ -1,4 +1,6 @@
+using DataAccess.Common;
 using DataAccess.DTOs;
+using DataAccess.Services.Messaging;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +30,7 @@ public class GuestService : IGuestService
 
     public async Task CreateGuestAsync(GuestDto dto, UserSession session)
     {
-        SecurityHelper.EnsurePermission(session, "GUEST_MANAGE");
+        SecurityHelper.EnsurePermission(session, AppPermissions.GuestManage);
         if (string.IsNullOrEmpty(dto.PhoneNumber) && string.IsNullOrEmpty(dto.EmailAddress))
             throw new Exception("Guest must have a phone number or email address.");
 
@@ -43,12 +45,17 @@ public class GuestService : IGuestService
         };
         context.Guests.Add(guest);
         await context.SaveChangesAsync();
+
+        // إرسال الإشعار من قلب الخدمة
+        MessageService.Current.ShowSuccess($"تم حفظ بيانات الضيف: {dto.FullName}");
+
         await _audit.LogActionAsync("Guests", guest.GuestId, "INSERT", null, dto, session.UserId);
     }
 
     public async Task UpdateGuestAsync(GuestDto dto, UserSession session)
     {
-        SecurityHelper.EnsureRole(session, "Coordination");
+        SecurityHelper.EnsureRole(session, AppPermissions.GuestManage);
+
         using var context = await _contextFactory.CreateDbContextAsync();
         var guest = await context.Guests.FindAsync(dto.GuestId);
         if (guest == null) return;
@@ -63,6 +70,8 @@ public class GuestService : IGuestService
         try
         {
             await context.SaveChangesAsync();
+            MessageService.Current.ShowInfo($"تم تحديث بيانات الضيف: {dto.FullName}");
+
             await _audit.LogActionAsync("Guests", guest.GuestId, "UPDATE", oldData, dto, session.UserId);
         }
         catch (DbUpdateConcurrencyException) { throw new Exception("Record modified by another user."); }
@@ -70,7 +79,7 @@ public class GuestService : IGuestService
 
     public async Task SoftDeleteGuestAsync(int guestId, UserSession session)
     {
-        SecurityHelper.EnsurePermission(session, "GUEST_MANAGE"); // 👈 احترافية وأمان أعلى
+        SecurityHelper.EnsurePermission(session, AppPermissions.GuestManage); // 👈 احترافية وأمان أعلى
 
         //SecurityHelper.EnsureRole(session, "Coordination");
 

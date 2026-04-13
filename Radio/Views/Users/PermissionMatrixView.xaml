@@ -13,77 +13,193 @@
     Style="{StaticResource BasicWindowStyle}"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <Grid Margin="16">
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            Margin="0,0,0,20"
-            Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-            Text="مصفوفة الصلاحيات" />
+        <!--  الهيدر  -->
+        <DockPanel Grid.Row="0" Margin="10,0,10,20">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon
+                    Width="35"
+                    Height="35"
+                    Margin="0,0,10,0"
+                    VerticalAlignment="Center"
+                    Foreground="#00BCD4"
+                    Kind="Security" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="26"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    Text="مصفوفة إدارة الصلاحيات" />
+            </StackPanel>
 
+            <!--  زر الحفظ بارز في الأعلى لسهولة الوصول  -->
+            <Button
+                x:Name="BtnSavePermissions"
+                Height="40"
+                Padding="20,0"
+                Margin="20,0,0,0"
+                HorizontalAlignment="Left"
+                materialDesign:ButtonAssist.CornerRadius="5"
+                Background="#00BCD4"
+                BorderBrush="#00BCD4"
+                Click="BtnSavePermissions_Click"
+                Foreground="White">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Kind="ContentSave" Margin="0,0,8,0" />
+                    <TextBlock Text="حفظ التعديلات" VerticalAlignment="Center" Foreground="White" />
+                </StackPanel>
+            </Button>
+        </DockPanel>
+
+        <!--  منطقة العمل الرئيسية  -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" />
-                <!--  قائمة الأدوار  -->
+                <!--  عمود الأدوار (أضيق)  -->
+                <ColumnDefinition Width="280" />
+                <ColumnDefinition Width="20" />
+                <!--  عمود الصلاحيات (أعرض)  -->
                 <ColumnDefinition Width="*" />
-                <!--  قائمة الصلاحيات  -->
             </Grid.ColumnDefinitions>
 
-            <!--  1. قائمة الأدوار  -->
-            <materialDesign:Card Grid.Column="0" Margin="0,0,10,0">
-                <ListBox
-                    x:Name="LstRoles"
-                    DisplayMemberPath="RoleName"
-                    SelectionChanged="LstRoles_SelectionChanged"
-                    Style="{StaticResource MaterialDesignListBox}" />
-            </materialDesign:Card>
-
-            <!--  2. مصفوفة الصلاحيات للدور المختار  -->
-            <materialDesign:Card Grid.Column="1" Padding="16">
+            <!--  1. قائمة الأدوار (Roles List)  -->
+            <materialDesign:Card
+                Grid.Column="0"
+                materialDesign:ElevationAssist.Elevation="Dp3"
+                Background="#1E1E1E"
+                UniformCornerRadius="10">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <ScrollViewer>
-                        <ListBox
-                            x:Name="ItemsPermissions"
-                            HorizontalContentAlignment="Stretch"
-                            Background="Transparent"
-                            BorderThickness="0">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <!--  استخدام Grid لضمان توزيع المساحة بين النص والـ Checkbox  -->
-                                    <Grid Margin="0,5">
-                                        <CheckBox
-                                            HorizontalAlignment="Stretch"
-                                            materialDesign:CheckBoxAssist.CheckBoxSize="24"
-                                            CommandParameter="{Binding PermissionId}"
-                                            IsChecked="{Binding IsAssigned}"
-                                            Style="{StaticResource MaterialDesignCheckBox}">
+                    <Border
+                        Padding="15"
+                        Background="#252526"
+                        CornerRadius="10,10,0,0">
+                        <TextBlock
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Foreground="#00BCD4"
+                            Text="الأدوار الوظيفية" />
+                    </Border>
 
-                                            <!--  وضع النص داخل الـ CheckBox مع تحديد اللون  -->
-                                            <TextBlock
-                                                Margin="10,0"
-                                                FontSize="16"
-                                                Foreground="{DynamicResource MaterialDesignBody}"
-                                                Text="{Binding DisplayName}" />
-                                        </CheckBox>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </ScrollViewer>
-
-                    <Button
+                    <ListBox
+                        x:Name="LstRoles"
                         Grid.Row="1"
-                        Margin="0,20,0,0"
-                        Click="BtnSavePermissions_Click"
-                        Content="حفظ تعديلات الصلاحيات" />
+                        Margin="0,10"
+                        ItemContainerStyle="{StaticResource MaterialDesignNavigationPrimaryListBoxItem}"
+                        SelectionChanged="LstRoles_SelectionChanged"
+                        Style="{StaticResource MaterialDesignNavigationListBox}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="10,5" Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Margin="0,0,10,0"
+                                        VerticalAlignment="Center"
+                                        Foreground="Gray"
+                                        Kind="AccountTie" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="16"
+                                        Foreground="White"
+                                        Text="{Binding RoleName}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </materialDesign:Card>
+
+            <!--  2. تفاصيل الصلاحيات (Permissions Details)  -->
+            <materialDesign:Card
+                Grid.Column="2"
+                materialDesign:ElevationAssist.Elevation="Dp3"
+                Background="#1E1E1E"
+                UniformCornerRadius="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!--  رسالة توجيهية تظهر في حال لم يتم اختيار دور  -->
+                    <Border
+                        Grid.Row="0"
+                        Padding="15"
+                        Background="#252526"
+                        CornerRadius="10,10,0,0">
+                        <TextBlock
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Foreground="#00BCD4"
+                            Text="الصلاحيات الممنوحة للدور المحدد" />
+                    </Border>
+
+                    <ScrollViewer
+                        Grid.Row="1"
+                        Margin="20"
+                        VerticalScrollBarVisibility="Auto">
+                        <!--  استخدام ItemsControl لترتيب الصلاحيات بشكل أنيق  -->
+                        <ItemsControl x:Name="ItemsPermissions">
+                            <!--  إذا أردت تجميع الصلاحيات (Grouping) لاحقاً، يمكنك إضافة GroupStyle هنا  -->
+
+                            <!--  تقسيم عرض الص صلاحيات إلى عمودين إذا كانت الشاشة واسعة  -->
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid VerticalAlignment="Top" Columns="2" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="10"
+                                        Padding="15"
+                                        Background="#2D2D30"
+                                        BorderBrush="#333333"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock
+                                                    FontSize="15"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="White"
+                                                    Text="{Binding DisplayName}"
+                                                    TextWrapping="Wrap" />
+                                                <TextBlock
+                                                    Margin="0,5,0,0"
+                                                    FontSize="12"
+                                                    Foreground="Gray"
+                                                    Text="{Binding Module}" />
+                                            </StackPanel>
+
+                                            <!--  زر التبديل (ToggleSwitch) العصري بدلاً من الـ CheckBox  -->
+                                            <ToggleButton
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                CommandParameter="{Binding PermissionId}"
+                                                Foreground="#00BCD4"
+                                                IsChecked="{Binding IsAssigned}"
+                                                Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                                ToolTip="منح / سحب الصلاحية" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </Grid>
             </materialDesign:Card>
         </Grid>

@@ -1,4 +1,6 @@
-﻿using DataAccess.Services;
+﻿using DataAccess.Common;
+using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using Domain.Models;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,7 +21,7 @@ namespace Radio.Views.Correspondents
             _service = service;
             _session = session;
             // استخدم الصلاحية التي عرفناها في جدول الصلاحيات
-            BtnAdd.Visibility = _session.HasPermission("CORR_MANAGE") ? Visibility.Visible : Visibility.Collapsed;
+            BtnAdd.Visibility = _session.HasPermission(AppPermissions.CoordinationManage) ? Visibility.Visible : Visibility.Collapsed;
             _ = LoadDataAsync();
         }
 
@@ -47,12 +49,28 @@ namespace Radio.Views.Correspondents
         {
             if (sender is Button btn && btn.DataContext is Correspondent cor)
             {
-                if (MessageBox.Show("حذف المراسل؟", "تأكيد", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                // 👈 استدعاء رسالة التأكيد بأسلوب أنيق جداً (ينتظر رد المستخدم)
+                bool isConfirmed = await MessageService.Current.ShowConfirmationAsync(
+                    $"هل أنت متأكد من رغبتك بحذف المراسل: {cor.FullName}؟\nلا يمكن التراجع عن هذا الإجراء.",
+                    "تأكيد الحذف");
+
+                if (isConfirmed)
                 {
-                    await _service.SoftDeleteAsync(cor.CorrespondentId, _session);
-                    await LoadDataAsync();
+                    try
+                    {
+                        await _service.SoftDeleteAsync(cor.CorrespondentId, _session);
+
+                        await LoadDataAsync();
+
+                        // لن نرسل رسالة نجاح هنا، لأن الـ Service نفسه سيتولى إرسالها!
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageService.Current.ShowError(ex.Message);
+                    }
                 }
             }
+
         }
 
         private void BtnCoverage_Click(object sender, RoutedEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using BroadcastWorkflow.Services;
 using DataAccess.DTOs;
 using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using System.Windows;
 
 namespace Radio.Views.Episodes
@@ -38,7 +39,7 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
-                MessageBox.Show("خطأ في تحميل قائمة البرامج: " + ex.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageService.Current.ShowError("حدث خطأ أثناء تحميل قائمة البرامج: " + ex.Message);
             }
         }
 
@@ -47,15 +48,16 @@ namespace Radio.Views.Episodes
             // 1. التحقق من صحة المدخلات (UI Validation)
             if (CboPrograms.SelectedValue == null)
             {
-                MessageBox.Show("يرجى اختيار البرنامج.");
+                MessageService.Current.ShowWarning("يرجى اختيار البرنامج من القائمة المنسدلة.");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(TxtEpisodeName.Text))
             {
-                MessageBox.Show("يرجى إدخال اسم أو عنوان الحلقة.");
+                MessageService.Current.ShowWarning("عنوان الحلقة مطلوب ولا يمكن تركه فارغاً.");
                 return;
             }
+
 
             // 2. دمج التاريخ والوقت
             DateTime? scheduledTime = null;
@@ -86,11 +88,11 @@ namespace Radio.Views.Episodes
             }
             catch (UnauthorizedAccessException ex)
             {
-                MessageBox.Show(ex.Message, "صلاحيات غير كافية", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageService.Current.ShowWarning("صلاحيات غير كافية: " + ex.Message);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("حدث خطأ أثناء حفظ الحلقة: " + ex.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageService.Current.ShowError("حدث خطأ أثناء حفظ الحلقة: " + ex.Message);
             }
             finally
             {

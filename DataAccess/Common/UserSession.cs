@@ -13,6 +13,9 @@ public class UserSession
     public bool IsPublishing => RoleName == "النشر الرقمي";
 
     // التحقق من الصلاحية: الأدمن يمر دائماً، وغيره يمر إذا ملك الصلاحية
-    public bool HasPermission(string permissionName) =>
-        IsAdmin || Permissions.Contains(permissionName);
+    // ✅ الحل الجذري: الأدمن يملك كل الصلاحيات دائماً
+    public bool HasPermission(string permissionName)
+    {
+        return RoleName == "Admin" || Permissions.Contains(permissionName);
+    }
 }

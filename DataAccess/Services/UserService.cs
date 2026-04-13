@@ -1,4 +1,5 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,7 @@ namespace DataAccess.Services
 
         public async Task CreateUserAsync(User user, string plainPassword, UserSession session)
         {
-            SecurityHelper.EnsurePermission(session, "USER_MANAGE");
+            SecurityHelper.EnsurePermission(session, AppPermissions.UserManage);
 
             using var context = await _contextFactory.CreateDbContextAsync();
 
@@ -59,7 +60,7 @@ namespace DataAccess.Services
 
         public async Task UpdateUserAsync(User user, string? newPassword, UserSession session)
         {
-            SecurityHelper.EnsurePermission(session, "USER_MANAGE");
+            SecurityHelper.EnsurePermission(session, AppPermissions.UserManage);
 
             using var context = await _contextFactory.CreateDbContextAsync();
             var dbUser = await context.Users.FindAsync(user.UserId);
@@ -92,7 +93,7 @@ namespace DataAccess.Services
 
         public async Task ToggleUserStatusAsync(int userId, bool isActive, UserSession session)
         {
-            SecurityHelper.EnsurePermission(session, "USER_MANAGE");
+            SecurityHelper.EnsurePermission(session, AppPermissions.UserManage);
 
             // منع المستخدم من تعطيل حسابه الشخصي
             if (userId == session.UserId)
@@ -152,7 +153,7 @@ namespace DataAccess.Services
 
         public async Task UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session)
         {
-            SecurityHelper.EnsurePermission(session, "USER_MANAGE");
+            SecurityHelper.EnsurePermission(session, AppPermissions.UserManage);
 
             using var context = await _contextFactory.CreateDbContextAsync();
             using var transaction = await context.Database.BeginTransactionAsync();

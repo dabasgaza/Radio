@@ -1,4 +1,5 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ namespace DataAccess.Services
 
         public async Task CreateAsync(CorrespondentDto dto, UserSession session)
         {
-            SecurityHelper.EnsureRole(session, "Coordination");
+            SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage);
             using var context = await _contextFactory.CreateDbContextAsync();
             context.Correspondents.Add(new Correspondent
             {
@@ -41,7 +42,7 @@ namespace DataAccess.Services
 
         public async Task UpdateAsync(CorrespondentDto dto, UserSession session)
         {
-            SecurityHelper.EnsureRole(session, "Coordination");
+            SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage);
             using var context = await _contextFactory.CreateDbContextAsync();
             var cor = await context.Correspondents.FindAsync(dto.CorrespondentId);
             if (cor == null) return;
@@ -55,7 +56,7 @@ namespace DataAccess.Services
 
         public async Task SoftDeleteAsync(int id, UserSession session)
         {
-            SecurityHelper.EnsureRole(session, "Coordination");
+            SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage);
             using var context = await _contextFactory.CreateDbContextAsync();
             var cor = await context.Correspondents.FindAsync(id);
             if (cor != null)

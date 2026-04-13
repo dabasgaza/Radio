@@ -1,4 +1,5 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Common;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,7 @@ namespace DataAccess.Services
         public async Task LogExecutionAsync(ExecutionLog log, UserSession session)
         {
             // 1. التحقق من الصلاحية: هل المستخدم منتج أو منسق؟
-            SecurityHelper.EnsureRole(session, "Coordination", "Production");
+            SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage, AppPermissions.ProgramManage);
 
             using var context = await _contextFactory.CreateDbContextAsync();
             // 2. بدء معاملة (Transaction) لضمان تنفيذ كل شيء أو لا شيء
