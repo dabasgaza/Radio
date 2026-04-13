@@ -1,0 +1,152 @@
+﻿<UserControl
+    x:Class="Radio.Views.Episodes.EpisodesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Episodes"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Style="{StaticResource UserControlStyle}"
+    mc:Ignorable="d">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  العنوان وزر الإضافة بشكل متناسق  -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock
+                FontWeight="Bold"
+                Foreground="{DynamicResource PrimaryHueMidBrush}"
+                Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                Text="سجل الحلقات" />
+
+            <Button
+                x:Name="BtnAddEpisode"
+                Margin="20,0,0,0"
+                HorizontalAlignment="Left"
+                materialDesign:ButtonAssist.CornerRadius="5"
+                Click="BtnAddEpisode_Click"
+                Style="{StaticResource MaterialDesignRaisedButton}">
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <materialDesign:PackIcon Margin="0,0,8,0" Kind="Plus" />
+                    <TextBlock VerticalAlignment="Center" Text="جدولة حلقة جديدة" />
+                </StackPanel>
+            </Button>
+        </DockPanel>
+
+        <!--  تحسين شكل الجدول  -->
+        <materialDesign:Card
+            Grid.Row="1"
+            materialDesign:ElevationAssist.Elevation="Dp3"
+            UniformCornerRadius="10">
+            <DataGrid
+                x:Name="DgEpisodes"
+                AutoGenerateColumns="False"
+                Background="{DynamicResource MaterialDesignPaper}"
+                CanUserAddRows="False"
+                IsReadOnly="True"
+                Style="{StaticResource MaterialDesignDataGrid}">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding ProgramName}"
+                        FontWeight="SemiBold"
+                        Header="البرنامج" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding EpisodeName}"
+                        Header="عنوان الحلقة" />
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding ScheduledExecutionTime, StringFormat='yyyy/MM/dd'}"
+                        Header="تاريخ البث" />
+
+                    <!--  تعريب الحالات مع الألوان  -->
+                    <DataGridTemplateColumn Width="120" Header="الحالة">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border
+                                    x:Name="StatusBorder"
+                                    Padding="8,4"
+                                    HorizontalAlignment="Center"
+                                    CornerRadius="10">
+                                    <TextBlock
+                                        x:Name="StatusTxt"
+                                        FontWeight="Bold"
+                                        Foreground="White"
+                                        Text="{Binding StatusText}" />
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding StatusText}" Value="مخطط لها">
+                                        <Setter TargetName="StatusBorder" Property="Background" Value="#607D8B" />
+                                        <!--  Grey Blue  -->
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding StatusText}" Value="تم التنفيذ">
+                                        <Setter TargetName="StatusBorder" Property="Background" Value="#1976D2" />
+                                        <!--  Deep Blue  -->
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding StatusText}" Value="تم النشر">
+                                        <Setter TargetName="StatusBorder" Property="Background" Value="#388E3C" />
+                                        <!--  Green  -->
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  تحسين الأزرار والتحكم بظهورها  -->
+                    <DataGridTemplateColumn Width="180" Header="الإجراءات">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+
+                                    <!--  زر التنفيذ: يظهر فقط إذا كانت الحالة "مخطط لها"  -->
+                                    <Button
+                                        Height="28"
+                                        Margin="2"
+                                        Padding="10,0"
+                                        Background="#1976D2"
+                                        BorderBrush="#1976D2"
+                                        Click="BtnMarkExecuted_Click"
+                                        Content="تنفيذ"
+                                        Style="{StaticResource MaterialDesignRaisedButton}">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource ExecutionVisibilityConverter}">
+                                                <Binding Path="StatusText" />
+                                                <Binding Path="ShowExecutedBtn" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                    </Button>
+
+                                    <!--  زر النشر: يظهر فقط إذا كانت الحالة "تم التنفيذ"  -->
+                                    <Button
+                                        Height="28"
+                                        Margin="2"
+                                        Padding="10,0"
+                                        Background="#388E3C"
+                                        BorderBrush="#388E3C"
+                                        Click="BtnMarkPublished_Click"
+                                        Content="نشر"
+                                        Style="{StaticResource MaterialDesignRaisedButton}">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource PublishingVisibilityConverter}">
+                                                <Binding Path="StatusText" />
+                                                <Binding Path="ShowPublishedBtn" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+    </Grid>
+
+</UserControl>

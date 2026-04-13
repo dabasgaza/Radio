@@ -1,0 +1,66 @@
+﻿<mah:MetroWindow
+    x:Class="Radio.Views.Correspondents.CorrespondentFormDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="بيانات المراسل"
+    Width="400"
+    Height="450"
+    Background="{DynamicResource MaterialDesignPaper}"
+    FlowDirection="RightToLeft"
+    Style="{StaticResource BasicWindowStyle}"
+    WindowStartupLocation="CenterScreen">
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock
+                x:Name="TxtHeader"
+                Margin="0,0,0,20"
+                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                Text="إضافة مراسل ميداني" />
+
+            <TextBox
+                x:Name="TxtName"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="الاسم الكامل للمراسل *"
+                materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                materialDesign:TextFieldAssist.LeadingIcon="Account"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+
+            <TextBox
+                x:Name="TxtPhone"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="رقم الهاتف"
+                materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                materialDesign:TextFieldAssist.LeadingIcon="Phone"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+
+            <TextBox
+                x:Name="TxtLocations"
+                Height="100"
+                VerticalContentAlignment="Top"
+                materialDesign:HintAssist.Hint="المناطق المكلف بها (مثال: دمشق، ريف دمشق)"
+                materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                materialDesign:TextFieldAssist.LeadingIcon="MapMarkerRadius"
+                AcceptsReturn="True"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                TextWrapping="Wrap" />
+
+            <StackPanel
+                Margin="0,20,0,0"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Margin="0,0,10,0"
+                    Content="إلغاء"
+                    IsCancel="True"
+                    Style="{StaticResource MaterialDesignOutlinedButton}" />
+                <Button
+                    x:Name="BtnSave"
+                    Click="BtnSave_Click"
+                    Content="حفظ البيانات"
+                    Style="{StaticResource MaterialDesignRaisedButton}" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

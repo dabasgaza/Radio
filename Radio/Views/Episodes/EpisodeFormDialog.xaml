@@ -1,0 +1,74 @@
+﻿<mah:MetroWindow
+    x:Class="Radio.Views.Episodes.EpisodeFormDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="جدولة حلقة"
+    Width="450"
+    Height="550"
+    Background="{DynamicResource MaterialDesignPaper}"
+    Style="{StaticResource BasicWindowStyle}"
+    WindowStartupLocation="CenterScreen">
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock
+                x:Name="TxtTitle"
+                Margin="0,0,0,20"
+                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                Text="جدولة حلقة جديدة" />
+
+            <!--  اختيار البرنامج  -->
+            <ComboBox
+                x:Name="CboPrograms"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="اختر البرنامج *"
+                DisplayMemberPath="ProgramName"
+                SelectedValuePath="ProgramId"
+                Style="{StaticResource MaterialDesignOutlinedComboBox}" />
+
+            <TextBox
+                x:Name="TxtEpisodeName"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="اسم الحلقة / العنوان *"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+
+            <!--  تاريخ ووقت البث  -->
+            <DatePicker
+                x:Name="DpDate"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="تاريخ البث"
+                Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+
+            <materialDesign:TimePicker
+                x:Name="TpTime"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="وقت البث"
+                Style="{StaticResource MaterialDesignOutlinedTimePicker}" />
+
+            <TextBox
+                x:Name="TxtNotes"
+                Height="80"
+                materialDesign:HintAssist.Hint="ملاحظات خاصة"
+                AcceptsReturn="True"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                TextWrapping="Wrap" />
+
+            <StackPanel
+                Margin="0,20,0,0"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Margin="0,0,10,0"
+                    Content="إلغاء"
+                    IsCancel="True"
+                    Style="{StaticResource MaterialDesignOutlinedButton}" />
+                <Button
+                    x:Name="BtnSave"
+                    Click="BtnSave_Click"
+                    Content="حفظ الجدولة"
+                    Style="{StaticResource MaterialDesignRaisedButton}" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

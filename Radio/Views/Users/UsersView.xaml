@@ -1,0 +1,73 @@
+﻿<UserControl
+    x:Class="Radio.Views.Users.UsersView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Users"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Style="{StaticResource UserControlStyle}"
+    mc:Ignorable="d">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" Text="إدارة مستخدمي النظام والصلاحيات" />
+            <Button
+                x:Name="BtnAddUser"
+                Margin="20,0,0,0"
+                HorizontalAlignment="Left"
+                Click="BtnAddUser_Click"
+                Content="إضافة مستخدم جديد" />
+        </DockPanel>
+
+        <materialDesign:Card Grid.Row="1">
+            <DataGrid
+                x:Name="DgUsers"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding FullName}"
+                        Header="الاسم الكامل" />
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding Username}"
+                        Header="اسم المستخدم" />
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding Role.RoleName}"
+                        Header="الدور / الصلاحية" />
+
+                    <DataGridTemplateColumn Width="100" Header="الحالة">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ToggleButton
+                                    Click="Status_Click"
+                                    IsChecked="{Binding IsActive}"
+                                    ToolTip="تفعيل/تعطيل" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Width="100" Header="إجراءات">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Click="BtnEdit_Click" Style="{StaticResource MaterialDesignFlatButton}">
+                                    <materialDesign:PackIcon Kind="Pencil" />
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

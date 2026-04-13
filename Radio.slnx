@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="DataAccess/DataAccess.csproj" Id="c2879181-e6ea-47b5-bc20-7cd74c1d5ba0" />
+  <Project Path="Domain/Domain.csproj" Id="24272085-529c-4ab3-8825-4deabebe81a0" />
+  <Project Path="Radio/Radio.csproj" />
+</Solution>

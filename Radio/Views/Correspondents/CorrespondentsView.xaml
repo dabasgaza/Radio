@@ -1,0 +1,83 @@
+﻿<UserControl
+    x:Class="Radio.Views.Correspondents.CorrespondentsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Correspondents"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Style="{StaticResource UserControlStyle}"
+    mc:Ignorable="d">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock
+                Margin="0,0,0,10"
+                Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                Text="إدارة المراسلين الميدانيين" />
+            <Button
+                x:Name="BtnAdd"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Click="BtnAdd_Click"
+                Content="إضافة مراسل" />
+        </StackPanel>
+
+        <materialDesign:Card Grid.Row="1">
+            <DataGrid
+                x:Name="DgCorrespondents"
+                AutoGenerateColumns="False"
+                IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="200"
+                        Binding="{Binding FullName}"
+                        CellStyle="{StaticResource LeftCellAligned}"
+                        Header="الاسم" />
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding PhoneNumber}"
+                        CellStyle="{StaticResource CenterCellAligned}"
+                        Header="الهاتف" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding AssignedLocations}"
+                        CellStyle="{StaticResource CenterCellAligned}"
+                        Header="المناطق المكلف بها" />
+                    <DataGridTemplateColumn Width="200" Header="إجراءات">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button
+                                        Click="BtnCoverage_Click"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        ToolTip="التغطيات">
+                                        <materialDesign:PackIcon Foreground="Green" Kind="MapMarkerCheck" />
+                                    </Button>
+                                    <Button
+                                        Click="BtnEdit_Click"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        ToolTip="تعديل">
+                                        <materialDesign:PackIcon Foreground="Blue" Kind="Pencil" />
+                                    </Button>
+                                    <Button
+                                        Click="BtnDelete_Click"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        ToolTip="حذف">
+                                        <materialDesign:PackIcon Foreground="Red" Kind="Delete" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

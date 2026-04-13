@@ -1,0 +1,142 @@
+﻿<UserControl
+    x:Class="Radio.Views.Reports.ReportsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Reports"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Style="{StaticResource UserControlStyle}"
+    mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <!--  Status Cards  -->
+                <RowDefinition Height="Auto" />
+                <!--  Today's Episodes  -->
+                <RowDefinition Height="Auto" />
+                <!--  Frequent Guests  -->
+            </Grid.RowDefinitions>
+
+            <!--  1. Status Dashboard Cards  -->
+            <UniformGrid
+                Grid.Row="0"
+                Margin="0,0,0,24"
+                Columns="3">
+                <materialDesign:Card
+                    Margin="8"
+                    Padding="16"
+                    Background="LightGray">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="حلقات قيد التخطيط" />
+                        <TextBlock
+                            x:Name="TxtPlannedCount"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource MaterialDesignHeadline3TextBlock}"
+                            Text="0" />
+                    </StackPanel>
+                </materialDesign:Card>
+                <materialDesign:Card
+                    Margin="8"
+                    Padding="16"
+                    Background="LightSkyBlue">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="حلقات تم تنفيذها" />
+                        <TextBlock
+                            x:Name="TxtExecutedCount"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource MaterialDesignHeadline3TextBlock}"
+                            Text="0" />
+                    </StackPanel>
+                </materialDesign:Card>
+                <materialDesign:Card
+                    Margin="8"
+                    Padding="16"
+                    Background="LightGreen">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="حلقات تم نشرها" />
+                        <TextBlock
+                            x:Name="TxtPublishedCount"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource MaterialDesignHeadline3TextBlock}"
+                            Text="0" />
+                    </StackPanel>
+                </materialDesign:Card>
+            </UniformGrid>
+
+            <!--  2. Today's Episodes Section  -->
+            <StackPanel Grid.Row="1" Margin="8,0,8,24">
+                <TextBlock
+                    Margin="0,0,0,10"
+                    Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                    Text="جدول بث اليوم" />
+                <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp2">
+                    <DataGrid
+                        x:Name="DgToday"
+                        MinHeight="150"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True"
+                        Style="{StaticResource MaterialDesignDataGrid}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="80"
+                                Binding="{Binding ScheduledExecutionTime, StringFormat='HH:mm'}"
+                                Header="الوقت" />
+                            <DataGridTextColumn
+                                Width="150"
+                                Binding="{Binding ProgramName}"
+                                Header="البرنامج" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding EpisodeName}"
+                                Header="اسم الحلقة" />
+                            <DataGridTextColumn
+                                Width="200"
+                                Binding="{Binding GuestNames}"
+                                Header="الضيوف" />
+                            <DataGridTextColumn
+                                Width="100"
+                                Binding="{Binding StatusText}"
+                                Header="الحالة" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </materialDesign:Card>
+            </StackPanel>
+
+            <!--  3. Top Guests Section  -->
+            <StackPanel Grid.Row="2" Margin="8,0,8,0">
+                <TextBlock
+                    Margin="0,0,0,10"
+                    Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                    Text="أكثر الضيوف مشاركة" />
+                <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp2">
+                    <DataGrid
+                        x:Name="DgTopGuests"
+                        MinHeight="150"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True"
+                        Style="{StaticResource MaterialDesignDataGrid}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding FullName}"
+                                Header="اسم الضيف" />
+                            <DataGridTextColumn
+                                Width="200"
+                                Binding="{Binding Organization}"
+                                Header="المؤسسة" />
+                            <DataGridTextColumn
+                                Width="150"
+                                Binding="{Binding EpisodeCount}"
+                                FontWeight="Bold"
+                                Header="عدد المشاركات" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </materialDesign:Card>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

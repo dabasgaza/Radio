@@ -1,0 +1,120 @@
+﻿<UserControl
+    x:Class="Radio.Views.Guests.GuestsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Guests"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Style="{StaticResource UserControlStyle}"
+    mc:Ignorable="d">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Header & Search  -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock
+                Margin="0,0,0,10"
+                Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                Text="إدارة الضيوف" />
+            <DockPanel>
+                <Button
+                    x:Name="BtnAddGuest"
+                    Click="BtnAddGuest_Click"
+                    Content="إضافة ضيف جديد"
+                    DockPanel.Dock="Left"
+                    Style="{StaticResource MaterialDesignRaisedButton}" />
+
+                <TextBox
+                    x:Name="TxtSearch"
+                    Width="300"
+                    Margin="20,0,0,0"
+                    HorizontalAlignment="Left"
+                    materialDesign:HintAssist.Hint="بحث بالاسم أو الهاتف..."
+                    materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                    materialDesign:TextFieldAssist.LeadingIcon="Search"
+                    TextChanged="TxtSearch_TextChanged" />
+            </DockPanel>
+        </StackPanel>
+
+        <!--  DataGrid  -->
+        <materialDesign:Card Grid.Row="1" materialDesign:ElevationAssist.Elevation="Dp2">
+            <DataGrid
+                x:Name="DgGuests"
+                Margin="0"
+                Padding="0"
+                AlternatingRowBackground="{DynamicResource MaterialDesignPaper}"
+                AutoGenerateColumns="False"
+                Background="{DynamicResource MaterialDesignPaper}"
+                BorderThickness="1"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                EnableColumnVirtualization="True"
+                EnableRowVirtualization="True"
+                GridLinesVisibility="All"
+                HorizontalGridLinesBrush="{DynamicResource AccentColorBrush}"
+                IsReadOnly="True"
+                RowBackground="{DynamicResource MaterialDesignPaper}"
+                SelectionMode="Single"
+                SnapsToDevicePixels="True"
+                UseLayoutRounding="True"
+                VerticalGridLinesBrush="{DynamicResource MaterialDesignDivider}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding FullName}"
+                        CellStyle="{StaticResource LeftCellAligned}"
+                        Header="الاسم الكامل" />
+
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding Organization}"
+                        CellStyle="{StaticResource LeftCellAligned}"
+                        Header="المؤسسة" />
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding PhoneNumber}"
+                        CellStyle="{StaticResource CenterCellAligned}"
+                        Header="رقم الهاتف" />
+                    <DataGridTextColumn
+                        Width="200"
+                        Binding="{Binding EmailAddress}"
+                        CellStyle="{StaticResource LeftCellAligned}"
+                        Header="البريد الإلكتروني" />
+                    <DataGridTemplateColumn Width="150" Header="إجراءات">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button
+                                        x:Name="BtnEdit"
+                                        Padding="4"
+                                        Click="BtnEdit_Click"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        ToolTip="تعديل"
+                                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=CoordinationOnlyVisibility}">
+                                        <materialDesign:PackIcon Foreground="Blue" Kind="Pencil" />
+                                    </Button>
+                                    <Button
+                                        x:Name="BtnDelete"
+                                        Padding="4"
+                                        Click="BtnDelete_Click"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        ToolTip="حذف"
+                                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=CoordinationOnlyVisibility}">
+                                        <materialDesign:PackIcon Foreground="Red" Kind="Delete" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+    </Grid>
+
+</UserControl>

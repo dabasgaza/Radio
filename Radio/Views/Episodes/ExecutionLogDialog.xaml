@@ -1,0 +1,50 @@
+﻿<mah:MetroWindow
+    x:Class="Radio.Views.Episodes.ExecutionLogDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Episodes"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="ExecutionLogDialog"
+    Width="800"
+    Height="450"
+    Style="{StaticResource BasicWindowStyle}"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock
+                Margin="0,0,0,20"
+                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                Text="بيانات تنفيذ الحلقة" />
+            <TextBox
+                x:Name="TxtDuration"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="مدة الحلقة (بالدقائق)"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+            <TextBox
+                x:Name="TxtNotes"
+                Height="80"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="ملاحظات التنفيذ"
+                AcceptsReturn="True"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                TextWrapping="Wrap" />
+            <TextBox
+                x:Name="TxtIssues"
+                Height="60"
+                materialDesign:HintAssist.Hint="مشاكل تقنية واجهتنا"
+                AcceptsReturn="True"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                TextWrapping="Wrap" />
+            <Button
+                Name="BtnSave"
+                Margin="0,20,0,0"
+                Click="BtnSave_Click"
+                Content="تأكيد التنفيذ"
+                Style="{StaticResource MaterialDesignRaisedButton}" />
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

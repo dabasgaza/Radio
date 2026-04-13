@@ -1,0 +1,71 @@
+﻿<mah:MetroWindow
+    x:Class="Radio.Views.Guests.GuestFormDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Guests"
+    xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="إضافة الضيوف"
+    Width="800"
+    Height="550"
+    Background="{DynamicResource MaterialDesignShadowBrush}"
+    Style="{StaticResource BasicWindowStyle}"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock
+                x:Name="TxtTitle"
+                Margin="0,0,0,20"
+                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                Text="إضافة ضيف جديد" />
+
+            <TextBox
+                x:Name="TxtName"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="الاسم الكامل *"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+            <TextBox
+                x:Name="TxtOrg"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="المؤسسة / الجهة"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+            <TextBox
+                x:Name="TxtPhone"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="رقم الهاتف"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+            <TextBox
+                x:Name="TxtEmail"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="البريد الإلكتروني"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+            <TextBox
+                x:Name="TxtBio"
+                Height="80"
+                VerticalContentAlignment="Top"
+                materialDesign:HintAssist.Hint="نبذة تعريفية"
+                AcceptsReturn="True"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                TextWrapping="Wrap" />
+
+            <StackPanel
+                Margin="0,20,0,0"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Margin="0,0,10,0"
+                    Content="إلغاء"
+                    IsCancel="True"
+                    Style="{StaticResource MaterialDesignOutlinedButton}" />
+                <Button
+                    x:Name="BtnSave"
+                    Click="BtnSave_Click"
+                    Content="حفظ"
+                    Style="{StaticResource MaterialDesignRaisedButton}" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

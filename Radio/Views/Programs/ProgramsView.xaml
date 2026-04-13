@@ -1,0 +1,59 @@
+﻿<UserControl
+    x:Class="Radio.Views.Programs.ProgramsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Programs"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Style="{StaticResource UserControlStyle}"
+    mc:Ignorable="d">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock
+                Margin="0,0,0,10"
+                Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                Text="إدارة البرامج" />
+            <Button
+                x:Name="BtnAddProgram"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Click="BtnAddProgram_Click"
+                Content="إضافة برنامج جديد" />
+        </StackPanel>
+        <materialDesign:Card Grid.Row="1">
+            <DataGrid
+                x:Name="DgPrograms"
+                AutoGenerateColumns="False"
+                IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding ProgramName}"
+                        Header="اسم البرنامج" />
+                    <DataGridTextColumn
+                        Width="200"
+                        Binding="{Binding Category}"
+                        CellStyle="{StaticResource CenterCellAligned}"
+                        Header="الفئة" />
+                    <DataGridTemplateColumn Width="100" Header="إجراءات">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Click="BtnEdit_Click" Style="{StaticResource MaterialDesignFlatButton}">
+                                    <materialDesign:PackIcon Kind="Pencil" />
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+    </Grid>
+
+</UserControl>
