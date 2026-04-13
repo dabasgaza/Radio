@@ -7,7 +7,7 @@ public class UserSession
     public List<string> Permissions { get; set; } = new();
 
     // 👈 التعديلات الجديدة
-    public bool IsAdmin => RoleName == "آدمن";
+    public bool IsAdmin => RoleName == "Admin";
     public bool IsCoordination => RoleName == "التنسيق";
     public bool IsProduction => RoleName == "الإنتاج";
     public bool IsPublishing => RoleName == "النشر الرقمي";

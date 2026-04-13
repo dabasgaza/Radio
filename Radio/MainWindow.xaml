@@ -7,313 +7,361 @@
     Title="بث برو | نظام إدارة سير العمل"
     Width="1280"
     Height="800"
-    Background="#0F0F0F"
+    Background="#0C0C0F"
     FlowDirection="RightToLeft"
     FontFamily="Hacen Tunisia"
-    GlowBrush="{DynamicResource PrimaryHueMidBrush}"
+    GlowBrush="#00D4FF"
     ShowTitleBar="False"
-    TextElement.Foreground="White"
+    TextElement.Foreground="#EAEAEA"
     TitleBarHeight="0"
     WindowStartupLocation="CenterScreen"
     WindowState="Maximized"
     WindowStyle="None">
 
-    <!--  DialogHost يغلف النافذة بالكامل لضمان ظهور رسائل التأكيد فوق كل شيء  -->
-    <!--  DialogHost يغلف النافذة بالكامل لضمان ظهور رسائل التأكيد فوق كل شيء  -->
     <materialDesign:DialogHost DialogTheme="Inherit" Identifier="RootDialog">
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <!--  العمود الأول: الشريط الجانبي (ثابت)  -->
-                <ColumnDefinition Width="280" />
-                <!--  العمود الثاني: المحتوى الرئيسي  -->
+                <ColumnDefinition Width="310" />
+                <!--  Sidebar أوسع قليلاً للإحساس بالفخامة  -->
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!--  =============================================  -->
-            <!--  الشريط الجانبي (Sidebar) - لون غامق متباين  -->
-            <!--  =============================================  -->
+            <!--  ====================== SIDEBAR ======================  -->
             <Border
                 Grid.Column="0"
-                Background="#161616"
-                BorderBrush="#252525"
-                BorderThickness="0,0,1,0">
+                Background="#121216"
+                CornerRadius="0,12,12,0">
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="30"
+                        Direction="0"
+                        Opacity="0.4"
+                        ShadowDepth="5"
+                        Color="#00D4FF" />
+                </Border.Effect>
+
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <!--  معلومات المستخدم  -->
                         <RowDefinition Height="*" />
-                        <!--  القائمة الكاملة  -->
                         <RowDefinition Height="Auto" />
-                        <!--  زر الخروج  -->
                     </Grid.RowDefinitions>
 
-                    <!--  هيدر المستخدم  -->
-                    <StackPanel Grid.Row="0" Background="#1A1A1A">
-                        <Grid HorizontalAlignment="Center">
-                            <Ellipse
-                                Width="70"
-                                Height="70"
-                                Fill="#252525"
-                                Stroke="{DynamicResource PrimaryHueMidBrush}"
-                                StrokeThickness="2" />
-                            <materialDesign:PackIcon
-                                Width="40"
-                                Height="40"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                Kind="Account" />
-                        </Grid>
-                        <TextBlock
-                            x:Name="TxtUserFullName"
-                            Margin="0,15,0,0"
-                            HorizontalAlignment="Center"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Foreground="White"
-                            Text="اسم المستخدم" />
-                        <TextBlock
-                            x:Name="TxtRoleDisplay"
-                            Margin="0,5,0,0"
-                            HorizontalAlignment="Center"
-                            FontSize="12"
-                            Foreground="Gray"
-                            Text="مدير النظام" />
-                    </StackPanel>
+                    <!--  User Header - Glass + Gradient  -->
+                    <Border
+                        Grid.Row="0"
+                        Margin="0,0,0,20"
+                        CornerRadius="0,0,16,16">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Offset="0" Color="#1F1F26" />
+                                <GradientStop Offset="1" Color="#16161B" />
+                            </LinearGradientBrush>
+                        </Border.Background>
 
-                    <!--  قائمة التنقل الكاملة  -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="28,35,28,28" HorizontalAlignment="Center">
+                            <Grid HorizontalAlignment="Center">
+                                <Ellipse
+                                    Width="88"
+                                    Height="88"
+                                    Fill="#1F1F26"
+                                    Stroke="#00D4FF"
+                                    StrokeThickness="2.5" />
+                                <Ellipse
+                                    Width="80"
+                                    Height="80"
+                                    Fill="#25252D" />
+                                <materialDesign:PackIcon
+                                    Width="46"
+                                    Height="46"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="#00D4FF"
+                                    Kind="RadioTower" />
+                            </Grid>
+
+                            <TextBlock
+                                x:Name="TxtUserFullName"
+                                Margin="0,20,0,6"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="#FFFFFF"
+                                Text="اسم المستخدم"
+                                TextAlignment="Center" />
+
+                            <materialDesign:Chip
+                                x:Name="ChipRole"
+                                Padding="20,7"
+                                Background="#2A2A32"
+                                BorderBrush="#00D4FF"
+                                BorderThickness="1"
+                                Content="مدير النظام"
+                                FontWeight="Medium"
+                                Foreground="#00E0FF" />
+                        </StackPanel>
+                    </Border>
+
+                    <!--  Menu  -->
+                    <ScrollViewer
+                        Grid.Row="1"
+                        Margin="12,0,12,10"
+                        VerticalScrollBarVisibility="Auto">
                         <ListBox
                             x:Name="MenuListBox"
-                            Margin="10,10"
-                            FontSize="16"
+                            FontSize="15.5"
                             SelectionChanged="MenuListBox_SelectionChanged"
                             Style="{StaticResource MaterialDesignNavigationListBox}">
 
-                            <!--  قسم العمليات اليومية  -->
                             <TextBlock
-                                Margin="15,10,0,5"
-                                FontSize="11"
-                                FontWeight="Bold"
-                                Foreground="Gray"
-                                Text="العمليات والبث" />
+                                Margin="24,18,24,10"
+                                FontSize="12.5"
+                                FontWeight="DemiBold"
+                                Foreground="#9999A8"
+                                Text="البث والعمليات" />
 
+                            <!--  Items مع ارتفاع أكبر ومسافات أفضل  -->
                             <ListBoxItem
                                 x:Name="MenuHome"
-                                Height="45"
+                                Height="56"
                                 IsSelected="True"
                                 Tag="Home">
-                                <StackPanel Margin="10,0" Orientation="Horizontal">
+                                <StackPanel Margin="16,0" Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,15,0"
-                                        Foreground="Cyan"
+                                        Width="27"
+                                        Height="27"
+                                        Margin="8,0,22,0"
+                                        Foreground="#00D4FF"
                                         Kind="ViewDashboard" />
-                                    <TextBlock VerticalAlignment="Center" Text="لوحة التحكم" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="لوحة التحكم" />
                                 </StackPanel>
                             </ListBoxItem>
 
                             <ListBoxItem
                                 x:Name="MenuPrograms"
-                                Height="45"
+                                Height="56"
                                 Tag="Programs">
-                                <StackPanel Margin="10,0" Orientation="Horizontal">
+                                <StackPanel Margin="16,0" Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,15,0"
-                                        Foreground="Orange"
+                                        Width="27"
+                                        Height="27"
+                                        Margin="8,0,22,0"
+                                        Foreground="#FF9E00"
                                         Kind="Television" />
-                                    <TextBlock VerticalAlignment="Center" Text="إدارة البرامج" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="إدارة البرامج" />
                                 </StackPanel>
                             </ListBoxItem>
 
                             <ListBoxItem
                                 x:Name="MenuEpisodes"
-                                Height="45"
+                                Height="56"
                                 Tag="Episodes">
-                                <StackPanel Margin="10,0" Orientation="Horizontal">
+                                <StackPanel Margin="16,0" Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,15,0"
-                                        Foreground="SkyBlue"
+                                        Width="27"
+                                        Height="27"
+                                        Margin="8,0,22,0"
+                                        Foreground="#4FC3F7"
                                         Kind="MoviePlay" />
-                                    <TextBlock VerticalAlignment="Center" Text="سجل الحلقات" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="سجل الحلقات" />
                                 </StackPanel>
                             </ListBoxItem>
 
                             <ListBoxItem
                                 x:Name="MenuGuests"
-                                Height="45"
+                                Height="56"
                                 Tag="Guests">
-                                <StackPanel Margin="10,0" Orientation="Horizontal">
+                                <StackPanel Margin="16,0" Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,15,0"
-                                        Foreground="Lime"
+                                        Width="27"
+                                        Height="27"
+                                        Margin="8,0,22,0"
+                                        Foreground="#66DE93"
                                         Kind="AccountGroup" />
-                                    <TextBlock VerticalAlignment="Center" Text="قاعدة الضيوف" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="قاعدة الضيوف" />
                                 </StackPanel>
                             </ListBoxItem>
 
                             <ListBoxItem
                                 x:Name="MenuCorrespondents"
-                                Height="45"
+                                Height="56"
                                 Tag="Correspondents">
-                                <StackPanel Margin="10,0" Orientation="Horizontal">
+                                <StackPanel Margin="16,0" Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,15,0"
-                                        Foreground="Yellow"
+                                        Width="27"
+                                        Height="27"
+                                        Margin="8,0,22,0"
+                                        Foreground="#FFEB3B"
                                         Kind="MapMarkerRadius" />
-                                    <TextBlock VerticalAlignment="Center" Text="المراسلين والتغطيات" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="المراسلين والتغطيات" />
                                 </StackPanel>
                             </ListBoxItem>
 
-                            <!--  قسم الإدارة والنظام  -->
-                            <Separator
-                                Margin="15,10"
-                                Opacity="0.1"
-                                Style="{StaticResource MaterialDesignSeparator}" />
+                            <Separator Margin="24,28,24,18" Opacity="0.18" />
+
                             <TextBlock
-                                Margin="15,0,0,5"
-                                FontSize="11"
-                                FontWeight="Bold"
-                                Foreground="Gray"
+                                Margin="24,10,24,10"
+                                FontSize="12.5"
+                                FontWeight="DemiBold"
+                                Foreground="#9999A8"
                                 Text="إدارة النظام" />
 
                             <ListBoxItem
                                 x:Name="MenuUsers"
-                                Height="45"
+                                Height="56"
                                 Tag="Users">
-                                <StackPanel Margin="10,0" Orientation="Horizontal">
+                                <StackPanel Margin="16,0" Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,15,0"
-                                        Foreground="Violet"
-                                        Kind="AccountSettings" />
-                                    <TextBlock VerticalAlignment="Center" Text="المستخدمين" />
+                                        Width="27"
+                                        Height="27"
+                                        Margin="8,0,22,0"
+                                        Foreground="#BA68C8"
+                                        Kind="AccountMultiple" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="المستخدمين" />
                                 </StackPanel>
                             </ListBoxItem>
 
                             <ListBoxItem
                                 x:Name="MenuPermissions"
-                                Height="45"
+                                Height="56"
                                 Tag="Permissions">
-                                <StackPanel Margin="10,0" Orientation="Horizontal">
+                                <StackPanel Margin="16,0" Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,15,0"
-                                        Foreground="LightPink"
+                                        Width="27"
+                                        Height="27"
+                                        Margin="8,0,22,0"
+                                        Foreground="#F06292"
                                         Kind="ShieldKey" />
-                                    <TextBlock VerticalAlignment="Center" Text="مصفوفة الصلاحيات" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="مصفوفة الصلاحيات" />
                                 </StackPanel>
                             </ListBoxItem>
 
                             <ListBoxItem
                                 x:Name="MenuReports"
-                                Height="45"
+                                Height="56"
                                 Tag="Reports">
-                                <StackPanel Margin="10,0" Orientation="Horizontal">
+                                <StackPanel Margin="16,0" Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,15,0"
-                                        Foreground="Gold"
+                                        Width="27"
+                                        Height="27"
+                                        Margin="8,0,22,0"
+                                        Foreground="#FFD54F"
                                         Kind="ChartBar" />
-                                    <TextBlock VerticalAlignment="Center" Text="التقارير والإحصائيات" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="التقارير والإحصائيات" />
                                 </StackPanel>
                             </ListBoxItem>
                         </ListBox>
                     </ScrollViewer>
 
-                    <!--  زر تسجيل الخروج  -->
+                    <!--  Logout  -->
                     <Button
                         Grid.Row="2"
-                        Height="50"
-                        Margin="15"
+                        Height="60"
+                        Margin="24,12"
+                        Background="Transparent"
+                        BorderBrush="#FF5252"
+                        BorderThickness="1.5"
                         Click="BtnLogout_Click"
-                        Foreground="#FF5252"
-                        Style="{StaticResource MaterialDesignFlatButton}">
+                        Foreground="#FF6B6B"
+                        Style="{StaticResource MaterialDesignOutlinedButton}">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon
-                                Width="22"
-                                Height="22"
-                                Margin="0,0,10,0"
+                                Width="26"
+                                Height="26"
+                                Margin="0,0,14,0"
                                 Kind="Logout" />
                             <TextBlock
                                 VerticalAlignment="Center"
-                                FontWeight="Bold"
+                                FontSize="15"
+                                FontWeight="SemiBold"
                                 Text="تسجيل الخروج" />
                         </StackPanel>
                     </Button>
                 </Grid>
             </Border>
 
-            <!--  =============================================  -->
-            <!--  منطقة المحتوى الرئيسي (Main Content)  -->
-            <!--  =============================================  -->
+            <!--  ====================== MAIN AREA ======================  -->
             <DockPanel Grid.Column="1">
-                <!--  الشريط العلوي (Header) - لون Indigo لكسر الغامق  -->
+
+                <!--  Header أكثر أناقة  -->
                 <materialDesign:ColorZone
-                    Padding="20,15"
-                    materialDesign:ElevationAssist.Elevation="Dp4"
+                    Padding="32,22"
+                    Background="#16161B"
                     DockPanel.Dock="Top"
                     Mode="PrimaryMid">
                     <Grid>
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                             <materialDesign:PackIcon
-                                Width="30"
-                                Height="30"
-                                VerticalAlignment="Center"
-                                Foreground="White"
-                                Kind="Broadcast" />
+                                Width="36"
+                                Height="36"
+                                Foreground="#00D4FF"
+                                Kind="RadioTower" />
                             <TextBlock
-                                Margin="15,0,0,0"
+                                Margin="20,0,0,0"
                                 VerticalAlignment="Center"
-                                FontSize="18"
+                                FontSize="23"
                                 FontWeight="Black"
-                                Foreground="White"
-                                Text="BROADCAST PRO | نظام إدارة البث" />
+                                Foreground="#FFFFFF"
+                                Text="بث برو" />
+                            <TextBlock
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="23"
+                                FontWeight="Light"
+                                Foreground="#888899"
+                                Text="نظام إدارة البث" />
                         </StackPanel>
 
                         <StackPanel
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Orientation="Horizontal">
-                            <materialDesign:Chip
-                                x:Name="ChipRole"
-                                Margin="0,0,20,0"
-                                Background="#33FFFFFF"
-                                Content="مدير"
-                                FontWeight="Bold"
-                                Foreground="White" />
-                            <TextBlock
-                                x:Name="TxtClock"
-                                VerticalAlignment="Center"
-                                FontSize="16"
-                                FontWeight="Light"
-                                Foreground="White"
-                                Text="00:00:00" />
+                            <Border
+                                Padding="18,9"
+                                Background="#1F1F26"
+                                CornerRadius="12">
+                                <TextBlock
+                                    x:Name="TxtClock"
+                                    FontSize="17.5"
+                                    FontWeight="Medium"
+                                    Foreground="#B0B0C0"
+                                    Text="00:00:00" />
+                            </Border>
                         </StackPanel>
                     </Grid>
                 </materialDesign:ColorZone>
 
-                <!--  مساحة العرض المتغيرة  -->
-                <Grid Background="#0F0F0F">
-                    <ContentControl x:Name="MainContentArea" Margin="25" />
+                <!--  Content  -->
+                <Grid Background="#0C0C0F">
+                    <ContentControl x:Name="MainContentArea" Margin="36" />
 
-                    <!--  Snackbar للإشعارات  -->
                     <materialDesign:Snackbar
                         x:Name="MainSnackbar"
-                        Margin="0,0,0,20"
+                        Margin="0,0,0,40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
                         MessageQueue="{materialDesign:MessageQueue}" />
@@ -321,6 +369,4 @@
             </DockPanel>
         </Grid>
     </materialDesign:DialogHost>
-
-
 </mah:MetroWindow>

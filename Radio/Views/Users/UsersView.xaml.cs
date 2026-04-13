@@ -1,4 +1,5 @@
 ﻿using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using Domain.Models;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,8 +21,8 @@ namespace Radio.Views.Users
             _userService = userService;
             _session = session;
 
-            // فقط "التنسيق" يمكنه إضافة مستخدمين
-            BtnAddUser.Visibility = _session.IsCoordination ? Visibility.Visible : Visibility.Collapsed;
+            // فقط "المسؤول" يمكنه إضافة مستخدمين
+            BtnAddUser.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
 
             _ = LoadDataAsync();
         }
@@ -38,7 +39,8 @@ namespace Radio.Views.Users
             }
             catch (Exception ex)
             {
-                MessageBox.Show("خطأ في تحميل قائمة المستخدمين: " + ex.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                // استخدام خدمة الرسائل بدلاً من MessageBox
+                MessageService.Current.ShowError("خطأ في تحميل قائمة المستخدمين: " + ex.Message);
             }
         }
 
@@ -86,7 +88,7 @@ namespace Radio.Views.Users
                 catch (Exception ex)
                 {
                     // في حال فشل العملية (مثلاً محاولة تعطيل حسابه الشخصي)
-                    MessageBox.Show(ex.Message, "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageService.Current.ShowWarning("تنبيه: " + ex.Message);
 
                     // إعادة الزر لحالته الأصلية لأن العملية فشلت
                     toggle.IsChecked = !newStatus;
