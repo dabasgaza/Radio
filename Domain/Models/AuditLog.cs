@@ -2,28 +2,28 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models;
 
 public partial class AuditLog
 {
+    [Key]
     public int AuditLogId { get; set; }
 
-    public string TableName { get; set; }
+    [Required, MaxLength(100)]
+    public string TableName { get; set; } = null!;
 
     public int RecordId { get; set; }
 
-    public string Action { get; set; }
+    [Required, MaxLength(10)]
+    public string Action { get; set; } = null!; // INSERT, UPDATE, DELETE
 
-    public string OldValues { get; set; }
-
-    public string NewValues { get; set; }
+    public string? OldValues { get; set; } // JSON
+    public string? NewValues { get; set; } // JSON
 
     public int? UserId { get; set; }
 
-    public DateTime Timestamp { get; set; }
-
-    public string IpAddress { get; set; }
-
-    public string UserAgent { get; set; }
+    // تأكد أن الاسم هنا ChangedAt ليطابق السكريبت الأخير
+    public DateTime ChangedAt { get; set; } = DateTime.UtcNow;
 }

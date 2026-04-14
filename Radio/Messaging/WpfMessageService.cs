@@ -30,7 +30,8 @@ namespace Radio.Messaging
         private void EnqueueMessage(string content)
         {
             // استخدام Dispatcher.Invoke لضمان عملها حتى لو استدعيت من Thread خلفي
-            Application.Current.Dispatcher.Invoke(() => {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
                 _messageQueue.Enqueue(content, null, null, null, false, true, TimeSpan.FromSeconds(4));
             });
         }
@@ -54,7 +55,7 @@ namespace Radio.Messaging
                 btns.Children.Add(btnYes);
                 view.Children.Add(btns);
 
-                var result = await DialogHost.Show(view , "RootDialog");
+                var result = await DialogHost.Show(view, "RootDialog");
 
                 return result is bool boolResult && boolResult;
             });

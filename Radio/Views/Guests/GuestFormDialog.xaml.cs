@@ -1,6 +1,10 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Common;
 using DataAccess.DTOs;
+using DataAccess.Services.Messaging;
 using Domain.Models;
+using Radio.Common;
+using Radio.Views.Common;
 using System.Windows;
 
 namespace Radio.Views.Guests
@@ -34,41 +38,55 @@ namespace Radio.Views.Guests
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // UI Validation
-            if (string.IsNullOrWhiteSpace(TxtName.Text))
-            {
-                MessageBox.Show("الاسم الكامل مطلوب."); return;
-            }
-            if (string.IsNullOrWhiteSpace(TxtPhone.Text) && string.IsNullOrWhiteSpace(TxtEmail.Text))
-            {
-                MessageBox.Show("يجب إدخال رقم الهاتف أو البريد الإلكتروني على الأقل."); return;
-            }
-
-            var dto = new GuestDto(
+            var dto = new GuestDto
+            (
                 _existingGuest?.GuestId ?? 0,
-                TxtName.Text.Trim(),
-                TxtOrg.Text.Trim(),
-                TxtPhone.Text.Trim(),
-                TxtEmail.Text.Trim(),
-                TxtBio.Text.Trim(),
-                null
+                TxtName.Text,
+                TxtOrg.Text,
+                TxtPhone.Text,
+                TxtEmail.Text,
+                TxtBio.Text,
+                String.Empty
             );
 
             try
             {
+                BtnSave.IsEnabled = false;
+
+                // استدعاء الخدمة مباشرة (هي ستتحقق من كل شيء)
                 if (_existingGuest == null)
                     await _guestService.CreateGuestAsync(dto, _session);
                 else
                     await _guestService.UpdateGuestAsync(dto, _session);
 
                 this.DialogResult = true;
-                this.Close();
             }
-            catch (Exception ex)
+            catch (ConcurrencyException ex)
             {
-                MessageBox.Show(ex.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                // 👈 إظهار نافذة المقارنة
+                var diag = new ConcurrencyDialog(ex.DatabaseValues);
+
+                if (diag.ShowDialog() == true)
+                {
+                    // إذا اختار المستخدم "الدهس"، سنقوم بإعادة المحاولة 
+                    // ولكن يجب أولاً تحديث RowVersion الخاص بالكائن المحلي ليتطابق مع الداتابيز
+                    // (هذا الجزء متقدم، عادة نطلب من المستخدم إعادة التحميل لضمان سلامة البيانات)
+                    MessageService.Current.ShowInfo("يرجى إغلاق النافذة وإعادة فتحها للحصول على أحدث نسخة.");
+                }
             }
+            catch (ValidationException ex) // 👈 اصطياد أخطاء البيانات
+            {
+                // عرض كافة الأخطاء بشكل أنيق عبر نظام الرسائل المركزي
+                string allErrors = string.Join("\n", ex.Errors);
+                MessageService.Current.ShowWarning(allErrors, "تنبيه في البيانات");
+            }
+            catch (Exception ex) // 👈 اصطياد أخطاء السيرفر
+            {
+                MessageService.Current.ShowError(ex.Message);
+            }
+            finally { BtnSave.IsEnabled = true; }
         }
+
 
     }
 }

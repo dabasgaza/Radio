@@ -1,5 +1,6 @@
 ﻿using BroadcastWorkflow.Services;
 using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
@@ -42,7 +43,17 @@ namespace Radio.Views.Episodes
 
         private async Task LoadDataAsync()
         {
-            DgEpisodes.ItemsSource = await _episodeService.GetActiveEpisodesAsync();
+            try
+            {
+                // إظهار مؤشر تحميل إذا أردت (Busy Indicator)
+                var data = await _episodeService.GetActiveEpisodesAsync();
+                DgEpisodes.ItemsSource = data;
+            }
+            catch (Exception ex)
+            {
+                // ✅ السحر هنا: عند اصطياد الخطأ وعرضه، يصبح "Observed" ويختفي الخطأ الخلفي
+                MessageService.Current.ShowError($"فشل تحميل الحلقات: {ex.Message}");
+            }
         }
 
         private async void BtnMarkExecuted_Click(object sender, RoutedEventArgs e)

@@ -23,7 +23,10 @@ namespace DataAccess.Services
         public async Task<List<Correspondent>> GetAllActiveAsync()
         {
             using var context = await _contextFactory.CreateDbContextAsync();
-            return await context.Correspondents.AsNoTracking().Where(c => c.IsActive).ToListAsync();
+            return await context.Correspondents
+                .AsNoTracking()
+                //.Where(c => c.IsActive)
+                .ToListAsync();
         }
 
         public async Task CreateAsync(CorrespondentDto dto, UserSession session)
@@ -73,7 +76,8 @@ namespace DataAccess.Services
             return await context.CorrespondentCoverages
                 .AsNoTracking()
                 .Include(c => c.Guest)
-                .Where(c => c.CorrespondentId == correspondentId && c.IsActive)
+                //.Where(c => c.CorrespondentId == correspondentId && c.IsActive)
+                .Where(c => c.CorrespondentId == correspondentId)
                 .ToListAsync();
         }
 

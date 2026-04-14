@@ -1,5 +1,7 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Services.Messaging;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Radio.Forms
 {
@@ -60,8 +62,7 @@ namespace Radio.Forms
 
         private void ShowError(string message)
         {
-            LblError.Text = message;
-            LblError.Visibility = Visibility.Visible;
+            MessageService.Current.ShowError(message);
         }
 
         private void SetLoading(bool isLoading)
@@ -72,5 +73,17 @@ namespace Radio.Forms
             LoginProgress.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
             LblError.Visibility = Visibility.Collapsed;
         }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 1)
+                this.DragMove();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
     }
 }

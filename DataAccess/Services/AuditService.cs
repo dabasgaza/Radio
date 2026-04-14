@@ -25,7 +25,6 @@ public class AuditService : IAuditService
             OldValues = oldVal != null ? JsonSerializer.Serialize(oldVal) : null,
             NewValues = newVal != null ? JsonSerializer.Serialize(newVal) : null,
             UserId = userId,
-            Timestamp = DateTime.UtcNow
         };
         context.AuditLogs.Add(log);
         await context.SaveChangesAsync();

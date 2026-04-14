@@ -10,36 +10,122 @@
     d:DesignWidth="800"
     Style="{StaticResource UserControlStyle}"
     mc:Ignorable="d">
-    <Grid>
+
+    <Grid FlowDirection="RightToLeft">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0" Margin="5,0,5,20">
-            <TextBlock
-                VerticalAlignment="Center"
-                FontSize="26"
-                FontWeight="Bold"
-                Foreground="White"
-                Text="سجل الحلقات والبث" />
-            <Button
-                x:Name="BtnAddEpisode"
-                Margin="20,0,0,0"
-                HorizontalAlignment="Left"
-                materialDesign:ButtonAssist.CornerRadius="5"
-                Background="#03A9F4"
-                BorderBrush="#03A9F4"
-                Click="BtnAddEpisode_Click"
-                Content="جدولة حلقة جديدة"
-                Foreground="White" />
-        </DockPanel>
+        <!--  رأس الصفحة  -->
+        <Border
+            Background="#2D2D30"
+            BorderBrush="#3E3E42"
+            BorderThickness="0,0,0,1">
+            <Grid Margin="20,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-        <materialDesign:Card
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="24"
+                        FontWeight="SemiBold"
+                        Foreground="#E0E0E0"
+                        Text="سجل الحلقات والبث" />
+                    <Border
+                        Margin="10,0,0,0"
+                        Padding="8,2"
+                        Background="#03A9F4"
+                        CornerRadius="14">
+                        <TextBlock
+                            x:Name="TxtEpisodesCount"
+                            FontSize="12"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Text="0" />
+                    </Border>
+                </StackPanel>
+
+                <!--  مربع بحث (اختياري – يمكن ربطه لاحقاً)  -->
+                <TextBox
+                    Grid.Column="1"
+                    Width="200"
+                    Margin="20,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    materialDesign:HintAssist.Hint="بحث عن حلقة...">
+                    <TextBox.Style>
+                        <Style BasedOn="{StaticResource MaterialDesignFilledTextBox}" TargetType="TextBox">
+                            <Setter Property="Background" Value="#3E3E42" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="#555" />
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <Button
+                    x:Name="BtnAddEpisode"
+                    Grid.Column="2"
+                    materialDesign:ButtonAssist.CornerRadius="8"
+                    Background="#03A9F4"
+                    BorderBrush="#03A9F4"
+                    Click="BtnAddEpisode_Click"
+                    Foreground="White"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    ToolTip="جدولة حلقة جديدة">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="18"
+                            Height="18"
+                            Margin="0,0,6,0"
+                            Kind="Plus" />
+                        <TextBlock Text="جدولة حلقة جديدة" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!--  شريط إحصائيات سريع  -->
+        <Border
             Grid.Row="1"
-            VerticalAlignment="Stretch"
+            Background="#252526"
+            BorderBrush="#3E3E42"
+            BorderThickness="0,0,0,1">
+            <StackPanel Margin="20,8" Orientation="Horizontal">
+                <materialDesign:PackIcon
+                    Width="16"
+                    Height="16"
+                    Foreground="#03A9F4"
+                    Kind="Calendar" />
+                <TextBlock
+                    Margin="6,0,15,0"
+                    FontSize="12"
+                    Foreground="#AAA"
+                    Text="البث القادم: --" />
+                <materialDesign:PackIcon
+                    Width="16"
+                    Height="16"
+                    Foreground="#4CAF50"
+                    Kind="CheckCircle" />
+                <TextBlock
+                    Margin="6,0,0,0"
+                    FontSize="12"
+                    Foreground="#AAA"
+                    Text="تم النشر: 0 حلقة" />
+            </StackPanel>
+        </Border>
+
+        <!--  DataGrid داخل Card  -->
+        <materialDesign:Card
+            Grid.Row="2"
+            Margin="16"
             Background="#1E1E1E"
-            UniformCornerRadius="10">
+            UniformCornerRadius="12">
             <DataGrid
                 x:Name="DgEpisodes"
                 AlternatingRowBackground="#252526"
@@ -47,17 +133,37 @@
                 Background="Transparent"
                 CanUserAddRows="False"
                 Foreground="White"
+                GridLinesVisibility="Horizontal"
+                HorizontalGridLinesBrush="#3E3E42"
                 IsReadOnly="True"
-                RowBackground="#1E1E1E">
+                RowBackground="#1E1E1E"
+                VerticalGridLinesBrush="Transparent">
+
+                <!--<DataGrid.Resources>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2A2A2A" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>-->
+
                 <DataGrid.ColumnHeaderStyle>
                     <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#03A9F4" />
-                        <Setter Property="Foreground" Value="White" />
-                        <Setter Property="FontWeight" Value="Bold" />
-                        <Setter Property="FontSize" Value="15" />
-                        <Setter Property="Padding" Value="10" />
+                        <Setter Property="Background" Value="#252526" />
+                        <Setter Property="Foreground" Value="#03A9F4" />
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                        <Setter Property="Padding" Value="12,10" />
+                        <Setter Property="BorderBrush" Value="#3E3E42" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
+
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Width="150"
@@ -65,28 +171,32 @@
                         CellStyle="{StaticResource LeftCellAligned}"
                         FontWeight="Bold"
                         Header="البرنامج" />
+
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding EpisodeName}"
                         CellStyle="{StaticResource LeftCellAligned}"
                         Header="عنوان الحلقة" />
+
                     <DataGridTextColumn
                         Width="120"
                         Binding="{Binding ScheduledExecutionTime, StringFormat='yyyy/MM/dd'}"
                         CellStyle="{StaticResource CenterCellAligned}"
                         Header="تاريخ البث" />
 
-                    <DataGridTemplateColumn Width="120" Header="الحالة">
+                    <!--  عمود الحالة مع شريحة ملونة  -->
+                    <DataGridTemplateColumn Width="130" Header="الحالة">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border
                                     x:Name="StatusBorder"
                                     Padding="8,4"
-                                    CornerRadius="10">
+                                    Background="DarkCyan"
+                                    CornerRadius="12">
                                     <TextBlock
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
-                                        FontWeight="Bold"
+                                        FontWeight="SemiBold"
                                         Foreground="White"
                                         Text="{Binding StatusText}" />
                                 </Border>
@@ -105,32 +215,35 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
+                    <!--  عمود الإجراءات  -->
                     <DataGridTemplateColumn Width="180" Header="إجراءات البث">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                     <Button
-                                        Height="28"
-                                        Margin="2"
-                                        Padding="10,0"
+                                        x:Name="BtnMarkExecuted"
+                                        Width="70"
+                                        Height="30"
+                                        Margin="3"
+                                        materialDesign:ButtonAssist.CornerRadius="6"
                                         Background="#03A9F4"
                                         BorderBrush="#03A9F4"
                                         Click="BtnMarkExecuted_Click"
-                                        Content="تنفيذ الإنتاج"
-                                        Style="{StaticResource MaterialDesignRaisedButton}">
-                                        <!--  Visibility Bindings remains the same  -->
-                                    </Button>
+                                        Content="تنفيذ"
+                                        Foreground="White"
+                                        Style="{StaticResource MaterialDesignRaisedButton}" />
                                     <Button
-                                        Height="28"
-                                        Margin="2"
-                                        Padding="10,0"
+                                        x:Name="BtnMarkPublished"
+                                        Width="70"
+                                        Height="30"
+                                        Margin="3"
+                                        materialDesign:ButtonAssist.CornerRadius="6"
                                         Background="#4CAF50"
                                         BorderBrush="#4CAF50"
                                         Click="BtnMarkPublished_Click"
-                                        Content="نشر رقمي"
-                                        Style="{StaticResource MaterialDesignRaisedButton}">
-                                        <!--  Visibility Bindings remains the same  -->
-                                    </Button>
+                                        Content="نشر"
+                                        Foreground="White"
+                                        Style="{StaticResource MaterialDesignRaisedButton}" />
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -139,5 +252,4 @@
             </DataGrid>
         </materialDesign:Card>
     </Grid>
-
 </UserControl>

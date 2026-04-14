@@ -26,8 +26,9 @@ namespace DataAccess.Services
             var episodes = await context.Episodes
                 .AsNoTracking()
                 .Include(e => e.Program)
+                .Include(e => e.EpisodeStatus) // 👈 إضافة جدول الحالات الجديد
                 .Include(e => e.EpisodeGuests).ThenInclude(eg => eg.Guest)
-                .Where(e => e.IsActive && e.ScheduledExecutionTime.HasValue &&
+                .Where(e => e.ScheduledExecutionTime.HasValue &&
                             e.ScheduledExecutionTime.Value.Date == today)
                 .ToListAsync();
 
@@ -37,8 +38,10 @@ namespace DataAccess.Services
                 e.EpisodeName,
                 e.Program.ProgramName,
                 e.ScheduledExecutionTime,
-                string.Join(", ", e.EpisodeGuests.Where(eg => eg.IsActive).Select(eg => eg.Guest.FullName)),
-                e.Status == 0 ? "مخطط لها" : (e.Status == 1 ? "تم التنفيذ" : "تم النشر")
+                // دمج أسماء الضيوف (الفلترة العالمية ستخفي المحذوفين تلقائياً)
+                string.Join(", ", e.EpisodeGuests.Select(eg => eg.Guest.FullName)),
+                // جلب الاسم العربي مباشرة من قاعدة البيانات 👈
+                e.EpisodeStatus.DisplayName
             )).ToList();
         }
 
@@ -57,7 +60,7 @@ namespace DataAccess.Services
                     g.FullName,
                     g.Organization,
                     // حساب العدد هنا كقيمة رقمية بسيطة
-                    Count = g.EpisodeGuests.Count(eg => eg.IsActive)
+                    Count = g.EpisodeGuests.Count()
                 })
                 // 2. الفرز والتقطيع يتمان في SQL بنجاح
                 .OrderByDescending(x => x.Count)
@@ -78,7 +81,7 @@ namespace DataAccess.Services
             using var context = await _contextFactory.CreateDbContextAsync();
             var stats = await context.Episodes
                 .Where(e => e.IsActive)
-                .GroupBy(e => e.Status)
+                .GroupBy(e => e.StatusId)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToListAsync();
 
@@ -86,7 +89,7 @@ namespace DataAccess.Services
             { "Planned",   stats.FirstOrDefault(s => s.Status == 0)?.Count ?? 0 },
             { "Executed",  stats.FirstOrDefault(s => s.Status == 1)?.Count ?? 0 },
             { "Published", stats.FirstOrDefault(s => s.Status == 2)?.Count ?? 0 }
-        };
+                };
         }
     }
 

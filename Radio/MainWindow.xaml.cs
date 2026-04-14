@@ -95,6 +95,8 @@ namespace Radio
 
         private void MenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (MainContentArea == null) return;
+
             if (MenuListBox.SelectedItem is ListBoxItem item)
             {
                 string tag = item.Tag?.ToString();

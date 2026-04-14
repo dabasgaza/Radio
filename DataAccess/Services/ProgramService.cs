@@ -21,7 +21,7 @@ namespace DataAccess.Services
         public async Task<List<Program>> GetAllActiveAsync()
         {
             using var context = await _contextFactory.CreateDbContextAsync();
-            return await context.Programs.AsNoTracking().Where(p => p.IsActive).ToListAsync();
+            return await context.Programs.AsNoTracking().ToListAsync();
         }
 
         public async Task CreateProgramAsync(ProgramDto dto, UserSession session)

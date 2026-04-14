@@ -1,6 +1,7 @@
 using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services.Messaging;
+using DataAccess.Validation;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,14 +26,14 @@ public class GuestService : IGuestService
     public async Task<List<Guest>> GetAllActiveAsync()
     {
         using var context = await _contextFactory.CreateDbContextAsync();
-        return await context.Guests.AsNoTracking().Where(g => g.IsActive).ToListAsync();
+        return await context.Guests.AsNoTracking().ToListAsync();
     }
 
     public async Task CreateGuestAsync(GuestDto dto, UserSession session)
     {
         SecurityHelper.EnsurePermission(session, AppPermissions.GuestManage);
-        if (string.IsNullOrEmpty(dto.PhoneNumber) && string.IsNullOrEmpty(dto.EmailAddress))
-            throw new Exception("Guest must have a phone number or email address.");
+
+        ValidationPipeline.ValidateGuest(dto);
 
         using var context = await _contextFactory.CreateDbContextAsync();
         var guest = new Guest
@@ -74,7 +75,24 @@ public class GuestService : IGuestService
 
             await _audit.LogActionAsync("Guests", guest.GuestId, "UPDATE", oldData, dto, session.UserId);
         }
-        catch (DbUpdateConcurrencyException) { throw new Exception("Record modified by another user."); }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // 👈 السحر هنا: جلب القيم التي وضعها المستخدم الآخر في الداتابيز حالياً
+            var entry = ex.Entries.Single();
+            var dbValues = await entry.GetDatabaseValuesAsync();
+
+            if (dbValues == null)
+                throw new Exception("تم حذف هذا السجل من قبل مستخدم آخر.");
+
+            var diff = new Dictionary<string, object?>();
+            foreach (var property in dbValues.Properties)
+            {
+                diff[property.Name] = dbValues[property.Name];
+            }
+
+            // رمي الاستثناء المخصص مع البيانات الجديدة
+            throw new ConcurrencyException(diff);
+        }
     }
 
     public async Task SoftDeleteGuestAsync(int guestId, UserSession session)
@@ -89,7 +107,7 @@ public class GuestService : IGuestService
         var hasExecutedEpisodes = await context.EpisodeGuests
             .AnyAsync(eg => eg.GuestId == guestId &&
                             eg.IsActive &&
-                            (eg.Episode.Status == 1 || eg.Episode.Status == 2));
+                            (eg.Episode.StatusId == 1 || eg.Episode.StatusId == 2));
 
         if (hasExecutedEpisodes)
         {

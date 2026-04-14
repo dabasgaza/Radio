@@ -41,17 +41,20 @@
             <Button
                 x:Name="BtnSavePermissions"
                 Height="40"
-                Padding="20,0"
                 Margin="20,0,0,0"
+                Padding="20,0"
                 HorizontalAlignment="Left"
                 materialDesign:ButtonAssist.CornerRadius="5"
                 Background="#00BCD4"
                 BorderBrush="#00BCD4"
                 Click="BtnSavePermissions_Click"
                 Foreground="White">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <materialDesign:PackIcon Kind="ContentSave" Margin="0,0,8,0" />
-                    <TextBlock Text="حفظ التعديلات" VerticalAlignment="Center" Foreground="White" />
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <materialDesign:PackIcon Margin="0,0,8,0" Kind="ContentSave" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="White"
+                        Text="حفظ التعديلات" />
                 </StackPanel>
             </Button>
         </DockPanel>

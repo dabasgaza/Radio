@@ -9,7 +9,7 @@ public interface IEpisodeService
 {
     Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync();
     Task CreateEpisodeAsync(EpisodeDto dto, UserSession session);
-    Task UpdateStatusAsync(int episodeId, byte newStatus, UserSession session);
+    Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session);
 }
 
 public class EpisodeService : IEpisodeService
@@ -23,16 +23,35 @@ public class EpisodeService : IEpisodeService
     public async Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync()
     {
         using var context = await _contextFactory.CreateDbContextAsync();
+
+        var source = await context.Episodes
+            .AsNoTracking()
+            .Include(e => e.Program)
+            .Include(e => e.EpisodeStatus) // تضمين جدول الحالات الجديد
+            .OrderByDescending(e => e.CreatedAt)
+            .Select(e => new ActiveEpisodeDto(
+                e.EpisodeId,
+                e.EpisodeName,
+                e.Program.ProgramName,
+                e.ScheduledExecutionTime,
+                e.EpisodeStatus.DisplayName,
+                e.SpecialNotes
+            )).ToListAsync();
+
+
         return await context.Episodes
             .AsNoTracking()
-            .Where(e => e.IsActive)
-                       .Select(e => new ActiveEpisodeDto
-                      (e.EpisodeId,
-                       e.EpisodeName,
-                       e.Program.ProgramName,
-                       e.ScheduledExecutionTime,
-                       e.Status == 0 ? "مخطط لها" : (e.Status == 1 ? "تم التنفيذ" : "تم النشر"),
-                       e.SpecialNotes))
+            .Include(e => e.Program)
+            .Include(e => e.EpisodeStatus) // تضمين جدول الحالات الجديد
+            .OrderByDescending(e => e.CreatedAt)
+            .Select(e => new ActiveEpisodeDto(
+                e.EpisodeId,
+                e.EpisodeName,
+                e.Program.ProgramName,
+                e.ScheduledExecutionTime,
+                e.EpisodeStatus.DisplayName,
+                e.SpecialNotes
+            ))
             .ToListAsync();
     }
 
@@ -45,41 +64,54 @@ public class EpisodeService : IEpisodeService
             ProgramId = dto.ProgramId,
             EpisodeName = dto.EpisodeName,
             ScheduledExecutionTime = dto.ScheduledTime,
-            Status = 0,
-            CreatedByUserId = session.UserId
+            StatusId = 0,
+            //CreatedByUserId = session.UserId
         };
         context.Episodes.Add(episode);
         await context.SaveChangesAsync();
         await _audit.LogActionAsync("Episodes", episode.EpisodeId, "INSERT", null, dto, session.UserId);
     }
 
-    public async Task UpdateStatusAsync(int episodeId, byte newStatus, UserSession session)
+    public async Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session)
     {
         // التحقق من الصلاحيات
-        if (newStatus == 1) SecurityHelper.EnsurePermission(session, AppPermissions.EpisodeExecute);
+        if (newStatusId == 1) SecurityHelper.EnsurePermission(session, AppPermissions.EpisodeExecute);
 
-        if (newStatus == 2) SecurityHelper.EnsurePermission(session, AppPermissions.EpisodePublish);
+        if (newStatusId == 2) SecurityHelper.EnsurePermission(session, AppPermissions.EpisodePublish);
 
 
         using var context = await _contextFactory.CreateDbContextAsync();
+
         var episode = await context.Episodes.FindAsync(episodeId);
 
         if (episode == null) throw new Exception("الحلقة غير موجودة.");
 
-        // بديل منطق الـ Stored Procedure: قواعد انتقال الحالة
-        if (episode.Status == 2)
-            throw new Exception("لا يمكن تغيير حالة حلقة منشورة (Published).");
+        // قاعدة: لا يمكن تغيير حالة حلقة منشورة نهائياً
+        if (episode.StatusId == 2)
+            throw new Exception("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
 
-        if (episode.Status == 1 && newStatus == 0)
-            throw new Exception("لا يمكن إعادة حلقة منفذة (Executed) إلى حالة التخطيط (Planned).");
+        // قاعدة: لا يمكن العودة من "منفذة" إلى "مجدولة"
+        if (episode.StatusId == 1 && newStatusId == 0)
+            throw new Exception("لا يمكن إعادة حلقة منفذة إلى حالة الجدولة.");
+
+        // قاعدة: لا يمكن الانتقال من "مجدولة" إلى "منشورة" مباشرة (يجب التنفيذ أولاً)
+        if (episode.StatusId == 0 && newStatusId == 2)
+            throw new Exception("يجب تنفيذ الحلقة وتوثيقها قبل عملية النشر الرقمي.");
+
 
         // تحديث الحالة
-        episode.Status = newStatus;
-        episode.UpdatedAt = DateTime.UtcNow;
-        episode.UpdatedByUserId = session.UserId;
+        episode.StatusId = newStatusId;
 
-        if (newStatus == 1) episode.ActualExecutionTime = DateTime.UtcNow;
 
-        await context.SaveChangesAsync();
+        if (newStatusId == 1) episode.ActualExecutionTime = DateTime.UtcNow;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new Exception("فشل التحديث: قام مستخدم آخر بتعديل حالة هذه الحلقة للتو.");
+        }
     }
 }
