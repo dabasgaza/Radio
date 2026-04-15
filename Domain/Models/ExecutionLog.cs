@@ -13,10 +13,6 @@ public partial class ExecutionLog
 
     public int ExecutedByUserId { get; set; }
 
-    public DateTime ExecutionStartTime { get; set; }
-
-    public DateTime? ExecutionEndTime { get; set; }
-
     public int? DurationMinutes { get; set; }
 
     public string ExecutionNotes { get; set; }

@@ -1,4 +1,5 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,17 +59,20 @@ namespace Radio.Views.Episodes
 
         private async void BtnMarkExecuted_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is ActiveEpisodeView ep && ep.StatusText == "Planned")
+            if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep && ep.StatusText == "مجدولة")
             {
                 var execService = _serviceProvider.GetRequiredService<IExecutionService>();
                 var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
-                if (dialog.ShowDialog() == true) await LoadDataAsync();
+
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
             }
+
         }
 
         private async void BtnMarkPublished_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is ActiveEpisodeView ep && ep.StatusText == "Executed")
+            if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep && ep.StatusText == "منفّذة")
             {
                 var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
                 var dialog = new PublishingLogDialog(ep.EpisodeId, pubService, _session);

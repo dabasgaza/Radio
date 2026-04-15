@@ -29,30 +29,19 @@ public class EpisodeService : IEpisodeService
             .Include(e => e.Program)
             .Include(e => e.EpisodeStatus) // تضمين جدول الحالات الجديد
             .OrderByDescending(e => e.CreatedAt)
-            .Select(e => new ActiveEpisodeDto(
-                e.EpisodeId,
-                e.EpisodeName,
-                e.Program.ProgramName,
-                e.ScheduledExecutionTime,
-                e.EpisodeStatus.DisplayName,
-                e.SpecialNotes
-            )).ToListAsync();
+            .Select(e => new ActiveEpisodeDto
+            {
+                EpisodeId = e.EpisodeId,
+                StatusId = e.StatusId,
+                EpisodeName = e.EpisodeName,
+                ProgramName = e.Program.ProgramName,
+                ScheduledExecutionTime = e.ScheduledExecutionTime,
+                StatusText = e.EpisodeStatus.DisplayName,
+                SpecialNotes = e.SpecialNotes
+            }).ToListAsync();
 
 
-        return await context.Episodes
-            .AsNoTracking()
-            .Include(e => e.Program)
-            .Include(e => e.EpisodeStatus) // تضمين جدول الحالات الجديد
-            .OrderByDescending(e => e.CreatedAt)
-            .Select(e => new ActiveEpisodeDto(
-                e.EpisodeId,
-                e.EpisodeName,
-                e.Program.ProgramName,
-                e.ScheduledExecutionTime,
-                e.EpisodeStatus.DisplayName,
-                e.SpecialNotes
-            ))
-            .ToListAsync();
+        return source;
     }
 
     public async Task CreateEpisodeAsync(EpisodeDto dto, UserSession session)

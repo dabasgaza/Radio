@@ -201,15 +201,19 @@
                                         Text="{Binding StatusText}" />
                                 </Border>
                                 <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding StatusText}" Value="مخطط لها">
+                                    <DataTrigger Binding="{Binding StatusText}" Value="مجدولة">
                                         <Setter TargetName="StatusBorder" Property="Background" Value="#757575" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding StatusText}" Value="تم التنفيذ">
+                                    <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
                                         <Setter TargetName="StatusBorder" Property="Background" Value="#03A9F4" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding StatusText}" Value="تم النشر">
+                                    <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
                                         <Setter TargetName="StatusBorder" Property="Background" Value="#4CAF50" />
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
+                                        <Setter TargetName="StatusBorder" Property="Background" Value="#F44336" />
+                                    </DataTrigger>
+
                                 </DataTemplate.Triggers>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -231,6 +235,7 @@
                                         Click="BtnMarkExecuted_Click"
                                         Content="تنفيذ"
                                         Foreground="White"
+                                        IsEnabled="{Binding CanMarkExecuted}"
                                         Style="{StaticResource MaterialDesignRaisedButton}" />
                                     <Button
                                         x:Name="BtnMarkPublished"
@@ -243,6 +248,7 @@
                                         Click="BtnMarkPublished_Click"
                                         Content="نشر"
                                         Foreground="White"
+                                        IsEnabled="{Binding CanMarkPublished}"
                                         Style="{StaticResource MaterialDesignRaisedButton}" />
                                 </StackPanel>
                             </DataTemplate>

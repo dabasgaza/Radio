@@ -1,5 +1,6 @@
 ﻿using BroadcastWorkflow.Services;
 using DataAccess.Common;
+using DataAccess.Services.Messaging;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,20 +31,34 @@ namespace DataAccess.Services
                 log.ExecutedByUserId = session.UserId;
                 context.ExecutionLogs.Add(log);
 
-                // 4. استدعاء الـ Stored Procedure لتغيير حالة الحلقة إلى 1 (Executed)
-                await context.Database.ExecuteSqlRawAsync("EXEC sp_UpdateEpisodeStatus @p0, 1, @p1", log.EpisodeId, session.UserId);
+                // 4. تحديث حالة الحلقة مباشرة عبر EF Core (بديل الـ Stored Procedure)
+                var episode = await context.Episodes.FindAsync(log.EpisodeId);
+                if (episode != null)
+                {
+                    // التحقق من قواعد العمل
+                    if (episode.StatusId == 2)
+                        throw new Exception("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
 
-                // 5. حفظ التغييرات نهائياً
+                    episode.StatusId = 1; // 1 = منفّذة (Executed)
+                    episode.ActualExecutionTime = DateTime.UtcNow;
+                    episode.UpdatedByUserId = session.UserId;
+                    episode.UpdatedAt = DateTime.UtcNow;
+                }
+
+                // حفظ كل التغييرات في قاعدة البيانات
                 await context.SaveChangesAsync();
 
-                // 6. تثبيت المعاملة
+                // تثبيت المعاملة
                 await transaction.CommitAsync();
+
+                // إظهار رسالة نجاح
+                MessageService.Current.ShowSuccess("تم تسجيل بيانات التنفيذ وتحديث حالة الحلقة بنجاح.");
             }
-            catch
+            catch (Exception ex)
             {
-                // 7. في حال حدوث أي خطأ، يتم التراجع عن كل شيء (Rollback)
+                // التراجع عن كل شيء في حال حدوث خطأ
                 await transaction.RollbackAsync();
-                throw; // إعادة إرسال الخطأ للواجهة لعرضه للمستخدم
+                throw new Exception($"حدث خطأ أثناء تسجيل التنفيذ: {ex.Message}");
             }
         }
 

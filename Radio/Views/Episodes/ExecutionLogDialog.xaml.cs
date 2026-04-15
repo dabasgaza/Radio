@@ -1,4 +1,5 @@
 ﻿using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using Domain.Models;
 using System.Windows;
 
@@ -26,7 +27,7 @@ namespace Radio.Views.Episodes
             // 1. التحقق من إدخال مدة الحلقة بشكل صحيح
             if (!int.TryParse(TxtDuration.Text, out int duration))
             {
-                MessageBox.Show("يرجى إدخال مدة الحلقة بشكل صحيح (أرقام فقط).", "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageService.Current.ShowWarning("يرجى إدخال مدة الحلقة بشكل صحيح (أرقام فقط)");
                 return;
             }
 
@@ -37,7 +38,6 @@ namespace Radio.Views.Episodes
                 DurationMinutes = duration,
                 ExecutionNotes = TxtNotes.Text.Trim(),
                 IssuesEncountered = TxtIssues.Text.Trim(),
-                ExecutionStartTime = DateTime.UtcNow, // توقيت البدء
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -53,7 +53,7 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
-                MessageBox.Show("حدث خطأ أثناء تسجيل التنفيذ: " + ex.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageService.Current.ShowError("حدث خطأ أثناء تسجيل التنفيذ: " + ex.Message);
             }
             finally
             {

@@ -76,7 +76,6 @@
                 x:Name="BtnForceSave"
                 Background="Orange"
                 BorderBrush="Orange"
-                Click="BtnForceSave_Click"
                 Content="حفظ بياناتي على أي حال (دعس)" />
         </StackPanel>
     </Grid>

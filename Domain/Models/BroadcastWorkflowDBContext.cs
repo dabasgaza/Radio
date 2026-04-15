@@ -307,7 +307,6 @@ public partial class BroadcastWorkflowDBContext : DbContext
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.FacebookUrl).HasMaxLength(500);
-            entity.Property(e => e.InstagramUrl).HasMaxLength(500);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.PublishedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.RowVersion)
@@ -385,55 +384,6 @@ public partial class BroadcastWorkflowDBContext : DbContext
                 .HasConstraintName("FK__Users__UpdatedBy__4316F928");
         });
 
-        modelBuilder.Entity<VwActiveEpisode>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("vw_ActiveEpisodes");
-
-            entity.Property(e => e.EpisodeName)
-                .IsRequired()
-                .HasMaxLength(300);
-            entity.Property(e => e.ProgramName)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.SpecialNotes).HasMaxLength(1000);
-            entity.Property(e => e.StatusText)
-                .HasMaxLength(9)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<VwActiveGuest>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("vw_ActiveGuests");
-
-            entity.Property(e => e.EmailAddress).HasMaxLength(255);
-            entity.Property(e => e.FullName)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.Organization).HasMaxLength(200);
-            entity.Property(e => e.PhoneNumber).HasMaxLength(20);
-        });
-
-        modelBuilder.Entity<VwTodayEpisode>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("vw_TodayEpisodes");
-
-            entity.Property(e => e.EpisodeName)
-                .IsRequired()
-                .HasMaxLength(300);
-            entity.Property(e => e.GuestNames).HasMaxLength(4000);
-            entity.Property(e => e.ProgramName)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.StatusText)
-                .HasMaxLength(9)
-                .IsUnicode(false);
-        });
 
         // 1. تعريف المفتاح المركب لجدول الربط RolePermissions
         modelBuilder.Entity<RolePermission>()

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Domain.Models;
 
-public partial class EpisodeGuest
+public partial class EpisodeGuest : BaseEntity
 {
     public int EpisodeGuestId { get; set; }
 
@@ -14,16 +14,6 @@ public partial class EpisodeGuest
     public int GuestId { get; set; }
 
     public string BookingNotes { get; set; }
-
-    public bool IsActive { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public int? CreatedByUserId { get; set; }
-
-    public byte[] RowVersion { get; set; }
-
-    public virtual User CreatedByUser { get; set; }
 
     public virtual Episode Episode { get; set; }
 

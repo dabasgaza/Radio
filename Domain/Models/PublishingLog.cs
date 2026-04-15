@@ -17,17 +17,11 @@ public partial class PublishingLog
 
     public string TwitterUrl { get; set; }
 
-    public string InstagramUrl { get; set; }
-
     public string FacebookUrl { get; set; }
 
     public string SoundCloudUrl { get; set; }
 
-    public string OtherPlatforms { get; set; }
-
     public DateTime PublishedAt { get; set; }
-
-    public string EngagementMetrics { get; set; }
 
     public bool IsActive { get; set; }
 
