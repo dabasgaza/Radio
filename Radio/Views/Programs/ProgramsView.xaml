@@ -9,56 +9,169 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     Style="{StaticResource UserControlStyle}"
+    FlowDirection="RightToLeft"
     mc:Ignorable="d">
-    <Grid Margin="16">
+
+    <UserControl.Resources>
+        <!-- تنسيقات النصوص بلوحة الألوان الجديدة -->
+        <Style x:Key="RightCellText" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Setter Property="Foreground" Value="#F1F5F9"/>
+            <!-- أبيض مائل للأزرق الفاتح -->
+        </Style>
+        <Style x:Key="CenterCellText" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Setter Property="Foreground" Value="#F1F5F9"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock
-                Margin="0,0,0,10"
-                Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                Text="إدارة البرامج" />
+
+        <!-- منطقة الهيدر والتحكم -->
+        <Grid Grid.Row="0" Margin="8,10,8,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- عنوان الصفحة مع أيقونة البث -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <materialDesign:PackIcon 
+                    Kind="RadioTower" 
+                    Width="32" 
+                    Height="32" 
+                    Foreground="#22D3EE" 
+                    Margin="0,0,12,0" 
+                    VerticalAlignment="Center"/>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="24"
+                    FontWeight="Bold"
+                    Foreground="#FFFFFF"
+                    Text="إدارة البرامج" />
+            </StackPanel>
+
+            <!-- زر الإضافة بلون السيان المميز -->
             <Button
                 x:Name="BtnAddProgram"
-                HorizontalAlignment="Right"
+                Grid.Column="1"
+                Height="38"
+                Padding="20,0"
                 VerticalAlignment="Center"
+                materialDesign:ButtonAssist.CornerRadius="8"
+                Background="#22D3EE"
+                BorderBrush="#22D3EE"
                 Click="BtnAddProgram_Click"
-                Content="إضافة برنامج جديد" />
-        </StackPanel>
-        <materialDesign:Card Grid.Row="1">
+                Content="إضافة برنامج جديد"
+                Foreground="#0F172A"
+                FontWeight="SemiBold"
+                FontSize="14"
+                Cursor="Hand"/>
+        </Grid>
+
+        <!-- بطاقة الجدول بلوحة الأزرق النيلي العميق -->
+        <materialDesign:Card
+            Grid.Row="1"
+            Margin="8,0"
+            Background="#0F172A"
+            BorderBrush="#334155"
+            BorderThickness="1"
+            UniformCornerRadius="12">
+
             <DataGrid
                 x:Name="DgPrograms"
                 AutoGenerateColumns="False"
-                IsReadOnly="True">
+                Background="Transparent"
+                CanUserAddRows="False"
+                Foreground="{DynamicResource MaterialDesignBody}"
+                GridLinesVisibility="None"
+                IsReadOnly="True"
+                RowBackground="#1E293B"
+                AlternatingRowBackground="#283548"
+                HeadersVisibility="Column"
+                RowHeight="50"
+                SelectionUnit="FullRow"
+                SelectionMode="Single">
+
+                <!-- تأثير التمرير (Hover) -->
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#334155" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+
+                <!-- ترويسة الجدول -->
+                <DataGrid.ColumnHeaderStyle>
+                    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#0F172A" />
+                        <Setter Property="Foreground" Value="#22D3EE" />
+                        <!-- سيان للترويسة -->
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                        <Setter Property="Padding" Value="14,12" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+
                 <DataGrid.Columns>
+
+                    <!-- عمود اسم البرنامج -->
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding ProgramName}"
-                        CellStyle="{StaticResource LeftCellAligned}"
-                        Header="اسم البرنامج" />
+                        Header="اسم البرنامج"
+                        ElementStyle="{StaticResource RightCellText}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                    </DataGridTextColumn>
+
+                    <!-- عمود الفئة -->
                     <DataGridTextColumn
                         Width="200"
                         Binding="{Binding Category}"
-                        CellStyle="{StaticResource CenterCellAligned}"
-                        Header="الفئة" />
-                    <DataGridTemplateColumn Width="100" Header="إجراءات">
+                        Header="الفئة"
+                        ElementStyle="{StaticResource CenterCellText}" />
+
+                    <!-- عمود الإجراءات -->
+                    <DataGridTemplateColumn Width="Auto" Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Click="BtnEdit_Click"
-                                    Style="{StaticResource MaterialDesignFlatButton}">
-                                    <materialDesign:PackIcon Kind="Pencil" />
-                                </Button>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <Button
+                                        Margin="4"
+                                        Padding="5"
+                                        Click="BtnEdit_Click"
+                                        Foreground="#22D3EE"
+                                        Style="{StaticResource MaterialDesignIconButton}"
+                                        ToolTip="تعديل البرنامج"
+                                        Cursor="Hand">
+                                        <materialDesign:PackIcon Kind="Pencil" Width="20" Height="20" />
+                                    </Button>
+                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+
                 </DataGrid.Columns>
             </DataGrid>
         </materialDesign:Card>
     </Grid>
-
 </UserControl>

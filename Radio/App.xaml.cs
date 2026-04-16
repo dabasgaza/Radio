@@ -14,6 +14,7 @@ using System.Windows.Threading;
 
 namespace Radio
 {
+    
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -58,6 +59,7 @@ namespace Radio
             services.AddTransient<IPublishingService, PublishingService>();
             services.AddTransient<IReportsService, ReportsService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ICoverageService , CoverageService>();
 
             // تسجيل مزود الجلسة ليكون متاحاً في كل مكان
             services.AddSingleton<CurrentSessionProvider>();

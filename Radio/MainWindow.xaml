@@ -467,10 +467,51 @@
                                             VerticalAlignment="Center"
                                             FontWeight="Medium"
                                             Foreground="#D4D4E8"
-                                            Text="المراسلين والتغطيات" />
+                                            Text="المراسلين" />
                                     </Grid>
                                 </ListBoxItem>
 
+                                <ListBoxItem
+                                    x:Name="MenuCoverages"
+                                    Style="{StaticResource SideNavItem}"
+                                    Tag="CoverageView">
+                                    <Grid Margin="18,0,14,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="44" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--  أيقونة التغطيات بتصميم ذهبي متناسق  -->
+                                        <Border
+                                            Width="36"
+                                            Height="36"
+                                            HorizontalAlignment="Center"
+                                            CornerRadius="10">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Offset="0" Color="#2A2200" />
+                                                    <GradientStop Offset="1" Color="#1A1500" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <materialDesign:PackIcon
+                                                Width="20"
+                                                Height="20"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Foreground="#FFEB3B"
+                                                Kind="MapMarkerCheck" />
+                                        </Border>
+
+                                        <!--  نص العنصر  -->
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Margin="10,0,0,0"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Medium"
+                                            Foreground="#D4D4E8"
+                                            Text="سجل التغطيات الميدانية" />
+                                    </Grid>
+                                </ListBoxItem>
                                 <!--  Divider  -->
                                 <Separator
                                     Height="1"

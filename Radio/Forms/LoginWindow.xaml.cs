@@ -1,5 +1,7 @@
 ﻿using BroadcastWorkflow.Services;
+using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -41,7 +43,8 @@ namespace Radio.Forms
                 if (session != null)
                 {
                     // Login Success: Open MainWindow and pass the session
-                    var mainWindow = new MainWindow(session, _serviceProvider);
+                    var reportsService = _serviceProvider.GetRequiredService<IReportsService>();
+                    var mainWindow = new MainWindow(session, _serviceProvider, reportsService);
                     mainWindow.Show();
                     this.Close();
                 }

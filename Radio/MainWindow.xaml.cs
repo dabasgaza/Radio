@@ -24,6 +24,7 @@ namespace Radio
     {
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IReportsService _reportsService;
 
         //سيتم حذف هذا الكونستركتور لاحقاً بعد بناء شاشة تسجيل الدخول وربطها بالجلسة 
         //public MainWindow(IServiceProvider serviceProvider)
@@ -34,10 +35,11 @@ namespace Radio
 
         //    InitializeUI();
         //}
-        public MainWindow(UserSession session, IServiceProvider serviceProvider)
+        public MainWindow(UserSession session, IServiceProvider serviceProvider, IReportsService reportsService)
         {
             _session = session;
             _serviceProvider = serviceProvider;
+            _reportsService = reportsService;
 
             InitializeComponent();
 
@@ -61,7 +63,7 @@ namespace Radio
             ApplyPermissionSecurity();
 
             // Default Navigation
-            NavigateTo(new HomeView());
+            NavigateTo(new ReportsView(_reportsService));
         }
 
         // 1. تحديث دالة تصفية القوائم بناءً على الصلاحيات الديناميكية
@@ -78,6 +80,10 @@ namespace Radio
 
             // التقارير
             MenuReports.Visibility = _session.HasPermission(AppPermissions.ViewReports) ? Visibility.Visible : Visibility.Collapsed;
+
+            // التغطيات تظهر فقط لمن يملك صلاحية إدارة التنسيق (لأنها مرتبطة بالمراسلين)
+            MenuCoverages.Visibility = _session.HasPermission(AppPermissions.CoordinationManage)
+                           ? Visibility.Visible : Visibility.Collapsed;
 
             // الحلقات والضيوف تظهر للجميع عادةً (والتحكم بالأزرار يكون داخلياً)
             MenuEpisodes.Visibility = Visibility.Visible;
@@ -144,6 +150,11 @@ namespace Radio
                         NavigateTo(new CorrespondentsView(corService, _session));
                         break;
 
+                    case "CoverageView":
+                        var covService = _serviceProvider.GetRequiredService<ICoverageService>();
+                        NavigateTo(new CoverageView(covService, _session, _serviceProvider));
+                        break;
+
                     case "Reports":
                         var reportService = _serviceProvider.GetRequiredService<IReportsService>();
                         NavigateTo(new ReportsView(reportService));
@@ -164,5 +175,14 @@ namespace Radio
             this.Close();
         }
 
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -107,14 +107,6 @@ public partial class BroadcastWorkflowDBContext : DbContext
 
             entity.ToTable("CorrespondentCoverage");
 
-            entity.Property(e => e.BroadcastStatus)
-                .IsRequired()
-                .HasMaxLength(20)
-                .HasDefaultValue("Pending");
-            entity.Property(e => e.CoverageStatus)
-                .IsRequired()
-                .HasMaxLength(20)
-                .HasDefaultValue("Pending");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Location).HasMaxLength(200);

@@ -53,6 +53,7 @@ namespace Radio.Views.Episodes
                 // إظهار مؤشر تحميل إذا أردت (Busy Indicator)
                 var data = await _episodeService.GetActiveEpisodesAsync();
                 DgEpisodes.ItemsSource = data;
+                TxtEpisodesCount.Text = $"{data.Count}";
             }
             catch (Exception ex)
             {

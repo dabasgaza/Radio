@@ -131,12 +131,8 @@
                     AutoGenerateColumns="False"
                     Background="Transparent"
                     BorderThickness="0"
-                    GridLinesVisibility="Horizontal"
-                    HeadersVisibility="Column"
-                    HorizontalGridLinesBrush="{DynamicResource MaterialDesignDivider}"
                     IsReadOnly="True"
                     IsTextSearchEnabled="True"
-                    RowBackground="Transparent"
                     SelectionUnit="FullRow">
                     <DataGrid.Columns>
                         <DataGridTextColumn
@@ -147,10 +143,9 @@
                             <DataGridTextColumn.HeaderStyle>
                                 <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
                                     <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                    <Setter Property="FontWeight" Value="SemiBold" />
                                     <Setter Property="FontSize" Value="15" />
                                     <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                    <Setter Property="Foreground" Value="Cyan" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
@@ -164,7 +159,8 @@
                                 <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
                                     <Setter Property="HorizontalContentAlignment" Value="Center" />
                                     <Setter Property="FontWeight" Value="SemiBold" />
-                                    <Setter Property="FontSize" Value="13" />
+                                    <Setter Property="FontSize" Value="15" />
+                                    <Setter Property="Foreground" Value="Cyan" />
                                     <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
@@ -178,8 +174,8 @@
                             <DataGridTextColumn.HeaderStyle>
                                 <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
                                     <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                    <Setter Property="FontWeight" Value="SemiBold" />
-                                    <Setter Property="FontSize" Value="13" />
+                                    <Setter Property="FontSize" Value="15" />
+                                    <Setter Property="Foreground" Value="Cyan" />
                                     <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>

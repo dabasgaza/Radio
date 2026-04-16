@@ -1,0 +1,79 @@
+﻿<mah:MetroWindow
+    x:Class="Radio.Views.Correspondents.CoverageFormDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Radio.Views.Correspondents"
+    xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="CoverageFormDialog"
+    Width="800"
+    Height="500"
+    Style="{StaticResource BasicWindowStyle}"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Grid Margin="25">
+        <StackPanel>
+            <TextBlock
+                x:Name="TxtTitle"
+                Margin="0,0,0,25"
+                FontSize="22"
+                FontWeight="Bold"
+                Foreground="Gold"
+                Text="تفاصيل التغطية الميدانية" />
+
+            <ComboBox
+                x:Name="CboCorrespondents"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="اختر المراسل *"
+                DisplayMemberPath="FullName"
+                SelectedValuePath="CorrespondentId"
+                Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
+            <ComboBox
+                x:Name="CboGuests"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="الضيف المرتبط (اختياري)"
+                DisplayMemberPath="FullName"
+                SelectedValuePath="GuestId"
+                Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
+
+            <TextBox
+                x:Name="TxtTopic"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="موضوع التغطية *"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+            <TextBox
+                x:Name="TxtLocation"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="الموقع الجغرافي"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+
+            <DatePicker
+                x:Name="DpDate"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="تاريخ التغطية"
+                Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
+
+            <StackPanel
+                Margin="0,20,0,0"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Margin="0,0,10,0"
+                    Content="إلغاء"
+                    Foreground="White"
+                    IsCancel="True"
+                    Style="{StaticResource MaterialDesignOutlinedButton}" />
+                <Button
+                    x:Name="BtnSave"
+                    Background="Gold"
+                    BorderBrush="Gold"
+                    Click="BtnSave_Click"
+                    Content="حفظ التغطية"
+                    Foreground="Black" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+
+</mah:MetroWindow>

@@ -21,12 +21,6 @@ public partial class CorrespondentCoverage : BaseEntity
 
     public DateTime? ActualTime { get; set; }
 
-    public string MediaLinks { get; set; }
-
-    public string CoverageStatus { get; set; }
-
-    public string BroadcastStatus { get; set; }
-
     public virtual Correspondent Correspondent { get; set; }
 
     public virtual Guest Guest { get; set; }
