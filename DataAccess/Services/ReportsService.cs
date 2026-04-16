@@ -8,7 +8,7 @@ namespace DataAccess.Services
     {
         Task<List<TodayEpisodeDto>> GetTodayEpisodesAsync();
         Task<Dictionary<string, int>> GetEpisodeStatusStatsAsync();
-        Task<List<ActiveGuestDto>> GetTopGuestsAsync(int count = 10);
+        Task<List<ActiveProgramDto>> GetMostActiveProgramsAsync();
     }
 
     public class ReportsService : IReportsService
@@ -16,81 +16,91 @@ namespace DataAccess.Services
         private readonly IDbContextFactory<BroadcastWorkflowDBContext> _contextFactory;
         public ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> factory) => _contextFactory = factory;
 
-        // بديل vw_TodayEpisodes
+        // 1. إحصائيات الحالات (معتمد كلياً على Episodes)
+        public async Task<Dictionary<string, int>> GetEpisodeStatusStatsAsync()
+        {
+            using var context = await _contextFactory.CreateDbContextAsync();
+
+            // جلب الإحصائيات مباشرة من جدول الحلقات
+            var stats = await context.Episodes
+                .GroupBy(e => e.EpisodeStatus.StatusName)
+                .Select(g => new { StatusName = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            return stats.ToDictionary(x => x.StatusName, x => x.Count);
+        }
+
+        // 2. جدول بث اليوم (محوره الحلقة)
         public async Task<List<TodayEpisodeDto>> GetTodayEpisodesAsync()
         {
             using var context = await _contextFactory.CreateDbContextAsync();
             var today = DateTime.Today;
 
-            // 1. جلب البيانات من القاعدة
-            var episodes = await context.Episodes
+            return await context.Episodes
                 .AsNoTracking()
                 .Include(e => e.Program)
-                .Include(e => e.EpisodeStatus) // 👈 إضافة جدول الحالات الجديد
-                .Include(e => e.EpisodeGuests).ThenInclude(eg => eg.Guest)
+                .Include(e => e.Guest)         // 👈 ربط مباشر بالضيف
+                .Include(e => e.EpisodeStatus) // 👈 ربط بجدول الحالات
                 .Where(e => e.ScheduledExecutionTime.HasValue &&
                             e.ScheduledExecutionTime.Value.Date == today)
+                .OrderBy(e => e.ScheduledExecutionTime)
+                .Select(e => new TodayEpisodeDto
+                (
+                    e.EpisodeId,
+                    e.EpisodeName,
+                    e.Program.ProgramName,
+                    // جلب اسم الضيف مباشرة من العلاقة الجديدة
+                    e.Guest != null ? e.Guest.FullName : "بدون ضيف",
+                    e.ScheduledExecutionTime,
+                    e.EpisodeStatus.DisplayName
+                ))
                 .ToListAsync();
 
-            // 2. التحويل إلى Record باستخدام الـ Constructor (أقواس دائرية)
-            return episodes.Select(e => new TodayEpisodeDto(
-                e.EpisodeId,
-                e.EpisodeName,
-                e.Program.ProgramName,
-                e.ScheduledExecutionTime,
-                // دمج أسماء الضيوف (الفلترة العالمية ستخفي المحذوفين تلقائياً)
-                string.Join(", ", e.EpisodeGuests.Select(eg => eg.Guest.FullName)),
-                // جلب الاسم العربي مباشرة من قاعدة البيانات 👈
-                e.EpisodeStatus.DisplayName
-            )).ToList();
         }
 
-        // بديل vw_ActiveGuests
-        public async Task<List<ActiveGuestDto>> GetTopGuestsAsync(int count = 10)
+
+        // 3. تقرير البرامج الأكثر نشاطاً (بدلاً من الضيوف، لتركيز التقرير على الحلقات)
+        // هذا التقرير يخبرك أي البرامج تستهلك أكبر عدد من الحلقات
+        public async Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync()
         {
             using var context = await _contextFactory.CreateDbContextAsync();
-
-            // 1. جلب البيانات باستخدام Anonymous Type لضمان ترجمة SQL صحيحة
-            var data = await context.Guests
+            return await context.Episodes
                 .AsNoTracking()
-                .Where(g => g.IsActive)
-                .Select(g => new
+                .Include(e => e.Program)
+                .Include(e => e.Guest) // 👈 تضمين الضيف مباشرة
+                .Include(e => e.EpisodeStatus)
+                .Select(e => new ActiveEpisodeDto
                 {
-                    g.GuestId,
-                    g.FullName,
-                    g.Organization,
-                    // حساب العدد هنا كقيمة رقمية بسيطة
-                    Count = g.EpisodeGuests.Count()
+                    EpisodeId = e.EpisodeId,
+                    EpisodeName = e.EpisodeName,
+                    ProgramName = e.Program.ProgramName,
+                    // جلب اسم الضيف مباشرة أو وضع نص في حال عدم وجوده
+                    GuestName = e.Guest != null ? e.Guest.FullName : "بدون ضيف",
+                    ScheduledExecutionTime = e.ScheduledExecutionTime,
+                    StatusText = e.EpisodeStatus.DisplayName,
+                    StatusId = e.StatusId
                 })
-                // 2. الفرز والتقطيع يتمان في SQL بنجاح
-                .OrderByDescending(x => x.Count)
-                .Take(count)
                 .ToListAsync();
-
-            // 3. التحويل النهائي إلى الـ Record يتم في الذاكرة (Memory)
-            return data.Select(x => new ActiveGuestDto(
-                x.GuestId,
-                x.FullName,
-                x.Organization,
-                x.Count
-            )).ToList();
         }
 
-        public async Task<Dictionary<string, int>> GetEpisodeStatusStatsAsync()
+        public async Task<List<ActiveProgramDto>> GetMostActiveProgramsAsync()
         {
             using var context = await _contextFactory.CreateDbContextAsync();
-            var stats = await context.Episodes
-                .Where(e => e.IsActive)
-                .GroupBy(e => e.StatusId)
-                .Select(g => new { Status = g.Key, Count = g.Count() })
-                .ToListAsync();
 
-            return new Dictionary<string, int> {
-            { "Planned",   stats.FirstOrDefault(s => s.Status == 0)?.Count ?? 0 },
-            { "Executed",  stats.FirstOrDefault(s => s.Status == 1)?.Count ?? 0 },
-            { "Published", stats.FirstOrDefault(s => s.Status == 2)?.Count ?? 0 }
-                };
+            return await context.Programs
+                .AsNoTracking()
+                .Select(p => new ActiveProgramDto
+                {
+                    ProgramName = p.ProgramName,
+                    Category = p.Category,
+                    // حساب عدد الحلقات الكلي المرتبط بالبرنامج
+                    TotalEpisodes = p.Episodes.Count(),
+                    // حساب عدد الحلقات التي وصلت لحالة النشر (StatusId = 2)
+                    PublishedEpisodes = p.Episodes.Count(e => e.StatusId == 2)
+                })
+                .OrderByDescending(x => x.TotalEpisodes)
+                .Take(5) // جلب أعلى 5 برامج نشاطاً
+                .ToListAsync();
         }
     }
-
 }

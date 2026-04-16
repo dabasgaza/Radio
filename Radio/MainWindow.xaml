@@ -796,7 +796,18 @@
                         Margin="0,0,0,40"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
-                        MessageQueue="{materialDesign:MessageQueue}" />
+                        MessageQueue="{materialDesign:MessageQueue}">
+                        <materialDesign:Snackbar.Resources>
+                            <!--  هذا الستايل يستهدف النص الداخلي للـ Snackbar  -->
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="FontSize" Value="14" />
+                                <Setter Property="Padding" Value="5" />
+                            </Style>
+                        </materialDesign:Snackbar.Resources>
+
+                    </materialDesign:Snackbar>
                 </Grid>
             </DockPanel>
         </Grid>

@@ -10,74 +10,221 @@
     d:DesignWidth="800"
     Style="{StaticResource UserControlStyle}"
     mc:Ignorable="d">
-    <Grid Margin="16">
+
+    <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock
-                Margin="0,0,0,10"
-                Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                Text="إدارة المراسلين الميدانيين" />
+        <!--  Header Section  -->
+        <Grid Grid.Row="0" Margin="0,0,0,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                    <Border
+                        Width="40"
+                        Height="40"
+                        Margin="0,0,12,0"
+                        Background="{DynamicResource PrimaryHueMidBrush}"
+                        CornerRadius="10">
+                        <materialDesign:PackIcon
+                            Width="22"
+                            Height="22"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="AccountGroup" />
+                    </Border>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                        Text="إدارة المراسلين الميدانيين" />
+                </StackPanel>
+                <TextBlock
+                    Margin="52,0,0,0"
+                    Foreground="{DynamicResource MaterialDesignBodyLight}"
+                    Opacity="0.8"
+                    Style="{StaticResource MaterialDesignBody2TextBlock}"
+                    Text="إضافة وتعديل وإدارة المراسلين ومهامهم التغطوية" />
+            </StackPanel>
+
             <Button
                 x:Name="BtnAdd"
+                Grid.Column="1"
+                Height="40"
+                Margin="20,0"
+                Padding="20,0"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
+                materialDesign:ButtonAssist.CornerRadius="8"
                 Click="BtnAdd_Click"
-                Content="إضافة مراسل" />
-        </StackPanel>
+                Style="{StaticResource MaterialDesignRaisedButton}">
+                <StackPanel Margin="0" Orientation="Horizontal">
+                    <materialDesign:PackIcon
+                        Width="20"
+                        Height="20"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Kind="Plus" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Text="إضافة مراسل" />
+                </StackPanel>
+            </Button>
+        </Grid>
 
-        <materialDesign:Card Grid.Row="1">
-            <DataGrid
-                x:Name="DgCorrespondents"
-                AutoGenerateColumns="False"
-                IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Width="200"
-                        Binding="{Binding FullName}"
-                        CellStyle="{StaticResource LeftCellAligned}"
-                        Header="الاسم" />
-                    <DataGridTextColumn
-                        Width="150"
-                        Binding="{Binding PhoneNumber}"
-                        CellStyle="{StaticResource CenterCellAligned}"
-                        Header="الهاتف" />
-                    <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding AssignedLocations}"
-                        CellStyle="{StaticResource CenterCellAligned}"
-                        Header="المناطق المكلف بها" />
-                    <DataGridTemplateColumn Width="200" Header="إجراءات">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Button
-                                        Click="BtnCoverage_Click"
-                                        Style="{StaticResource MaterialDesignFlatButton}"
-                                        ToolTip="التغطيات">
-                                        <materialDesign:PackIcon Foreground="Green" Kind="MapMarkerCheck" />
-                                    </Button>
-                                    <Button
-                                        Click="BtnEdit_Click"
-                                        Style="{StaticResource MaterialDesignFlatButton}"
-                                        ToolTip="تعديل">
-                                        <materialDesign:PackIcon Foreground="Blue" Kind="Pencil" />
-                                    </Button>
-                                    <Button
-                                        Click="BtnDelete_Click"
-                                        Style="{StaticResource MaterialDesignFlatButton}"
-                                        ToolTip="حذف">
-                                        <materialDesign:PackIcon Foreground="Red" Kind="Delete" />
-                                    </Button>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+        <!--  Divider  -->
+        <Border
+            Grid.Row="1"
+            Height="1"
+            Margin="0,10,0,16"
+            Background="{DynamicResource MaterialDesignDivider}"
+            Opacity="0.6" />
+
+        <!--  Data Card  -->
+        <materialDesign:Card Grid.Row="2" UniformCornerRadius="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  Card Header Bar  -->
+                <Border
+                    Grid.Row="0"
+                    Padding="20,12"
+                    Background="{DynamicResource PrimaryHueMidBrush}"
+                    CornerRadius="12,12,0,0">
+                    <Grid>
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="20"
+                                Height="20"
+                                Margin="0,0,10,0"
+                                Foreground="White"
+                                Kind="FormatListBulleted"
+                                Opacity="0.9" />
+                            <TextBlock
+                                FontSize="15"
+                                FontWeight="Medium"
+                                Foreground="White"
+                                Opacity="0.95"
+                                Text="قائمة المراسلين" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!--  DataGrid  -->
+                <DataGrid
+                    x:Name="DgCorrespondents"
+                    Grid.Row="1"
+                    materialDesign:DataGridAssist.CellPadding="12,8"
+                    materialDesign:DataGridAssist.ColumnHeaderPadding="14,10"
+                    AlternatingRowBackground="{DynamicResource MaterialDesignPaper}"
+                    AutoGenerateColumns="False"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    GridLinesVisibility="Horizontal"
+                    HeadersVisibility="Column"
+                    HorizontalGridLinesBrush="{DynamicResource MaterialDesignDivider}"
+                    IsReadOnly="True"
+                    IsTextSearchEnabled="True"
+                    RowBackground="Transparent"
+                    SelectionUnit="FullRow">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="200"
+                            Binding="{Binding FullName}"
+                            CellStyle="{StaticResource LeftCellAligned}"
+                            Header="الاسم">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="FontSize" Value="15" />
+                                    <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            Width="150"
+                            Binding="{Binding PhoneNumber}"
+                            CellStyle="{StaticResource CenterCellAligned}"
+                            Header="الهاتف">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="FontSize" Value="13" />
+                                    <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding AssignedLocations}"
+                            CellStyle="{StaticResource CenterCellAligned}"
+                            Header="المناطق المكلف بها">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="FontSize" Value="13" />
+                                    <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTemplateColumn Width="180" Header="إجراءات">
+                            <DataGridTemplateColumn.HeaderStyle>
+                                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="FontSize" Value="13" />
+                                    <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
+                                </Style>
+                            </DataGridTemplateColumn.HeaderStyle>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                        <Button
+                                            Click="BtnCoverage_Click"
+                                            Foreground="{DynamicResource MaterialDesignBody}"
+                                            Style="{StaticResource MaterialDesignIconButton}"
+                                            ToolTip="التغطيات">
+                                            <materialDesign:PackIcon Kind="MapMarkerCheck" />
+                                        </Button>
+                                        <Button
+                                            Click="BtnEdit_Click"
+                                            Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                            Style="{StaticResource MaterialDesignIconButton}"
+                                            ToolTip="تعديل">
+                                            <materialDesign:PackIcon Kind="Pencil" />
+                                        </Button>
+                                        <Button
+                                            Click="BtnDelete_Click"
+                                            Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                            Style="{StaticResource MaterialDesignIconButton}"
+                                            ToolTip="حذف">
+                                            <materialDesign:PackIcon Kind="Delete" />
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
         </materialDesign:Card>
     </Grid>
 </UserControl>

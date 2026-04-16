@@ -2,9 +2,9 @@
 {
     public record GuestDto(int GuestId, string FullName, string? Organization, string? PhoneNumber, string? EmailAddress, string? Bio, string? Gender);
     public record ProgramDto(int ProgramId, string ProgramName, string? Category, string? ProgramDescription);
-    public record EpisodeDto(int EpisodeId, int ProgramId, string EpisodeName, DateTime? ScheduledTime, string? SpecialNotes);
+    public record EpisodeDto(int EpisodeId, int ProgramId, int? GuestId, string EpisodeName, DateTime? ScheduledTime, string? SpecialNotes);
     public record CorrespondentDto(int CorrespondentId, string FullName, string? PhoneNumber, string? AssignedLocations);
-    public record TodayEpisodeDto(int EpisodeId, string EpisodeName, string ProgramName, DateTime? ScheduledExecutionTime, string StatusText, string? GuestNames);
+    public record TodayEpisodeDto(int EpisodeId, string EpisodeName, string ProgramName, string GuestName, DateTime? ScheduledExecutionTime, string StatusText);
     public record ActiveGuestDto(int GuestId, string FullName, string? Organization, int EpisodeCount);
 
     //public record PermissionViewModel(int PermissionId, string PermissionName, bool IsAssigned);

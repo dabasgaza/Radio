@@ -1,5 +1,6 @@
 ﻿using DataAccess.Common;
 using DataAccess.DTOs;
+using DataAccess.Services.Messaging;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ public interface IEpisodeService
 {
     Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync();
     Task CreateEpisodeAsync(EpisodeDto dto, UserSession session);
+    Task UpdateEpisodeAsync(EpisodeDto dto, UserSession session);
     Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session);
 }
 
@@ -27,13 +29,17 @@ public class EpisodeService : IEpisodeService
         var source = await context.Episodes
             .AsNoTracking()
             .Include(e => e.Program)
+            .Include(e => e.Guest) // تضمين جدول الضيوف
             .Include(e => e.EpisodeStatus) // تضمين جدول الحالات الجديد
-            .OrderByDescending(e => e.CreatedAt)
+            .OrderBy(e => e.ScheduledExecutionTime)
             .Select(e => new ActiveEpisodeDto
             {
                 EpisodeId = e.EpisodeId,
                 StatusId = e.StatusId,
+                ProgramId = e.ProgramId, // 👈
+                GuestId = e.GuestId,     // 👈
                 EpisodeName = e.EpisodeName,
+                GuestName = e.Guest != null ? e.Guest.FullName: "لا يوجد ضيف", // التعامل مع الضيوف غير المحددين
                 ProgramName = e.Program.ProgramName,
                 ScheduledExecutionTime = e.ScheduledExecutionTime,
                 StatusText = e.EpisodeStatus.DisplayName,
@@ -44,13 +50,36 @@ public class EpisodeService : IEpisodeService
         return source;
     }
 
+    public async Task UpdateEpisodeAsync(EpisodeDto dto, UserSession session)
+    {
+        SecurityHelper.EnsurePermission(session, AppPermissions.EpisodeManage);
+        using var context = await _contextFactory.CreateDbContextAsync();
+
+        var episode = await context.Episodes.FindAsync(dto.EpisodeId);
+        if (episode == null) throw new Exception("الحلقة غير موجودة.");
+
+        // تحديث الحقول
+        episode.ProgramId = dto.ProgramId;
+        episode.GuestId = dto.GuestId;
+        episode.EpisodeName = dto.EpisodeName;
+        episode.ScheduledExecutionTime = dto.ScheduledTime;
+        episode.SpecialNotes = dto.SpecialNotes;
+
+        // الـ Interceptor سيتولى تحديث UpdatedAt و UpdatedByUserId تلقائياً
+        await context.SaveChangesAsync();
+        MessageService.Current.ShowSuccess("تم تحديث بيانات الحلقة بنجاح.");
+    }
+
     public async Task CreateEpisodeAsync(EpisodeDto dto, UserSession session)
     {
         SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage);
+
         using var context = await _contextFactory.CreateDbContextAsync();
+
         var episode = new Episode
         {
             ProgramId = dto.ProgramId,
+            GuestId = dto.GuestId,
             EpisodeName = dto.EpisodeName,
             ScheduledExecutionTime = dto.ScheduledTime,
             StatusId = 0,

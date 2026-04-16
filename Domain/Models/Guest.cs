@@ -11,31 +11,15 @@ public partial class Guest : BaseEntity
 
     public string FullName { get; set; }
 
-    public string Gender { get; set; }
-
-    public string Bio { get; set; }
-
     public string Organization { get; set; }
-
-    public string Website { get; set; }
 
     public string PhoneNumber { get; set; }
 
     public string EmailAddress { get; set; }
 
-    public string Twitter { get; set; }
-
-    public string Instagram { get; set; }
-
-    public string TikTok { get; set; }
-
-    public string LinkedIn { get; set; }
-
-    public string YouTube { get; set; }
-
-    public string SpecialNotes { get; set; }
-
     public virtual ICollection<CorrespondentCoverage> CorrespondentCoverages { get; set; } = new List<CorrespondentCoverage>();
+    
+    public virtual ICollection<Episode> Episodes { get; set; } = new List<Episode>();
 
     public virtual ICollection<EpisodeGuest> EpisodeGuests { get; set; } = new List<EpisodeGuest>();
 }

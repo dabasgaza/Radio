@@ -1,4 +1,6 @@
 ﻿using DataAccess.Services;
+using DataAccess.Services.Messaging;
+using System.Runtime.Versioning;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,6 +9,9 @@ namespace Radio.Views.Reports
     /// <summary>
     /// Interaction logic for ReportsView.xaml
     /// </summary>
+    /// 
+
+    [SupportedOSPlatform("windows")] // 👈 أضف هذا السطر فوق الكلاس أو الميثود
     public partial class ReportsView : UserControl
     {
         private readonly IReportsService _reportsService;
@@ -22,21 +27,26 @@ namespace Radio.Views.Reports
         {
             try
             {
+                // 1. تحميل الإحصائيات العلوية
                 var stats = await _reportsService.GetEpisodeStatusStatsAsync();
-                TxtPlannedCount.Text = stats["Planned"].ToString();
-                TxtExecutedCount.Text = stats["Executed"].ToString();
-                TxtPublishedCount.Text = stats["Published"].ToString();
 
-                // ستعمل الآن لأنها تجلب DTO بدلاً من محاولة الوصول لـ DbSet غير موجود
+                // نستخدم المسميات البرمجية (Planned, Executed, Published) كمفاتيح
+                TxtPlannedCount.Text = stats.GetValueOrDefault("Planned", 0).ToString();
+                TxtExecutedCount.Text = stats.GetValueOrDefault("Executed", 0).ToString();
+                TxtPublishedCount.Text = stats.GetValueOrDefault("Published", 0).ToString();
+
+                // 2. تحميل جدول اليوم
                 DgToday.ItemsSource = await _reportsService.GetTodayEpisodesAsync();
-                DgTopGuests.ItemsSource = await _reportsService.GetTopGuestsAsync();
+
+                // 3. تحميل أداء البرامج
+                DgProgramStats.ItemsSource = await _reportsService.GetMostActiveProgramsAsync();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("خطأ في تحميل التقارير: " + ex.Message);
+                // استخدام نظام الرسائل المركزي الجديد
+                MessageService.Current.ShowError($"فشل تحديث لوحة التقارير: {ex.Message}");
             }
         }
-
 
     }
 }

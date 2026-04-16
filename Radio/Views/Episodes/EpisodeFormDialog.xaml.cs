@@ -2,6 +2,8 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using Domain.Models;
+using System.Runtime.Versioning;
 using System.Windows;
 
 namespace Radio.Views.Episodes
@@ -9,17 +11,26 @@ namespace Radio.Views.Episodes
     /// <summary>
     /// Interaction logic for EpisodeFormDialog.xaml
     /// </summary>
+
+    [SupportedOSPlatform("windows")] // 👈 أضف هذا السطر فوق الكلاس أو الميثود
     public partial class EpisodeFormDialog
     {
+        private readonly ActiveEpisodeDto? _existingEpisode;
         private readonly IEpisodeService _episodeService;
         private readonly IProgramService _programService;
+        private readonly IGuestService _guestService; // 👈 إضافة خدمة الضيوف
+
         private readonly UserSession _session;
 
-        public EpisodeFormDialog(IEpisodeService episodeService, IProgramService programService, UserSession session)
+        public EpisodeFormDialog(IEpisodeService episodeService,
+            IProgramService programService, 
+            IGuestService guestService, UserSession session, ActiveEpisodeDto? existingEpisode)
         {
             InitializeComponent();
             _episodeService = episodeService;
             _programService = programService;
+            _guestService = guestService;
+            _existingEpisode = existingEpisode;
             _session = session;
 
             // إعداد القيم الافتراضية
@@ -34,13 +45,42 @@ namespace Radio.Views.Episodes
         {
             try
             {
-                var programs = await _programService.GetAllActiveAsync();
-                CboPrograms.ItemsSource = programs;
+                // تحميل البرامج والضيوف بالتوازي لسرعة الأداء
+                var programsTask = _programService.GetAllActiveAsync();
+                var guestsTask = _guestService.GetAllActiveAsync();
+
+                await Task.WhenAll(programsTask, guestsTask);
+
+                CboPrograms.ItemsSource = await programsTask;
+                CboGuests.ItemsSource = await guestsTask; // 👈 تعبئة قائمة الضيوف
+
+                // في حالة التعديل، نحدد القيم المختارة مسبقاً
+                if (_existingEpisode != null)
+                {
+                    TxtTitle.Text = "تعديل بيانات الحلقة";
+                    BtnSave.Content = "حفظ التعديلات";
+
+                    // تحديد البرنامج والضيف المختارين مسبقاً
+                    CboPrograms.SelectedValue = _existingEpisode.ProgramId;
+                    CboGuests.SelectedValue = _existingEpisode.GuestId;
+
+                    // ملء النصوص والتواريخ
+                    TxtEpisodeName.Text = _existingEpisode.EpisodeName;
+                    TxtNotes.Text = _existingEpisode.SpecialNotes;
+
+                    if (_existingEpisode.ScheduledExecutionTime.HasValue)
+                    {
+                        DpDate.SelectedDate = _existingEpisode.ScheduledExecutionTime.Value.Date;
+                        TpTime.SelectedTime = _existingEpisode.ScheduledExecutionTime.Value;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                MessageService.Current.ShowError("حدث خطأ أثناء تحميل قائمة البرامج: " + ex.Message);
+                MessageService.Current
+                    .ShowError($"خطأ في تحميل البيانات: {ex.InnerException?.Message ?? ex.Message}");
             }
+
         }
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -72,6 +112,7 @@ namespace Radio.Views.Episodes
             var dto = new EpisodeDto(
                 0, // ID 0 للإضافة الجديدة
                 (int)CboPrograms.SelectedValue,
+                (int?)CboGuests.SelectedValue, // 👈 جلب المعرف من الـ ComboBox
                 TxtEpisodeName.Text.Trim(),
                 scheduledTime,
                 TxtNotes.Text.Trim()
@@ -81,7 +122,15 @@ namespace Radio.Views.Episodes
             try
             {
                 BtnSave.IsEnabled = false; // منع النقرات المتعددة
-                await _episodeService.CreateEpisodeAsync(dto, _session);
+
+                if(_existingEpisode != null)
+                {
+                    // في حالة التعديل، نستخدم معرف الحلقة الحالية
+                    dto = dto with { EpisodeId = _existingEpisode.EpisodeId };
+                    await _episodeService.UpdateEpisodeAsync(dto, _session);
+                }
+                else
+                    await _episodeService.CreateEpisodeAsync(dto, _session);
 
                 this.DialogResult = true; // إغلاق النافذة بنجاح
                 this.Close();

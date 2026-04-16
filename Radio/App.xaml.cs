@@ -91,7 +91,7 @@ namespace Radio
         /// </summary>
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            MessageService.Current.ShowError($"حدث خطأ في النظام: {e.Exception.Message}");
+            MessageService.Current.ShowError($"حدث خطأ في النظام: {e.Exception?.InnerException?.Message}");
 
             // إخبار النظام بأننا تعاملنا مع الخطأ، فلا تقم بإغلاق البرنامج
             e.Handled = true;
@@ -102,7 +102,7 @@ namespace Radio
         /// </summary>
         private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
         {
-            MessageService.Current.ShowError($"خطأ خلفي: {e.Exception?.Message}");
+            MessageService.Current.ShowError($"خطأ خلفي: {e.Exception?.InnerException?.Message}");
             e.SetObserved();
         }
 

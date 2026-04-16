@@ -15,6 +15,7 @@ namespace Radio.Views.Episodes
     public partial class EpisodesView : UserControl
     {
         private readonly IEpisodeService _episodeService;
+        private readonly IGuestService _guestService;
         private readonly IProgramService _programService;
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
@@ -22,7 +23,9 @@ namespace Radio.Views.Episodes
         public Visibility ShowPublishedBtn { get; set; }
 
         // Logic for button visibility inside DataGrid based on Role & Status
-        public EpisodesView(IEpisodeService epService, IProgramService progService, UserSession session, IServiceProvider serviceProvider)
+        public EpisodesView(IEpisodeService epService,  
+            IProgramService progService, UserSession session,
+            IServiceProvider serviceProvider, IGuestService guestService)
         {
             InitializeComponent();
             _episodeService = epService;
@@ -40,6 +43,7 @@ namespace Radio.Views.Episodes
             this.ShowPublishedBtn = _session.HasPermission("EPISODE_PUBLISH") ? Visibility.Visible : Visibility.Collapsed;
 
             _ = LoadDataAsync();
+            _guestService = guestService;
         }
 
         private async Task LoadDataAsync()
@@ -82,9 +86,29 @@ namespace Radio.Views.Episodes
 
         private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new EpisodeFormDialog(_episodeService, _programService, _session);
+            var dialog = 
+                new EpisodeFormDialog(_episodeService, _programService, _guestService, _session,null);
+
             if (dialog.ShowDialog() == true) await LoadDataAsync();
         }
 
+        private async void BtnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is ActiveEpisodeDto selectedEpisode)
+            {
+                var epService = _serviceProvider.GetRequiredService<IEpisodeService>();
+                var progService = _serviceProvider.GetRequiredService<IProgramService>();
+                var guestService = _serviceProvider.GetRequiredService<IGuestService>();
+
+                // نمرر selectedEpisode كبارامتر أخير (وهو الـ _existingEpisode)
+                var dialog = new EpisodeFormDialog(epService, progService, guestService, _session, selectedEpisode);
+
+                if (dialog.ShowDialog() == true)
+                {
+                    await LoadDataAsync(); // تحديث الجدول بعد التعديل
+                }
+            }
+
+        }
     }
 }

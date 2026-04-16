@@ -130,7 +130,8 @@ namespace Radio
                     case "Episodes":
                         var epService = _serviceProvider.GetRequiredService<IEpisodeService>();
                         var pService = _serviceProvider.GetRequiredService<IProgramService>();
-                        NavigateTo(new EpisodesView(epService, pService, _session, _serviceProvider));
+                        var gService = _serviceProvider.GetRequiredService<IGuestService>();
+                        NavigateTo(new EpisodesView(epService, pService, _session, _serviceProvider, gService));
                         break;
 
                     case "Guests":

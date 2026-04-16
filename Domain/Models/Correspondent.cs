@@ -13,15 +13,7 @@ public partial class Correspondent : BaseEntity
 
     public string PhoneNumber { get; set; }
 
-    public string EmailAddress { get; set; }
-
     public string AssignedLocations { get; set; }
-
-    public string TwitterHandle { get; set; }
-
-    public string InstagramHandle { get; set; }
-
-    public string SpecialNotes { get; set; }
 
     public virtual ICollection<CorrespondentCoverage> CorrespondentCoverages { get; set; } = new List<CorrespondentCoverage>();
 }

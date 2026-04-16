@@ -81,19 +81,15 @@ public partial class BroadcastWorkflowDBContext : DbContext
 
             entity.Property(e => e.AssignedLocations).HasMaxLength(500);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.EmailAddress).HasMaxLength(255);
             entity.Property(e => e.FullName)
                 .IsRequired()
                 .HasMaxLength(200);
-            entity.Property(e => e.InstagramHandle).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
             entity.Property(e => e.RowVersion)
                 .IsRequired()
                 .IsRowVersion()
                 .IsConcurrencyToken();
-            entity.Property(e => e.SpecialNotes).HasMaxLength(1000);
-            entity.Property(e => e.TwitterHandle).HasMaxLength(100);
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.CorrespondentCreatedByUsers)
@@ -182,6 +178,12 @@ public partial class BroadcastWorkflowDBContext : DbContext
             .WithMany() // أو .WithMany(s => s.Episodes) إذا كانت المعرفة في الطرف الآخر
             .HasForeignKey(e => e.StatusId);
 
+            modelBuilder.Entity<Episode>()
+            .HasOne(e => e.Guest)
+            .WithMany(g => g.Episodes)
+            .HasForeignKey(e => e.GuestId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         });
 
         modelBuilder.Entity<EpisodeGuest>(entity =>
@@ -241,28 +243,19 @@ public partial class BroadcastWorkflowDBContext : DbContext
         {
             entity.HasKey(e => e.GuestId).HasName("PK__Guests__0C423C127A15238D");
 
-            entity.Property(e => e.Bio).HasMaxLength(2000);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.EmailAddress).HasMaxLength(255);
             entity.Property(e => e.FullName)
                 .IsRequired()
                 .HasMaxLength(200);
-            entity.Property(e => e.Gender).HasMaxLength(10);
-            entity.Property(e => e.Instagram).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.LinkedIn).HasMaxLength(100);
             entity.Property(e => e.Organization).HasMaxLength(200);
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
             entity.Property(e => e.RowVersion)
                 .IsRequired()
                 .IsRowVersion()
                 .IsConcurrencyToken();
-            entity.Property(e => e.SpecialNotes).HasMaxLength(1000);
-            entity.Property(e => e.TikTok).HasMaxLength(100);
-            entity.Property(e => e.Twitter).HasMaxLength(100);
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Website).HasMaxLength(500);
-            entity.Property(e => e.YouTube).HasMaxLength(200);
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.GuestCreatedByUsers)
                 .HasForeignKey(d => d.CreatedByUserId)

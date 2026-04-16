@@ -6,7 +6,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="جدولة حلقة"
     Width="450"
-    Height="550"
+    Height="600"
     Background="{DynamicResource MaterialDesignPaper}"
     Style="{StaticResource BasicWindowStyle}"
     WindowStartupLocation="CenterScreen">
@@ -33,6 +33,13 @@
                 materialDesign:HintAssist.Hint="اسم الحلقة / العنوان *"
                 Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
+            <ComboBox
+                x:Name="CboGuests"
+                Margin="0,0,0,15"
+                materialDesign:HintAssist.Hint="الضيف المشارك (اختياري)"
+                DisplayMemberPath="FullName"
+                SelectedValuePath="GuestId"
+                Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
             <!--  تاريخ ووقت البث  -->
             <DatePicker
                 x:Name="DpDate"

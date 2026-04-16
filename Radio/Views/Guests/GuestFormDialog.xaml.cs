@@ -32,7 +32,7 @@ namespace Radio.Views.Guests
                 TxtOrg.Text = _existingGuest.Organization;
                 TxtPhone.Text = _existingGuest.PhoneNumber;
                 TxtEmail.Text = _existingGuest.EmailAddress;
-                TxtBio.Text = _existingGuest.Bio;
+                
             }
         }
 

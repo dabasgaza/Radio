@@ -11,6 +11,8 @@ public partial class Episode : BaseEntity
 
     public int ProgramId { get; set; }
 
+    public int? GuestId { get; set; }
+
     public string EpisodeName { get; set; }
 
     public string EpisodeDescription { get; set; }
@@ -28,8 +30,7 @@ public partial class Episode : BaseEntity
 
     [ForeignKey("StatusId")]
     public virtual EpisodeStatus EpisodeStatus { get; set; } = null!;
-
-
+    public virtual Guest Guest { get; set; } = null!;
 
     public virtual ICollection<EpisodeGuest> EpisodeGuests { get; set; } = new List<EpisodeGuest>();
 
