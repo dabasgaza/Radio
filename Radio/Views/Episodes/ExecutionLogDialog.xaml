@@ -8,43 +8,372 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="ExecutionLogDialog"
-    Width="800"
-    Height="450"
+    Width="540"
+    Height="660"
+    AllowsTransparency="True"
+    Background="Transparent"
+    ResizeMode="NoResize"
+    ShowCloseButton="False"
+    ShowTitleBar="False"
     Style="{StaticResource BasicWindowStyle}"
     WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
     mc:Ignorable="d">
-    <Grid Margin="20">
-        <StackPanel>
-            <TextBlock
-                Margin="0,0,0,20"
-                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                Text="بيانات تنفيذ الحلقة" />
-            <TextBox
-                x:Name="TxtDuration"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="مدة الحلقة (بالدقائق)"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
-            <TextBox
-                x:Name="TxtNotes"
-                Height="80"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="ملاحظات التنفيذ"
-                AcceptsReturn="True"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                TextWrapping="Wrap" />
-            <TextBox
-                x:Name="TxtIssues"
-                Height="60"
-                materialDesign:HintAssist.Hint="مشاكل تقنية واجهتنا"
-                AcceptsReturn="True"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                TextWrapping="Wrap" />
-            <Button
-                Name="BtnSave"
-                Margin="0,20,0,0"
-                Click="BtnSave_Click"
-                Content="تأكيد التنفيذ"
-                Style="{StaticResource MaterialDesignRaisedButton}" />
-        </StackPanel>
+
+    <mah:MetroWindow.Resources>
+
+        <!--  ══════════════ الألوان (Emerald Teal) ══════════════  -->
+        <SolidColorBrush x:Key="BgBase" Color="#0C0F16" />
+        <SolidColorBrush x:Key="BgInput" Color="#21262F" />
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2A3042" />
+        <SolidColorBrush x:Key="TextMain" Color="#E0E4EB" />
+        <SolidColorBrush x:Key="TextMuted" Color="#5E6687" />
+        <SolidColorBrush x:Key="TealMain" Color="#00BFA5" />
+        <SolidColorBrush x:Key="TealDark" Color="#00897B" />
+        <SolidColorBrush x:Key="RedAccent" Color="#E54D4D" />
+        <SolidColorBrush x:Key="AmberSoft" Color="#D4943A" />
+
+        <!--  ══════════════ التدرجات والتأثيرات ══════════════  -->
+        <LinearGradientBrush x:Key="GradTealBtn" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#00BFA5" />
+            <GradientStop Offset="1" Color="#1DE9B6" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradLine" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#00BFA5" />
+            <GradientStop Offset="1" Color="#00897B" />
+        </LinearGradientBrush>
+        <DropShadowEffect
+            x:Key="GlowTeal"
+            BlurRadius="14"
+            Opacity="0.3"
+            ShadowDepth="0"
+            Color="#00BFA5" />
+        <DropShadowEffect
+            x:Key="BtnShadow"
+            BlurRadius="18"
+            Opacity="0.3"
+            ShadowDepth="4"
+            Color="#00BFA5" />
+        <DropShadowEffect
+            x:Key="CardShadow"
+            BlurRadius="8"
+            Opacity="0.4"
+            ShadowDepth="2"
+            Color="#000000" />
+
+        <!--  ══════════════ تخصيص ألوان حقول MaterialDesign ══════════════  -->
+        <SolidColorBrush x:Key="MaterialDesignBrush.Foreground" Color="#E0E4EB" />
+        <SolidColorBrush x:Key="MaterialDesignBrush.Background" Color="#21262F" />
+        <SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#00BFA5" />
+
+        <!--  ══════════════ زر إغلاق مخصص ══════════════  -->
+        <Style x:Key="BtnCloseStyle" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#1C2130"
+                            BorderBrush="#2A3042"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E54D4D" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#E54D4D" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ زر التنفيذ ══════════════  -->
+        <Style x:Key="BtnSaveStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#0C0F16" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Padding="24,0"
+                            Background="{StaticResource GradTealBtn}"
+                            CornerRadius="10"
+                            Effect="{StaticResource BtnShadow}"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="20"
+                                    Height="20"
+                                    Margin="0,0,10,0"
+                                    Kind="PlayCircleOutline" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ زر إلغاء ══════════════  -->
+        <Style x:Key="BtnCancelStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#5E6687" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#21262F"
+                            BorderBrush="#2A3042"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="16"
+                                    Height="16"
+                                    Margin="0,0,8,0"
+                                    Kind="Close" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#E54D4D" />
+                                <Setter Property="Foreground" Value="#E54D4D" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </mah:MetroWindow.Resources>
+
+    <!--  ═══════════════════════════════════════════  -->
+    <!--  التخطيط الرئيسي  -->
+    <!--  ═══════════════════════════════════════════  -->
+    <Grid Background="#0C0F16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  ═══════════ خلفية النافذة ═══════════  -->
+        <Border Grid.RowSpan="3" CornerRadius="16">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#15181F" />
+                    <GradientStop Offset="1" Color="#0C0F16" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <!--  ═══════════ شريط علوي مخصص (Card مدمج) ═══════════  -->
+        <Border
+            Grid.Row="0"
+            Margin="14,14,14,0"
+            Background="#181C24"
+            BorderBrush="#2A3042"
+            BorderThickness="1"
+            CornerRadius="12"
+            Effect="{StaticResource CardShadow}"
+            MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--  أيقونة + العنوان  -->
+                <StackPanel
+                    Margin="18,18,0,18"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Border
+                        Width="42"
+                        Height="42"
+                        Background="{StaticResource GradTealBtn}"
+                        CornerRadius="11"
+                        Effect="{StaticResource GlowTeal}">
+                        <materialDesign:PackIcon
+                            Width="20"
+                            Height="20"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="Broadcast" />
+                    </Border>
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Text="تنفيذ الحلقة" />
+                        <TextBlock
+                            Margin="0,3,0,0"
+                            FontSize="11"
+                            Foreground="#5E6687"
+                            Text="سجّل مدة البث والملاحظات والمشاكل التقنية" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!--  زر الإغلاق فقط  -->
+                <Button
+                    Grid.Column="2"
+                    Margin="0,0,14,0"
+                    Click="BtnClose_Click"
+                    Style="{StaticResource BtnCloseStyle}"
+                    ToolTip="إغلاق">
+                    <materialDesign:PackIcon
+                        Width="14"
+                        Height="14"
+                        Foreground="#5E6687"
+                        Kind="Close" />
+                </Button>
+            </Grid>
+        </Border>
+
+        <!--  ═══════════ المحتوى ═══════════  -->
+        <ScrollViewer
+            Grid.Row="1"
+            Margin="14,12,14,8"
+            Padding="12,0,12,8"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="4">
+
+                <!--  مدة الحلقة  -->
+                <TextBlock
+                    Margin="0,0,0,6"
+                    FontSize="12"
+                    FontWeight="Medium"
+                    Foreground="#00BFA5"
+                    Text="مدة الحلقة" />
+                <TextBox
+                    x:Name="TxtDuration"
+                    Margin="0,0,0,20"
+                    materialDesign:HintAssist.Foreground="#5E6687"
+                    materialDesign:HintAssist.Hint="أدخل المدة بالدقائق"
+                    materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                    materialDesign:TextFieldAssist.LeadingIcon="TimerOutline"
+                    Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+
+                <!--  ملاحظات التنفيذ  -->
+                <TextBlock
+                    Margin="0,0,0,6"
+                    FontSize="12"
+                    FontWeight="Medium"
+                    Foreground="#5E6670"
+                    Text="ملاحظات التنفيذ" />
+                <TextBox
+                    x:Name="TxtNotes"
+                    Height="100"
+                    Margin="0,0,0,20"
+                    VerticalContentAlignment="Top"
+                    materialDesign:HintAssist.Foreground="#5E6687"
+                    materialDesign:HintAssist.Hint="أي تفاصيل حول سير البث..."
+                    materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                    materialDesign:TextFieldAssist.LeadingIcon="FileDocumentOutline"
+                    AcceptsReturn="True"
+                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                    TextWrapping="Wrap" />
+
+                <!--  مشاكل تقنية  -->
+                <TextBlock
+                    Margin="0,0,0,6"
+                    FontSize="12"
+                    FontWeight="Medium"
+                    Foreground="#D4943A"
+                    Text="مشاكل تقنية" />
+                <TextBox
+                    x:Name="TxtIssues"
+                    Height="80"
+                    VerticalContentAlignment="Top"
+                    materialDesign:HintAssist.Foreground="#5E6687"
+                    materialDesign:HintAssist.Hint="اذكر أي أعطال أو مشاكل حدثت"
+                    materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                    materialDesign:TextFieldAssist.LeadingIcon="AlertCircleOutline"
+                    AcceptsReturn="True"
+                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                    TextWrapping="Wrap" />
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!--  ═══════════ التذييل ═══════════  -->
+        <Border
+            Grid.Row="2"
+            Margin="14,0,14,14"
+            Padding="14,16"
+            Background="#141821"
+            BorderBrush="#2A3042"
+            BorderThickness="1"
+            CornerRadius="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button
+                    Grid.Column="0"
+                    Content="إلغاء"
+                    IsCancel="True"
+                    Style="{StaticResource BtnCancelStyle}" />
+
+                <Button
+                    x:Name="BtnSave"
+                    Grid.Column="2"
+                    Click="BtnSave_Click"
+                    Content="تأكيد التنفيذ"
+                    Style="{StaticResource BtnSaveStyle}" />
+            </Grid>
+        </Border>
     </Grid>
 </mah:MetroWindow>

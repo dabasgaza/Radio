@@ -22,7 +22,7 @@ namespace DataAccess.Services
             using var context = await _contextFactory.CreateDbContextAsync();
 
             // جلب الإحصائيات مباشرة من جدول الحلقات
-            var stats = await context.Episodes
+            var stats = await context.Episodes.AsNoTracking()
                 .GroupBy(e => e.EpisodeStatus.StatusName)
                 .Select(g => new { StatusName = g.Key, Count = g.Count() })
                 .ToListAsync();
@@ -38,9 +38,6 @@ namespace DataAccess.Services
 
             return await context.Episodes
                 .AsNoTracking()
-                .Include(e => e.Program)
-                .Include(e => e.Guest)         // 👈 ربط مباشر بالضيف
-                .Include(e => e.EpisodeStatus) // 👈 ربط بجدول الحالات
                 .Where(e => e.ScheduledExecutionTime.HasValue &&
                             e.ScheduledExecutionTime.Value.Date == today)
                 .OrderBy(e => e.ScheduledExecutionTime)
@@ -58,7 +55,6 @@ namespace DataAccess.Services
 
         }
 
-
         // 3. تقرير البرامج الأكثر نشاطاً (بدلاً من الضيوف، لتركيز التقرير على الحلقات)
         // هذا التقرير يخبرك أي البرامج تستهلك أكبر عدد من الحلقات
         public async Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync()
@@ -66,9 +62,6 @@ namespace DataAccess.Services
             using var context = await _contextFactory.CreateDbContextAsync();
             return await context.Episodes
                 .AsNoTracking()
-                .Include(e => e.Program)
-                .Include(e => e.Guest) // 👈 تضمين الضيف مباشرة
-                .Include(e => e.EpisodeStatus)
                 .Select(e => new ActiveEpisodeDto
                 {
                     EpisodeId = e.EpisodeId,

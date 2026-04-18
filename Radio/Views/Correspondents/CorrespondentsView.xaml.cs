@@ -82,5 +82,9 @@ namespace Radio.Views.Correspondents
             }
         }
 
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }

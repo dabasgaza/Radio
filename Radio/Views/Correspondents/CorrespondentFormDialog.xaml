@@ -5,62 +5,382 @@
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="بيانات المراسل"
-    Width="400"
-    Height="450"
-    Background="{DynamicResource MaterialDesignPaper}"
-    FlowDirection="RightToLeft"
+    Width="520"
+    Height="520"
+    AllowsTransparency="True"
+    Background="Transparent"
+    GlowBrush="DarkCyan"
+    ResizeMode="NoResize"
+    ShowCloseButton="False"
+    ShowTitleBar="False"
     Style="{StaticResource BasicWindowStyle}"
-    WindowStartupLocation="CenterScreen">
-    <Grid Margin="20">
-        <StackPanel>
-            <TextBlock
-                x:Name="TxtHeader"
-                Margin="0,0,0,20"
-                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                Text="إضافة مراسل ميداني" />
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None">
 
-            <TextBox
-                x:Name="TxtName"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="الاسم الكامل للمراسل *"
-                materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                materialDesign:TextFieldAssist.LeadingIcon="Account"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+    <mah:MetroWindow.Resources>
 
-            <TextBox
-                x:Name="TxtPhone"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="رقم الهاتف"
-                materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                materialDesign:TextFieldAssist.LeadingIcon="Phone"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+        <!--  ══════════════ الألوان الأساسية ══════════════  -->
+        <SolidColorBrush x:Key="BgBase" Color="#111419" />
+        <SolidColorBrush x:Key="BgSurface" Color="#191D25" />
+        <SolidColorBrush x:Key="BgInput" Color="#21262F" />
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2C323E" />
+        <SolidColorBrush x:Key="BorderHover" Color="#363D4B" />
+        <SolidColorBrush x:Key="BorderFocus" Color="#3D9DA6" />
+        <SolidColorBrush x:Key="TextMain" Color="#E0E4EB" />
+        <SolidColorBrush x:Key="TextMuted" Color="#515B6E" />
 
-            <TextBox
-                x:Name="TxtLocations"
-                Height="100"
-                VerticalContentAlignment="Top"
-                materialDesign:HintAssist.Hint="المناطق المكلف بها (مثال: دمشق، ريف دمشق)"
-                materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                materialDesign:TextFieldAssist.LeadingIcon="MapMarkerRadius"
-                AcceptsReturn="True"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                TextWrapping="Wrap" />
+        <!--  ألوان لكسر الغامق  -->
+        <SolidColorBrush x:Key="TealAccent" Color="#3D9DA6" />
+        <SolidColorBrush x:Key="AmberAccent" Color="#D4943A" />
+        <SolidColorBrush x:Key="VioletAccent" Color="#7C4DFF" />
 
-            <StackPanel
-                Margin="0,20,0,0"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
+        <!--  ══════════════ التدرجات ══════════════  -->
+        <LinearGradientBrush x:Key="GradLine" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#3D9DA6" />
+            <GradientStop Offset="1" Color="#D4943A" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradViolet" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="#7C4DFF" />
+            <GradientStop Offset="1" Color="#E040FB" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradAccentBtn" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#00D4AA" />
+            <GradientStop Offset="1" Color="#448AFF" />
+        </LinearGradientBrush>
+
+        <!--  ══════════════ التأثيرات ══════════════  -->
+        <DropShadowEffect
+            x:Key="GlowViolet"
+            BlurRadius="12"
+            Opacity="0.2"
+            ShadowDepth="0"
+            Color="#7C4DFF" />
+        <DropShadowEffect
+            x:Key="GlowTeal"
+            BlurRadius="10"
+            Opacity="0.2"
+            ShadowDepth="0"
+            Color="#3D9DA6" />
+        <DropShadowEffect
+            x:Key="CardShadow"
+            BlurRadius="30"
+            Opacity="0.35"
+            ShadowDepth="6"
+            Color="#000000" />
+
+        <!--  ══════════════ تسمية الحقل ══════════════  -->
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="#515B6E" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+
+        <!--  ══════════════ نمط حقل الإدخال (آمن تماماً) ══════════════  -->
+        <Style x:Key="FormField" TargetType="TextBox">
+            <Setter Property="Background" Value="#21262F" />
+            <Setter Property="Foreground" Value="#E0E4EB" />
+            <Setter Property="CaretBrush" Value="#3D9DA6" />
+            <Setter Property="BorderBrush" Value="#2C323E" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="14,11" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <Border
+                                x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                SnapsToDevicePixels="True" />
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Disabled" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3D9DA6" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#363D4B" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ زر حفظ ══════════════  -->
+        <Style x:Key="BtnSaveStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="{StaticResource GradAccentBtn}"
+                            CornerRadius="10"
+                            Effect="{StaticResource GlowTeal}"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Margin="0,0,8,0"
+                                    Kind="ContentSaveOutline" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ زر إلغاء ══════════════  -->
+        <Style x:Key="BtnCancelStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#515B6E" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#21262F"
+                            BorderBrush="#2C323E"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="16"
+                                    Height="16"
+                                    Margin="0,0,8,0"
+                                    Kind="Close" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#E54D4D" />
+                                <Setter Property="Foreground" Value="#E54D4D" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </mah:MetroWindow.Resources>
+
+    <!--  ═══════════════════════════════════════════  -->
+    <!--  التخطيط الرئيسي  -->
+    <!--  ═══════════════════════════════════════════  -->
+    <Grid Background="#111419">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  ═══════════ خلفية النافذة ═══════════  -->
+        <Border Grid.RowSpan="3" CornerRadius="14">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#15181F" />
+                    <GradientStop Offset="1" Color="#111419" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <!--  ═══════════ الرأس ═══════════  -->
+        <Border
+            Grid.Row="0"
+            Padding="26,24,26,20"
+            BorderBrush="#2C323E"
+            BorderThickness="0,0,0,1"
+            MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Width="48"
+                    Height="48"
+                    Background="{StaticResource GradViolet}"
+                    CornerRadius="13"
+                    Effect="{StaticResource GlowViolet}">
+                    <materialDesign:PackIcon
+                        Width="22"
+                        Height="22"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="White"
+                        Kind="AccountPlusOutline" />
+                </Border>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        x:Name="TxtHeader"
+                        FontSize="20"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Text="إضافة مراسل ميداني" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        FontSize="12"
+                        Foreground="#515B6E"
+                        Text="أدخل بيانات المراسل والمناطق المكلف بها" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--  ═══════════ المحتوى ═══════════  -->
+        <ScrollViewer
+            Grid.Row="1"
+            Padding="26,20,26,8"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <!--  ──── الاسم الكامل ────  -->
+                <TextBlock Style="{StaticResource FieldLabel}" Text="الاسم الكامل" />
+                <Grid Margin="0,0,0,22">
+                    <TextBox
+                        x:Name="TxtName"
+                        Padding="42,11"
+                        Style="{StaticResource FormField}" />
+                    <materialDesign:PackIcon
+                        Width="18"
+                        Height="18"
+                        Margin="14,0,0,0"
+                        VerticalAlignment="Center"
+                        Foreground="#515B6E"
+                        IsHitTestVisible="False"
+                        Kind="AccountOutline" />
+                </Grid>
+
+                <!--  ──── رقم الهاتف ────  -->
+                <TextBlock Style="{StaticResource FieldLabel}" Text="رقم الهاتف" />
+                <Grid Margin="0,0,0,22">
+                    <TextBox
+                        x:Name="TxtPhone"
+                        Padding="42,11"
+                        Style="{StaticResource FormField}" />
+                    <materialDesign:PackIcon
+                        Width="18"
+                        Height="18"
+                        Margin="14,0,0,0"
+                        VerticalAlignment="Center"
+                        Foreground="#515B6E"
+                        IsHitTestVisible="False"
+                        Kind="PhoneOutline" />
+                </Grid>
+
+                <!--  ──── المناطق المكلف بها ────  -->
+                <TextBlock Style="{StaticResource FieldLabel}" Text="المناطق المكلف بها" />
+                <TextBlock
+                    Margin="0,0,0,6"
+                    FontSize="11"
+                    Foreground="#3E4858"
+                    Text="مثال: دمشق، ريف دمشق، حلب" />
+                <Grid>
+                    <TextBox
+                        x:Name="TxtLocations"
+                        Padding="42,14"
+                        VerticalContentAlignment="Top"
+                        AcceptsReturn="True"
+                        Style="{StaticResource FormField}"
+                        TextWrapping="Wrap" />
+                    <materialDesign:PackIcon
+                        Width="18"
+                        Height="18"
+                        Margin="14,14,0,0"
+                        VerticalAlignment="Top"
+                        Foreground="#D4943A"
+                        IsHitTestVisible="False"
+                        Kind="MapMarkerRadiusOutline" />
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!--  ═══════════ التذييل ═══════════  -->
+        <Border
+            Grid.Row="2"
+            Padding="26,14,26,22"
+            BorderBrush="#2C323E"
+            BorderThickness="0,1,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
                 <Button
-                    Margin="0,0,10,0"
+                    Grid.Column="0"
                     Content="إلغاء"
                     IsCancel="True"
-                    Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    Style="{StaticResource BtnCancelStyle}" />
+
                 <Button
                     x:Name="BtnSave"
+                    Grid.Column="2"
                     Click="BtnSave_Click"
                     Content="حفظ البيانات"
-                    Style="{StaticResource MaterialDesignRaisedButton}" />
-            </StackPanel>
-        </StackPanel>
+                    Style="{StaticResource BtnSaveStyle}" />
+            </Grid>
+        </Border>
     </Grid>
 </mah:MetroWindow>

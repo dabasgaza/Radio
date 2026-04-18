@@ -19,6 +19,7 @@ namespace Radio.Views.Users
             _existing = existing;
             _userService = userService;
             _session = session;
+
             _ = LoadRoles();
 
             if (_existing != null)
@@ -63,5 +64,33 @@ namespace Radio.Views.Users
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
+        /// <summary>
+        /// استدعِ هذا عند فتح النافذة للتعديل
+        /// </summary>
+        public void SetEditMode()
+        {
+            // تغيير العنوان والأيقونة
+            TxtTitle.Text = "تعديل بيانات المستخدم";
+            TxtSubtitle.Text = "قم بتحديث البيانات المطلوبة ثم اضغط حفظ";
+
+            // إظهار ملاحظة كلمة المرور
+            PwdHintCard.Visibility = Visibility.Visible;
+
+            // تغيير أيقونة الرأس
+            // (يمكنك تغييرها برمجياً أو بإضافة أيقونة أخرى في XAML)
+        }
+
+        /// <summary>
+        /// تأثير بسيط لإظهار خطأ في الحقل
+        /// </summary>
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
     }
 }

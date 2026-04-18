@@ -16,24 +16,30 @@ public class AuthService : IAuthService
     public async Task<UserSession?> LoginAsync(string username, string password)
     {
         using var context = await _contextFactory.CreateDbContextAsync();
+
+        // ✅ تحسين: AsNoTracking لأن LoginAsync قراءة + تحديث واحد فقط
+        // ✅ تحسين: جلب الصلاحيات في نفس الاستعلام بدلاً من رحلتين لقاعدة البيانات
         var user = await context.Users
+            .AsNoTracking()
             .Include(u => u.Role)
+            .Include(u => u.Role.RolePermissions)
+                .ThenInclude(rp => rp.Permission)
             .FirstOrDefaultAsync(u => u.Username == username && u.IsActive);
 
-        var hash = BCrypt.Net.BCrypt.HashPassword(password);
-
+        // ✅ تحسين: التحقق من وجود المستخدم أولاً قبل أي عملية BCrypt
+        // السبب: BCrypt.HashPassword عملية مكلفة جداً (~100ms) — لا تُنفَّذ مجاناً
         if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             return null;
 
-        // داخل AuthService.cs في دالة LoginAsync
-        var permissions = await context.RolePermissions
-            .Where(rp => rp.RoleId == user.RoleId)
+        var permissions = user.Role.RolePermissions
             .Select(rp => rp.Permission.SystemName)
-            .ToListAsync();
+            .ToList();
 
-
-        user.LastLoginAt = DateTime.UtcNow;
-        await context.SaveChangesAsync();
+        // تحديث LastLoginAt يحتاج Tracked context منفصل
+        using var writeContext = await _contextFactory.CreateDbContextAsync();
+        await writeContext.Users
+            .Where(u => u.UserId == user.UserId)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginAt, DateTime.UtcNow));
 
         return new UserSession
         {

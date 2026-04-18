@@ -53,6 +53,7 @@ namespace Radio.Views.Users
             if (dialog.ShowDialog() == true)
             {
                 await LoadDataAsync();
+                UpdateStats();
             }
         }
 
@@ -67,6 +68,7 @@ namespace Radio.Views.Users
                 if (dialog.ShowDialog() == true)
                 {
                     await LoadDataAsync();
+                    UpdateStats();
                 }
             }
         }
@@ -99,6 +101,24 @@ namespace Radio.Views.Users
                     await LoadDataAsync();
                 }
             }
+        }
+
+        // تحديث الإحصائيات بعد كل عملية
+        private void UpdateStats()
+        {
+            var items = DgUsers.ItemsSource;
+            if (items != null)
+            {
+                var list = items.Cast<dynamic>().ToList();
+                TxtTotalUsers.Text = list.Count.ToString();
+                TxtActiveUsers.Text = list.Count(u => u.IsActive == true).ToString();
+                TxtInactiveUsers.Text = list.Count(u => u.IsActive == false).ToString();
+            }
+        }
+
+        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 

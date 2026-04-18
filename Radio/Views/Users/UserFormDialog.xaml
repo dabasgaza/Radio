@@ -8,69 +8,604 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="UserFormDialog"
-    Width="800"
-    Height="650"
+    Width="680"
+    Height="720"
+    GlowBrush="DarkCyan"
+    ResizeMode="NoResize"
+    ShowCloseButton="False"
+    ShowTitleBar="False"
     Style="{StaticResource BasicWindowStyle}"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <Grid Margin="20">
-        <StackPanel>
-            <TextBlock
-                x:Name="TxtTitle"
-                Margin="0,0,0,20"
-                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                Text="إضافة مستخدم" />
 
-            <TextBox
-                x:Name="TxtFullName"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="الاسم الكامل *"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
-            <TextBox
-                x:Name="TxtUsername"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="اسم المستخدم *"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+    <mah:MetroWindow.Resources>
 
-            <PasswordBox
-                x:Name="TxtPassword"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="كلمة المرور *"
-                Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
+        <!--  ══════════════ الألوان ══════════════  -->
+        <SolidColorBrush x:Key="BgBase" Color="#0C0F16" />
+        <SolidColorBrush x:Key="BgSurface" Color="#141821" />
+        <SolidColorBrush x:Key="BgInput" Color="#1C2130" />
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2A3042" />
 
-            <ComboBox
-                x:Name="CboRoles"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="الصلاحية / الدور *"
-                DisplayMemberPath="RoleName"
-                SelectedValuePath="RoleId"
-                Style="{StaticResource MaterialDesignOutlinedComboBox}" />
+        <!--  ══════════════ التدرجات ══════════════  -->
+        <LinearGradientBrush x:Key="GradAccent" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#00D4AA" />
+            <GradientStop Offset="1" Color="#448AFF" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradViolet" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="#7C4DFF" />
+            <GradientStop Offset="1" Color="#E040FB" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradLine" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#00D4AA" />
+            <GradientStop Offset="0.5" Color="#448AFF" />
+            <GradientStop Offset="1" Color="#7C4DFF" />
+        </LinearGradientBrush>
 
-            <TextBox
-                x:Name="TxtPhone"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="رقم الهاتف"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
-            <TextBox
-                x:Name="TxtEmail"
-                Margin="0,0,0,15"
-                materialDesign:HintAssist.Hint="البريد الإلكتروني"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+        <!--  ══════════════ التأثيرات ══════════════  -->
+        <DropShadowEffect
+            x:Key="GlowTeal"
+            BlurRadius="12"
+            Opacity="0.25"
+            ShadowDepth="0"
+            Color="#00D4AA" />
+        <DropShadowEffect
+            x:Key="GlowViolet"
+            BlurRadius="12"
+            Opacity="0.25"
+            ShadowDepth="0"
+            Color="#7C4DFF" />
 
-            <TextBlock
-                x:Name="TxtPwdHint"
-                Margin="0,0,0,10"
-                FontSize="10"
-                Foreground="Gray"
-                Text="* اترك كلمة المرور فارغة إذا كنت لا تريد تغييرها"
-                Visibility="Collapsed" />
+        <!--  ══════════════ عنوان القسم ══════════════  -->
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="#5E6687" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
 
-            <Button
-                x:Name="BtnSave"
-                Click="BtnSave_Click"
-                Content="حفظ البيانات"
-                Style="{StaticResource MaterialDesignRaisedButton}" />
-        </StackPanel>
+        <!--  ══════════════ تسمية الحقل ══════════════  -->
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="#8A92AB" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+
+        <!--  ══════════════ نمط حقول الإدخال ══════════════  -->
+        <Style x:Key="FormField" TargetType="TextBox">
+            <Setter Property="Background" Value="#1C2130" />
+            <Setter Property="Foreground" Value="#E4E8F1" />
+            <Setter Property="CaretBrush" Value="#00D4AA" />
+            <Setter Property="BorderBrush" Value="#2A3042" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <Border
+                                x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                SnapsToDevicePixels="True" />
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Disabled" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#00D4AA" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3A4058" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ نمط كلمة المرور ══════════════  -->
+        <Style x:Key="PwdField" TargetType="PasswordBox">
+            <Setter Property="Background" Value="#1C2130" />
+            <Setter Property="Foreground" Value="#E4E8F1" />
+            <Setter Property="CaretBrush" Value="#00D4AA" />
+            <Setter Property="BorderBrush" Value="#2A3042" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Grid>
+                            <Border
+                                x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                SnapsToDevicePixels="True" />
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Disabled" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#00D4AA" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3A4058" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ نمط القائمة المنسدلة ══════════════  -->
+        <!--  ══════════════ نمط القائمة المنسدلة (مُصلح) ══════════════  -->
+        <Style x:Key="ComboField" TargetType="ComboBox">
+            <Setter Property="Background" Value="#1C2130" />
+            <Setter Property="Foreground" Value="#E4E8F1" />
+            <Setter Property="BorderBrush" Value="#2A3042" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+
+                            <!--  خلفية وحدود  -->
+                            <Border
+                                x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                SnapsToDevicePixels="True" />
+
+                            <!--  زر التبديل المخفي - ضروري لفتح القائمة  -->
+                            <ToggleButton
+                                x:Name="PART_Toggle"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="0"
+                                ClickMode="Press"
+                                Focusable="False"
+                                IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+
+                            <!--  المحتوى - غير قابل للنقر ليمر النقر للتبديل  -->
+                            <Grid Margin="{TemplateBinding Padding}" IsHitTestVisible="False">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <ContentPresenter
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding SelectionBoxItem}"
+                                    ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                    ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                    TextBlock.Foreground="{TemplateBinding Foreground}" />
+
+                                <!--  سهم مع دوران عند الفتح  -->
+                                <materialDesign:PackIcon
+                                    x:Name="ArrowIcon"
+                                    Grid.Column="1"
+                                    Width="20"
+                                    Height="20"
+                                    Margin="8,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="#5E6687"
+                                    Kind="ChevronDown"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <materialDesign:PackIcon.RenderTransform>
+                                        <RotateTransform Angle="0" />
+                                    </materialDesign:PackIcon.RenderTransform>
+                                </materialDesign:PackIcon>
+                            </Grid>
+
+                            <!--  القائمة المنسدلة  -->
+                            <Popup
+                                x:Name="PART_Popup"
+                                AllowsTransparency="True"
+                                Focusable="False"
+                                IsOpen="{TemplateBinding IsDropDownOpen}"
+                                Placement="Bottom"
+                                PopupAnimation="Slide">
+                                <Border
+                                    x:Name="PopupBorder"
+                                    MinWidth="{TemplateBinding ActualWidth}"
+                                    Margin="0,4,0,0"
+                                    Background="#1C2130"
+                                    BorderBrush="#2A3042"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    SnapsToDevicePixels="True">
+                                    <ScrollViewer MaxHeight="220" VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <!--  عند فتح القائمة  -->
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#00D4AA" />
+                                <Setter TargetName="ArrowIcon" Property="Foreground" Value="#00D4AA" />
+                                <Setter TargetName="ArrowIcon" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="180" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <!--  عند التمرير  -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3A4058" />
+                            </Trigger>
+                            <!--  معطل  -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <!--  نمط عناصر القائمة  -->
+            <Style.Resources>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="#E4E8F1" />
+                    <Setter Property="Padding" Value="14,10" />
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="FontFamily" Value="Segoe UI" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ComboBoxItem">
+                                <Border
+                                    x:Name="Bd"
+                                    Padding="{TemplateBinding Padding}"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="6"
+                                    SnapsToDevicePixels="True">
+                                    <ContentPresenter VerticalAlignment="Center" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#242A3A" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#00D4AA18" />
+                                        <Setter Property="Foreground" Value="#00D4AA" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Style.Resources>
+        </Style>
+        <!--  ══════════════ زر الحفظ ══════════════  -->
+        <Style x:Key="BtnSave" TargetType="Button">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="{StaticResource GradAccent}"
+                            CornerRadius="12"
+                            Effect="{StaticResource GlowTeal}"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="20"
+                                    Height="20"
+                                    Margin="0,0,10,0"
+                                    Kind="ContentSaveOutline" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ زر إلغاء ══════════════  -->
+        <Style x:Key="BtnCancel" TargetType="Button">
+            <Setter Property="Foreground" Value="#5E6687" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#1C2130"
+                            BorderBrush="#2A3042"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Margin="0,0,8,0"
+                                    Kind="Close" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#FF5252" />
+                                <Setter Property="Foreground" Value="#FF5252" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </mah:MetroWindow.Resources>
+
+    <!--  ═══════════════════════════════════════════  -->
+    <!--  التخطيط الرئيسي  -->
+    <!--  ═══════════════════════════════════════════  -->
+    <Grid Background="#0C0F16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  ═══════════ الرأس ═══════════  -->
+        <Border
+            Grid.Row="0"
+            Padding="30,28,30,24"
+            BorderBrush="#2A3042"
+            BorderThickness="0,0,0,1"
+            MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Width="52"
+                    Height="52"
+                    Background="{StaticResource GradViolet}"
+                    CornerRadius="14"
+                    Effect="{StaticResource GlowViolet}">
+                    <materialDesign:PackIcon
+                        Width="24"
+                        Height="24"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="White"
+                        Kind="AccountPlusOutline" />
+                </Border>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="18,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        x:Name="TxtTitle"
+                        FontSize="22"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Text="إضافة مستخدم جديد" />
+                    <TextBlock
+                        x:Name="TxtSubtitle"
+                        Margin="0,4,0,0"
+                        FontSize="12"
+                        Foreground="#5E6687"
+                        Text="أدخل بيانات المستخدم لإنشاء حساب جديد في النظام" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--  ═══════════ المحتوى ═══════════  -->
+        <ScrollViewer
+            Grid.Row="1"
+            Margin="10"
+            Padding="30,24,30,8"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <!--  ──── قسم المعلومات الأساسية ────  -->
+                <TextBlock Style="{StaticResource SectionTitle}" Text="المعلومات الأساسية" />
+
+                <Grid Margin="0,0,0,24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="14" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="18" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!--  الاسم الكامل  -->
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="الاسم الكامل" />
+                        <TextBox x:Name="TxtFullName" Style="{StaticResource FormField}" />
+                    </StackPanel>
+
+                    <!--  اسم المستخدم  -->
+                    <StackPanel Grid.Row="0" Grid.Column="2">
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="اسم المستخدم" />
+                        <TextBox x:Name="TxtUsername" Style="{StaticResource FormField}" />
+                    </StackPanel>
+
+                    <!--  كلمة المرور  -->
+                    <StackPanel Grid.Row="2" Grid.Column="0">
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="كلمة المرور" />
+                        <PasswordBox x:Name="TxtPassword" Style="{StaticResource PwdField}" />
+                    </StackPanel>
+
+                    <!--  الدور  -->
+                    <StackPanel Grid.Row="2" Grid.Column="2">
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="الدور / الصلاحية" />
+                        <ComboBox
+                            x:Name="CboRoles"
+                            DisplayMemberPath="RoleName"
+                            SelectedValuePath="RoleId"
+                            Style="{StaticResource MaterialDesignComboBox}" />
+                    </StackPanel>
+                </Grid>
+
+                <!--  ──── فاصل قسم ────  -->
+                <Border
+                    Height="1"
+                    Margin="0,0,0,24"
+                    Background="#2A3042" />
+
+                <!--  ──── قسم معلومات التواصل ────  -->
+                <TextBlock Style="{StaticResource SectionTitle}" Text="معلومات التواصل" />
+
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="14" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  رقم الهاتف  -->
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="رقم الهاتف" />
+                        <TextBox x:Name="TxtPhone" Style="{StaticResource FormField}" />
+                    </StackPanel>
+
+                    <!--  البريد الإلكتروني  -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Style="{StaticResource FieldLabel}" Text="البريد الإلكتروني" />
+                        <TextBox x:Name="TxtEmail" Style="{StaticResource FormField}" />
+                    </StackPanel>
+                </Grid>
+
+                <!--  ملاحظة كلمة المرور  -->
+                <Border
+                    x:Name="PwdHintCard"
+                    Margin="0,4,0,0"
+                    Padding="14,10"
+                    Background="#7C4DFF10"
+                    BorderBrush="#7C4DFF30"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="16"
+                            Height="16"
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center"
+                            Foreground="#B388FF"
+                            Kind="InformationOutline" />
+                        <TextBlock
+                            x:Name="TxtPwdHint"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="#B388FF"
+                            Text="اترك كلمة المرور فارغة إذا كنت لا تريد تغييرها" />
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!--  ═══════════ التذييل ═══════════  -->
+        <Border
+            Grid.Row="2"
+            Padding="30,16,30,26"
+            BorderBrush="#2A3042"
+            BorderThickness="0,1,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button
+                    x:Name="BtnCancel"
+                    Grid.Column="0"
+                    Click="BtnCancel_Click"
+                    Content="إلغاء"
+                    Style="{StaticResource BtnCancel}" />
+
+                <Button
+                    x:Name="BtnSave"
+                    Grid.Column="2"
+                    Click="BtnSave_Click"
+                    Content="حفظ البيانات"
+                    Style="{StaticResource BtnSave}" />
+            </Grid>
+        </Border>
     </Grid>
-
 </mah:MetroWindow>

@@ -12,6 +12,7 @@ namespace Radio.Views.Programs
     {
         private readonly IProgramService _programService;
         private readonly UserSession _session;
+        private List<Program> _allPrograms = new();
 
         public ProgramsView(IProgramService programService, UserSession session)
         {
@@ -29,8 +30,8 @@ namespace Radio.Views.Programs
         {
             try
             {
-                var programs = await _programService.GetAllActiveAsync();
-                DgPrograms.ItemsSource = programs;
+                _allPrograms = await _programService.GetAllActiveAsync();
+                DgPrograms.ItemsSource = _allPrograms;
             }
             catch (Exception ex)
             {
@@ -57,6 +58,33 @@ namespace Radio.Views.Programs
                     await LoadDataAsync();
                 }
             }
+        }
+
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string keyword = TxtSearch.Text.Trim().ToLower();
+
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                string filter = TxtSearch.Text.ToLower();
+
+                DgPrograms.ItemsSource = _allPrograms.Where(g =>
+                    g.ProgramName.ToLower().Contains(filter)).ToList();
+
+            }
+            else
+            {
+                var filtered = _allPrograms
+                    .Where(p => p.ProgramName.ToLower().Contains(keyword))
+                    .ToList();
+
+                DgPrograms.ItemsSource = filtered;
+            }
+        }
+
+        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 

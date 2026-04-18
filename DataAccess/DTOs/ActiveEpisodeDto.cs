@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DataAccess.DTOs
+﻿namespace DataAccess.DTOs
 {
     public record ActiveEpisodeDto
     {
@@ -18,10 +14,10 @@ namespace DataAccess.DTOs
         public string SpecialNotes { get; init; }
 
         // 👈 منطق تفعيل زر التنفيذ: فقط إذا كانت الحالة "مجدولة" (0)
-        public bool CanMarkExecuted => StatusId == 0 ;
+        public bool CanMarkExecuted => StatusId == 0;
 
         // 👈 منطق تفعيل زر النشر: فقط إذا كانت الحالة "منفذة" (1)
-        public bool CanMarkPublished => StatusId == 1 ;
+        public bool CanMarkPublished => StatusId == 1;
     }
 
 }

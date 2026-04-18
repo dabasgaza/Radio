@@ -60,6 +60,11 @@ namespace Radio.Views.Programs
                 MessageBox.Show("خطأ أثناء الحفظ: " + ex.Message);
             }
         }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
     }
 
 }

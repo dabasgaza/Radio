@@ -8,303 +8,588 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="LoginWindow"
-    Width="800"
-    Height="600"
+    Width="860"
+    Height="650"
     AllowsTransparency="True"
     Background="Transparent"
-    ResizeMode="CanResizeWithGrip"
+    ResizeMode="NoResize"
+    ShowCloseButton="False"
+    ShowTitleBar="False"
     Style="{StaticResource BasicWindowStyle}"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None"
     mc:Ignorable="d">
 
-    <Window.Resources>
-        <!--  Modern close button style  -->
-        <Style x:Key="ModernCloseButton" TargetType="Button">
+    <mah:MetroWindow.Resources>
+
+        <!--  ══════════════ الألوان الأساسية ══════════════  -->
+        <SolidColorBrush x:Key="BgWindow" Color="#0C0E13" />
+        <SolidColorBrush x:Key="BgSurface" Color="#161A22" />
+        <SolidColorBrush x:Key="BgInput" Color="#1E222C" />
+        <SolidColorBrush x:Key="BgElevated" Color="#242832" />
+        <SolidColorBrush x:Key="BorderSubtle" Color="#282D3A" />
+        <SolidColorBrush x:Key="BorderHover" Color="#353B4A" />
+        <SolidColorBrush x:Key="BorderFocus" Color="#5A657A" />
+        <SolidColorBrush x:Key="TextPrimary" Color="#E2E6ED" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#7A8499" />
+        <SolidColorBrush x:Key="TextMuted" Color="#3E4858" />
+        <SolidColorBrush x:Key="RedAccent" Color="#E54D4D" />
+
+        <!--  ══════════════ الألوان المُضافة (كسر الغامق) ══════════════  -->
+        <!--  نحاسي دافئ - للأزرار والعناوين  -->
+        <SolidColorBrush x:Key="AmberAccent" Color="#D4943A" />
+        <SolidColorBrush x:Key="AmberLight" Color="#E8A94E" />
+        <SolidColorBrush x:Key="AmberDark" Color="#B87A2A" />
+        <SolidColorBrush x:Key="AmberGhost" Color="#D4943A" />
+        <!--  فيروزي هادئ - للأيقونات والعناصر الزخرفية  -->
+        <SolidColorBrush x:Key="TealAccent" Color="#3D9DA6" />
+        <SolidColorBrush x:Key="TealLight" Color="#4DB8C2" />
+        <SolidColorBrush x:Key="TealDark" Color="#2E7D86" />
+        <SolidColorBrush x:Key="TealGhost" Color="#3D9DA6" />
+
+        <!--  ══════════════ التدرجات ══════════════  -->
+        <LinearGradientBrush x:Key="GradAmberBtn" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#D4943A" />
+            <GradientStop Offset="1" Color="#E8A94E" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradLeftPanel" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0" Color="#0F1219" />
+            <GradientStop Offset="0.5" Color="#121822" />
+            <GradientStop Offset="1" Color="#0F1219" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradSeparator" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0" Color="#D4943A00" />
+            <GradientStop Offset="0.5" Color="#D4943A" />
+            <GradientStop Offset="1" Color="#D4943A00" />
+        </LinearGradientBrush>
+        <RadialGradientBrush x:Key="GradLogoGlow" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+            <GradientStop Offset="0" Color="#3D9DA618" />
+            <GradientStop Offset="1" Color="#3D9DA600" />
+        </RadialGradientBrush>
+        <RadialGradientBrush x:Key="GradAmberGlow" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+            <GradientStop Offset="0" Color="#D4943A10" />
+            <GradientStop Offset="1" Color="#D4943A00" />
+        </RadialGradientBrush>
+
+        <!--  ══════════════ التأثيرات ══════════════  -->
+        <DropShadowEffect
+            x:Key="CardShadow"
+            BlurRadius="50"
+            Opacity="0.45"
+            ShadowDepth="10"
+            Color="#000000" />
+        <DropShadowEffect
+            x:Key="BtnShadow"
+            BlurRadius="20"
+            Opacity="0.25"
+            ShadowDepth="4"
+            Color="#D4943A" />
+        <DropShadowEffect
+            x:Key="TealGlow"
+            BlurRadius="18"
+            Opacity="0.2"
+            ShadowDepth="0"
+            Color="#3D9DA6" />
+        <DropShadowEffect
+            x:Key="AmberGlow"
+            BlurRadius="14"
+            Opacity="0.15"
+            ShadowDepth="0"
+            Color="#D4943A" />
+
+        <!--  ══════════════ تسمية الحقل ══════════════  -->
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="#5A657A" />
+            <Setter Property="Margin" Value="0,0,0,7" />
+        </Style>
+
+        <!--  ══════════════ نمط حقل الإدخال ══════════════  -->
+        <Style x:Key="FormField" TargetType="TextBox">
+            <Setter Property="Background" Value="#1E222C" />
+            <Setter Property="Foreground" Value="#E2E6ED" />
+            <Setter Property="CaretBrush" Value="#D4943A" />
+            <Setter Property="BorderBrush" Value="#282D3A" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <Border
+                                x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                SnapsToDevicePixels="True" />
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Disabled" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#D4943A" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#353B4A" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ نمط كلمة المرور ══════════════  -->
+        <Style x:Key="PwdField" TargetType="PasswordBox">
+            <Setter Property="Background" Value="#1E222C" />
+            <Setter Property="Foreground" Value="#E2E6ED" />
+            <Setter Property="CaretBrush" Value="#D4943A" />
+            <Setter Property="BorderBrush" Value="#282D3A" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Grid>
+                            <Border
+                                x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                SnapsToDevicePixels="True" />
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Disabled" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#D4943A" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#353B4A" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ زر تسجيل الدخول ══════════════  -->
+        <Style x:Key="BtnLoginStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#0C0E13" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="{StaticResource GradAmberBtn}"
+                            CornerRadius="10"
+                            Effect="{StaticResource BtnShadow}"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Margin="0,0,10,0"
+                                    Foreground="#0C0E13"
+                                    Kind="LoginVariant" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ زر الإغلاق ══════════════  -->
+        <Style x:Key="CloseBtnStyle" TargetType="Button">
             <Setter Property="Width" Value="32" />
             <Setter Property="Height" Value="32" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="#CCCCCC" />
-            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border
-                            Background="#FF4444"
-                            BorderBrush="#33FFFFFF"
-                            BorderThickness="0"
-                            CornerRadius="16">
+                            x:Name="Bd"
+                            Background="Transparent"
+                            CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E54D4D" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
         </Style>
-    </Window.Resources>
 
-    <!--  Main layout  -->
+    </mah:MetroWindow.Resources>
+
+    <!--  ═══════════════════════════════════════════  -->
+    <!--  التخطيط الرئيسي  -->
+    <!--  ═══════════════════════════════════════════  -->
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40" />
-            <!--  Sleek title bar  -->
+            <RowDefinition Height="42" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  Window background (transparency support)  -->
-        <Border
-            Grid.RowSpan="2"
-            Background="{DynamicResource MahApps.Brushes.Window.Background}"
-            CornerRadius="16" />
-
-        <!--  Gradient background  -->
+        <!--  ═══════════ خلفية النافذة ═══════════  -->
         <Border Grid.RowSpan="2" CornerRadius="16">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0" Color="#1A1A2E" />
-                    <GradientStop Offset="0.5" Color="#16213E" />
-                    <GradientStop Offset="1" Color="#0F3460" />
+                    <GradientStop Offset="0" Color="#0C0E13" />
+                    <GradientStop Offset="0.5" Color="#10131A" />
+                    <GradientStop Offset="1" Color="#0C0E13" />
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
 
-        <!--  Subtle accents  -->
+        <!--  ═══════════ عناصر العمق الملونة ═══════════  -->
+        <!--  وهج فيروزي خلفي  -->
         <Ellipse
             Grid.RowSpan="2"
-            Width="600"
-            Height="600"
-            Fill="#3F51B5"
-            Opacity="0.08" />
-        <Ellipse
-            Grid.RowSpan="2"
-            Width="400"
-            Height="400"
-            Margin="100,0,0,100"
-            HorizontalAlignment="Left"
+            Width="450"
+            Height="450"
+            Margin="0,0,-100,-100"
+            HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
-            Fill="#5C6BC0"
-            Opacity="0.05" />
+            Fill="#3D9DA6"
+            Opacity="0.03" />
+        <!--  وهج نحاسي خلفي  -->
+        <Ellipse
+            Grid.RowSpan="2"
+            Width="350"
+            Height="350"
+            Margin="-80,-80,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Fill="#D4943A"
+            Opacity="0.025" />
 
-        <!--  Custom Title Bar (only close button)  -->
+        <!--  ═══════════ شريط العنوان ═══════════  -->
         <Border
             Grid.Row="0"
+            Background="#0E1017"
             CornerRadius="16,16,0,0"
             MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                    <GradientStop Offset="0" Color="#2A2A3E" />
-                    <GradientStop Offset="1" Color="#1E1E2E" />
-                </LinearGradientBrush>
-            </Border.Background>
             <Grid>
-                <!--  App icon and title  -->
+                <!--  أيقونة واسم التطبيق  -->
                 <StackPanel
-                    Margin="16,0,0,0"
+                    Margin="18,0,0,0"
                     VerticalAlignment="Center"
                     Orientation="Horizontal">
                     <materialDesign:PackIcon
-                        Width="18"
-                        Height="18"
-                        Foreground="#3F51B5"
+                        Width="16"
+                        Height="16"
+                        Foreground="#3D9DA6"
                         Kind="Broadcast" />
                     <TextBlock
                         Margin="8,0,0,0"
-                        FontSize="13"
+                        FontSize="12"
                         FontWeight="SemiBold"
-                        Foreground="#E0E0E0"
+                        Foreground="#4F5B6E"
                         Text="Broadcast Pro" />
                 </StackPanel>
 
-                <!--  Modern close button (right side)  -->
+                <!--  زر الإغلاق  -->
                 <Button
                     x:Name="CloseButton"
-                    Margin="0,0,16,0"
+                    Margin="0,0,18,0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Click="CloseButton_Click"
-                    Style="{StaticResource ModernCloseButton}"
+                    Style="{StaticResource CloseBtnStyle}"
                     ToolTip="إغلاق">
                     <materialDesign:PackIcon
-                        Width="14"
-                        Height="14"
+                        Width="12"
+                        Height="12"
+                        Foreground="#5A657A"
                         Kind="Close" />
                 </Button>
             </Grid>
         </Border>
 
-        <!--  Main content (same professional login card)  -->
-        <Grid Grid.Row="1" Margin="0,0,0,0">
-            <materialDesign:Card
-                Margin="30,20,30,30"
-                materialDesign:ElevationAssist.Elevation="Dp8"
-                Background="#22FFFFFF"
-                BorderBrush="#33FFFFFF"
+        <!--  ═══════════ البطاقة الرئيسية ═══════════  -->
+        <Grid Grid.Row="1" Margin="15">
+
+            <!--  ظل البطاقة  -->
+            <Border
+                Background="#161A22"
+                BorderBrush="#222736"
                 BorderThickness="1"
-                UniformCornerRadius="24">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                CornerRadius="20"
+                Effect="{StaticResource CardShadow}" />
 
-                    <!--  Left decorative panel  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="240" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  ═══════════ اللوحة اليمنى ═══════════  -->
+                <Grid Grid.Column="0">
+                    <Border Background="{StaticResource GradLeftPanel}" CornerRadius="20,0,0,20" />
+                    <!--  خط فاصل عمودي متدرج  -->
                     <Border
-                        Grid.Column="0"
-                        Width="200"
-                        Background="#1A3F51B5"
-                        CornerRadius="20,0,0,20">
-                        <StackPanel Margin="20" VerticalAlignment="Center">
+                        Width="1"
+                        HorizontalAlignment="Right"
+                        Background="{StaticResource GradSeparator}" />
+
+                    <StackPanel Margin="28,0" VerticalAlignment="Center">
+
+                        <!--  وهج اللوغو  -->
+                        <Ellipse
+                            Width="120"
+                            Height="120"
+                            HorizontalAlignment="Center"
+                            Fill="{StaticResource GradLogoGlow}" />
+
+                        <!--  أيقونة اللوغو  -->
+                        <Border
+                            Width="72"
+                            Height="72"
+                            HorizontalAlignment="Center"
+                            Background="#141820"
+                            BorderBrush="#3D9DA630"
+                            BorderThickness="1.5"
+                            CornerRadius="36"
+                            Effect="{StaticResource TealGlow}">
                             <materialDesign:PackIcon
-                                Width="70"
-                                Height="70"
+                                Width="30"
+                                Height="30"
                                 HorizontalAlignment="Center"
-                                Foreground="White"
-                                Kind="Broadcast"
-                                Opacity="0.9" />
-                            <TextBlock
-                                Margin="0,20,0,5"
-                                HorizontalAlignment="Center"
-                                FontSize="18"
-                                FontWeight="Bold"
-                                Foreground="White"
-                                Text="إذاعة صوت القدس" />
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                FontSize="14"
-                                Foreground="#CCFFFFFF"
-                                Opacity="0.8"
-                                Text="Broadcast Pro" />
-                            <Separator Margin="0,25,0,15" Background="#55FFFFFF" />
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                FontSize="12"
-                                Foreground="#CCFFFFFF"
-                                Text="نظام إدارة البث الاحترافي"
-                                TextAlignment="Center"
-                                TextWrapping="Wrap" />
-                        </StackPanel>
-                    </Border>
-
-                    <!--  Right login form  -->
-                    <StackPanel
-                        Grid.Column="1"
-                        Margin="30,20,30,20"
-                        VerticalAlignment="Center">
-                        <materialDesign:PackIcon
-                            Width="50"
-                            Height="50"
-                            HorizontalAlignment="Center"
-                            Foreground="Beige"
-                            Kind="AccountKey" />
+                                VerticalAlignment="Center"
+                                Foreground="#3D9DA6"
+                                Kind="Broadcast" />
+                        </Border>
 
                         <TextBlock
-                            Margin="0,15,0,5"
+                            Margin="0,22,0,5"
                             HorizontalAlignment="Center"
-                            FontSize="28"
+                            FontSize="16"
                             FontWeight="Bold"
-                            Foreground="White"
-                            Text="تسجيل الدخول" />
+                            Foreground="#C8CDD8"
+                            Text="إذاعة صوت القدس" />
 
-                        <TextBlock
-                            Margin="0,0,0,35"
+                        <!--  شارة الإصدار  -->
+                        <Border
+                            Padding="12,4"
                             HorizontalAlignment="Center"
-                            FontSize="13"
-                            Foreground="#CCCCCC"
-                            Text="أدخل بيانات اعتمادك للمتابعة" />
+                            Background="#3D9DA615"
+                            CornerRadius="10">
+                            <TextBlock
+                                FontSize="10"
+                                FontWeight="SemiBold"
+                                Foreground="#3D9DA6"
+                                Text="v2.0 PRO" />
+                        </Border>
 
-                        <TextBox
-                            x:Name="TxtUsername"
-                            Margin="0,0,0,20"
-                            materialDesign:HintAssist.Foreground="#AAAAAA"
-                            materialDesign:HintAssist.Hint="اسم المستخدم"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                            materialDesign:TextFieldAssist.LeadingIcon="Account"
-                            CaretBrush="#3F51B5"
-                            Foreground="White"
-                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                            Text="admin" />
-
-                        <PasswordBox
-                            x:Name="TxtPassword"
-                            Margin="0,0,0,15"
-                            materialDesign:HintAssist.Foreground="#AAAAAA"
-                            materialDesign:HintAssist.Hint="كلمة المرور"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                            materialDesign:TextFieldAssist.LeadingIcon="Lock"
-                            CaretBrush="#3F51B5"
-                            Foreground="White"
-                            Password="Admin@123"
-                            Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
-
-                        <TextBlock
-                            x:Name="LblError"
-                            Margin="0,5"
+                        <!--  فاصل متدرج  -->
+                        <Border
+                            Width="50"
+                            Height="1"
+                            Margin="0,26,0,26"
                             HorizontalAlignment="Center"
-                            FontSize="12"
-                            Foreground="#FF5252"
-                            Visibility="Collapsed" />
+                            Background="{StaticResource GradSeparator}" />
 
-                        <Button
-                            x:Name="BtnLogin"
-                            Height="48"
-                            Margin="0,25,0,0"
-                            materialDesign:ButtonAssist.CornerRadius="12"
-                            Background="#3F51B5"
-                            BorderBrush="#3F51B5"
-                            Click="BtnLogin_Click"
-                            Content="دخول آمن"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Foreground="White">
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.MouseEnter">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ColorAnimation
-                                                Storyboard.TargetProperty="Background.Color"
-                                                To="#5C6BC0"
-                                                Duration="0:0:0.15" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="Button.MouseLeave">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ColorAnimation
-                                                Storyboard.TargetProperty="Background.Color"
-                                                To="#3F51B5"
-                                                Duration="0:0:0.15" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Button.Triggers>
-                        </Button>
-
-                        <ProgressBar
-                            x:Name="LoginProgress"
-                            Width="40"
-                            Height="40"
-                            Margin="0,15,0,0"
-                            HorizontalAlignment="Center"
-                            Style="{StaticResource MaterialDesignCircularProgressBar}"
-                            Visibility="Collapsed" />
-
+                        <!--  وصف  -->
                         <TextBlock
-                            Margin="0,25,0,0"
                             HorizontalAlignment="Center"
                             FontSize="11"
-                            Foreground="#AAAAAA">
-                            <Hyperlink
-                                Foreground="#9FA8DA"
-                                NavigateUri="#"
-                                ToolTip="لا يؤثر على وظيفة تسجيل الدخول">
-                                نسيت كلمة المرور؟
-                            </Hyperlink>
-                        </TextBlock>
+                            Foreground="#353B4A"
+                            LineHeight="20"
+                            Text="نظام إدارة البث الاحترافي&#x0a;لإذاعة صوت القدس"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap" />
+
+                        <!--  حقوق  -->
+                        <TextBlock
+                            Margin="0,36,0,0"
+                            HorizontalAlignment="Center"
+                            FontSize="10"
+                            Foreground="#252A35"
+                            Text="© 2025 جميع الحقوق محفوظة" />
                     </StackPanel>
                 </Grid>
-            </materialDesign:Card>
+
+                <!--  ═══════════ لوحة النموذج (اليسرى) ═══════════  -->
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="44,32,44,32"
+                    VerticalAlignment="Center">
+
+                    <!--  أيقونة تسجيل الدخول مع وهج  -->
+                    <Grid HorizontalAlignment="Center">
+                        <Ellipse
+                            Width="70"
+                            Height="70"
+                            Fill="{StaticResource GradAmberGlow}" />
+                        <Border
+                            Width="54"
+                            Height="54"
+                            Background="#1A1E28"
+                            BorderBrush="#D4943A25"
+                            BorderThickness="1.5"
+                            CornerRadius="27"
+                            Effect="{StaticResource AmberGlow}">
+                            <materialDesign:PackIcon
+                                Width="24"
+                                Height="24"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Foreground="#D4943A"
+                                Kind="AccountKey" />
+                        </Border>
+                    </Grid>
+
+                    <TextBlock
+                        Margin="0,18,0,4"
+                        HorizontalAlignment="Center"
+                        FontSize="24"
+                        FontWeight="Bold"
+                        Foreground="#E2E6ED"
+                        Text="تسجيل الدخول" />
+
+                    <!--  خط تدرج تحت العنوان  -->
+                    <Border
+                        Width="40"
+                        Height="2"
+                        Margin="0,0,0,16"
+                        HorizontalAlignment="Center"
+                        Background="{StaticResource GradAmberBtn}"
+                        CornerRadius="1"
+                        Effect="{StaticResource AmberGlow}" />
+
+                    <TextBlock
+                        Margin="0,0,0,34"
+                        HorizontalAlignment="Center"
+                        FontSize="13"
+                        Foreground="#4F5B6E"
+                        Text="أدخل بيانات اعتمادك للمتابعة" />
+
+                    <!--  ──── حقل اسم المستخدم ────  -->
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="اسم المستخدم" />
+                    <Grid Margin="0,0,0,24">
+                        <TextBox
+                            x:Name="TxtUsername"
+                            Padding="46,12"
+                            Style="{StaticResource FormField}"
+                            Text="admin" />
+                        <materialDesign:PackIcon
+                            Width="18"
+                            Height="18"
+                            Margin="16,0,0,0"
+                            VerticalAlignment="Center"
+                            Foreground="#4A5568"
+                            IsHitTestVisible="False"
+                            Kind="AccountOutline" />
+                    </Grid>
+
+                    <!--  ──── حقل كلمة المرور ────  -->
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="كلمة المرور" />
+                    <Grid Margin="0,0,0,8">
+                        <PasswordBox
+                            x:Name="TxtPassword"
+                            Padding="46,12"
+                            Password="Admin@123"
+                            Style="{StaticResource PwdField}" />
+                        <materialDesign:PackIcon
+                            Width="18"
+                            Height="18"
+                            Margin="16,0,0,0"
+                            VerticalAlignment="Center"
+                            Foreground="#4A5568"
+                            IsHitTestVisible="False"
+                            Kind="LockOutline" />
+                    </Grid>
+
+                    <!--  رسالة الخطأ  -->
+                    <TextBlock
+                        x:Name="LblError"
+                        Margin="0,6"
+                        HorizontalAlignment="Center"
+                        FontSize="12"
+                        Foreground="#E54D4D"
+                        Visibility="Collapsed" />
+
+                    <!--  ──── زر الدخول ═══════════  -->
+                    <Button
+                        x:Name="BtnLogin"
+                        Margin="0,22,0,0"
+                        Click="BtnLogin_Click"
+                        Content="تسجيل الدخول"
+                        Style="{StaticResource BtnLoginStyle}" />
+
+                    <!--  مؤشر التحميل  -->
+                    <ProgressBar
+                        x:Name="LoginProgress"
+                        Width="36"
+                        Height="36"
+                        Margin="0,16,0,0"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource MaterialDesignCircularProgressBar}"
+                        Visibility="Collapsed" />
+
+                    <!--  نسيت كلمة المرور  -->
+                    <TextBlock
+                        Margin="0,24,0,0"
+                        HorizontalAlignment="Center"
+                        FontSize="11">
+                        <Hyperlink
+                            Foreground="#3D9DA6"
+                            NavigateUri="#"
+                            ToolTip="لا يؤثر على وظيفة تسجيل الدخول">
+                            نسيت كلمة المرور؟
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </mah:MetroWindow>

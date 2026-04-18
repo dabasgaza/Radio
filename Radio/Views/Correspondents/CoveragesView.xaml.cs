@@ -4,18 +4,8 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Radio.Views.Correspondents
 {
@@ -76,7 +66,7 @@ namespace Radio.Views.Correspondents
                     _coverageService,
                     _serviceProvider.GetRequiredService<ICorrespondentService>(),
                     _serviceProvider.GetRequiredService<IGuestService>(),
-                    _session,dto);
+                    _session, dto);
 
                 if (dialog.ShowDialog() == true)
                     await LoadDataAsync();
@@ -106,6 +96,41 @@ namespace Radio.Views.Correspondents
         }
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void CboLocation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void DpDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void BtnClearFilters_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ToggleDateFilter_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void DpFromDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void DpToDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }

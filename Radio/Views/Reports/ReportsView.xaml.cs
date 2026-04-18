@@ -1,7 +1,6 @@
 ﻿using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using System.Runtime.Versioning;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace Radio.Views.Reports

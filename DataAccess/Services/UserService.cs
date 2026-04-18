@@ -165,8 +165,15 @@ namespace DataAccess.Services
                     .Where(rp => rp.RoleId == roleId)
                     .ToListAsync();
 
-                context.RolePermissions.RemoveRange(oldPermissions);
-                await context.SaveChangesAsync();
+                //context.RolePermissions.RemoveRange(oldPermissions);
+                //await context.SaveChangesAsync();
+
+                // ✅ تحسين: ExecuteDeleteAsync بدلاً من ToList + RemoveRange
+                // السبب: رحلة واحدة لقاعدة البيانات (DELETE WHERE) بدلاً من SELECT ثم DELETE
+                await context.RolePermissions
+                    .Where(rp => rp.RoleId == roleId)
+                    .ExecuteDeleteAsync();
+
 
                 // 2. إضافة الارتباطات الجديدة
                 if (selectedPermissionIds != null && selectedPermissionIds.Any())

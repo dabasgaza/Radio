@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DataAccess.DTOs
+﻿namespace DataAccess.DTOs
 {
     public record CoverageDto
     {

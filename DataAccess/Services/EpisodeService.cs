@@ -28,9 +28,6 @@ public class EpisodeService : IEpisodeService
 
         var source = await context.Episodes
             .AsNoTracking()
-            .Include(e => e.Program)
-            .Include(e => e.Guest) // تضمين جدول الضيوف
-            .Include(e => e.EpisodeStatus) // تضمين جدول الحالات الجديد
             .OrderBy(e => e.ScheduledExecutionTime)
             .Select(e => new ActiveEpisodeDto
             {
@@ -39,7 +36,7 @@ public class EpisodeService : IEpisodeService
                 ProgramId = e.ProgramId, // 👈
                 GuestId = e.GuestId,     // 👈
                 EpisodeName = e.EpisodeName,
-                GuestName = e.Guest != null ? e.Guest.FullName: "لا يوجد ضيف", // التعامل مع الضيوف غير المحددين
+                GuestName = e.Guest != null ? e.Guest.FullName : "لا يوجد ضيف", // التعامل مع الضيوف غير المحددين
                 ProgramName = e.Program.ProgramName,
                 ScheduledExecutionTime = e.ScheduledExecutionTime,
                 StatusText = e.EpisodeStatus.DisplayName,

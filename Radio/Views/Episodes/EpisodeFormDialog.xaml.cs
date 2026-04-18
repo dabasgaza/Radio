@@ -2,7 +2,6 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Domain.Models;
 using System.Runtime.Versioning;
 using System.Windows;
 
@@ -23,7 +22,7 @@ namespace Radio.Views.Episodes
         private readonly UserSession _session;
 
         public EpisodeFormDialog(IEpisodeService episodeService,
-            IProgramService programService, 
+            IProgramService programService,
             IGuestService guestService, UserSession session, ActiveEpisodeDto? existingEpisode)
         {
             InitializeComponent();
@@ -32,6 +31,8 @@ namespace Radio.Views.Episodes
             _guestService = guestService;
             _existingEpisode = existingEpisode;
             _session = session;
+
+            this.IsWindowDraggable = true;
 
             // إعداد القيم الافتراضية
             DpDate.SelectedDate = DateTime.Today;
@@ -123,7 +124,7 @@ namespace Radio.Views.Episodes
             {
                 BtnSave.IsEnabled = false; // منع النقرات المتعددة
 
-                if(_existingEpisode != null)
+                if (_existingEpisode != null)
                 {
                     // في حالة التعديل، نستخدم معرف الحلقة الحالية
                     dto = dto with { EpisodeId = _existingEpisode.EpisodeId };
@@ -147,6 +148,16 @@ namespace Radio.Views.Episodes
             {
                 BtnSave.IsEnabled = true;
             }
+        }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
         }
     }
 

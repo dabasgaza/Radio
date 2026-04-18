@@ -6,358 +6,638 @@
     xmlns:local="clr-namespace:Radio.Views.Episodes"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="550"
+    d:DesignWidth="950"
+    FlowDirection="RightToLeft"
     Style="{StaticResource UserControlStyle}"
     mc:Ignorable="d">
 
-    <Grid FlowDirection="RightToLeft">
+    <UserControl.Resources>
+        <!--  ══════════════ الألوان (مبنية على #D4943A) ══════════════  -->
+        <SolidColorBrush x:Key="BgBase" Color="#0C0E12" />
+        <SolidColorBrush x:Key="BgSurface" Color="#14161C" />
+        <SolidColorBrush x:Key="BgElevated" Color="#1C1E26" />
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2A2C36" />
+        <SolidColorBrush x:Key="TextMain" Color="#E4E6EC" />
+        <SolidColorBrush x:Key="TextMuted" Color="#5E6070" />
+
+        <!--  عائلة النحاسي  -->
+        <SolidColorBrush x:Key="AmberMain" Color="#D4943A" />
+        <SolidColorBrush x:Key="AmberLight" Color="#E8B86D" />
+        <SolidColorBrush x:Key="AmberDark" Color="#B87A2A" />
+        <SolidColorBrush x:Key="AmberGhost" Color="#D4943A" />
+
+        <!--  ألوان داعمة تكميلية  -->
+        <SolidColorBrush x:Key="TealSoft" Color="#4DB6AC" />
+        <SolidColorBrush x:Key="GreenSoft" Color="#66BB6A" />
+        <SolidColorBrush x:Key="BlueSoft" Color="#5C9CE6" />
+        <SolidColorBrush x:Key="RedSoft" Color="#EF5350" />
+
+        <!--  ══════════════ التدرجات ══════════════  -->
+        <LinearGradientBrush x:Key="GradAmberBtn" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#D4943A" />
+            <GradientStop Offset="1" Color="#E8A94E" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradLine" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#D4943A" />
+            <GradientStop Offset="0.5" Color="#B87A2A" />
+            <GradientStop Offset="1" Color="#D4943A" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradAmberAvatar" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="#D4943A" />
+            <GradientStop Offset="1" Color="#B87A2A" />
+        </LinearGradientBrush>
+
+        <!--  ══════════════ التأثيرات ══════════════  -->
+        <DropShadowEffect
+            x:Key="GlowAmber"
+            BlurRadius="12"
+            Opacity="0.25"
+            ShadowDepth="0"
+            Color="#D4943A" />
+        <DropShadowEffect
+            x:Key="BtnShadow"
+            BlurRadius="18"
+            Opacity="0.3"
+            ShadowDepth="4"
+            Color="#D4943A" />
+        <DropShadowEffect
+            x:Key="CardShadow"
+            BlurRadius="24"
+            Opacity="0.25"
+            ShadowDepth="4"
+            Color="#000000" />
+
+        <!--  ══════════════ أنماط DataGrid ══════════════  -->
+        <Style x:Key="DgRow" TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1C1E26" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#24262E" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DgCell" TargetType="DataGridCell">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="12,18" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="#E4E6EC" />
+            <Setter Property="FontSize" Value="13" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="#E4E6EC" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DgHeader" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#18191F" />
+            <Setter Property="Foreground" Value="#5E6070" />
+            <Setter Property="Padding" Value="14,16" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="SeparatorVisibility" Value="Collapsed" />
+        </Style>
+
+        <!--  ══════════════ أزرار الإجراءات (آمنة) ══════════════  -->
+        <!--  ══════════════ أزرار الإجراءات (ألوان وظيفية مميزة) ══════════════  -->
+
+        <!--  نشر (أخضر)  -->
+        <Style x:Key="BtnActionGreen" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#66BB6A"
+                            BorderBrush="#66BB6A"
+                            BorderThickness="1"
+                            CornerRadius="7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.3" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  تنفيذ (أزرق)  -->
+        <Style x:Key="BtnActionBlue" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#42A5F5"
+                            BorderBrush="#42A5F5"
+                            BorderThickness="1"
+                            CornerRadius="7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.3" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  تعديل (نحاسي)  -->
+        <Style x:Key="BtnActionAmber" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#D4943A"
+                            BorderBrush="#D4943A"
+                            BorderThickness="1"
+                            CornerRadius="7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  حذف (أحمر)  -->
+        <Style x:Key="BtnActionRed" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#EF5350"
+                            BorderBrush="#EF5350"
+                            BorderThickness="1"
+                            CornerRadius="7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ بطاقة إحصائية ══════════════  -->
+        <Style x:Key="StatCard" TargetType="Border">
+            <Setter Property="Background" Value="#14161C" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="14" />
+            <Setter Property="BorderBrush" Value="#2A2C36" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!--  ══════════════ زر الإضافة ══════════════  -->
+        <Style x:Key="BtnAddStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#0C0E12" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Padding="20,10"
+                            Background="{StaticResource GradAmberBtn}"
+                            CornerRadius="10"
+                            Effect="{StaticResource BtnShadow}"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center"
+                                    Kind="Plus" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.96" ScaleY="0.96" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <!--  ═══════════════════════════════════════════  -->
+    <!--  التخطيط الرئيسي  -->
+    <!--  ═══════════════════════════════════════════  -->
+    <Grid Background="#0C0E12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  رأس الصفحة  -->
-        <Border
-            Background="#2D2D30"
-            BorderBrush="#3E3E42"
-            BorderThickness="0,0,0,1">
-            <Grid Margin="20,15">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontSize="24"
-                        FontWeight="SemiBold"
-                        Foreground="#E0E0E0"
-                        Text="سجل الحلقات والبث" />
-                    <Border
-                        Margin="10,0,0,0"
-                        Padding="8,2"
-                        Background="#03A9F4"
-                        CornerRadius="14">
-                        <TextBlock
-                            x:Name="TxtEpisodesCount"
-                            VerticalAlignment="Center"
-                            FontSize="12"
-                            FontWeight="Bold"
-                            Foreground="White"
-                            Text="0" />
-                    </Border>
-                </StackPanel>
-
-                <!--  مربع بحث (اختياري – يمكن ربطه لاحقاً)  -->
-                <TextBox
-                    Grid.Column="1"
-                    Width="200"
-                    Margin="20,0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    materialDesign:HintAssist.Hint="بحث عن حلقة...">
-                    <TextBox.Style>
-                        <Style BasedOn="{StaticResource MaterialDesignFilledTextBox}" TargetType="TextBox">
-                            <Setter Property="Background" Value="#3E3E42" />
-                            <Setter Property="Foreground" Value="White" />
-                            <Setter Property="BorderBrush" Value="#555" />
-                        </Style>
-                    </TextBox.Style>
-                </TextBox>
-
-                <Button
-                    x:Name="BtnAddEpisode"
-                    Grid.Column="2"
-                    materialDesign:ButtonAssist.CornerRadius="8"
-                    Background="#03A9F4"
-                    BorderBrush="#03A9F4"
-                    Click="BtnAddEpisode_Click"
+        <!--  ═══════════ الرأس ═══════════  -->
+        <Grid Grid.Row="0" Margin="28,28,28,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock
+                    FontSize="26"
+                    FontWeight="Bold"
                     Foreground="White"
-                    Style="{StaticResource MaterialDesignRaisedButton}"
-                    ToolTip="جدولة حلقة جديدة">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon
-                            Width="18"
-                            Height="18"
-                            Margin="0,0,6,0"
-                            Kind="Plus" />
-                        <TextBlock Text="جدولة حلقة جديدة" />
-                    </StackPanel>
-                </Button>
-            </Grid>
-        </Border>
-
-        <!--  شريط إحصائيات سريع  -->
-        <Border
-            Grid.Row="1"
-            Background="#252526"
-            BorderBrush="#3E3E42"
-            BorderThickness="0,0,0,1">
-            <StackPanel Margin="20,8" Orientation="Horizontal">
-                <materialDesign:PackIcon
-                    Width="16"
-                    Height="16"
-                    Foreground="#03A9F4"
-                    Kind="Calendar" />
+                    Text="سجل الحلقات والبث" />
                 <TextBlock
-                    Margin="6,0,15,0"
-                    FontSize="12"
-                    Foreground="#AAA"
-                    Text="البث القادم: --" />
-                <materialDesign:PackIcon
-                    Width="16"
-                    Height="16"
-                    Foreground="#4CAF50"
-                    Kind="CheckCircle" />
-                <TextBlock
-                    Margin="6,0,0,0"
-                    FontSize="12"
-                    Foreground="#AAA"
-                    Text="تم النشر: 0 حلقة" />
+                    Margin="0,5,0,0"
+                    FontSize="13"
+                    Foreground="#5E6070"
+                    Text="جدولة الحلقات الإذاعية ومتابعة حالات البث والنشر" />
+                <Border
+                    Width="55"
+                    Height="3"
+                    Margin="0,14,0,0"
+                    Background="{StaticResource GradAmberBtn}"
+                    CornerRadius="2">
+                    <Border.Effect>
+                        <DropShadowEffect
+                            BlurRadius="8"
+                            Opacity="0.5"
+                            ShadowDepth="0"
+                            Color="#D4943A" />
+                    </Border.Effect>
+                </Border>
             </StackPanel>
-        </Border>
+            <Button
+                x:Name="BtnAddEpisode"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Click="BtnAddEpisode_Click"
+                Content="جدولة حلقة جديدة"
+                Style="{StaticResource BtnAddStyle}" />
+        </Grid>
 
-        <!--  DataGrid داخل Card  -->
-        <materialDesign:Card
+        <!--  ═══════════ شريط البحث والإحصائيات ═══════════  -->
+        <Grid Grid.Row="1" Margin="28,18,28,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.5*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  حقل البحث  -->
+            <TextBox
+                x:Name="TxtSearch"
+                Grid.Column="0"
+                Margin="0,0,10,0"
+                materialDesign:HintAssist.Foreground="#5E6070"
+                materialDesign:HintAssist.Hint="بحث بعنوان الحلقة أو الضيف..."
+                materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                materialDesign:TextFieldAssist.LeadingIcon="Magnify"
+                FontSize="14"
+                Foreground="#E4E6EC"
+                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                TextChanged="TxtSearch_TextChanged" />
+
+            <!--  إجمالي الحلقات  -->
+            <Border
+                Grid.Column="1"
+                Margin="5,0"
+                Style="{StaticResource StatCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Width="34"
+                        Height="34"
+                        Background="#D4943A15"
+                        CornerRadius="8">
+                        <materialDesign:PackIcon
+                            Width="16"
+                            Height="16"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="#D4943A"
+                            Kind="PlaylistPlay" />
+                    </Border>
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="10"
+                            Foreground="#5E6070"
+                            Text="الإجمالي" />
+                        <TextBlock
+                            x:Name="TxtTotal"
+                            Margin="0,1,0,0"
+                            HorizontalAlignment="Center"
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Foreground="#E4E6EC"
+                            Text="0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  منفّذة  -->
+            <Border
+                Grid.Column="2"
+                Margin="5,0"
+                Style="{StaticResource StatCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Width="34"
+                        Height="34"
+                        Background="#5C9CE615"
+                        CornerRadius="8">
+                        <materialDesign:PackIcon
+                            Width="16"
+                            Height="16"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="#5C9CE6"
+                            Kind="PlayCircleOutline" />
+                    </Border>
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="10"
+                            Foreground="#5E6070"
+                            Text="منفّذة" />
+                        <TextBlock
+                            x:Name="TxtExecuted"
+                            Margin="0,1,0,0"
+                            HorizontalAlignment="Center"
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Foreground="#5C9CE6"
+                            Text="0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  منشورة  -->
+            <Border
+                Grid.Column="3"
+                Margin="10,0,0,0"
+                Style="{StaticResource StatCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Width="34"
+                        Height="34"
+                        Background="#66BB6A15"
+                        CornerRadius="8">
+                        <materialDesign:PackIcon
+                            Width="16"
+                            Height="16"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="#66BB6A"
+                            Kind="CloudUploadOutline" />
+                    </Border>
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="10"
+                            Foreground="#5E6070"
+                            Text="منشورة" />
+                        <TextBlock
+                            x:Name="TxtPublished"
+                            Margin="0,1,0,0"
+                            HorizontalAlignment="Center"
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Foreground="#66BB6A"
+                            Text="0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!--  ═══════════ جدول البيانات ═══════════  -->
+        <Border
             Grid.Row="2"
-            Margin="16"
-            Background="{DynamicResource MaterialDesignPaper}"
-            BorderBrush="{DynamicResource MaterialDesignDivider}"
+            Margin="28,16,28,28"
+            Background="#14161C"
+            BorderBrush="#2A2C36"
             BorderThickness="1"
-            UniformCornerRadius="12">
+            CornerRadius="14"
+            Effect="{StaticResource CardShadow}">
+            <DataGrid
+                x:Name="DgEpisodes"
+                AutoGenerateColumns="False"
+                Background="Transparent"
+                CanUserAddRows="False"
+                CellStyle="{StaticResource DgCell}"
+                ColumnHeaderStyle="{StaticResource DgHeader}"
+                GridLinesVisibility="None"
+                HeadersVisibility="Column"
+                IsReadOnly="True"
+                MinRowHeight="50"
+                RowStyle="{StaticResource DgRow}"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                SelectionMode="Single"
+                SelectionUnit="FullRow">
 
-            <!--  تعريف موارد محلية للتنسيق  -->
-            <materialDesign:Card.Resources>
-                <!--  تنسيق النصوص في الخلايا  -->
-                <Style x:Key="CenterCellText" TargetType="TextBlock">
-                    <Setter Property="HorizontalAlignment" Value="Center" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                </Style>
-                <Style x:Key="RightCellText" TargetType="TextBlock">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                    <Setter Property="Margin" Value="10,0,0,0" />
-                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                </Style>
-            </materialDesign:Card.Resources>
+                <DataGrid.Columns>
 
-            <materialDesign:Card
-                Grid.Row="2"
-                Margin="16"
-                Background="#1A1A22"
-                BorderBrush="#333346"
-                BorderThickness="1"
-                UniformCornerRadius="12">
+                    <!--  عمود الإجراءات  -->
+                    <DataGridTemplateColumn Width="160" Header="إجراءات">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <Button
+                                        Click="BtnMarkPublished_Click"
+                                        IsEnabled="{Binding CanMarkPublished}"
+                                        Style="{StaticResource BtnActionGreen}"
+                                        ToolTip="نشر">
+                                        <materialDesign:PackIcon
+                                            Width="14"
+                                            Height="14"
+                                            Foreground="#F5F5F5"
+                                            Kind="Upload" />
+                                    </Button>
+                                    <Button
+                                        Margin="4,0,0,0"
+                                        Click="BtnMarkExecuted_Click"
+                                        IsEnabled="{Binding CanMarkExecuted}"
+                                        Style="{StaticResource BtnActionBlue}"
+                                        ToolTip="تنفيذ">
+                                        <materialDesign:PackIcon
+                                            Width="14"
+                                            Height="14"
+                                            Foreground="#F5F5F5"
+                                            Kind="PlayCircle" />
+                                    </Button>
+                                    <Button
+                                        Margin="4,0,0,0"
+                                        Click="BtnEdit_Click"
+                                        Style="{StaticResource BtnActionAmber}"
+                                        ToolTip="تعديل">
+                                        <materialDesign:PackIcon
+                                            Width="14"
+                                            Height="14"
+                                            Foreground="#F5F5F5"
+                                            Kind="PencilOutline" />
+                                    </Button>
+                                    <Button
+                                        Margin="4,0,0,0"
+                                        Click="BtnDelete_Click"
+                                        Style="{StaticResource BtnActionRed}"
+                                        ToolTip="حذف">
+                                        <materialDesign:PackIcon
+                                            Width="14"
+                                            Height="14"
+                                            Foreground="#E3F2FD"
+                                            Kind="TrashCanOutline" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <materialDesign:Card.Resources>
-                    <!--  تنسيق النصوص في الخلايا  -->
-                    <Style x:Key="CenterCellText" TargetType="TextBlock">
-                        <Setter Property="HorizontalAlignment" Value="Center" />
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                        <Setter Property="Foreground" Value="#E0E0E0" />
-                    </Style>
-                    <Style x:Key="RightCellText" TargetType="TextBlock">
-                        <Setter Property="HorizontalAlignment" Value="Right" />
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="Margin" Value="10,0,0,0" />
-                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                        <Setter Property="Foreground" Value="#E0E0E0" />
-                    </Style>
-                </materialDesign:Card.Resources>
+                    <!--  عمود البرنامج  -->
+                    <DataGridTextColumn
+                        Width="140"
+                        Binding="{Binding ProgramName}"
+                        Header="البرنامج" />
 
-                <DataGrid
-                    x:Name="DgEpisodes"
-                    AlternatingRowBackground="#27273A"
-                    AutoGenerateColumns="False"
-                    Background="Transparent"
-                    CanUserAddRows="False"
-                    FlowDirection="RightToLeft"
-                    Foreground="{DynamicResource MaterialDesignBody}"
-                    GridLinesVisibility="None"
-                    HeadersVisibility="Column"
-                    IsReadOnly="True"
-                    RowBackground="#1E1E24"
-                    SelectionMode="Single"
-                    SelectionUnit="FullRow">
-
-                    <!--  تأثير التمرير (Hover) على الصفوف  -->
-                    <DataGrid.RowStyle>
-                        <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#33334A" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGrid.RowStyle>
-
-                    <!--  تنسيق رؤوس الأعمدة (التصميم الجديد)  -->
-                    <DataGrid.ColumnHeaderStyle>
-                        <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                            <!--  لون خلفية الهيدر المميز جداً  -->
-                            <Setter Property="Background" Value="#12131A" />
-                            <!--  لون النص المميز  -->
-                            <Setter Property="Foreground" Value="#5EAEFF" />
-                            <Setter Property="FontSize" Value="13" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                            <Setter Property="Padding" Value="14,12" />
-                            <!--  إزالة الحدود لجعله يبدو ككتلة واحدة  -->
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                        </Style>
-                    </DataGrid.ColumnHeaderStyle>
-
-                    <DataGrid.Columns>
-
-                        <!--  عمود الإجراءات  -->
-                        <DataGridTemplateColumn Width="Auto" Header="الإجراءات">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            Margin="4"
-                                            Padding="4"
-                                            Click="BtnMarkPublished_Click"
-                                            Foreground="#66BB6A"
-                                            IsEnabled="{Binding CanMarkPublished}"
-                                            Style="{StaticResource MaterialDesignIconButton}"
-                                            ToolTip="نشر">
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                Kind="Upload" />
-                                        </Button>
-                                        <Button
-                                            Margin="4"
-                                            Padding="4"
-                                            Click="BtnMarkExecuted_Click"
-                                            Foreground="#42A5F5"
-                                            IsEnabled="{Binding CanMarkExecuted}"
-                                            Style="{StaticResource MaterialDesignIconButton}"
-                                            ToolTip="تنفيذ">
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                Kind="PlayCircle" />
-                                        </Button>
-                                        <Button
-                                            Margin="4"
-                                            Padding="4"
-                                            Click="BtnEdit_Click"
-                                            Foreground="#FFA726"
-                                            Style="{StaticResource MaterialDesignIconButton}"
-                                            ToolTip="تعديل">
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                Kind="Pencil" />
-                                        </Button>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <!--  عمود البرنامج  -->
-                        <DataGridTextColumn
-                            Width="150"
-                            Binding="{Binding ProgramName}"
-                            ElementStyle="{StaticResource RightCellText}"
-                            Header="البرنامج">
-                            <DataGridTextColumn.HeaderStyle>
-                                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                    <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                </Style>
-                            </DataGridTextColumn.HeaderStyle>
-                        </DataGridTextColumn>
-
-                        <!--  عمود عنوان الحلقة  -->
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding EpisodeName}"
-                            ElementStyle="{StaticResource RightCellText}"
-                            Header="عنوان الحلقة">
-                            <DataGridTextColumn.HeaderStyle>
-                                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                    <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                </Style>
-                            </DataGridTextColumn.HeaderStyle>
-                        </DataGridTextColumn>
-
-                        <!--  عمود ضيف الحلقة  -->
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding GuestName}"
-                            ElementStyle="{StaticResource RightCellText}"
-                            Header="ضيف الحلقة">
-                            <DataGridTextColumn.HeaderStyle>
-                                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                    <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                </Style>
-                            </DataGridTextColumn.HeaderStyle>
-                        </DataGridTextColumn>
-
-                        <!--  عمود تاريخ البث  -->
-                        <DataGridTextColumn
-                            Width="120"
-                            Binding="{Binding ScheduledExecutionTime, StringFormat='yyyy/MM/dd'}"
-                            ElementStyle="{StaticResource CenterCellText}"
-                            Header="تاريخ البث" />
-
-                        <!--  عمود الحالة  -->
-                        <DataGridTemplateColumn Width="120" Header="الحالة">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
+                    <!--  عمود عنوان الحلقة (مع أيقونة)  -->
+                    <DataGridTemplateColumn Width="*" Header="عنوان الحلقة">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                     <Border
-                                        x:Name="StatusBorder"
-                                        Margin="8,0"
-                                        Padding="12,5"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Background="#37474F"
-                                        CornerRadius="15">
-                                        <TextBlock
+                                        Width="30"
+                                        Height="30"
+                                        Background="{StaticResource GradAmberAvatar}"
+                                        CornerRadius="15"
+                                        Effect="{StaticResource GlowAmber}">
+                                        <materialDesign:PackIcon
+                                            Width="14"
+                                            Height="14"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            FontSize="12"
-                                            FontWeight="Medium"
-                                            Foreground="#B0BEC5"
-                                            Text="{Binding StatusText}" />
+                                            Foreground="White"
+                                            Kind="Broadcast" />
                                     </Border>
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding StatusText}" Value="مجدولة">
-                                            <Setter TargetName="StatusBorder" Property="Background" Value="#37474F" />
-                                            <Setter TargetName="StatusBorder" Property="TextElement.Foreground" Value="#90A4AE" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                            <Setter TargetName="StatusBorder" Property="Background" Value="#1565C0" />
-                                            <Setter TargetName="StatusBorder" Property="TextElement.Foreground" Value="#BBDEFB" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
-                                            <Setter TargetName="StatusBorder" Property="Background" Value="#2E7D32" />
-                                            <Setter TargetName="StatusBorder" Property="TextElement.Foreground" Value="#C8E6C9" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
-                                            <Setter TargetName="StatusBorder" Property="Background" Value="#C62828" />
-                                            <Setter TargetName="StatusBorder" Property="TextElement.Foreground" Value="#FFCDD2" />
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                                    <TextBlock
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="#E4E6EC"
+                                        Text="{Binding EpisodeName}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                    </DataGrid.Columns>
-                </DataGrid>
-            </materialDesign:Card>
-        </materialDesign:Card>
+                    <!--  عمود الضيف  -->
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding GuestName}"
+                        Header="ضيف الحلقة" />
+
+                    <!--  عمود تاريخ البث  -->
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding ScheduledExecutionTime, StringFormat='yyyy/MM/dd'}"
+                        Header="تاريخ البث" />
+
+                    <!--  عمود الحالة  -->
+                    <DataGridTemplateColumn Width="110" Header="الحالة">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border
+                                    x:Name="StatusBorder"
+                                    Padding="12,5"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Background="#2A2C36"
+                                    CornerRadius="12">
+                                    <TextBlock
+                                        x:Name="StatusText"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        FontWeight="Medium"
+                                        Foreground="#5E6070"
+                                        Text="{Binding StatusText}" />
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding StatusText}" Value="مجدولة">
+                                        <Setter TargetName="StatusBorder" Property="Background" Value="#D4943A18" />
+                                        <Setter TargetName="StatusText" Property="Foreground" Value="#E8B86D" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
+                                        <Setter TargetName="StatusBorder" Property="Background" Value="#5C9CE618" />
+                                        <Setter TargetName="StatusText" Property="Foreground" Value="#5C9CE6" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
+                                        <Setter TargetName="StatusBorder" Property="Background" Value="#66BB6A18" />
+                                        <Setter TargetName="StatusText" Property="Foreground" Value="#66BB6A" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
+                                        <Setter TargetName="StatusBorder" Property="Background" Value="#EF535018" />
+                                        <Setter TargetName="StatusText" Property="Foreground" Value="#EF5350" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
     </Grid>
 </UserControl>

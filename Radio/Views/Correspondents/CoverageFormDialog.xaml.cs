@@ -125,5 +125,9 @@ namespace Radio.Views.Correspondents
             }
         }
 
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
     }
 }

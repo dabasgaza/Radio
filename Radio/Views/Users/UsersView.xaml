@@ -6,107 +6,528 @@
     xmlns:local="clr-namespace:Radio.Views.Users"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="650"
+    d:DesignWidth="900"
     Style="{StaticResource UserControlStyle}"
     mc:Ignorable="d">
-    <Grid>
+
+    <UserControl.Resources>
+        <!--  ══════════════ ألوان النظام ══════════════  -->
+        <SolidColorBrush x:Key="BgBase" Color="#0C0F16" />
+        <SolidColorBrush x:Key="BgSurface" Color="#141821" />
+        <SolidColorBrush x:Key="BgElevated" Color="#1C2130" />
+        <SolidColorBrush x:Key="BgHover" Color="#242A3A" />
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2A3042" />
+        <SolidColorBrush x:Key="AccentTeal" Color="#00D4AA" />
+        <SolidColorBrush x:Key="AccentViolet" Color="#7C4DFF" />
+        <SolidColorBrush x:Key="AccentBlue" Color="#448AFF" />
+        <SolidColorBrush x:Key="TextMain" Color="#E4E8F1" />
+        <SolidColorBrush x:Key="TextMuted" Color="#5E6687" />
+        <SolidColorBrush x:Key="GreenBright" Color="#00E676" />
+        <SolidColorBrush x:Key="RedBright" Color="#FF5252" />
+
+        <!--  ══════════════ تدرجات لونية ══════════════  -->
+        <LinearGradientBrush x:Key="GradAccent" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#00D4AA" />
+            <GradientStop Offset="1" Color="#448AFF" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradViolet" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="#7C4DFF" />
+            <GradientStop Offset="1" Color="#E040FB" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradLine" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#00D4AA" />
+            <GradientStop Offset="0.5" Color="#448AFF" />
+            <GradientStop Offset="1" Color="#7C4DFF" />
+        </LinearGradientBrush>
+
+        <!--  ══════════════ تأثيرات بصرية ══════════════  -->
+        <DropShadowEffect
+            x:Key="GlowTeal"
+            BlurRadius="10"
+            Opacity="0.2"
+            ShadowDepth="0"
+            Color="#00D4AA" />
+        <DropShadowEffect
+            x:Key="GlowViolet"
+            BlurRadius="10"
+            Opacity="0.2"
+            ShadowDepth="0"
+            Color="#7C4DFF" />
+        <DropShadowEffect
+            x:Key="CardShadow"
+            BlurRadius="24"
+            Opacity="0.25"
+            ShadowDepth="4"
+            Color="#000000" />
+
+        <!--  ══════════════ زر الإضافة ══════════════  -->
+        <Style x:Key="BtnAddStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Padding="20,11"
+                            Background="{StaticResource GradAccent}"
+                            CornerRadius="10"
+                            Effect="{StaticResource GlowTeal}"
+                            RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center"
+                                    Kind="Plus" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.96" ScaleY="0.96" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ نمط صف DataGrid ══════════════  -->
+        <Style x:Key="DgRow" TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1C2130" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#242A3A" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  ══════════════ نمط خلية DataGrid ══════════════  -->
+        <Style x:Key="DgCell" TargetType="DataGridCell">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="#E4E8F1" />
+            <Setter Property="FontSize" Value="14" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="#E4E8F1" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  ══════════════ نمط رأس العمود ══════════════  -->
+        <Style x:Key="DgHeader" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#181D28" />
+            <Setter Property="Foreground" Value="#5E6687" />
+            <Setter Property="Padding" Value="14,14" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="SeparatorVisibility" Value="Collapsed" />
+        </Style>
+
+        <!--  ══════════════ زر الإجراءات ══════════════  -->
+        <Style x:Key="BtnAction" TargetType="Button">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#1C2130"
+                            BorderBrush="#2A3042"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#448AFF" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#448AFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ زر الحذف ══════════════  -->
+        <Style x:Key="BtnDeleteAction" TargetType="Button">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bd"
+                            Background="#1C2130"
+                            BorderBrush="#2A3042"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#FF5252" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#FF5252" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ══════════════ بطاقة إحصائية ══════════════  -->
+        <Style x:Key="StatCard" TargetType="Border">
+            <Setter Property="Background" Value="#141821" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="BorderBrush" Value="#2A3042" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#3A4058" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <!--  ═══════════════════════════════════════════════  -->
+    <!--  التخطيط الرئيسي  -->
+    <!--  ═══════════════════════════════════════════════  -->
+    <Grid Background="#0C0F16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel
-            Grid.Row="0"
-            Margin="10,20,10,20"
-            VerticalAlignment="Center">
-            <TextBlock
-                VerticalAlignment="Center"
-                FontSize="26"
-                FontWeight="Bold"
-                Foreground="White"
-                Text="إدارة مستخدمي النظام" />
+        <!--  ═══════════ الرأس ═══════════  -->
+        <Grid Grid.Row="0" Margin="28,28,28,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+                <TextBlock
+                    FontSize="28"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    Text="إدارة المستخدمين" />
+                <TextBlock
+                    Margin="0,5,0,0"
+                    FontSize="13"
+                    Foreground="#5E6687"
+                    Text="إشراف على الحسابات والصلاحيات والتحكم في صلاحيات الوصول" />
+                <!--  خط التدرج المميز  -->
+                <Border
+                    Width="55"
+                    Height="3"
+                    Margin="0,14,0,0"
+                    Background="{StaticResource GradLine}"
+                    CornerRadius="2">
+                    <Border.Effect>
+                        <DropShadowEffect
+                            BlurRadius="8"
+                            Opacity="0.5"
+                            ShadowDepth="0"
+                            Color="#00D4AA" />
+                    </Border.Effect>
+                </Border>
+            </StackPanel>
+
             <Button
                 x:Name="BtnAddUser"
-                Margin="20,0,0,0"
-                HorizontalAlignment="Left"
-                materialDesign:ButtonAssist.CornerRadius="5"
-                Background="#1F6F5F"
-                BorderBrush="#1F6F5F"
+                Grid.Column="1"
+                VerticalAlignment="Center"
                 Click="BtnAddUser_Click"
-                Content="إضافة مستخدم"
-                Foreground="White" />
-        </DockPanel>
+                Content="إضافة مستخدم جديد"
+                Style="{StaticResource BtnAddStyle}" />
+        </Grid>
 
-        <materialDesign:Card
-            Grid.Row="1"
-            Background="#1E1E1E"
-            UniformCornerRadius="10">
+        <!--  ═══════════ بطاقات الإحصائيات ═══════════  -->
+        <Grid Grid.Row="1" Margin="28,22,28,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  إجمالي المستخدمين  -->
+            <Border Margin="0,0,10,0" Style="{StaticResource StatCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Width="44"
+                        Height="44"
+                        Background="#00D4AA12"
+                        CornerRadius="10">
+                        <materialDesign:PackIcon
+                            Width="22"
+                            Height="22"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="#00D4AA"
+                            Kind="AccountGroup" />
+                    </Border>
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="14,0,0,0"
+                        VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="#5E6687"
+                            Text="إجمالي المستخدمين" />
+                        <TextBlock
+                            x:Name="TxtTotalUsers"
+                            Margin="0,2,0,0"
+                            FontSize="24"
+                            FontWeight="Bold"
+                            Foreground="#E4E8F1"
+                            Text="0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  حسابات نشطة  -->
+            <Border Margin="10,0" Style="{StaticResource StatCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Width="44"
+                        Height="44"
+                        Background="#00E67612"
+                        CornerRadius="10">
+                        <materialDesign:PackIcon
+                            Width="22"
+                            Height="22"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="#00E676"
+                            Kind="AccountCheck" />
+                    </Border>
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="14,0,0,0"
+                        VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="#5E6687"
+                            Text="حسابات نشطة" />
+                        <TextBlock
+                            x:Name="TxtActiveUsers"
+                            Margin="0,2,0,0"
+                            FontSize="24"
+                            FontWeight="Bold"
+                            Foreground="#00E676"
+                            Text="0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  حسابات معطلة  -->
+            <Border Margin="10,0,0,0" Style="{StaticResource StatCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Width="44"
+                        Height="44"
+                        Background="#FF525212"
+                        CornerRadius="10">
+                        <materialDesign:PackIcon
+                            Width="22"
+                            Height="22"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="#FF5252"
+                            Kind="AccountRemove" />
+                    </Border>
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="14,0,0,0"
+                        VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="#5E6687"
+                            Text="حسابات معطلة" />
+                        <TextBlock
+                            x:Name="TxtInactiveUsers"
+                            Margin="0,2,0,0"
+                            FontSize="24"
+                            FontWeight="Bold"
+                            Foreground="#FF5252"
+                            Text="0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!--  ═══════════ جدول البيانات ═══════════  -->
+        <Border
+            Grid.Row="2"
+            Margin="28,20,28,28"
+            Background="#141821"
+            BorderBrush="#2A3042"
+            BorderThickness="1"
+            CornerRadius="14"
+            Effect="{StaticResource CardShadow}">
             <DataGrid
                 x:Name="DgUsers"
-                AlternatingRowBackground="#252526"
                 AutoGenerateColumns="False"
                 Background="Transparent"
                 CanUserAddRows="False"
-                Foreground="White"
+                CellStyle="{StaticResource DgCell}"
+                ColumnHeaderStyle="{StaticResource DgHeader}"
+                GridLinesVisibility="None"
+                HeadersVisibility="Column"
                 IsReadOnly="True"
-                RowBackground="#1E1E1E">
-                <DataGrid.ColumnHeaderStyle>
-                    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#1F6F5F" />
-                        <Setter Property="Foreground" Value="White" />
-                        <Setter Property="Padding" Value="15" />
-                    </Style>
-                </DataGrid.ColumnHeaderStyle>
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding FullName}"
-                        CellStyle="{StaticResource LeftCellAligned}"
-                        Header="الاسم الكامل" />
-                    <DataGridTextColumn
-                        Width="150"
-                        Binding="{Binding Username}"
-                        CellStyle="{StaticResource CenterCellAligned}"
-                        FontWeight="Bold"
-                        Foreground="#9C27B0"
-                        Header="اسم المستخدم" />
-                    <DataGridTextColumn
-                        Width="150"
-                        Binding="{Binding Role.RoleName}"
-                        Header="الدور" />
+                RowStyle="{StaticResource DgRow}"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                SelectionMode="Single"
+                SelectionUnit="FullRow">
 
-                    <DataGridTemplateColumn Width="100" Header="حالة الحساب">
+                <DataGrid.Columns>
+
+                    <!--  عمود المستخدم: أفاتار + اسم + يوزرنيم  -->
+                    <DataGridTemplateColumn Width="*" Header="المستخدم">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <!--  Toggle Button بلمسة عصرية  -->
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        Background="{StaticResource GradViolet}"
+                                        CornerRadius="20"
+                                        Effect="{StaticResource GlowViolet}">
+                                        <materialDesign:PackIcon
+                                            Width="20"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Foreground="White"
+                                            Kind="Account" />
+                                    </Border>
+                                    <StackPanel Margin="14,0,0,0">
+                                        <TextBlock
+                                            FontSize="14"
+                                            FontWeight="SemiBold"
+                                            Foreground="#E4E8F1"
+                                            Text="{Binding FullName}" />
+                                        <TextBlock
+                                            Margin="0,3,0,0"
+                                            FontSize="12"
+                                            Foreground="#5E6687"
+                                            Text="{Binding Username}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  عمود الدور: شارة ملونة  -->
+                    <DataGridTemplateColumn Width="160" Header="الدور">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Padding="14,6"
+                                    HorizontalAlignment="Center"
+                                    Background="#7C4DFF18"
+                                    CornerRadius="8">
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Foreground="#B388FF"
+                                        Text="{Binding Role.RoleName}" />
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  عمود الحالة: مفتاح تبديل  -->
+                    <DataGridTemplateColumn Width="110" Header="الحالة">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
                                 <ToggleButton
+                                    HorizontalAlignment="Center"
                                     Click="Status_Click"
-                                    Foreground="#9C27B0"
                                     IsChecked="{Binding IsActive}"
                                     Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                    ToolTip="تفعيل/تعطيل" />
+                                    ToolTip="تفعيل / تعطيل الحساب" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="80" Header="إجراءات">
+                    <!--  عمود الإجراءات  -->
+                    <DataGridTemplateColumn Width="110" Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button
-                                    x:Name="BtnEdit"
-                                    Width="30"
-                                    Height="30"
-                                    Click="BtnEdit_Click"
-                                    Foreground="#03A9F4"
-                                    Style="{StaticResource MaterialDesignIconForegroundButton}">
-                                    <materialDesign:PackIcon Kind="Pencil" />
-                                </Button>
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <Button
+                                        x:Name="BtnEdit"
+                                        Click="BtnEdit_Click"
+                                        Style="{StaticResource BtnAction}"
+                                        ToolTip="تعديل">
+                                        <materialDesign:PackIcon
+                                            Width="16"
+                                            Height="16"
+                                            Foreground="#5E6687"
+                                            Kind="PencilOutline" />
+                                    </Button>
+                                    <Button
+                                        Margin="8,0,0,0"
+                                        Click="BtnDelete_Click"
+                                        Style="{StaticResource BtnDeleteAction}"
+                                        ToolTip="حذف">
+                                        <materialDesign:PackIcon
+                                            Width="16"
+                                            Height="16"
+                                            Foreground="#5E6687"
+                                            Kind="TrashCanOutline" />
+                                    </Button>
+                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+
                 </DataGrid.Columns>
             </DataGrid>
-        </materialDesign:Card>
+        </Border>
     </Grid>
 </UserControl>

@@ -41,5 +41,9 @@ namespace Radio.Views.Correspondents
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
     }
 }

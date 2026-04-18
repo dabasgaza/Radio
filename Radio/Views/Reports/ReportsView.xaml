@@ -78,16 +78,16 @@
                         </Border>
                         <TextBlock
                             Margin="0,18,0,6"
-                            FontSize="14"
                             HorizontalAlignment="Center"
+                            FontSize="14"
                             Foreground="#9E9CB8"
                             Text="قيد التخطيط" />
                         <TextBlock
                             x:Name="TxtPlannedCount"
                             Margin="0,0,0,12"
+                            HorizontalAlignment="Center"
                             FontSize="40"
                             FontWeight="Bold"
-                            HorizontalAlignment="Center"
                             Foreground="#FFFFFF"
                             Text="0" />
                         <!--  خط ملون سفلي كلمسة فنية  -->
@@ -124,16 +124,16 @@
                         </Border>
                         <TextBlock
                             Margin="0,18,0,6"
-                            FontSize="14"
                             HorizontalAlignment="Center"
+                            FontSize="14"
                             Foreground="#9E9CB8"
                             Text="تم تنفيذها" />
                         <TextBlock
                             x:Name="TxtExecutedCount"
                             Margin="0,0,0,12"
+                            HorizontalAlignment="Center"
                             FontSize="40"
                             FontWeight="Bold"
-                            HorizontalAlignment="Center"
                             Foreground="#FFFFFF"
                             Text="0" />
                         <Rectangle
@@ -175,9 +175,9 @@
                         <TextBlock
                             x:Name="TxtPublishedCount"
                             Margin="0,0,0,12"
+                            HorizontalAlignment="Center"
                             FontSize="40"
                             FontWeight="Bold"
-                            HorizontalAlignment="Center"
                             Foreground="#FFFFFF"
                             Text="0" />
                         <Rectangle

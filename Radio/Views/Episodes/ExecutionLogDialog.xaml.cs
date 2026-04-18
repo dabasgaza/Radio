@@ -20,6 +20,11 @@ namespace Radio.Views.Episodes
             _episodeId = episodeId;
             _executionService = executionService;
             _session = session;
+
+            TxtDuration.PreviewTextInput += (s, e) =>
+            {
+                e.Handled = !System.Text.RegularExpressions.Regex.IsMatch(e.Text, @"^[0-9.]$");
+            };
         }
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -61,5 +66,14 @@ namespace Radio.Views.Episodes
             }
         }
 
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
     }
 }
