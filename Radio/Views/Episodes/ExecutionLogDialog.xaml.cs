@@ -1,4 +1,5 @@
-﻿using DataAccess.Services;
+﻿using DataAccess.DTOs;
+using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
 using System.Windows;
@@ -37,13 +38,13 @@ namespace Radio.Views.Episodes
             }
 
             // 2. تجهيز كائن السجل
-            var log = new ExecutionLog
+            var log = new ExecutionLogDto
             {
                 EpisodeId = _episodeId,
                 DurationMinutes = duration,
                 ExecutionNotes = TxtNotes.Text.Trim(),
                 IssuesEncountered = TxtIssues.Text.Trim(),
-                CreatedAt = DateTime.UtcNow
+                //CreatedAt = DateTime.UtcNow
             };
 
             try

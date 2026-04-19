@@ -1,4 +1,5 @@
-﻿using BroadcastWorkflow.Services;
+﻿using DataAccess.DTOs;
+using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
 using System.Windows;
@@ -13,7 +14,7 @@ namespace Radio.Views.Guests
     {
         private readonly IGuestService _guestService;
         private readonly UserSession _session;
-        private List<Guest> _allGuests = new();
+        private List<GuestDto> _allGuests = new();
 
         // Dependency Property for Role-based UI visibility in DataGrid
         public Visibility CanManageGuests => _session.HasPermission("GUEST_MANAGE") ? Visibility.Visible : Visibility.Collapsed;

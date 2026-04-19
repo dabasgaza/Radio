@@ -1,4 +1,5 @@
-﻿using DataAccess.Services;
+﻿using DataAccess.DTOs;
+using DataAccess.Services;
 using Domain.Models;
 using System.Windows;
 
@@ -11,9 +12,9 @@ namespace Radio.Views.Users
     {
         private readonly IUserService _userService;
         private readonly UserSession _session;
-        private readonly User? _existing;
+        private readonly UserDto? _existing;
 
-        public UserFormDialog(User? existing, IUserService userService, UserSession session)
+        public UserFormDialog(UserDto? existing, IUserService userService, UserSession session)
         {
             InitializeComponent();
             _existing = existing;
@@ -41,7 +42,7 @@ namespace Radio.Views.Users
         {
             if (string.IsNullOrWhiteSpace(TxtFullName.Text) || CboRoles.SelectedValue == null) return;
 
-            var user = _existing ?? new User();
+            var user = _existing ?? new UserDto();
             user.FullName = TxtFullName.Text;
             user.Username = TxtUsername.Text;
             user.RoleId = (int)CboRoles.SelectedValue;

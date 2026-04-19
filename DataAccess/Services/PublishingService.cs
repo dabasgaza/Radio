@@ -1,63 +1,63 @@
-﻿using BroadcastWorkflow.Services;
-using DataAccess.Common;
-using DataAccess.Services.Messaging;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataAccess.Services
+namespace DataAccess.Services;
+
+public interface IPublishingService
 {
-    public interface IPublishingService
-    {
-        Task LogPublishingAsync(PublishingLog log, UserSession session);
-    }
+    // ✨ استقبال DTO بدلاً من الكيان
+    Task LogPublishingAsync(PublishingLogDto dto, UserSession session);
+}
 
-    public class PublishingService : IPublishingService
+// ✨ استخدام Primary Constructor
+public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IPublishingService
+{
+    public async Task LogPublishingAsync(PublishingLogDto dto, UserSession session)
     {
-        private readonly IDbContextFactory<BroadcastWorkflowDBContext> _contextFactory;
-        public PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> factory) => _contextFactory = factory;
+        // ✨ استخدام الـ Extension Method
+        session.EnsurePermission(AppPermissions.EpisodePublish);
 
-        public async Task LogPublishingAsync(PublishingLog log, UserSession session)
+        using var context = await contextFactory.CreateDbContextAsync();
+        using var transaction = await context.Database.BeginTransactionAsync();
+
+        try
         {
-            // 1. التحقق من الصلاحية (نشر الحلقات)
-            SecurityHelper.EnsurePermission(session, AppPermissions.EpisodePublish);
-
-            using var context = await _contextFactory.CreateDbContextAsync();
-            using var transaction = await context.Database.BeginTransactionAsync();
-
-            try
+            // ✨ إنشاء الكيان من الـ DTO داخل الـ Service فقط (حماية من Mass Assignment)
+            var log = new PublishingLog
             {
-                // 2. إضافة سجل النشر الرقمي
-                log.PublishedByUserId = session.UserId;
-                context.PublishingLogs.Add(log);
+                EpisodeId = dto.EpisodeId,
+                PublishedByUserId = session.UserId, // حقل أعمال خاص بالنشر
+                YouTubeUrl = dto.YouTubeUrl,
+                SoundCloudUrl = dto.SoundCloudUrl,
+                FacebookUrl = dto.FacebookUrl,
+                TwitterUrl = dto.TwitterUrl
+            };
 
-                // 3. تحديث حالة الحلقة مباشرة (بديل الـ SP)
-                var episode = await context.Episodes.FindAsync(log.EpisodeId);
+            context.PublishingLogs.Add(log);
 
-                if (episode == null)
-                    throw new Exception("عذراً، لم يتم العثور على الحلقة المطلوبة.");
+            var episode = await context.Episodes.FindAsync(dto.EpisodeId);
 
-                // التأكد من أن الحلقة في حالة "منفذة" قبل السماح بنشرها
-                if (episode.StatusId != 1)
-                    throw new Exception("لا يمكن نشر حلقة لم يتم توثيق تنفيذها (الإنتاج) أولاً.");
+            if (episode == null)
+                throw new KeyNotFoundException("عذراً، لم يتم العثور على الحلقة المطلوبة.");
 
-                episode.StatusId = 2; // 2 = منشورة (Published)
+            // ✨ استخدام الثوابت بدلاً من الأرقام السحرية
+            if (episode.StatusId != EpisodeStatus.Executed)
+                throw new InvalidOperationException("لا يمكن نشر حلقة لم يتم توثيق تنفيذها (الإنتاج) أولاً.");
 
-                // ملاحظة: التواريخ والمستخدم يتم تحديثهم تلقائياً عبر الـ Interceptor
-                await context.SaveChangesAsync();
+            episode.StatusId = EpisodeStatus.Published;
+            // ✨ الإشارة للـ Interceptor أنه سيتولى UpdatedAt و UpdatedByUserId
 
-                // 4. تثبيت العملية
-                await transaction.CommitAsync();
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
 
-                // إشعار النجاح عبر النظام المركزي
-                MessageService.Current.ShowSuccess("تم توثيق روابط النشر وتحديث حالة الحلقة بنجاح.");
-            }
-            catch (Exception)
-            {
-                // التراجع عن كل شيء في حال حدوث خطأ
-                await transaction.RollbackAsync();
-                throw;
-            }
+            // ❌ تم إزالة MessageService (الـ UI سيتولى عرض رسالة النجاح)
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw; // ✨ رمي الاستثناء الأصلي كما هو للحفاظ على الـ Stack Trace
         }
     }
-
 }

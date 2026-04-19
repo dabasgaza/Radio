@@ -1,4 +1,5 @@
-﻿using DataAccess.Services;
+﻿using DataAccess.DTOs;
+using DataAccess.Services;
 using Domain.Models;
 using System.Windows;
 
@@ -31,7 +32,7 @@ namespace Radio.Views.Episodes
             }
 
             // تجهيز كائن سجل النشر
-            var log = new PublishingLog
+            var log = new PublishingLogDto
             {
                 EpisodeId = _episodeId,
                 YouTubeUrl = TxtYouTube.Text.Trim(),

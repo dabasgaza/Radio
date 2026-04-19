@@ -1,4 +1,5 @@
-﻿using DataAccess.Services;
+﻿using DataAccess.DTOs;
+using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
 using System.Windows;
@@ -62,7 +63,7 @@ namespace Radio.Views.Users
         /// </summary>
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is User user)
+            if (sender is Button btn && btn.DataContext is UserDto user)
             {
                 var dialog = new UserFormDialog(user, _userService, _session);
                 if (dialog.ShowDialog() == true)

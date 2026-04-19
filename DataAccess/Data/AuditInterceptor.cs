@@ -7,20 +7,24 @@ using System.Text.Json;
 namespace DataAccess.Data
 {
     /// <summary>
-    /// هذا الكلاس يعترض أي عملية حفظ في قاعدة البيانات (SaveChanges)
-    /// ليقوم تلقائياً بتحديث توقيت التعديل، وتسجيل سجل التتبع (AuditLog).
-    /// </summary>
-    /// <summary>
     /// معترض عمليات الحفظ: يقوم بتحديث تواريخ التعديل تلقائياً وتسجيل التغييرات في جدول AuditLogs
     /// </summary>
-    public class AuditInterceptor : SaveChangesInterceptor
+    public class AuditInterceptor(CurrentSessionProvider sessionProvider) : SaveChangesInterceptor
     {
-        private readonly CurrentSessionProvider _sessionProvider;
-
-        public AuditInterceptor(CurrentSessionProvider sessionProvider)
+        // إعدادات الـ JSON المشتركة لتحسين الأداء وتجنب تخصيص الذاكرة في كل مرة
+        private static readonly JsonSerializerOptions JsonOptions = new()
         {
-            _sessionProvider = sessionProvider;
-        }
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = false // عدم التنسيق لتوفير مساحة التخزين في قاعدة البيانات
+        };
+
+        // حقول لا يجب تسجيلها في الـ JSON لأنها بيانات تشويشية (Audit Fields)
+        private static readonly HashSet<string> AuditFields = new(StringComparer.OrdinalIgnoreCase)
+    {
+        nameof(BaseEntity.UpdatedAt), nameof(BaseEntity.UpdatedByUserId),
+        nameof(BaseEntity.CreatedAt), nameof(BaseEntity.CreatedByUserId),
+        nameof(BaseEntity.RowVersion), nameof(BaseEntity.IsActive) // IsActive يتم تسجيله كفعل (SoftDelete) وليس كقيمة
+    };
 
         public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
             DbContextEventData eventData,
@@ -30,17 +34,16 @@ namespace DataAccess.Data
             var context = eventData.Context;
             if (context == null) return base.SavingChangesAsync(eventData, result, cancellationToken);
 
-            var userId = _sessionProvider.CurrentSession?.UserId;
+            var userId = sessionProvider.CurrentSession?.UserId;
             var auditEntries = new List<AuditLog>();
 
-            // الحصول على كافة السجلات التي تم تعديلها أو إضافتها أو حذفها
             var entries = context.ChangeTracker.Entries()
                 .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted)
                 .ToList();
 
             foreach (var entry in entries)
             {
-                // 1. تحديث حقول التدقيق الأساسية إذا كان الكيان يرث من BaseEntity
+                // 1. تحديث حقول التدقيق الأساسية
                 if (entry.Entity is BaseEntity baseEntity)
                 {
                     if (entry.State == EntityState.Added)
@@ -53,34 +56,51 @@ namespace DataAccess.Data
                     baseEntity.UpdatedByUserId = userId;
                 }
 
-                // 2. تجهيز سجل التدقيق (Audit Log)
+                // 2. تحديد نوع الإجراء بدقة (خصوصاً الحذف المنطقي)
+                var action = entry.State.ToString();
+                if (entry.State == EntityState.Modified && entry.Entity is BaseEntity { IsActive: false } &&
+                    entry.Property(nameof(BaseEntity.IsActive)).OriginalValue is true)
+                {
+                    action = "SOFT_DELETED"; // ✨ تمييز الحذف المنطقي
+                }
+
+                // 3. تجهيز سجل التدقيق
                 var auditEntry = new AuditLog
                 {
                     TableName = entry.Metadata.GetTableName() ?? entry.Entity.GetType().Name,
                     UserId = userId,
                     ChangedAt = DateTime.UtcNow,
-                    Action = entry.State.ToString().ToUpper()
+                    Action = action.ToUpper()
                 };
 
-                // 3. جلب المفتاح الأساسي ديناميكياً (حل مشكلة Invalid column name 'Id')
+                // 4. جلب المفتاح الأساسي (حتى للسجلات المضافة Added)
+                // 4. جلب المفتاح الأساسي
                 var primaryKey = entry.Metadata.FindPrimaryKey();
-                if (primaryKey != null && entry.State != EntityState.Added)
+                if (primaryKey != null)
                 {
                     var pkName = primaryKey.Properties[0].Name;
                     var pkValue = entry.Property(pkName).CurrentValue;
-                    if (pkValue != null)
+
+                    // ✨ إذا كان السجل مضافاً حديثاً، المفتاح لا يزال غير موجود (غالباً 0 أو Null)
+                    // سنقوم بتعيين RecordId إلى Null بدلاً من 0 ليكون أكثر دقة أرشيفياً
+                    if (entry.State == EntityState.Added)
                     {
-                        auditEntry.RecordId = Convert.ToInt32(pkValue);
+                        auditEntry.RecordId = null; // أو يمكنك تركه يحول الـ 0 إذا أردت
+                    }
+                    else
+                    {
+                        // للسجلات المعدلة أو المحذوفة، المفتاح موجود بالفعل
+                        auditEntry.RecordId = pkValue != null ? Convert.ToInt32(pkValue) : null;
                     }
                 }
 
-                // 4. تسجيل القيم القديمة والجديدة بصيغة JSON
+                // 5. تسجيل القيم القديمة والجديدة (مع استبعاد حقوق التدقيق لتقليل الحجم)
                 var oldValues = new Dictionary<string, object?>();
                 var newValues = new Dictionary<string, object?>();
 
                 foreach (var property in entry.Properties)
                 {
-                    if (property.Metadata.IsPrimaryKey() || property.Metadata.Name == "RowVersion")
+                    if (property.Metadata.IsPrimaryKey() || AuditFields.Contains(property.Metadata.Name))
                         continue;
 
                     string propertyName = property.Metadata.Name;
@@ -90,11 +110,9 @@ namespace DataAccess.Data
                         case EntityState.Added:
                             newValues[propertyName] = property.CurrentValue;
                             break;
-
-                        case EntityState.Deleted:
+                        case EntityState.Deleted: // الحذف الفعلي من قاعدة البيانات
                             oldValues[propertyName] = property.OriginalValue;
                             break;
-
                         case EntityState.Modified:
                             if (property.IsModified)
                             {
@@ -105,17 +123,15 @@ namespace DataAccess.Data
                     }
                 }
 
-                auditEntry.OldValues = oldValues.Count == 0 ? null : JsonSerializer.Serialize(oldValues);
-                auditEntry.NewValues = newValues.Count == 0 ? null : JsonSerializer.Serialize(newValues);
+                auditEntry.OldValues = oldValues.Count == 0 ? null : JsonSerializer.Serialize(oldValues, JsonOptions);
+                auditEntry.NewValues = newValues.Count == 0 ? null : JsonSerializer.Serialize(newValues, JsonOptions);
 
-                // لا نقوم بإضافة سجلات التدقيق لجدول AuditLogs نفسه لتجنب حلقة مفرغة
-                if (auditEntry.TableName != "AuditLogs")
+                if (!auditEntry.TableName.Equals("AuditLogs", StringComparison.OrdinalIgnoreCase))
                 {
                     auditEntries.Add(auditEntry);
                 }
             }
 
-            // 5. إضافة سجلات التدقيق للـ Context
             if (auditEntries.Any())
             {
                 context.Set<AuditLog>().AddRange(auditEntries);

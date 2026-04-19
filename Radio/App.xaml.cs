@@ -1,5 +1,4 @@
-﻿using BroadcastWorkflow.Services;
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.Data;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -7,8 +6,8 @@ using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Radio.Forms;
-using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -22,52 +21,45 @@ namespace Radio
     {
         public static IServiceProvider ServiceProvider { get; private set; } = null!;
         public IConfiguration Configuration { get; private set; } = null!;
+        public static IHost AppHost { get; private set; } = null!;
 
         public App()
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            // ✅ النهج الحديث في .NET 10 (بدلاً من CreateDefaultBuilder)
+            var builder = Host.CreateApplicationBuilder();
 
-            Configuration = builder.Build();
-
-            var serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
-            ServiceProvider = serviceCollection.BuildServiceProvider();
-        }
-
-        private void ConfigureServices(IServiceCollection services)
-        {
-            // 1. Database Context Factory
-            string connectionString = Configuration.GetConnectionString("DefaultConnection")!;
-            services.AddDbContextFactory<BroadcastWorkflowDBContext>((serviceProvider, options) =>
+            // 1. Database Context Factory (EF Core 10)
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+            builder.Services.AddDbContextFactory<BroadcastWorkflowDBContext>((sp, options) =>
             {
-                var interceptor = serviceProvider.GetRequiredService<AuditInterceptor>();
+                var interceptor = sp.GetRequiredService<AuditInterceptor>();
                 options.UseSqlServer(connectionString)
-                       .AddInterceptors(interceptor); // 👈 ربط المعترض
+                       .AddInterceptors(interceptor);
             });
 
-            // 2. Services (To be implemented in Phase 3)
-            services.AddTransient<IAuditService, AuditService>();
-            services.AddTransient<IAuthService, AuthService>();
-            services.AddTransient<IGuestService, GuestService>();
-            services.AddTransient<ICorrespondentService, CorrespondentService>();
-            services.AddTransient<IEpisodeService, EpisodeService>();
-            services.AddTransient<IProgramService, ProgramService>();
-            services.AddTransient<IExecutionService, ExecutionService>();
-            services.AddTransient<IPublishingService, PublishingService>();
-            services.AddTransient<IReportsService, ReportsService>();
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<ICoverageService, CoverageService>();
+            // 2. Infrastructure
+            builder.Services.AddSingleton<CurrentSessionProvider>();
+            builder.Services.AddSingleton<AuditInterceptor>();
 
-            // تسجيل مزود الجلسة ليكون متاحاً في كل مكان
-            services.AddSingleton<CurrentSessionProvider>();
-            services.AddSingleton<AuditInterceptor>();
+            // 3. Application Services
+            builder.Services.AddTransient<IAuthService, AuthService>();
+            builder.Services.AddTransient<IGuestService, GuestService>();
+            builder.Services.AddTransient<ICorrespondentService, CorrespondentService>();
+            builder.Services.AddTransient<IEpisodeService, EpisodeService>();
+            builder.Services.AddTransient<IProgramService, ProgramService>();
+            builder.Services.AddTransient<IExecutionService, ExecutionService>();
+            builder.Services.AddTransient<IPublishingService, PublishingService>();
+            builder.Services.AddTransient<IReportsService, ReportsService>();
+            builder.Services.AddTransient<IUserService, UserService>();
+            builder.Services.AddTransient<ICoverageService, CoverageService>();
+            // ... باقي الخدمات ...
+
+            // 4. UI
+            builder.Services.AddTransient<LoginWindow>();
+            builder.Services.AddTransient<MainWindow>();
 
 
-            // 3. Windows (To be implemented in Phase 4+)
-            services.AddTransient<MainWindow>();
-            services.AddTransient<LoginWindow>();
+            AppHost = builder.Build();
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -82,8 +74,11 @@ namespace Radio
             // 2. اصطياد أخطاء المهام الخلفية (Background Task Exceptions)
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
 
-            var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            var loginWindow = AppHost.Services.GetRequiredService<LoginWindow>();
             loginWindow.Show();
+
             base.OnStartup(e);
         }
 
@@ -107,6 +102,10 @@ namespace Radio
             e.SetObserved();
         }
 
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            // TODO: Log using ILogger
+        }
 
     }
 

@@ -1,5 +1,4 @@
-﻿using BroadcastWorkflow.Services;
-using DataAccess.Services;
+﻿using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;

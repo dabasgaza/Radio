@@ -14,7 +14,7 @@ public partial class AuditLog
     [Required, MaxLength(100)]
     public string TableName { get; set; } = null!;
 
-    public int RecordId { get; set; }
+    public int? RecordId { get; set; }
 
     [Required, MaxLength(10)]
     public string Action { get; set; } = null!; // INSERT, UPDATE, DELETE

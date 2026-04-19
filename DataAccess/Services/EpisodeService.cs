@@ -1,10 +1,18 @@
 ﻿using DataAccess.Common;
 using DataAccess.DTOs;
-using DataAccess.Services.Messaging;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BroadcastWorkflow.Services;
+namespace DataAccess.Services;
+
+// 1. استخدام الثوابت بدلاً من الأرقام السحرية لتسهيل القراءة
+public static class EpisodeStatus
+{
+    public const byte Planned = 0;
+    public const byte Executed = 1;
+    public const byte Published = 2;
+    public const byte Cancelled = 3;
+}
 
 public interface IEpisodeService
 {
@@ -14,46 +22,40 @@ public interface IEpisodeService
     Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session);
 }
 
-public class EpisodeService : IEpisodeService
+// ✨ استخدام C# 13 Primary Constructor
+public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IEpisodeService
 {
-    private readonly IDbContextFactory<BroadcastWorkflowDBContext> _contextFactory;
-    private readonly IAuditService _audit;
-
-    public EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> factory, IAuditService audit)
-    { _contextFactory = factory; _audit = audit; }
+    // تم إزالة IAuditService لأن الـ AuditInterceptor يتولى الأمر تلقائياً!
 
     public async Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync()
     {
-        using var context = await _contextFactory.CreateDbContextAsync();
+        using var context = await contextFactory.CreateDbContextAsync();
 
-        var source = await context.Episodes
+        return await context.Episodes
             .AsNoTracking()
             .OrderBy(e => e.ScheduledExecutionTime)
             .Select(e => new ActiveEpisodeDto
             {
                 EpisodeId = e.EpisodeId,
                 StatusId = e.StatusId,
-                ProgramId = e.ProgramId, // 👈
-                GuestId = e.GuestId,     // 👈
+                ProgramId = e.ProgramId,
+                GuestId = e.GuestId,
                 EpisodeName = e.EpisodeName,
-                GuestName = e.Guest != null ? e.Guest.FullName : "لا يوجد ضيف", // التعامل مع الضيوف غير المحددين
+                GuestName = e.Guest != null ? e.Guest.FullName : "لا يوجد ضيف",
                 ProgramName = e.Program.ProgramName,
                 ScheduledExecutionTime = e.ScheduledExecutionTime,
                 StatusText = e.EpisodeStatus.DisplayName,
                 SpecialNotes = e.SpecialNotes
             }).ToListAsync();
-
-
-        return source;
     }
 
-    public async Task UpdateEpisodeAsync(EpisodeDto dto, UserSession session)
+    public async Task UpdateEpisodeAsync(EpisodeDto dto , UserSession session)
     {
-        SecurityHelper.EnsurePermission(session, AppPermissions.EpisodeManage);
-        using var context = await _contextFactory.CreateDbContextAsync();
+        session.EnsurePermission(AppPermissions.EpisodeManage);
+        using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = await context.Episodes.FindAsync(dto.EpisodeId);
-        if (episode == null) throw new Exception("الحلقة غير موجودة.");
+        if (episode == null) throw new KeyNotFoundException("الحلقة غير موجودة.");
 
         // تحديث الحقول
         episode.ProgramId = dto.ProgramId;
@@ -64,14 +66,14 @@ public class EpisodeService : IEpisodeService
 
         // الـ Interceptor سيتولى تحديث UpdatedAt و UpdatedByUserId تلقائياً
         await context.SaveChangesAsync();
-        MessageService.Current.ShowSuccess("تم تحديث بيانات الحلقة بنجاح.");
+
+        // ❌ تم إزالة MessageService.Current.ShowSuccess من هنا! الـ UI هي من تعرض الرسالة.
     }
 
-    public async Task CreateEpisodeAsync(EpisodeDto dto, UserSession session)
+    public async Task CreateEpisodeAsync(EpisodeDto dto , UserSession session)
     {
-        SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage);
-
-        using var context = await _contextFactory.CreateDbContextAsync();
+        session.EnsurePermission(AppPermissions.CoordinationManage);
+        using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = new Episode
         {
@@ -79,46 +81,44 @@ public class EpisodeService : IEpisodeService
             GuestId = dto.GuestId,
             EpisodeName = dto.EpisodeName,
             ScheduledExecutionTime = dto.ScheduledTime,
-            StatusId = 0,
-            //CreatedByUserId = session.UserId
+            StatusId = EpisodeStatus.Planned // ✨ استخدام الثوابت
+            // ❌ لا حاجة لـ CreatedByUserId، الـ Interceptor سيضعه تلقائياً!
         };
+
         context.Episodes.Add(episode);
         await context.SaveChangesAsync();
-        await _audit.LogActionAsync("Episodes", episode.EpisodeId, "INSERT", null, dto, session.UserId);
+
+        // ❌ تم إزالة استدعاء _audit.LogActionAsync! الـ Interceptor سجل البيانات والـ JSON تلقائياً
     }
 
     public async Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session)
     {
-        // التحقق من الصلاحيات
-        if (newStatusId == 1) SecurityHelper.EnsurePermission(session, AppPermissions.EpisodeExecute);
+        // التحقق من الصلاحيات بناءً على الحالة الجديدة
+        if (newStatusId == EpisodeStatus.Executed)
+            session.EnsurePermission(AppPermissions.EpisodeExecute);
+        if (newStatusId == EpisodeStatus.Published)
+            session.EnsurePermission(AppPermissions.EpisodePublish);
 
-        if (newStatusId == 2) SecurityHelper.EnsurePermission(session, AppPermissions.EpisodePublish);
-
-
-        using var context = await _contextFactory.CreateDbContextAsync();
+        using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = await context.Episodes.FindAsync(episodeId);
+        if (episode == null) throw new KeyNotFoundException("الحلقة غير موجودة.");
 
-        if (episode == null) throw new Exception("الحلقة غير موجودة.");
+        // ✨ قواعد الـ Workflow باستخدام الثوابت (أوضح وأسهل للصيانة)
+        if (episode.StatusId == EpisodeStatus.Published)
+            throw new InvalidOperationException("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
 
-        // قاعدة: لا يمكن تغيير حالة حلقة منشورة نهائياً
-        if (episode.StatusId == 2)
-            throw new Exception("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
+        if (episode.StatusId == EpisodeStatus.Executed && newStatusId == EpisodeStatus.Planned)
+            throw new InvalidOperationException("لا يمكن إعادة حلقة منفذة إلى حالة الجدولة.");
 
-        // قاعدة: لا يمكن العودة من "منفذة" إلى "مجدولة"
-        if (episode.StatusId == 1 && newStatusId == 0)
-            throw new Exception("لا يمكن إعادة حلقة منفذة إلى حالة الجدولة.");
-
-        // قاعدة: لا يمكن الانتقال من "مجدولة" إلى "منشورة" مباشرة (يجب التنفيذ أولاً)
-        if (episode.StatusId == 0 && newStatusId == 2)
-            throw new Exception("يجب تنفيذ الحلقة وتوثيقها قبل عملية النشر الرقمي.");
-
+        if (episode.StatusId == EpisodeStatus.Planned && newStatusId == EpisodeStatus.Published)
+            throw new InvalidOperationException("يجب تنفيذ الحلقة وتوثيقها قبل عملية النشر الرقمي.");
 
         // تحديث الحالة
         episode.StatusId = newStatusId;
 
-
-        if (newStatusId == 1) episode.ActualExecutionTime = DateTime.UtcNow;
+        if (newStatusId == EpisodeStatus.Executed)
+            episode.ActualExecutionTime = DateTime.UtcNow;
 
         try
         {
@@ -126,7 +126,7 @@ public class EpisodeService : IEpisodeService
         }
         catch (DbUpdateConcurrencyException)
         {
-            throw new Exception("فشل التحديث: قام مستخدم آخر بتعديل حالة هذه الحلقة للتو.");
+            throw new InvalidOperationException("فشل التحديث: قام مستخدم آخر بتعديل حالة هذه الحلقة للتو.");
         }
     }
 }

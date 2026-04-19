@@ -1,42 +1,43 @@
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BroadcastWorkflow.Services;
+namespace DataAccess.Services;
 
 public interface IAuthService
 {
     Task<UserSession?> LoginAsync(string username, string password);
 }
 
-public class AuthService : IAuthService
+// ✨ استخدام C# 13 Primary Constructor لتبسيط الكود
+public class AuthService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IAuthService
 {
-    private readonly IDbContextFactory<BroadcastWorkflowDBContext> _contextFactory;
-    public AuthService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) => _contextFactory = contextFactory;
+    // هاش وهمي ثابت يتم التحقق منه في حال كان المستخدم غير موجود لتضليل المخترق
+    private const string DummyHash = "$2a$11$dummyHashToPreventTimingAttack1234567890";
 
     public async Task<UserSession?> LoginAsync(string username, string password)
     {
-        using var context = await _contextFactory.CreateDbContextAsync();
+        using var context = contextFactory.CreateDbContext();
 
-        // ✅ تحسين: AsNoTracking لأن LoginAsync قراءة + تحديث واحد فقط
-        // ✅ تحسين: جلب الصلاحيات في نفس الاستعلام بدلاً من رحلتين لقاعدة البيانات
         var user = await context.Users
             .AsNoTracking()
             .Include(u => u.Role)
-            .Include(u => u.Role.RolePermissions)
-                .ThenInclude(rp => rp.Permission)
+                .ThenInclude(r => r.RolePermissions)
+                    .ThenInclude(rp => rp.Permission)
             .FirstOrDefaultAsync(u => u.Username == username && u.IsActive);
 
-        // ✅ تحسين: التحقق من وجود المستخدم أولاً قبل أي عملية BCrypt
-        // السبب: BCrypt.HashPassword عملية مكلفة جداً (~100ms) — لا تُنفَّذ مجاناً
-        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        // ✨ حماية من Timing Attack
+        // إذا كان المستخدم غير موجود، سنستخدم الـ DummyHash لنضمن تنفيذ خوارزمية BCrypt واستغراق نفس الوقت
+        var hashToVerify = user?.PasswordHash ?? DummyHash;
+
+        if (!BCrypt.Net.BCrypt.Verify(password, hashToVerify) || user == null)
             return null;
 
-        var permissions = user.Role.RolePermissions
+        var permissions = user.Role?.RolePermissions
             .Select(rp => rp.Permission.SystemName)
-            .ToList();
+            .ToList() ?? new List<string>();
 
-        // تحديث LastLoginAt يحتاج Tracked context منفصل
-        using var writeContext = await _contextFactory.CreateDbContextAsync();
+        // تحديث LastLoginAt باستخدام ExecuteUpdate (أداء فائق)
+        using var writeContext = await contextFactory.CreateDbContextAsync();
         await writeContext.Users
             .Where(u => u.UserId == user.UserId)
             .ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginAt, DateTime.UtcNow));
@@ -46,7 +47,7 @@ public class AuthService : IAuthService
             UserId = user.UserId,
             Username = user.Username,
             FullName = user.FullName,
-            RoleName = user.Role.RoleName,
+            RoleName = user.Role?.RoleName ?? "Unknown",
             Permissions = permissions
         };
     }

@@ -2,400 +2,42 @@
 #nullable disable
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq.Expressions;
 
 namespace Domain.Models;
 
 public partial class BroadcastWorkflowDBContext : DbContext
 {
-    public BroadcastWorkflowDBContext()
-    {
-    }
 
+    // ✅ هذا هو الكونستراكتور المطلوب حصراً ليعمل مع IDBContextFactory
     public BroadcastWorkflowDBContext(DbContextOptions<BroadcastWorkflowDBContext> options)
-        : base(options)
+        : base(options) // <--- السحر كله في تمرير الـ options للكلاس الأساسي
     {
     }
 
-    public virtual DbSet<AuditLog> AuditLogs { get; set; }
+    // استخدام التعبير البدني (Expression-bodied) لتعريف الـ DbSets (أمان أكثر)
+    public virtual DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public virtual DbSet<Correspondent> Correspondents => Set<Correspondent>();
+    public virtual DbSet<CorrespondentCoverage> CorrespondentCoverages => Set<CorrespondentCoverage>();
+    public virtual DbSet<Episode> Episodes => Set<Episode>();
+    public virtual DbSet<EpisodeStatus> EpisodeStatuses => Set<EpisodeStatus>();
+    public virtual DbSet<EpisodeGuest> EpisodeGuests => Set<EpisodeGuest>();
+    public virtual DbSet<ExecutionLog> ExecutionLogs => Set<ExecutionLog>();
+    public virtual DbSet<Guest> Guests => Set<Guest>();
+    public virtual DbSet<Program> Programs => Set<Program>();
+    public virtual DbSet<PublishingLog> PublishingLogs => Set<PublishingLog>();
+    public virtual DbSet<Role> Roles => Set<Role>();
+    public virtual DbSet<User> Users => Set<User>();
+    public virtual DbSet<Permission> Permissions => Set<Permission>();
+    public virtual DbSet<RolePermission> RolePermissions => Set<RolePermission>();
 
-    public virtual DbSet<Correspondent> Correspondents { get; set; }
-
-    public virtual DbSet<CorrespondentCoverage> CorrespondentCoverages { get; set; }
-
-    public virtual DbSet<Episode> Episodes { get; set; }
-
-    public DbSet<EpisodeStatus> EpisodeStatuses => Set<EpisodeStatus>();
-
-    public virtual DbSet<EpisodeGuest> EpisodeGuests { get; set; }
-
-    public virtual DbSet<ExecutionLog> ExecutionLogs { get; set; }
-
-    public virtual DbSet<Guest> Guests { get; set; }
-
-    public virtual DbSet<Program> Programs { get; set; }
-
-    public virtual DbSet<PublishingLog> PublishingLogs { get; set; }
-
-    public virtual DbSet<Role> Roles { get; set; }
-
-    public virtual DbSet<User> Users { get; set; }
-    public DbSet<Permission> Permissions => Set<Permission>();
-    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
-
-
-    //public virtual DbSet<VwActiveEpisode> VwActiveEpisodes { get; set; }
-
-    //public virtual DbSet<VwActiveGuest> VwActiveGuests { get; set; }
-
-    //public virtual DbSet<VwTodayEpisode> VwTodayEpisodes { get; set; }
-
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //{
-    //    if (!optionsBuilder.IsConfigured)
-    //    {
-    //        var configuration = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
-    //            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-    //            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    //            .Build();
-    //        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-    //    }
-    //}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AuditLog>(entity =>
-        {
-            entity.HasKey(e => e.AuditLogId).HasName("PK__AuditLog__EB5F6CBD2A08B93C");
+        // ✨ السحر هنا: تطبيق كل الإعدادات من مجلد Configurations تلقائياً
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(BroadcastWorkflowDBContext).Assembly);
 
-            entity.Property(e => e.Action)
-                .IsRequired()
-                .HasMaxLength(10);
-            entity.Property(e => e.TableName)
-                .IsRequired()
-                .HasMaxLength(100);
-        });
-
-        modelBuilder.Entity<Correspondent>(entity =>
-        {
-            entity.HasKey(e => e.CorrespondentId).HasName("PK__Correspo__F362C86F0FDC6F2C");
-
-            entity.Property(e => e.AssignedLocations).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.FullName)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.PhoneNumber).HasMaxLength(20);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.CorrespondentCreatedByUsers)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__Correspon__Creat__6A30C649");
-
-            entity.HasOne(d => d.UpdatedByUser).WithMany(p => p.CorrespondentUpdatedByUsers)
-                .HasForeignKey(d => d.UpdatedByUserId)
-                .HasConstraintName("FK__Correspon__Updat__6B24EA82");
-        });
-
-        modelBuilder.Entity<CorrespondentCoverage>(entity =>
-        {
-            entity.HasKey(e => e.CoverageId).HasName("PK__Correspo__45403DBB1D3D03D7");
-
-            entity.ToTable("CorrespondentCoverage");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.Location).HasMaxLength(200);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-            entity.Property(e => e.Topic).HasMaxLength(500);
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-
-            entity.HasOne(d => d.Correspondent).WithMany(p => p.CorrespondentCoverages)
-                .HasForeignKey(d => d.CorrespondentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Correspon__Corre__6E01572D");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.CorrespondentCoverageCreatedByUsers)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__Correspon__Creat__76969D2E");
-
-            entity.HasOne(d => d.Guest).WithMany(p => p.CorrespondentCoverages)
-                .HasForeignKey(d => d.GuestId)
-                .HasConstraintName("FK__Correspon__Guest__6EF57B66");
-
-            entity.HasOne(d => d.UpdatedByUser).WithMany(p => p.CorrespondentCoverageUpdatedByUsers)
-                .HasForeignKey(d => d.UpdatedByUserId)
-                .HasConstraintName("FK__Correspon__Updat__778AC167");
-        });
-
-        modelBuilder.Entity<Episode>(entity =>
-        {
-            entity.HasKey(e => e.EpisodeId).HasName("PK__Episodes__AC6609F50A6FB356");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.EpisodeDescription).HasMaxLength(2000);
-            entity.Property(e => e.EpisodeName)
-                .IsRequired()
-                .HasMaxLength(300);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-            entity.Property(e => e.SpecialNotes).HasMaxLength(1000);
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.EpisodeCreatedByUsers)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__Episodes__Create__534D60F1");
-
-            entity.HasOne(d => d.Program).WithMany(p => p.Episodes)
-                .HasForeignKey(d => d.ProgramId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Episodes__Progra__4D94879B");
-
-            entity.HasOne(d => d.UpdatedByUser).WithMany(p => p.EpisodeUpdatedByUsers)
-                .HasForeignKey(d => d.UpdatedByUserId)
-                .HasConstraintName("FK__Episodes__Update__5441852A");
-
-            modelBuilder.Entity<Episode>()
-            .HasOne(e => e.EpisodeStatus)
-            .WithMany() // أو .WithMany(s => s.Episodes) إذا كانت المعرفة في الطرف الآخر
-            .HasForeignKey(e => e.StatusId);
-
-            modelBuilder.Entity<Episode>()
-            .HasOne(e => e.Guest)
-            .WithMany(g => g.Episodes)
-            .HasForeignKey(e => e.GuestId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        });
-
-        modelBuilder.Entity<EpisodeGuest>(entity =>
-        {
-            entity.HasKey(e => e.EpisodeGuestId).HasName("PK__EpisodeG__55ACD45DBA306B61");
-
-            entity.HasIndex(e => new { e.EpisodeId, e.GuestId }, "UQ_EpisodeGuests").IsUnique();
-
-            entity.Property(e => e.BookingNotes).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.EpisodeGuests)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__EpisodeGu__Creat__6477ECF3");
-
-            entity.HasOne(d => d.Episode).WithMany(p => p.EpisodeGuests)
-                .HasForeignKey(d => d.EpisodeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__EpisodeGu__Episo__60A75C0F");
-
-            entity.HasOne(d => d.Guest).WithMany(p => p.EpisodeGuests)
-                .HasForeignKey(d => d.GuestId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__EpisodeGu__Guest__619B8048");
-        });
-
-        modelBuilder.Entity<ExecutionLog>(entity =>
-        {
-            entity.HasKey(e => e.ExecutionLogId).HasName("PK__Executio__94E00D50CF128CCF");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.ExecutionNotes).HasMaxLength(2000);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.IssuesEncountered).HasMaxLength(2000);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-
-            entity.HasOne(d => d.Episode).WithMany(p => p.ExecutionLogs)
-                .HasForeignKey(d => d.EpisodeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Execution__Episo__7A672E12");
-
-            entity.HasOne(d => d.ExecutedByUser).WithMany(p => p.ExecutionLogs)
-                .HasForeignKey(d => d.ExecutedByUserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Execution__Execu__7B5B524B");
-        });
-
-        modelBuilder.Entity<Guest>(entity =>
-        {
-            entity.HasKey(e => e.GuestId).HasName("PK__Guests__0C423C127A15238D");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.EmailAddress).HasMaxLength(255);
-            entity.Property(e => e.FullName)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.Organization).HasMaxLength(200);
-            entity.Property(e => e.PhoneNumber).HasMaxLength(20);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.GuestCreatedByUsers)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__Guests__CreatedB__5AEE82B9");
-
-            entity.HasOne(d => d.UpdatedByUser).WithMany(p => p.GuestUpdatedByUsers)
-                .HasForeignKey(d => d.UpdatedByUserId)
-                .HasConstraintName("FK__Guests__UpdatedB__5BE2A6F2");
-        });
-
-        modelBuilder.Entity<Program>(entity =>
-        {
-            entity.HasKey(e => e.ProgramId).HasName("PK__Programs__75256058FEF6EA19");
-
-            entity.HasIndex(e => e.ProgramName, "UQ__Programs__4F925710930EE22B").IsUnique();
-
-            entity.Property(e => e.Category).HasMaxLength(100);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.ProgramDescription).HasMaxLength(1000);
-            entity.Property(e => e.ProgramName)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.ProgramCreatedByUsers)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__Programs__Create__49C3F6B7");
-
-            entity.HasOne(d => d.UpdatedByUser).WithMany(p => p.ProgramUpdatedByUsers)
-                .HasForeignKey(d => d.UpdatedByUserId)
-                .HasConstraintName("FK__Programs__Update__4AB81AF0");
-        });
-
-        modelBuilder.Entity<PublishingLog>(entity =>
-        {
-            entity.HasKey(e => e.PublishingLogId).HasName("PK__Publishi__B2A203362BF0DEB9");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.FacebookUrl).HasMaxLength(500);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.PublishedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-            entity.Property(e => e.SoundCloudUrl).HasMaxLength(500);
-            entity.Property(e => e.TwitterUrl).HasMaxLength(500);
-            entity.Property(e => e.YouTubeUrl).HasMaxLength(500);
-
-            entity.HasOne(d => d.Episode).WithMany(p => p.PublishingLogs)
-                .HasForeignKey(d => d.EpisodeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Publishin__Episo__00200768");
-
-            entity.HasOne(d => d.PublishedByUser).WithMany(p => p.PublishingLogs)
-                .HasForeignKey(d => d.PublishedByUserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Publishin__Publi__01142BA1");
-        });
-
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.HasKey(e => e.RoleId).HasName("PK__Roles__8AFACE1A5196C910");
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.RoleDescription).HasMaxLength(500);
-            entity.Property(e => e.RoleName)
-                .IsRequired()
-                .HasMaxLength(50);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-        });
-
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CE4919F9C");
-
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E4449F875A").IsUnique();
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.EmailAddress).HasMaxLength(255);
-            entity.Property(e => e.FullName)
-                .IsRequired()
-                .HasMaxLength(200);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.PasswordHash)
-                .IsRequired()
-                .HasMaxLength(255);
-            entity.Property(e => e.PhoneNumber).HasMaxLength(20);
-            entity.Property(e => e.RowVersion)
-                .IsRequired()
-                .IsRowVersion()
-                .IsConcurrencyToken();
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Username)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.InverseCreatedByUser)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__Users__CreatedBy__4222D4EF");
-
-            entity.HasOne(d => d.Role).WithMany(p => p.Users)
-                .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Users__RoleId__3E52440B");
-
-            entity.HasOne(d => d.UpdatedByUser).WithMany(p => p.InverseUpdatedByUser)
-                .HasForeignKey(d => d.UpdatedByUserId)
-                .HasConstraintName("FK__Users__UpdatedBy__4316F928");
-        });
-
-
-        // 1. تعريف المفتاح المركب لجدول الربط RolePermissions
-        modelBuilder.Entity<RolePermission>()
-            .HasKey(rp => new { rp.RoleId, rp.PermissionId });
-
-        // 2. إعداد العلاقة بين الدور وجدول الربط
-        modelBuilder.Entity<RolePermission>()
-            .HasOne(rp => rp.Role)
-            .WithMany(r => r.RolePermissions)
-            .HasForeignKey(rp => rp.RoleId);
-
-        // 3. إعداد العلاقة بين الصلاحية وجدول الربط
-        modelBuilder.Entity<RolePermission>()
-            .HasOne(rp => rp.Permission)
-            .WithMany(p => p.RolePermissions)
-            .HasForeignKey(rp => rp.PermissionId);
-
-        // 4. قيود إضافية (Unique SystemName)
-        modelBuilder.Entity<Permission>()
-            .HasIndex(p => p.SystemName)
-            .IsUnique();
-
-        // ✨ تطبيق الفلترة على الجداول التي تحتوي على IsActive ولكنها لا ترث من BaseEntity
-        modelBuilder.Entity<Role>().HasQueryFilter(r => r.IsActive);
-        modelBuilder.Entity<EpisodeGuest>().HasQueryFilter(eg => eg.IsActive);
-
-        // ✨ السطر الجديد: حقن حالات الحلقات الأساسية
+        // تطبيق الـ Seed Data للـ EpisodeStatus
         modelBuilder.Entity<EpisodeStatus>().HasData(
             new EpisodeStatus { StatusId = 0, StatusName = "Planned", DisplayName = "مجدولة", SortOrder = 0 },
             new EpisodeStatus { StatusId = 1, StatusName = "Executed", DisplayName = "منفّذة", SortOrder = 1 },
@@ -404,7 +46,28 @@ public partial class BroadcastWorkflowDBContext : DbContext
         );
 
 
+        // ✨ إصلاح خلل الحذف المنطقي: تطبيق الفلتر على أي كيان يرث من BaseEntity
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(
+                    GenerateSoftDeleteFilter(entityType.ClrType)
+                );
+            }
+        }
+
+
         OnModelCreatingPartial(modelBuilder);
+    }
+
+    // دالة مساعدة لبناء فلتر الحذف المنطقي ديناميكياً لكل كيان
+    private static LambdaExpression GenerateSoftDeleteFilter(Type entityType)
+    {
+        var parameter = System.Linq.Expressions.Expression.Parameter(entityType, "e");
+        var property = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntity.IsActive));
+        var condition = System.Linq.Expressions.Expression.Equal(property, System.Linq.Expressions.Expression.Constant(true));
+        return System.Linq.Expressions.Expression.Lambda(condition, parameter);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

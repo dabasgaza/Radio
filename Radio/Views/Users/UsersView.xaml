@@ -474,7 +474,7 @@
                                         FontSize="13"
                                         FontWeight="SemiBold"
                                         Foreground="#B388FF"
-                                        Text="{Binding Role.RoleName}" />
+                                        Text="{Binding RoleName}" />
                                 </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

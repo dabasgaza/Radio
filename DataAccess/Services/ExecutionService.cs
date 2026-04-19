@@ -1,67 +1,60 @@
-﻿using BroadcastWorkflow.Services;
-using DataAccess.Common;
-using DataAccess.Services.Messaging;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataAccess.Services
+namespace DataAccess.Services;
+
+public interface IExecutionService
 {
-    public interface IExecutionService
-    {
-        Task LogExecutionAsync(ExecutionLog log, UserSession session);
-    }
+    // ✨ استقبال DTO بدلاً من الكيان
+    Task LogExecutionAsync(ExecutionLogDto dto, UserSession session);
+}
 
-    public class ExecutionService : IExecutionService
+// ✨ استخدام Primary Constructor
+public class ExecutionService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IExecutionService
+{
+    public async Task LogExecutionAsync(ExecutionLogDto dto, UserSession session)
     {
-        private readonly IDbContextFactory<BroadcastWorkflowDBContext> _contextFactory;
-        public ExecutionService(IDbContextFactory<BroadcastWorkflowDBContext> factory) => _contextFactory = factory;
+        // ✨ تصحيح الأمان: استخدام EnsurePermission للصلاحيات
+        session.EnsurePermission(AppPermissions.EpisodeExecute);
 
-        public async Task LogExecutionAsync(ExecutionLog log, UserSession session)
+        using var context = await contextFactory.CreateDbContextAsync();
+        using var transaction = await context.Database.BeginTransactionAsync();
+
+        try
         {
-            // 1. التحقق من الصلاحية: هل المستخدم منتج أو منسق؟
-            SecurityHelper.EnsureRole(session, AppPermissions.CoordinationManage, AppPermissions.ProgramManage);
-
-            using var context = await _contextFactory.CreateDbContextAsync();
-            // 2. بدء معاملة (Transaction) لضمان تنفيذ كل شيء أو لا شيء
-            using var transaction = await context.Database.BeginTransactionAsync();
-
-            try
+            // ✨ إنشاء الكيان من الـ DTO داخل الـ Service فقط (حماية من Mass Assignment)
+            var log = new ExecutionLog
             {
-                // 3. ربط السجل بالمستخدم الحالي وحفظه
-                log.ExecutedByUserId = session.UserId;
-                context.ExecutionLogs.Add(log);
+                EpisodeId = dto.EpisodeId,
+                ExecutedByUserId = session.UserId, // هذا حقل أعمال خاص بالتنفيذ، يجب تعبئته
+                ExecutionNotes = dto.ExecutionNotes,
+                IssuesEncountered = dto.IssuesEncountered
+            };
 
-                // 4. تحديث حالة الحلقة مباشرة عبر EF Core (بديل الـ Stored Procedure)
-                var episode = await context.Episodes.FindAsync(log.EpisodeId);
-                if (episode != null)
-                {
-                    // التحقق من قواعد العمل
-                    if (episode.StatusId == 2)
-                        throw new Exception("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
+            context.ExecutionLogs.Add(log);
 
-                    episode.StatusId = 1; // 1 = منفّذة (Executed)
-                    episode.ActualExecutionTime = DateTime.UtcNow;
-                    episode.UpdatedByUserId = session.UserId;
-                    episode.UpdatedAt = DateTime.UtcNow;
-                }
+            var episode = await context.Episodes.FindAsync(dto.EpisodeId);
+            if (episode == null) throw new KeyNotFoundException("الحلقة غير موجودة.");
 
-                // حفظ كل التغييرات في قاعدة البيانات
-                await context.SaveChangesAsync();
+            // ✨ استخدام الثوابت بدلاً من الأرقام السحرية
+            if (episode.StatusId == EpisodeStatus.Published)
+                throw new InvalidOperationException("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
 
-                // تثبيت المعاملة
-                await transaction.CommitAsync();
+            episode.StatusId = EpisodeStatus.Executed;
+            episode.ActualExecutionTime = DateTime.UtcNow;
 
-                // إظهار رسالة نجاح
-                MessageService.Current.ShowSuccess("تم تسجيل بيانات التنفيذ وتحديث حالة الحلقة بنجاح.");
-            }
-            catch (Exception ex)
-            {
-                // التراجع عن كل شيء في حال حدوث خطأ
-                await transaction.RollbackAsync();
-                throw new Exception($"حدث خطأ أثناء تسجيل التنفيذ: {ex.Message}");
-            }
+            // ❌ تم إزالة UpdatedAt و UpdatedByUserId (الـ Interceptor سيتولى الأمر تلقائياً)
+
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
-
-
+        catch
+        {
+            await transaction.RollbackAsync();
+            // ✨ رمي الاستثناء الأصلي كما هو للحفاظ على الـ Stack Trace (بدون تغليف)
+            throw;
+        }
     }
 }

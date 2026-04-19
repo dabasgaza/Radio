@@ -1,4 +1,5 @@
-﻿using DataAccess.Services;
+﻿using DataAccess.DTOs;
+using DataAccess.Services;
 using Domain.Models;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +13,7 @@ namespace Radio.Views.Programs
     {
         private readonly IProgramService _programService;
         private readonly UserSession _session;
-        private List<Program> _allPrograms = new();
+        private List<ProgramDto> _allPrograms = new();
 
         public ProgramsView(IProgramService programService, UserSession session)
         {

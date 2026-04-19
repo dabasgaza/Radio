@@ -1,7 +1,5 @@
-﻿using BroadcastWorkflow.Services;
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.DTOs;
-using DataAccess.Services.Messaging;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,15 +13,14 @@ namespace DataAccess.Services
         Task DeleteAsync(int id, UserSession session);
     }
 
-    public class CoverageService : ICoverageService
+    // ✨ استخدام Primary Constructor
+    public class CoverageService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : ICoverageService
     {
-        private readonly IDbContextFactory<BroadcastWorkflowDBContext> _contextFactory;
-
-        public CoverageService(IDbContextFactory<BroadcastWorkflowDBContext> factory) => _contextFactory = factory;
-
         public async Task<List<CoverageDto>> GetAllAsync()
         {
-            using var context = await _contextFactory.CreateDbContextAsync();
+            using var context = await contextFactory.CreateDbContextAsync();
+
+            // ✅ كودك هنا ممتاز ولا يحتاج لتعديل (استخدام الـ DTO في الـ Select هو القمة)
             return await context.CorrespondentCoverages
                 .AsNoTracking()
                 .Select(c => new CoverageDto
@@ -43,8 +40,10 @@ namespace DataAccess.Services
 
         public async Task CreateAsync(CoverageDto dto, UserSession session)
         {
-            SecurityHelper.EnsurePermission(session, AppPermissions.CoordinationManage);
-            using var context = await _contextFactory.CreateDbContextAsync();
+            // ✨ استخدام الـ Extension Method
+            session.EnsurePermission(AppPermissions.CoordinationManage);
+
+            using var context = await contextFactory.CreateDbContextAsync();
 
             var coverage = new CorrespondentCoverage
             {
@@ -54,20 +53,25 @@ namespace DataAccess.Services
                 Topic = dto.Topic,
                 ScheduledTime = dto.ScheduledTime,
                 ActualTime = dto.ActualTime
+                // ❌ لا حاجة لتمرير CreatedByUserId، الـ Interceptor يتكفل به
             };
 
             context.CorrespondentCoverages.Add(coverage);
             await context.SaveChangesAsync();
-            MessageService.Current.ShowSuccess("تمت إضافة التغطية الميدانية بنجاح.");
+
+            // ❌ تم إزالة MessageService
         }
 
         public async Task UpdateAsync(CoverageDto dto, UserSession session)
         {
-            SecurityHelper.EnsurePermission(session, AppPermissions.CoordinationManage);
-            using var context = await _contextFactory.CreateDbContextAsync();
+            session.EnsurePermission(AppPermissions.CoordinationManage);
+
+            using var context = await contextFactory.CreateDbContextAsync();
 
             var coverage = await context.CorrespondentCoverages.FindAsync(dto.CoverageId);
-            if (coverage == null) return;
+
+            // ✨ إطلاق خطأ بدلاً من الصمت
+            if (coverage == null) throw new KeyNotFoundException("التغطية غير موجودة.");
 
             coverage.CorrespondentId = dto.CorrespondentId;
             coverage.GuestId = dto.GuestId;
@@ -75,31 +79,34 @@ namespace DataAccess.Services
             coverage.Topic = dto.Topic;
             coverage.ScheduledTime = dto.ScheduledTime;
             coverage.ActualTime = dto.ActualTime;
+            // ❌ لا حاجة لتحديث UpdatedAt يدوياً، الـ Interceptor يفعل ذلك
 
             try
             {
                 await context.SaveChangesAsync();
-                MessageService.Current.ShowInfo("تم تحديث بيانات التغطية.");
+                // ❌ تم إزالة MessageService
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw new Exception("فشل التحديث: قام مستخدم آخر بتعديل هذه التغطية للتو.");
+                throw new InvalidOperationException("فشل التحديث: قام مستخدم آخر بتعديل هذه التغطية للتو.");
             }
         }
 
         public async Task DeleteAsync(int id, UserSession session)
         {
-            SecurityHelper.EnsurePermission(session, AppPermissions.CoordinationManage);
+            session.EnsurePermission(AppPermissions.CoordinationManage);
 
-            using var context = await _contextFactory.CreateDbContextAsync();
+            using var context = await contextFactory.CreateDbContextAsync();
             var coverage = await context.CorrespondentCoverages.FindAsync(id);
-            if (coverage != null)
-            {
-                coverage.IsActive = false;
-                await context.SaveChangesAsync();
-                MessageService.Current.ShowSuccess("تم حذف التغطية بنجاح.");
-            }
-        }
 
+            // ✨ إطلاق خطأ بدلاً من الصمت
+            if (coverage == null) throw new KeyNotFoundException("التغطية غير موجودة.");
+
+            coverage.IsActive = false;
+            // ❌ لا حاجة لتحديث UpdatedByUserId يدوياً، الـ Interceptor يفعل ذلك عند تغير أي حقل
+
+            await context.SaveChangesAsync();
+            // ❌ تم إزالة MessageService
+        }
     }
 }
