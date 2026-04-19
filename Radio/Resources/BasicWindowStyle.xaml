@@ -3,12 +3,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls">
 
+    <!--  BasicWindowStyle  -->
     <Style x:Key="BasicWindowStyle" TargetType="{x:Type mah:MetroWindow}">
-        <Setter Property="Background" Value="#303030" />
+        <!--  تم إصلاح اللون الثابت #303030 واستبداله بلون الخلفية الرسمي من Material Design  -->
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
 
-        <!--  إضافات جديدة لتوافق أفضل مع MahApps + Dark Theme  -->
         <Setter Property="GlowBrush" Value="{DynamicResource AccentColorBrush}" />
         <Setter Property="WindowTitleBrush" Value="{DynamicResource WindowTitleColorBrush}" />
         <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource MaterialDesignPaper}" />
@@ -18,8 +19,10 @@
         <Setter Property="FontSize" Value="16" />
     </Style>
 
+    <!--  UserControlStyle  -->
     <Style x:Key="UserControlStyle" TargetType="{x:Type UserControl}">
-        <Setter Property="Background" Value="#303030" />
+        <!--  تم إصلاح اللون الثابت #303030 ليستجيب للثيم الفاتح والداكن  -->
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
@@ -29,15 +32,16 @@
         <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
 
-    <!--  DataGrid styles (ما زالت تعمل كما هي مع التحديثات الجديدة)  -->
+    <!--  DataGrid Column Header  -->
     <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="{x:Type DataGridColumnHeader}">
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="#6FD7FF" />
-        <!--  يمكنك تغييره إلى DynamicResource إذا أردت  -->
+        <!--  تم استبدال #6FD7FF بلون Secondary ليكون متناسقاً مع الـ Primary الأزرق ويوفر تبايناً ممتازاً  -->
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
     </Style>
 
+    <!--  DataGrid Row  -->
     <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="{x:Type DataGridRow}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
@@ -50,16 +54,15 @@
         </Style.Triggers>
     </Style>
 
-    <!--  Style أساسي لكل الـ Cells مع التحكم في الحدود (مهم جدًا للتناسق)  -->
+    <!--  DataGrid Cell Base  -->
     <Style BasedOn="{StaticResource MaterialDesignDataGridCell}" TargetType="{x:Type DataGridCell}">
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
         <Setter Property="BorderThickness" Value="0" />
-        <!--  سنتحكم فيه من الـ DataGrid  -->
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
-    <!--  CenterCellAligned - محدث  -->
+    <!--  CenterCellAligned  -->
     <Style
         x:Key="CenterCellAligned"
         BasedOn="{StaticResource MaterialDesignDataGridCell}"
@@ -70,7 +73,7 @@
         <Setter Property="Padding" Value="0" />
     </Style>
 
-    <!--  CenterCellAlignedAndBackColor2 - محدث  -->
+    <!--  CenterCellAlignedAndBackColor2  -->
     <Style
         x:Key="CenterCellAlignedAndBackColor2"
         BasedOn="{StaticResource CenterCellAligned}"
@@ -79,7 +82,7 @@
         <Setter Property="Foreground" Value="{DynamicResource PrimaryHueLightForegroundBrush}" />
     </Style>
 
-    <!--  LeftCellAligned - محدث  -->
+    <!--  LeftCellAligned  -->
     <Style
         x:Key="LeftCellAligned"
         BasedOn="{StaticResource MaterialDesignDataGridCell}"
@@ -89,15 +92,13 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Padding" Value="10,0,0,0" />
     </Style>
-    <!--  DataGrid Grid Lines - حل شامل ومتناسق  -->
+
+    <!--  DataGrid Base  -->
     <Style BasedOn="{StaticResource MaterialDesignDataGrid}" TargetType="{x:Type DataGrid}">
         <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="RowBackground" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="AlternatingRowBackground" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="GridLinesVisibility" Value="None" />
-        <!--<Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource MaterialDesignDivider}" />
-        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource MaterialDesignDivider}" />
-        <Setter Property="BorderThickness" Value="0" />-->
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>

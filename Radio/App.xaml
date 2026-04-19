@@ -6,31 +6,33 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
     <Application.Resources>
         <ResourceDictionary>
-
             <ResourceDictionary.MergedDictionaries>
 
-                <!--  MahApps.Metro  -->
+                <!--  MahApps.Metro Base Styles  -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
 
-                <!--  Material Design (Dark Theme)  -->
-                <materialDesign:BundledTheme
-                    BaseTheme="Dark"
-                    PrimaryColor="Blue"
-                    SecondaryColor="Lime" />
-
-                <!--  أو استخدم MaterialDesignTheme.Dark.xaml + swatches إذا أردت الطريقة القديمة  -->
+                <!--  Material Design Default Resources  -->
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
 
-                <!--  MaterialDesign + MahApps Compatibility (مهم جدًا)  -->
+                <!--  MaterialDesign + MahApps Compatibility  -->
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Flyout.xaml" />
 
+                <!--  الثيم الأساسي (عادي جداً بدون أي x:Key)  -->
+                <!--  تم تغييرها من Lime إلى Amber ليتوافق مع ديكور شاشة الدخول ديناميكياً  -->
+                <materialDesign:BundledTheme
+                    BaseTheme="Dark"
+                    PrimaryColor="Blue"
+                    SecondaryColor="Amber" />
+
+
+                <!--  Custom App Styles  -->
                 <ResourceDictionary Source="Resources/BasicWindowStyle.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
 
-            <!--  Override MahApps brushes بألوان Material Design (هذا يحل مشكلة النصوص)  -->
+            <!--  Override MahApps brushes  -->
             <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource Primary700}" />
             <SolidColorBrush x:Key="AccentBaseColorBrush" Color="{DynamicResource Primary600}" />
             <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource Primary500}" />
@@ -45,21 +47,6 @@
                 Opacity="0.4"
                 Color="{DynamicResource Primary500}" />
 
-            <!--  ... يمكنك إضافة المزيد حسب الحاجة  -->
-            <!--  region Converter  -->
-            <!--<converter:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-
-            <converter:BooleanToBrushConverter x:Key="BooleanToBrushConverter" />
-
-            <converter:BooleanToTextConverter x:Key="BooleanToTextConverter" />
-
-            <converter:IsCreditConverter x:Key="IsCreditConverter" />
-
-            <converter:BooleanToIntegerConverter x:Key="BooleanToIntegerConverter" />
-
-            <converter:NumberToBrushConverter x:Key="NumberToBrushConverter" />-->
-
-            <!--  Endregion Converter  -->
         </ResourceDictionary>
     </Application.Resources>
 </Application>

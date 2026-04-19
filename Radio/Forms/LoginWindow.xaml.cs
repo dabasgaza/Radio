@@ -26,10 +26,10 @@ namespace Radio.Forms
             string username = TxtUsername.Text.Trim();
             string password = TxtPassword.Password;
 
-            // UI Validation
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            // التحقق المبدئي من الصيغة (UI Validation)
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                ShowError("يرجى إدخال اسم المستخدم وكلمة المرور.");
+                MessageService.Current.ShowWarning("يرجى إدخال اسم المستخدم وكلمة المرور.");
                 return;
             }
 
@@ -37,34 +37,36 @@ namespace Radio.Forms
 
             try
             {
+                // استدعاء الـ Service (النجاح يعني عدم رمي استثناء)
                 var session = await _authService.LoginAsync(username, password);
 
-                if (session != null)
-                {
-                    // Login Success: Open MainWindow and pass the session
-                    var reportsService = _serviceProvider.GetRequiredService<IReportsService>();
-                    var mainWindow = new MainWindow(session, _serviceProvider, reportsService);
-                    mainWindow.Show();
-                    this.Close();
-                }
-                else
-                {
-                    ShowError("اسم المستخدم أو كلمة المرور غير صحيحة.");
-                }
+                // إذا وصلنا هنا،意味着 النجاح
+                MessageService.Current.ShowSuccess($"مرحباً بك، {session.Username}");
+
+                var reportsService = _serviceProvider.GetRequiredService<IReportsService>();
+                var mainWindow = new MainWindow(session, _serviceProvider, reportsService);
+                mainWindow.Show();
+                this.Close();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // خطأ في بيانات الدخول (رمزتها الخلفية كـ 401)
+                MessageService.Current.ShowError("اسم المستخدم أو كلمة المرور غير صحيحة.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // خطأ في قواعد العمل (مثلاً: الحساب معطل)
+                MessageService.Current.ShowWarning(ex.Message);
             }
             catch (Exception)
             {
-                ShowError("حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة لاحقاً.");
+                // خطأ نظام عام (مشكلة شبكة، قاعدة بيانات، إلخ)
+                MessageService.Current.ShowError("حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة لاحقاً.");
             }
             finally
             {
                 SetLoading(false);
             }
-        }
-
-        private void ShowError(string message)
-        {
-            MessageService.Current.ShowError(message);
         }
 
         private void SetLoading(bool isLoading)
@@ -73,7 +75,6 @@ namespace Radio.Forms
             TxtUsername.IsEnabled = !isLoading;
             TxtPassword.IsEnabled = !isLoading;
             LoginProgress.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
-            LblError.Visibility = Visibility.Collapsed;
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -86,6 +87,5 @@ namespace Radio.Forms
         {
             this.Close();
         }
-
     }
 }
