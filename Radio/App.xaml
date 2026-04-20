@@ -8,31 +8,39 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
 
-                <!--  MahApps.Metro Base Styles  -->
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
 
                 <!--  Material Design Default Resources  -->
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
 
-                <!--  MaterialDesign + MahApps Compatibility  -->
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Flyout.xaml" />
 
                 <!--  الثيم الأساسي (عادي جداً بدون أي x:Key)  -->
                 <!--  تم تغييرها من Lime إلى Amber ليتوافق مع ديكور شاشة الدخول ديناميكياً  -->
                 <materialDesign:BundledTheme
-                    BaseTheme="Dark"
-                    PrimaryColor="Blue"
-                    SecondaryColor="Amber" />
+                    BaseTheme="Light"
+                    PrimaryColor="Indigo"
+                    SecondaryColor="LightBlue" />
+
+
+
 
 
                 <!--  Custom App Styles  -->
                 <ResourceDictionary Source="Resources/BasicWindowStyle.xaml" />
 
+
+
+                <!--  3. الموارد المخصصة النظيفة (بدون أي تضارب)  -->
+                <ResourceDictionary Source="Resources/AppColors.xaml" />
+
+                <ResourceDictionary Source="Resources/AppStyles.xaml" />
+
+                <ResourceDictionary Source="Resources/MasterDataGridStyles.xaml" />
+
+
             </ResourceDictionary.MergedDictionaries>
 
             <!--  Override MahApps brushes  -->
+            <!--
             <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource Primary700}" />
             <SolidColorBrush x:Key="AccentBaseColorBrush" Color="{DynamicResource Primary600}" />
             <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource Primary500}" />
@@ -45,7 +53,22 @@
             <SolidColorBrush
                 x:Key="IdealForegroundDisabledBrush"
                 Opacity="0.4"
-                Color="{DynamicResource Primary500}" />
+                Color="{DynamicResource Primary500}" />-->
+
+            <!--  يوضع داخل ResourceDictionary  -->
+            <Storyboard x:Key="OnAirPulseStoryboard" RepeatBehavior="Forever">
+                <DoubleAnimation
+                    AutoReverse="True"
+                    Storyboard.TargetName="OnAirGlow"
+                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                    From="0.2"
+                    To="0.8"
+                    Duration="0:0:1" />
+            </Storyboard>
+
+            <!--  region Converter  -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <!--  Endregion Converter  -->
 
         </ResourceDictionary>
     </Application.Resources>

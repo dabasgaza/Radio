@@ -2,12 +2,9 @@
     x:Class="Radio.Forms.LoginWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Radio.Forms"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="LoginWindow"
+    Title="تسجيل الدخول - Broadcast Pro"
     Width="860"
     Height="650"
     AllowsTransparency="True"
@@ -17,247 +14,51 @@
     ShowTitleBar="False"
     Style="{StaticResource BasicWindowStyle}"
     WindowStartupLocation="CenterScreen"
-    WindowStyle="None"
-    mc:Ignorable="d">
+    WindowStyle="None">
 
-    <mah:MetroWindow.Resources>
-
-        <!--  ══════════════ هوية الألوان الخاصة بالتطبيق (Brand Colors) ══════════════  -->
-        <!--  تم وضعها هنا كـ StaticResource لأنها هوية بصرية ثابتة ولا يجب أن تتغير بتبديل الثيم  -->
-        <SolidColorBrush x:Key="BrandAmber" Color="#D4943A" />
-        <SolidColorBrush x:Key="BrandAmberLight" Color="#E8A94E" />
-        <SolidColorBrush x:Key="BrandAmberDark" Color="#B87A2A" />
-        <SolidColorBrush x:Key="BrandAmberText" Color="#0C0E13" />
-
-        <SolidColorBrush x:Key="BrandTeal" Color="#3D9DA6" />
-        <SolidColorBrush x:Key="BrandTealLight" Color="#4DB8C2" />
-
-        <SolidColorBrush x:Key="TextSecondaryCustom" Color="#8A94A6" />
-        <SolidColorBrush x:Key="TextMutedCustom" Color="#5A657A" />
-
-        <!--  التأثيرات  -->
-        <DropShadowEffect
-            x:Key="CardShadow"
-            BlurRadius="50"
-            Opacity="0.45"
-            ShadowDepth="10"
-            Color="#000000" />
-        <DropShadowEffect
-            x:Key="TealGlowEffect"
-            BlurRadius="18"
-            Opacity="0.2"
-            ShadowDepth="0"
-            Color="#3D9DA6" />
-        <DropShadowEffect
-            x:Key="AmberGlowEffect"
-            BlurRadius="14"
-            Opacity="0.15"
-            ShadowDepth="0"
-            Color="#D4943A" />
-        <DropShadowEffect
-            x:Key="BtnShadowEffect"
-            BlurRadius="20"
-            Opacity="0.25"
-            ShadowDepth="4"
-            Color="#D4943A" />
-
-        <!--  ══════════════ نمط حقل اسم المستخدم ══════════════  -->
-        <Style x:Key="FormField" TargetType="TextBox">
-            <Setter Property="Background" Value="{DynamicResource MaterialDesignTextFieldBoxBackground}" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-            <Setter Property="CaretBrush" Value="{StaticResource BrandAmber}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="Padding" Value="46,12" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Grid>
-                            <Border
-                                x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10"
-                                SnapsToDevicePixels="True" />
-                            <ScrollViewer
-                                x:Name="PART_ContentHost"
-                                Margin="{TemplateBinding Padding}"
-                                VerticalAlignment="Center"
-                                HorizontalScrollBarVisibility="Disabled"
-                                VerticalScrollBarVisibility="Disabled" />
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrandAmber}" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource TextMutedCustom}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!--  ══════════════ نمط حقل كلمة المرور ══════════════  -->
-        <Style x:Key="PwdField" TargetType="PasswordBox">
-            <Setter Property="Background" Value="{DynamicResource MaterialDesignTextFieldBoxBackground}" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-            <Setter Property="CaretBrush" Value="{StaticResource BrandAmber}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="Padding" Value="46,12" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="PasswordBox">
-                        <Grid>
-                            <Border
-                                x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10"
-                                SnapsToDevicePixels="True" />
-                            <ScrollViewer
-                                x:Name="PART_ContentHost"
-                                Margin="{TemplateBinding Padding}"
-                                VerticalAlignment="Center"
-                                HorizontalScrollBarVisibility="Disabled"
-                                VerticalScrollBarVisibility="Disabled" />
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrandAmber}" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource TextMutedCustom}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!--  ══════════════ تسمية الحقل ══════════════  -->
-        <Style x:Key="FieldLabel" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="FontWeight" Value="Medium" />
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryCustom}" />
-            <Setter Property="Margin" Value="0,0,0,7" />
-        </Style>
-
-        <!--  ══════════════ زر تسجيل الدخول (النحاسي المميز) ══════════════  -->
-        <Style x:Key="BtnLoginStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="{StaticResource BrandAmberText}" />
-            <Setter Property="Background" Value="{StaticResource BrandAmber}" />
-            <Setter Property="FontSize" Value="17" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Height" Value="48" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="10"
-                            Effect="{StaticResource BtnShadowEffect}"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
-                            <StackPanel
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                                <materialDesign:PackIcon
-                                    Width="18"
-                                    Height="18"
-                                    Margin="0,0,10,0"
-                                    VerticalAlignment="Center"
-                                    Foreground="{TemplateBinding Foreground}"
-                                    Kind="LoginVariant" />
-                                <ContentPresenter VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrandAmberLight}" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </mah:MetroWindow.Resources>
-
-    <!--  ═══════════════════════════════════════════  -->
     <!--  التخطيط الرئيسي  -->
-    <!--  ═══════════════════════════════════════════  -->
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="42" />
+            <RowDefinition Height="56" />
+            <!--  App Bar Height  -->
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  خلفية النافذة  -->
-        <Border Grid.RowSpan="2" CornerRadius="16">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0" Color="#0F1117"/>
-                    <GradientStop Offset="1" Color="#1A1F2B"/>
-                </LinearGradientBrush>
-            </Border.Background>
-        </Border>
-        <!--  شريط العنوان  -->
+        <!--  خلفية مسطحة (Strict Flat Surface)  -->
+        <Border
+            Grid.RowSpan="2"
+            Background="{DynamicResource MaterialDesignPaper}"
+            CornerRadius="8" />
+
+        <!--  Top App Bar (طبقاً للمواصفات)  -->
         <Border
             Grid.Row="0"
-            Background="#0E1017"
-            CornerRadius="16,16,0,0"
+            Background="#303F9F"
+            CornerRadius="8,8,0,0"
             MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid>
                 <StackPanel
-                    Margin="18,0,0,0"
+                    Margin="16,0,0,0"
                     VerticalAlignment="Center"
                     Orientation="Horizontal">
                     <materialDesign:PackIcon
-                        Width="16"
-                        Height="16"
-                        Foreground="{StaticResource BrandTeal}"
+                        Width="24"
+                        Height="24"
+                        Foreground="White"
                         Kind="Broadcast" />
                     <TextBlock
-                        Margin="8,0,0,0"
-                        FontSize="12"
-                        FontWeight="SemiBold"
-                        Foreground="{StaticResource TextSecondaryCustom}"
+                        Margin="12,0,0,0"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="White"
                         Text="Broadcast Pro" />
                 </StackPanel>
                 <Button
-                    x:Name="CloseButton"
-                    Margin="0,0,18,0"
+                    Margin="0,0,8,0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Click="CloseButton_Click"
+                    Foreground="White"
                     Style="{StaticResource MaterialDesignIconButton}"
                     ToolTip="إغلاق">
                     <materialDesign:PackIcon Kind="Close" />
@@ -265,235 +66,157 @@
             </Grid>
         </Border>
 
-        <!--  البطاقة الرئيسية  -->
-        <Grid Grid.Row="1" Margin="15">
+        <!--  المحتوى الرئيسي (البطاقة)  -->
+        <Grid Grid.Row="1" Margin="24">
             <Border
                 Background="{DynamicResource MaterialDesignCardBackground}"
-                BorderBrush="#222736"
+                BorderBrush="{DynamicResource MaterialDesignDivider}"
                 BorderThickness="1"
-                CornerRadius="20"
-                Effect="{StaticResource CardShadow}" />
+                CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="16"
+                        Opacity="0.1"
+                        ShadowDepth="4"
+                        Color="#000000" />
+                </Border.Effect>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="240" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <!--  اللوحة اليمنى (الزخرفية)  -->
-<!--  اللوحة اليمنى - نظام الألوان العاجية/الذهبية الفاتحة (Warm Ivory Light)  -->
-<Grid Grid.Column="0">
-    
-    <!--  Background: خلفية عاجية ذهبية مسطحة (مساحة نقية)  -->
-    <Border Background="#FAF7F2" CornerRadius="20,0,0,20" />
-
-    <!--  Border: فاصل رفيع جداً يفصل بين الداكن والفاتح  -->
-    <Border Width="1" HorizontalAlignment="Right" Background="#E7E5E4" />
-
-    <StackPanel Margin="28,0" VerticalAlignment="Center">
-        
-        <!--  Surface Elevated: دائرة الشعار (أبيض نظيف مع ظل مسطح لرفعها عن الخلفية العاجية)  -->
-        <Border
-            Width="72"
-            Height="72"
-            HorizontalAlignment="Center"
-            Background="#FFFFFF"
-            BorderBrush="#F5F5F4"
-            BorderThickness="1"
-            CornerRadius="36">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="12" Opacity="0.08" ShadowDepth="4" Color="#000000" />
-            </Border.Effect>
-            <!--  الأيقونة تأخذ اللون النحاسي الغامق لتناسب الفاتح  -->
-            <materialDesign:PackIcon
-                Width="30"
-                Height="30"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Foreground="#B87A2A"
-                Kind="Broadcast" />
-        </Border>
-
-        <!--  Text Primary: عنوان بلون بني داكن دافئ (Stone 900) - تباين عالي جداً  -->
-        <TextBlock
-            Margin="0,24,0,6"
-            HorizontalAlignment="Center"
-            FontSize="17"
-            FontWeight="SemiBold"
-            Foreground="#1C1917"
-            Text="إذاعة صوت القدس" />
-
-        <!--  Accent: شارة الإصدار (الذهبي يظهر بشكل ملكي على العاجي)  -->
-        <Border
-            Padding="14,5"
-            HorizontalAlignment="Center"
-            Background="#FEF3C7"
-            CornerRadius="8">
-            <TextBlock
-                FontSize="10"
-                FontWeight="Medium"
-                Foreground="#92400E"
-                Text="v2.0 PRO" />
-        </Border>
-
-        <!--  Border: فاصل أفقي بلون رمادي دافئ فاتح جداً  -->
-        <Border
-            Width="40"
-            Height="1"
-            Margin="0,28,0,28"
-            HorizontalAlignment="Center"
-            Background="#D6D3D1" />
-
-        <!--  Text Secondary: الوصف بلون رمادي دافئ (Stone 500) ليكون مقروءاً ولا يخدش العين  -->
-        <TextBlock
-            HorizontalAlignment="Center"
-            FontSize="12"
-            Foreground="#78716C"
-            LineHeight="20"
-            Text="نظام إدارة البث الاحترافي&#x0a;لإذاعة صوت القدس"
-            TextAlignment="Center"
-            TextWrapping="Wrap" />
-
-        <!--  عنصر الاشتراك (مصمم كلون داكن عائم على الخلفية الفاتحة لجذب الانتباه)  -->
-        <Border
-            Margin="0,32,0,0"
-            Padding="16,8"
-            HorizontalAlignment="Center"
-            Background="#1C1917"
-            CornerRadius="10"
-            Cursor="Hand">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock
-                    FontSize="13"
-                    FontWeight="Medium"
-                    Foreground="#FAFAF9"
-                    Text="الاشتراك الآن!" />
-                <materialDesign:PackIcon
-                    Width="16"
-                    Height="16"
-                    Margin="8,0,0,0"
-                    VerticalAlignment="Center"
-                    Foreground="#D4943A"
-                    Kind="ArrowLeft" />
-            </StackPanel>
-        </Border>
-            
-        <!--  Text Disabled: حقوق النشر (أخف درجة ممكنة)  -->
-        <TextBlock
-            Margin="0,40,0,0"
-            HorizontalAlignment="Center"
-            FontSize="10"
-            Foreground="#A8A29E"
-            Text="© 2025 جميع الحقوق محفوظة" />
-    </StackPanel>
-</Grid>
-
-                <!--  لوحة النموذج (اليسرى)  -->
-                <StackPanel
-                    Grid.Column="1"
-                    Margin="44,32,44,32"
-                    VerticalAlignment="Center">
-
+                    <!--  اللوحة اليمنى (Sidebar Specs: Indigo 700)  -->
                     <Border
-                        Width="54"
-                        Height="54"
-                        HorizontalAlignment="Center"
-                        Background="#1A1E28"
-                        BorderBrush="#D4943A25"
-                        BorderThickness="1.5"
-                        CornerRadius="27"
-                        Effect="{StaticResource AmberGlowEffect}">
-                        <materialDesign:PackIcon
-                            Width="24"
-                            Height="24"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Foreground="{StaticResource BrandAmber}"
-                            Kind="AccountKey" />
+                        Grid.Column="0"
+                        Background="#303F9F"
+                        CornerRadius="8,0,0,8">
+                        <StackPanel Margin="32,0" VerticalAlignment="Center">
+
+                            <materialDesign:PackIcon
+                                Width="64"
+                                Height="64"
+                                HorizontalAlignment="Center"
+                                Foreground="#DEEEFF"
+                                Kind="Broadcast" />
+
+                            <TextBlock
+                                Margin="0,24,0,8"
+                                HorizontalAlignment="Center"
+                                FontSize="22"
+                                FontWeight="Medium"
+                                Foreground="#DEEEFF"
+                                Text="إذاعة صوت القدس" />
+
+                            <Border
+                                Padding="12,4"
+                                HorizontalAlignment="Center"
+                                Background="{StaticResource SuccessBrush}"
+                                CornerRadius="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    FontWeight="Medium"
+                                    Foreground="White"
+                                    Text="v2.0 PRO" />
+                            </Border>
+
+                            <Border
+                                Width="40"
+                                Height="1"
+                                Margin="0,32,0,32"
+                                HorizontalAlignment="Center"
+                                Background="#FFFFFF30" />
+
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="14"
+                                Foreground="#DEEEFF"
+                                Text="نظام إدارة البث الاحترافي"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Margin="0,48,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="11"
+                                Foreground="#FFFFFF60"
+                                Text="© 2025 جميع الحقوق محفوظة" />
+                        </StackPanel>
                     </Border>
 
-                    <TextBlock
-                        Margin="0,18,0,4"
-                        HorizontalAlignment="Center"
-                        FontSize="24"
-                        FontWeight="Bold"
-                        Foreground="#E2E6ED"
-                        Text="تسجيل الدخول" />
-                    <Border
-                        Width="40"
-                        Height="2"
-                        Margin="0,0,0,16"
-                        HorizontalAlignment="Center"
-                        Background="{StaticResource BrandAmber}"
-                        CornerRadius="1" />
-                    <TextBlock
-                        Margin="0,0,0,34"
-                        HorizontalAlignment="Center"
-                        FontSize="13"
-                        Foreground="{StaticResource TextSecondaryCustom}"
-                        Text="أدخل بيانات اعتمادك للمتابعة" />
+                    <!--  لوحة النموذج (اليسرى)  -->
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="48,40,48,40"
+                        VerticalAlignment="Center">
 
-                    <!--  حقل اسم المستخدم  -->
-                    <TextBlock Style="{StaticResource FieldLabel}" Text="اسم المستخدم" />
-                    <Grid Margin="0,0,0,24">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="28"
+                            FontWeight="Regular"
+                            Foreground="{DynamicResource MaterialDesignBody}"
+                            Text="تسجيل الدخول" />
+                        <TextBlock
+                            Margin="0,8,0,40"
+                            HorizontalAlignment="Center"
+                            FontSize="14"
+                            Foreground="{DynamicResource MaterialDesignBodyLight}"
+                            Text="أدخل بيانات اعتمادك للمتابعة" />
+
+                        <!--  حقل اسم المستخدم (MaterialDesignOutlinedTextBox)  -->
                         <TextBox
                             x:Name="TxtUsername"
-                            Style="{StaticResource FormField}"
+                            Margin="0,0,0,24"
+                            materialDesign:HintAssist.Hint="اسم المستخدم"
+                            materialDesign:TextFieldAssist.PrefixText="  "
+                            FontSize="14"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
                             Text="admin" />
-                        <materialDesign:PackIcon
-                            Width="18"
-                            Height="18"
-                            Margin="16,0,0,0"
-                            VerticalAlignment="Center"
-                            Foreground="{StaticResource BrandTeal}"
-                            IsHitTestVisible="False"
-                            Kind="AccountOutline" />
-                    </Grid>
 
-                    <!--  حقل كلمة المرور  -->
-                    <TextBlock Style="{StaticResource FieldLabel}" Text="كلمة المرور" />
-                    <Grid Margin="0,0,0,8">
+                        <!--  حقل كلمة المرور  -->
                         <PasswordBox
                             x:Name="TxtPassword"
+                            Margin="0,0,0,8"
+                            materialDesign:HintAssist.Hint="كلمة المرور"
+                            materialDesign:TextFieldAssist.PrefixText="  "
+                            FontSize="14"
                             Password="Admin@123"
-                            Style="{StaticResource PwdField}" />
-                        <materialDesign:PackIcon
-                            Width="18"
-                            Height="18"
-                            Margin="16,0,0,0"
-                            VerticalAlignment="Center"
-                            Foreground="{StaticResource BrandTeal}"
-                            IsHitTestVisible="False"
-                            Kind="LockOutline" />
-                    </Grid>
+                            Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
 
-                    <!--  زر الدخول  -->
-                    <Button
-                        x:Name="BtnLogin"
-                        Margin="0,22,0,0"
-                        Click="BtnLogin_Click"
-                        Content="تسجيل الدخول"
-                        Style="{StaticResource BtnLoginStyle}" />
+                        <!--  زر الدخول (Primary Spec: #1565C0)  -->
+                        <Button
+                            x:Name="BtnLogin"
+                            Height="48"
+                            Margin="0,24,0,0"
+                            Click="BtnLogin_Click"
+                            Content="تسجيل الدخول"
+                            Style="{StaticResource MaterialDesignRaisedButton}">
+                            <Button.Resources>
+                                <SolidColorBrush x:Key="MaterialDesignRaisedButtonBackground" Color="#1565C0" />
+                                <SolidColorBrush x:Key="MaterialDesignRaisedButtonForeground" Color="White" />
+                            </Button.Resources>
+                        </Button>
 
-                    <!--  مؤشر التحميل  -->
-                    <ProgressBar
-                        x:Name="LoginProgress"
-                        Width="36"
-                        Height="36"
-                        Margin="0,16,0,0"
-                        HorizontalAlignment="Center"
-                        IsIndeterminate="True"
-                        Style="{StaticResource MaterialDesignCircularProgressBar}"
-                        Visibility="Collapsed" />
+                        <!--  مؤشر التحميل  -->
+                        <ProgressBar
+                            x:Name="LoginProgress"
+                            Width="36"
+                            Height="36"
+                            Margin="0,16,0,0"
+                            HorizontalAlignment="Center"
+                            IsIndeterminate="True"
+                            Style="{StaticResource MaterialDesignCircularProgressBar}"
+                            Visibility="Collapsed" />
 
-                    <TextBlock
-                        Margin="0,24,0,0"
-                        HorizontalAlignment="Center"
-                        FontSize="11">
-                        <Hyperlink Foreground="{StaticResource BrandTeal}" NavigateUri="#">نسيت كلمة المرور؟</Hyperlink>
-                    </TextBlock>
-                </StackPanel>
-            </Grid>
+                        <TextBlock
+                            Margin="0,24,0,0"
+                            HorizontalAlignment="Center"
+                            FontSize="14">
+                            <Hyperlink Foreground="#1565C0" NavigateUri="#">نسيت كلمة المرور؟</Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </mah:MetroWindow>

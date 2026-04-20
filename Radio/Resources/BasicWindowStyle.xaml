@@ -33,16 +33,18 @@
     </Style>
 
     <!--  DataGrid Column Header  -->
-    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="{x:Type DataGridColumnHeader}">
+    <!--<Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="{x:Type DataGridColumnHeader}">
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Background" Value="Transparent" />
-        <!--  تم استبدال #6FD7FF بلون Secondary ليكون متناسقاً مع الـ Primary الأزرق ويوفر تبايناً ممتازاً  -->
+    -->
+    <!--  تم استبدال #6FD7FF بلون Secondary ليكون متناسقاً مع الـ Primary الأزرق ويوفر تبايناً ممتازاً  -->
+    <!--
         <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
-    </Style>
+    </Style>-->
 
     <!--  DataGrid Row  -->
-    <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="{x:Type DataGridRow}">
+    <!--<Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="{x:Type DataGridRow}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
@@ -52,15 +54,15 @@
                 <Setter Property="Foreground" Value="{DynamicResource PrimaryHueLightForegroundBrush}" />
             </Trigger>
         </Style.Triggers>
-    </Style>
+    </Style>-->
 
     <!--  DataGrid Cell Base  -->
-    <Style BasedOn="{StaticResource MaterialDesignDataGridCell}" TargetType="{x:Type DataGridCell}">
+    <!--<Style BasedOn="{StaticResource MaterialDesignDataGridCell}" TargetType="{x:Type DataGridCell}">
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
-    </Style>
+    </Style>-->
 
     <!--  CenterCellAligned  -->
     <Style
@@ -93,13 +95,4 @@
         <Setter Property="Padding" Value="10,0,0,0" />
     </Style>
 
-    <!--  DataGrid Base  -->
-    <Style BasedOn="{StaticResource MaterialDesignDataGrid}" TargetType="{x:Type DataGrid}">
-        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
-        <Setter Property="RowBackground" Value="{DynamicResource MaterialDesignPaper}" />
-        <Setter Property="AlternatingRowBackground" Value="{DynamicResource MaterialDesignPaper}" />
-        <Setter Property="GridLinesVisibility" Value="None" />
-        <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-    </Style>
 </ResourceDictionary>

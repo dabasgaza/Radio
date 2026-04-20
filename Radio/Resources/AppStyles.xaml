@@ -1,0 +1,280 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+
+    <!--  ═══════════ Typography (Segoe UI) ═══════════  -->
+    <Style x:Key="HeadlineLarge" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+    </Style>
+    <Style x:Key="TitleLarge" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+    </Style>
+    <Style x:Key="BodyMedium" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+    </Style>
+    <Style x:Key="DataGridTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+    </Style>
+
+    <!--  ═══════════ Buttons ═══════════  -->
+    <Style
+        x:Key="PrimaryActionButton"
+        BasedOn="{StaticResource MaterialDesignRaisedButton}"
+        TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="4" />
+        <Setter Property="Height" Value="40" />
+    </Style>
+
+    <Style
+        x:Key="DestructiveOutlinedButton"
+        BasedOn="{StaticResource MaterialDesignOutlinedButton}"
+        TargetType="Button">
+        <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
+    </Style>
+
+    <!--  ═══════════ Cancel / Close Flat Button (تصميم هادئ) ═══════════  -->
+    <Style
+        x:Key="CancelFlatButton"
+        BasedOn="{StaticResource MaterialDesignFlatButton}"
+        TargetType="Button">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style.Triggers>
+            <!--  عند التمرير: خلفية رمادية شبحية جداً بدلاً من الأحمر  -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MaterialDesignDivider}" />
+            </Trigger>
+            <!--  عند الضغط: رمادي أقلي قليلاً لإعطاء إحساس بالنقر  -->
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#E0E0E0" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <!--  ═══════════ TextBox ═══════════  -->
+    <Style
+        x:Key="BroadcastTextBox"
+        BasedOn="{StaticResource MaterialDesignFilledTextBox}"
+        TargetType="TextBox">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <!--  الحشوة الداخلية لجعل الحقل أوسع وأريح  -->
+        <Setter Property="Padding" Value="12,8" />
+        <!--  إزالة الحد السفلي المزدوج الافتراضي لجعله أنظف  -->
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
+    </Style>
+
+    <!--  ═══════════ DataGrid (النسخة النهائية المدمجة) ═══════════  -->
+
+    <!--<Style
+        x:Key="BroadcastProDataGrid"
+        BasedOn="{StaticResource MaterialDesignDataGrid}"
+        TargetType="{x:Type DataGrid}">
+
+        <Setter Property="AlternationCount" Value="2" />
+        <Setter Property="MinRowHeight" Value="50" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="SelectionMode" Value="Single" />
+        <Setter Property="SelectionUnit" Value="FullRow" />
+
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Setter Property="GridLinesVisibility" Value="None" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="materialDesign:DataGridAssist.CellPadding" Value="16,12" />
+        <Setter Property="materialDesign:DataGridAssist.CornerRadius" Value="8" />
+
+    -->
+    <!--  Column Header - Light Theme فقط  -->
+    <!--
+        <Setter Property="ColumnHeaderStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#C5CAE9" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="FontSize" Value="12" />
+                    <Setter Property="Padding" Value="16,12" />
+                    <Setter Property="Height" Value="48" />
+                    <Setter Property="SeparatorVisibility" Value="Collapsed" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+
+    -->
+    <!--  Row Style  -->
+    <!--
+        <Setter Property="RowStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="SnapsToDevicePixels" Value="True" />
+
+                    <Style.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="#0A3F51B5" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#293F51B5" />
+                            <Setter Property="BorderThickness" Value="4,0,0,0" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#143F51B5" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
+
+    -->
+    <!--  Cell Style  -->
+    <!--
+        <Setter Property="CellStyle">
+            <Setter.Value>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Padding" Value="16,12" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridCell">
+                                <Border
+                                    Padding="{TemplateBinding Padding}"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                    <ContentPresenter VerticalAlignment="Center" />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="materialDesign:ScrollViewerAssist.IgnorePadding" Value="True" />
+
+    </Style>-->
+
+    <!--  ═══════════ Card ═══════════  -->
+    <Style x:Key="BroadcastCard" TargetType="materialDesign:Card">
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+        <Setter Property="Margin" Value="8" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect
+                    BlurRadius="8"
+                    Opacity="0.08"
+                    ShadowDepth="2"
+                    Color="Black" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!--  ═══════════ On-Air Critical Button with Pulse ═══════════  -->
+    <Style
+        x:Key="BtnOnAir"
+        BasedOn="{StaticResource MaterialDesignRaisedButton}"
+        TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource OnAirBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <!--  الحلقة المتحركة (Pulse Ring)  -->
+                        <Ellipse
+                            x:Name="PulseRing"
+                            Width="140"
+                            Height="68"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Opacity="0.6"
+                            Stroke="{DynamicResource OnAirBrush}"
+                            StrokeThickness="2">
+                            <Ellipse.RenderTransform>
+                                <ScaleTransform CenterX="70" CenterY="34" />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                        <!--  زر البث الحقيقي  -->
+                        <Border
+                            x:Name="ButtonBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!--  تشغيل الأنيميشن بمجرد تحميل الزر  -->
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard RepeatBehavior="Forever">
+                                    <DoubleAnimation
+                                        AutoReverse="True"
+                                        Storyboard.TargetName="PulseRing"
+                                        Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                        From="1"
+                                        To="1.3"
+                                        Duration="0:0:1.5" />
+                                    <DoubleAnimation
+                                        AutoReverse="True"
+                                        Storyboard.TargetName="PulseRing"
+                                        Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                        From="1"
+                                        To="1.3"
+                                        Duration="0:0:1.5" />
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="PulseRing"
+                                        Storyboard.TargetProperty="Opacity"
+                                        From="0.6"
+                                        To="0"
+                                        Duration="0:0:1.5" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="PulseRing" Property="Visibility" Value="Collapsed" />
+                            <Setter Property="Opacity" Value="0.38" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

@@ -8,495 +8,235 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="550"
     d:DesignWidth="900"
-    FlowDirection="RightToLeft"
     Style="{StaticResource UserControlStyle}"
     mc:Ignorable="d">
 
-    <UserControl.Resources>
-        <!--  ══════════════ الألوان الأساسية ══════════════  -->
-        <SolidColorBrush x:Key="BgBase" Color="#0C0F16" />
-        <SolidColorBrush x:Key="BgSurface" Color="#141821" />
-        <SolidColorBrush x:Key="BgElevated" Color="#1C2130" />
-        <SolidColorBrush x:Key="BorderSubtle" Color="#2A3042" />
-        <SolidColorBrush x:Key="TextMain" Color="#E4E8F1" />
-        <SolidColorBrush x:Key="TextMuted" Color="#5E6687" />
-
-        <!--  ألوان مميزة للبرامج  -->
-        <SolidColorBrush x:Key="CyanAccent" Color="#22D3EE" />
-        <SolidColorBrush x:Key="NavyAccent" Color="#1E3A5F" />
-        <SolidColorBrush x:Key="AmberAccent" Color="#D4943A" />
-        <SolidColorBrush x:Key="RedAccent" Color="#E54D4D" />
-
-        <!--  ══════════════ التدرجات ══════════════  -->
-        <LinearGradientBrush x:Key="GradCyanBtn" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Offset="0" Color="#22D3EE" />
-            <GradientStop Offset="1" Color="#06B6D4" />
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="GradLine" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Offset="0" Color="#22D3EE" />
-            <GradientStop Offset="1" Color="#D4943A" />
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="GradCyanAvatar" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Offset="0" Color="#22D3EE" />
-            <GradientStop Offset="1" Color="#1E88E5" />
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="GradNavyBadge" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Offset="0" Color="#1E3A5F" />
-            <GradientStop Offset="1" Color="#0F2744" />
-        </LinearGradientBrush>
-
-        <!--  ══════════════ التأثيرات ══════════════  -->
-        <DropShadowEffect
-            x:Key="GlowCyan"
-            BlurRadius="10"
-            Opacity="0.2"
-            ShadowDepth="0"
-            Color="#22D3EE" />
-        <DropShadowEffect
-            x:Key="GlowCyanBtn"
-            BlurRadius="18"
-            Opacity="0.3"
-            ShadowDepth="4"
-            Color="#22D3EE" />
-        <DropShadowEffect
-            x:Key="CardShadow"
-            BlurRadius="24"
-            Opacity="0.25"
-            ShadowDepth="4"
-            Color="#000000" />
-
-        <!--  ══════════════ نمط صف DataGrid ══════════════  -->
-        <Style x:Key="DgRow" TargetType="DataGridRow">
-            <Setter Property="Background" Value="Transparent" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#1C2130" />
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#242A3A" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!--  ══════════════ نمط خلية DataGrid ══════════════  -->
-        <Style x:Key="DgCell" TargetType="DataGridCell">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="14,18" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Foreground" Value="#E4E8F1" />
-            <Setter Property="FontSize" Value="14" />
-            <Style.Triggers>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="Foreground" Value="#E4E8F1" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!--  ══════════════ نمط رأس العمود ══════════════  -->
-        <Style x:Key="DgHeader" TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#181D28" />
-            <Setter Property="Foreground" Value="#5E6687" />
-            <Setter Property="Padding" Value="14,16" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="SeparatorVisibility" Value="Collapsed" />
-        </Style>
-
-        <!--  ══════════════ أزرار الإجراءات ══════════════  -->
-        <Style x:Key="BtnActionCyan" TargetType="Button">
-            <Setter Property="Width" Value="34" />
-            <Setter Property="Height" Value="34" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            x:Name="Bd"
-                            Background="#1C2130"
-                            BorderBrush="#2A3042"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#22D3EE" />
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#22D3EE" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="BtnActionRed" TargetType="Button">
-            <Setter Property="Width" Value="34" />
-            <Setter Property="Height" Value="34" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            x:Name="Bd"
-                            Background="#1C2130"
-                            BorderBrush="#2A3042"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#E54D4D" />
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#E54D4D" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!--  ══════════════ بطاقة إحصائية ══════════════  -->
-        <Style x:Key="StatCard" TargetType="Border">
-            <Setter Property="Background" Value="#141821" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="16" />
-            <Setter Property="BorderBrush" Value="#2A3042" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-
-        <!--  ══════════════ زر الإضافة ══════════════  -->
-        <Style x:Key="BtnAddStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="#0C0F16" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            x:Name="Bd"
-                            Padding="20,10"
-                            Background="{StaticResource GradCyanBtn}"
-                            CornerRadius="10"
-                            Effect="{StaticResource GlowCyanBtn}"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon
-                                    Width="18"
-                                    Height="18"
-                                    Margin="0,0,8,0"
-                                    VerticalAlignment="Center"
-                                    Kind="Plus" />
-                                <ContentPresenter VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <ScaleTransform ScaleX="0.96" ScaleY="0.96" />
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
-
-    <!--  ═══════════════════════════════════════════  -->
-    <!--  التخطيط الرئيسي  -->
-    <!--  ═══════════════════════════════════════════  -->
-    <Grid Background="#0C0F16">
+    <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  ═══════════ الرأس ═══════════  -->
-        <Grid Grid.Row="0" Margin="28,28,28,0">
+        <!--  ═══════════ الرأس والعنوان ═══════════  -->
+        <Grid Grid.Row="0" Margin="0,0,0,24">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Style="{StaticResource TitleLarge}" Text="إدارة البرامج" />
                 <TextBlock
-                    FontSize="26"
-                    FontWeight="Bold"
-                    Foreground="White"
-                    Text="إدارة البرامج" />
-                <TextBlock
-                    Margin="0,5,0,0"
-                    FontSize="13"
-                    Foreground="#5E6687"
+                    Margin="0,4,0,0"
+                    Foreground="#757575"
+                    Style="{StaticResource BodyMedium}"
                     Text="تنظيم وجدولة البرامج الإذاعية وفقاً للفئات" />
-                <Border
-                    Width="55"
-                    Height="3"
-                    Margin="0,14,0,0"
-                    Background="{StaticResource GradLine}"
-                    CornerRadius="2">
-                    <Border.Effect>
-                        <DropShadowEffect
-                            BlurRadius="8"
-                            Opacity="0.5"
-                            ShadowDepth="0"
-                            Color="#22D3EE" />
-                    </Border.Effect>
-                </Border>
             </StackPanel>
 
+            <!--  زر إضافة (باستخدام الـ Style المركزي)  -->
             <Button
-                x:Name="BtnAddProgram"
+                Name="BtnAddProgram"
                 Grid.Column="1"
-                VerticalAlignment="Center"
                 Click="BtnAddProgram_Click"
-                Content="إضافة برنامج جديد"
-                Style="{StaticResource BtnAddStyle}" />
+                Style="{StaticResource PrimaryActionButton}">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon
+                        Width="18"
+                        Height="18"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Kind="Plus" />
+                    <TextBlock VerticalAlignment="Center" Text="إضافة برنامج جديد" />
+                </StackPanel>
+            </Button>
         </Grid>
 
-        <!--  ═══════════ شريط البحث والإحصائيات ═══════════  -->
-        <Grid Grid.Row="1" Margin="28,18,28,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.5*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <!--  ═══════════ البحث وبطاقات الإحصائيات (KPIs) ═══════════  -->
+        <StackPanel
+            Grid.Row="1"
+            Margin="10,0,10,24"
+            VerticalAlignment="Center"
+            Orientation="Horizontal">
 
-            <!--  حقل البحث  -->
+            <!--  حقل البحث (باستخدام الـ Style المركزي)  -->
             <TextBox
-                x:Name="TxtSearch"
-                Grid.Column="0"
-                Margin="0,0,12,0"
-                materialDesign:HintAssist.Foreground="#5E6687"
+                Name="TxtSearch"
+                Width="350"
+                Margin="0,0,16,8"
+                VerticalAlignment="Bottom"
                 materialDesign:HintAssist.Hint="بحث باسم البرنامج أو الفئة..."
                 materialDesign:TextFieldAssist.HasLeadingIcon="True"
                 materialDesign:TextFieldAssist.LeadingIcon="Magnify"
-                FontSize="14"
-                Foreground="#E4E8F1"
-                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                Style="{StaticResource BroadcastTextBox}"
                 TextChanged="TxtSearch_TextChanged" />
 
-            <!--  إجمالي البرامج  -->
-            <Border
-                Grid.Column="1"
-                Margin="6,0"
-                Style="{StaticResource StatCard}">
+            <!--  بطاقة: إجمالي البرامج  -->
+            <materialDesign:Card
+                Width="220"
+                Margin="0,0,16,0"
+                VerticalAlignment="Center"
+                Style="{StaticResource BroadcastCard}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Border
-                        Width="38"
-                        Height="38"
-                        Background="#22D3EE12"
-                        CornerRadius="9">
+                        Width="48"
+                        Height="48"
+                        Background="#E8EAF6"
+                        CornerRadius="8">
                         <materialDesign:PackIcon
-                            Width="18"
-                            Height="18"
+                            Width="24"
+                            Height="24"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Foreground="#22D3EE"
+                            Foreground="#303F9F"
                             Kind="RadioTower" />
                     </Border>
                     <StackPanel
                         Grid.Column="1"
-                        Margin="12,0,0,0"
+                        Margin="16,0,0,0"
                         VerticalAlignment="Center">
                         <TextBlock
-                            FontSize="10"
-                            Foreground="#5E6687"
+                            FontSize="12"
+                            Foreground="#757575"
                             Text="إجمالي البرامج" />
                         <TextBlock
                             x:Name="TxtTotal"
-                            Margin="0,2,0,0"
-                            FontSize="20"
+                            FontSize="28"
                             FontWeight="Bold"
-                            Foreground="#E4E8F1"
+                            Foreground="#212121"
                             Text="0" />
                     </StackPanel>
                 </Grid>
-            </Border>
+            </materialDesign:Card>
 
-            <!--  الفئات  -->
-            <Border
-                Grid.Column="2"
-                Margin="12,0,0,0"
-                Style="{StaticResource StatCard}">
+            <!--  بطاقة: الفئات  -->
+            <materialDesign:Card
+                Width="220"
+                VerticalAlignment="Center"
+                Style="{StaticResource BroadcastCard}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Border
-                        Width="38"
-                        Height="38"
-                        Background="#D4943A12"
-                        CornerRadius="9">
+                        Width="48"
+                        Height="48"
+                        Background="#E1F5FE"
+                        CornerRadius="8">
                         <materialDesign:PackIcon
-                            Width="18"
-                            Height="18"
+                            Width="24"
+                            Height="24"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Foreground="#D4943A"
+                            Foreground="#0288D1"
                             Kind="TagMultipleOutline" />
                     </Border>
                     <StackPanel
                         Grid.Column="1"
-                        Margin="12,0,0,0"
+                        Margin="16,0,0,0"
                         VerticalAlignment="Center">
                         <TextBlock
-                            FontSize="10"
-                            Foreground="#5E6687"
+                            FontSize="12"
+                            Foreground="#757575"
                             Text="الفئات" />
                         <TextBlock
                             x:Name="TxtCategories"
-                            Margin="0,2,0,0"
-                            FontSize="20"
+                            FontSize="28"
                             FontWeight="Bold"
-                            Foreground="#D4943A"
+                            Foreground="#0288D1"
                             Text="0" />
                     </StackPanel>
                 </Grid>
-            </Border>
-        </Grid>
+            </materialDesign:Card>
+        </StackPanel>
 
-        <!--  ═══════════ جدول البيانات ═══════════  -->
-        <Border
+        <!--  ═══════════ جدول البيانات (باستخدام الـ Style المركزي) ═══════════  -->
+        <DataGrid
+            x:Name="DgPrograms"
             Grid.Row="2"
-            Margin="28,16,28,28"
-            Background="#141821"
-            BorderBrush="#2A3042"
-            BorderThickness="1"
-            CornerRadius="14"
-            Effect="{StaticResource CardShadow}">
-            <DataGrid
-                x:Name="DgPrograms"
-                AutoGenerateColumns="False"
-                Background="Transparent"
-                CanUserAddRows="False"
-                CellStyle="{StaticResource DgCell}"
-                ColumnHeaderStyle="{StaticResource DgHeader}"
-                GridLinesVisibility="None"
-                HeadersVisibility="Column"
-                IsReadOnly="True"
-                MinRowHeight="50"
-                RowStyle="{StaticResource DgRow}"
-                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                SelectionMode="Single"
-                SelectionUnit="FullRow">
+            VerticalAlignment="Stretch"
+            AutoGenerateColumns="False"
+            ColumnHeaderStyle="{StaticResource BroadcastPro.DataGridColumnHeader}"
+            IsReadOnly="True"
+            ItemsSource="{Binding ProgramsList}"
+            RowStyle="{StaticResource BroadcastPro.DataGridRow}"
+            Style="{StaticResource BroadcastProDataGrid}">
 
-                <DataGrid.Columns>
+            <DataGrid.Columns>
 
-                    <!--  عمود البرنامج: أفاتار + اسم  -->
-                    <DataGridTemplateColumn Width="*" Header="البرنامج">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                    <Border
-                                        Width="30"
-                                        Height="30"
-                                        Background="{StaticResource GradCyanAvatar}"
-                                        CornerRadius="19"
-                                        Effect="{StaticResource GlowCyan}">
-                                        <materialDesign:PackIcon
-                                            Width="18"
-                                            Height="18"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Foreground="White"
-                                            Kind="Radio" />
-                                    </Border>
-                                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock
-                                            VerticalAlignment="Center"
-                                            FontSize="15"
-                                            Foreground="#E4E8F1"
-                                            Text="{Binding ProgramName}" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                <!--  عمود اسم البرنامج  -->
+                <DataGridTextColumn
+                    Width="150"
+                    Binding="{Binding ProgramName}"
+                    ElementStyle="{StaticResource DataGridTextStyle}"
+                    Header="البرنامج" />
 
-                    <!--  عمود الفئة: شارة نيلية  -->
-                    <DataGridTemplateColumn Width="200" Header="الفئة">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Border
-                                    Padding="14,6"
+                <!--  عمود الفئة (باستخدام Chip بسيط مطابق للثيم الفاتح)  -->
+                <DataGridTemplateColumn Width="200" Header="الفئة">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border
+                                MinWidth="100"
+                                Margin="0,4"
+                                Padding="14,5"
+                                HorizontalAlignment="Center"
+                                Background="#81D4FA"
+                                CornerRadius="14">
+                                <!--  ظل مسطح خفيف جداً لرفع الشارة عن سطح الجدول  -->
+                                <Border.Effect>
+                                    <DropShadowEffect
+                                        BlurRadius="6"
+                                        Opacity="0.15"
+                                        ShadowDepth="2"
+                                        Color="#000000" />
+                                </Border.Effect>
+                                <TextBlock
                                     HorizontalAlignment="Center"
-                                    Background="{StaticResource GradNavyBadge}"
-                                    BorderBrush="#22D3EE20"
-                                    BorderThickness="1"
-                                    CornerRadius="6">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="14"
-                                            Height="14"
-                                            Margin="0,0,8,0"
-                                            VerticalAlignment="Center"
-                                            Foreground="#22D3EE"
-                                            Kind="TagOutline" />
-                                        <TextBlock
-                                            VerticalAlignment="Center"
-                                            FontSize="13"
-                                            FontWeight="Medium"
-                                            Foreground="#22D3EE"
-                                            Text="{Binding Category}" />
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                                    VerticalAlignment="Center"
+                                    FontSize="13"
+                                    Foreground="Black"
+                                    Text="{Binding Category}" />
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!--  عمود الإجراءات (أزرار مسطحة بمواصفات MD)  -->
+                <DataGridTemplateColumn Width="200" Header="إجراءات">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                <Button
+                                    Margin="20,0"
+                                    Click="BtnEdit_Click"
+                                    Foreground="#1565C0"
+                                    Style="{StaticResource MaterialDesignIconButton}"
+                                    ToolTip="تعديل">
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        Kind="Pencil" />
+                                </Button>
+                                <Button
+                                    Click="BtnDelete_Click"
+                                    Foreground="#B00020"
+                                    Style="{StaticResource MaterialDesignIconButton}"
+                                    ToolTip="حذف">
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        Kind="Delete" />
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                    <!--  عمود الإجراءات  -->
-                    <DataGridTemplateColumn Width="100" Header="إجراءات">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                    <Button
-                                        Click="BtnEdit_Click"
-                                        Style="{StaticResource BtnActionCyan}"
-                                        ToolTip="تعديل">
-                                        <materialDesign:PackIcon
-                                            Width="15"
-                                            Height="15"
-                                            Foreground="#5E6687"
-                                            Kind="PencilOutline" />
-                                    </Button>
-                                    <Button
-                                        Margin="6,0,0,0"
-                                        Click="BtnDelete_Click"
-                                        Style="{StaticResource BtnActionRed}"
-                                        ToolTip="حذف">
-                                        <materialDesign:PackIcon
-                                            Width="15"
-                                            Height="15"
-                                            Foreground="#5E6687"
-                                            Kind="TrashCanOutline" />
-                                    </Button>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                </DataGrid.Columns>
-            </DataGrid>
-        </Border>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>

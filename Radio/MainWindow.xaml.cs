@@ -25,15 +25,6 @@ namespace Radio
         private readonly IServiceProvider _serviceProvider;
         private readonly IReportsService _reportsService;
 
-        //سيتم حذف هذا الكونستركتور لاحقاً بعد بناء شاشة تسجيل الدخول وربطها بالجلسة 
-        //public MainWindow(IServiceProvider serviceProvider)
-        //{
-        //    InitializeComponent();
-        //    _session = new UserSession();
-        //      _serviceProvider = serviceProvider;
-
-        //    InitializeUI();
-        //}
         public MainWindow(UserSession session, IServiceProvider serviceProvider, IReportsService reportsService)
         {
             _session = session;
@@ -43,7 +34,7 @@ namespace Radio
             InitializeComponent();
 
             TxtUserFullName.Text = _session.FullName;
-            ChipRole.Content = TranslateRole(_session.RoleName);
+            //ChipRole.Content = TranslateRole(_session.RoleName);
 
             // 👈 تهيئة نظام الإشعارات المركزي وربطه بالـ Snackbar الخاص بهذه النافذة
             var wpfMessaging = new WpfMessageService(MainSnackbar.MessageQueue!);
@@ -56,7 +47,7 @@ namespace Radio
         {
             // Set User Info in Header
             TxtUserFullName.Text = _session.FullName;
-            ChipRole.Content = TranslateRole(_session.RoleName);
+            //ChipRole.Content = TranslateRole(_session.RoleName);
 
             // استدعاء نظام الأمان الجديد
             ApplyPermissionSecurity();
@@ -98,16 +89,53 @@ namespace Radio
             _ => roleName
         };
 
-        private void MenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void NavigateTo(UserControl view)
         {
-            if (MainContentArea == null) return;
+            MainContentArea.Content = view;
+        }
 
-            if (MenuListBox.SelectedItem is ListBoxItem item)
+        private void BtnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            var loginWindow = _serviceProvider.GetRequiredService<LoginWindow>();
+            loginWindow.Show();
+            this.Close();
+        }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Environment.Exit(0);
+            this.Close();
+        }
+
+        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void BtnMaximize_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = this.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        }
+
+        private void Tab_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is RadioButton selectedTab)
             {
-                string tag = item.Tag?.ToString();
-                var userService = _serviceProvider.GetRequiredService<IUserService>();
+                LoadView(selectedTab.Tag?.ToString());
+            }
 
-                switch (tag)
+        }
+
+        // ═══════════ مركز تحميل النوافذ ═══════════
+        private void LoadView(string viewName)
+        {
+            // مسح المحتوى الحالي أثناء التحميل
+            MainContentArea.Content = null;
+            var userService = _serviceProvider.GetRequiredService<IUserService>();
+
+            try
+            {
+                switch (viewName)
                 {
                     case "Home":
                         NavigateTo(new HomeView());
@@ -149,7 +177,7 @@ namespace Radio
                         NavigateTo(new CorrespondentsView(corService, _session));
                         break;
 
-                    case "CoverageView":
+                    case "Coverage":
                         var covService = _serviceProvider.GetRequiredService<ICoverageService>();
                         NavigateTo(new CoverageView(covService, _session, _serviceProvider));
                         break;
@@ -158,30 +186,26 @@ namespace Radio
                         var reportService = _serviceProvider.GetRequiredService<IReportsService>();
                         NavigateTo(new ReportsView(reportService));
                         break;
+
+                    default:
+                        MainContentArea.Content = new TextBlock { Text = "قيد التطوير...", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Foreground = System.Windows.Media.Brushes.LightGray };
+                        break;
                 }
+            }
+            catch (Exception ex)
+            {
+                // في حالة كان الـ UserControl غير موجود أو هناك خطأ في بنائه
+                MainContentArea.Content = new TextBlock
+                {
+                    Text = $"خطأ في تحميل الشاشة: {ex.Message}",
+                    FontSize = 14,
+                    Foreground = System.Windows.Media.Brushes.Red
+                };
+
+                // يمكنك استدعاء MessageService هنا لإظهار الخطأ في Snackbar
+                // MainSnackbar.MessageQueue.Enqueue($"خطأ: {ex.Message}");
             }
         }
 
-        private void NavigateTo(UserControl view)
-        {
-            MainContentArea.Content = view;
-        }
-
-        private void BtnLogout_Click(object sender, RoutedEventArgs e)
-        {
-            var loginWindow = _serviceProvider.GetRequiredService<LoginWindow>();
-            loginWindow.Show();
-            this.Close();
-        }
-
-        private void BtnClose_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }

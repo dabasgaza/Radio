@@ -51,7 +51,7 @@ namespace Radio.Views.Programs
 
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is Program prog)
+            if (sender is Button btn && btn.DataContext is ProgramDto prog)
             {
                 var dialog = new ProgramFormDialog(prog, _programService, _session);
                 if (dialog.ShowDialog() == true)

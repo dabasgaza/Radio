@@ -3,6 +3,8 @@ using DataAccess.Data;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
+using MaterialDesignColors;
+using MaterialDesignThemes.Wpf;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,6 +62,21 @@ namespace Radio
 
 
             AppHost = builder.Build();
+        }
+
+        public void SwitchTheme(bool isDark)
+        {
+            // البحث عن كائن الثيم المدمج
+            var theme = Current.Resources.MergedDictionaries.OfType<BundledTheme>().FirstOrDefault();
+            if (theme != null)
+            {
+                // تغيير الوضع الأساسي
+                theme.BaseTheme = isDark ? BaseTheme.Dark : BaseTheme.Light;
+
+                // تغيير الألوان لتناسب المواصفات بدقة
+                theme.PrimaryColor = isDark ? PrimaryColor.Indigo : PrimaryColor.Indigo;
+                theme.SecondaryColor = isDark ? SecondaryColor.LightBlue : SecondaryColor.LightBlue;
+            }
         }
 
         protected override void OnStartup(StartupEventArgs e)

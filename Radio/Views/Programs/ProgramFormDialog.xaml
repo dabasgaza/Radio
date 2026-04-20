@@ -5,11 +5,10 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="ProgramFormDialog"
-    Width="560"
-    Height="520"
+    Width="600"
+    Height="620"
     AllowsTransparency="True"
     Background="Transparent"
-    GlowBrush="DarkCyan"
     ResizeMode="NoResize"
     ShowCloseButton="False"
     ShowTitleBar="False"
@@ -17,193 +16,36 @@
     WindowStartupLocation="CenterScreen"
     WindowStyle="None">
 
-    <mah:MetroWindow.Resources>
 
-        <!--  ══════════════ الألوان (Navy Indigo) ══════════════  -->
-        <SolidColorBrush x:Key="BgBase" Color="#0C0F16" />
-        <SolidColorBrush x:Key="BgInput" Color="#21262F" />
-        <SolidColorBrush x:Key="BorderSubtle" Color="#2C323E" />
-        <SolidColorBrush x:Key="TextMain" Color="#E0E4EB" />
-        <SolidColorBrush x:Key="TextMuted" Color="#515B6E" />
-        <SolidColorBrush x:Key="IndigoMain" Color="#7C4DFF" />
-        <SolidColorBrush x:Key="IndigoDark" Color="#651FFF" />
-        <SolidColorBrush x:Key="NavyLight" Color="#9FA8DA" />
-        <SolidColorBrush x:Key="RedAccent" Color="#E54D4D" />
-
-        <!--  ══════════════ التدرجات والتأثيرات ══════════════  -->
-        <LinearGradientBrush x:Key="HintBgc" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Offset="0" Color="#D4943A" />
-            <GradientStop Offset="1" Color="#E8A94E" />
-        </LinearGradientBrush>
-
-        <LinearGradientBrush x:Key="GradIndigoBtn" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Offset="0" Color="#7C4DFF" />
-            <GradientStop Offset="1" Color="#651FFF" />
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="GradLine" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Offset="0" Color="#7C4DFF" />
-            <GradientStop Offset="1" Color="#B388FF" />
-        </LinearGradientBrush>
-        <DropShadowEffect
-            x:Key="GlowIndigo"
-            BlurRadius="14"
-            Opacity="0.3"
-            ShadowDepth="0"
-            Color="#7C4DFF" />
-        <DropShadowEffect
-            x:Key="BtnShadow"
-            BlurRadius="18"
-            Opacity="0.3"
-            ShadowDepth="4"
-            Color="#7C4DFF" />
-
-        <!--  ══════════════ تخصيص ألوان حقول MaterialDesign ══════════════  -->
-        <SolidColorBrush x:Key="MaterialDesignBrush.Foreground" Color="#E0E4EB" />
-        <SolidColorBrush x:Key="MaterialDesignBrush.Background" Color="#21262F" />
-        <SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#7C4DFF" />
-
-        <!--  ══════════════ زر حفظ ══════════════  -->
-        <Style x:Key="BtnSaveStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Height" Value="44" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            x:Name="Bd"
-                            Padding="20,0"
-                            Background="{StaticResource GradIndigoBtn}"
-                            CornerRadius="10"
-                            Effect="{StaticResource BtnShadow}"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
-                            <StackPanel
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                                <materialDesign:PackIcon
-                                    Width="18"
-                                    Height="18"
-                                    Margin="0,0,8,0"
-                                    Kind="ContentSaveOutline" />
-                                <ContentPresenter VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.9" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!--  ══════════════ زر إلغاء ══════════════  -->
-        <Style x:Key="BtnCancelStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="#515B6E" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Height" Value="44" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            x:Name="Bd"
-                            Background="#21262F"
-                            BorderBrush="#2C323E"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
-                            <StackPanel
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                                <materialDesign:PackIcon
-                                    Width="16"
-                                    Height="16"
-                                    Margin="0,0,8,0"
-                                    Kind="Close" />
-                                <ContentPresenter VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#E54D4D" />
-                                <Setter Property="Foreground" Value="#E54D4D" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </mah:MetroWindow.Resources>
-
-    <!--  ═══════════════════════════════════════════  -->
-    <!--  التخطيط الرئيسي  -->
-    <!--  ═══════════════════════════════════════════  -->
-    <Grid Background="#0C0F16">
+    <!--  ═══════════ التخطيط الرئيسي ═══════════  -->
+    <!--  استخدام MaterialDesignCardBackground يعطي النافذة خلفية مرتفعة قليلاً عن النافذة الأم (مظهر حواري احترافي)  -->
+    <Grid Margin="40" Background="{DynamicResource MaterialDesignCardBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!--  ═══════════ خلفية النافذة ═══════════  -->
-        <Border Grid.RowSpan="3" CornerRadius="14">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="#15181F" />
-                    <GradientStop Offset="1" Color="#0C0F16" />
-                </LinearGradientBrush>
-            </Border.Background>
-        </Border>
-
-        <!--  ═══════════ الرأس ═══════════  -->
+        <!--  ═══════════ الرأس (بدون تدرجات أو توهج) ═══════════  -->
         <Border
             Grid.Row="0"
-            Padding="26,24,26,20"
-            BorderBrush="#2C323E"
-            BorderThickness="0,0,0,1"
+            Padding="0,24,0,20"
             MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Border
                     Width="48"
                     Height="48"
-                    Background="{StaticResource GradIndigoBtn}"
-                    CornerRadius="13"
-                    Effect="{StaticResource GlowIndigo}">
+                    Background="{DynamicResource PrimaryHueMidBrush}"
+                    CornerRadius="12">
                     <materialDesign:PackIcon
-                        Width="22"
-                        Height="22"
+                        Width="24"
+                        Height="24"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Foreground="White"
@@ -216,91 +58,104 @@
                     VerticalAlignment="Center">
                     <TextBlock
                         x:Name="TxtTitle"
-                        FontSize="20"
-                        FontWeight="Bold"
-                        Foreground="White"
+                        Style="{StaticResource TitleLarge}"
                         Text="إضافة برنامج جديد" />
                     <TextBlock
                         Margin="0,4,0,0"
-                        FontSize="12"
-                        Foreground="#515B6E"
+                        Foreground="{DynamicResource MaterialDesignBodyLight}"
+                        Style="{StaticResource BodyMedium}"
                         Text="أدخل تفاصيل البرنامج الإذاعي" />
                 </StackPanel>
+
+                <!--  زر إغلاق النافذة (أيقونة X)  -->
+                <Button
+                    Grid.Column="2"
+                    Click="CloseButton_Click"
+                    Foreground="{DynamicResource MaterialDesignBodyLight}"
+                    Style="{StaticResource MaterialDesignIconButton}">
+                    <materialDesign:PackIcon Kind="Close" />
+                </Button>
             </Grid>
         </Border>
 
-        <!--  ═══════════ المحتوى ═══════════  -->
+        <!--  ═══════════ المحتوى (الحقول) ═══════════  -->
         <ScrollViewer
             Grid.Row="1"
-            Margin="15"
-            Padding="26,20,26,8"
+            Margin="10"
             VerticalScrollBarVisibility="Auto">
             <StackPanel>
 
                 <!--  اسم البرنامج  -->
                 <TextBox
                     x:Name="TxtName"
-                    Margin="0,15,0,22"
-                    materialDesign:HintAssist.Foreground="{StaticResource HintBgc}"
+                    Margin="0,8"
                     materialDesign:HintAssist.Hint="اسم البرنامج *"
                     materialDesign:TextFieldAssist.HasLeadingIcon="True"
                     materialDesign:TextFieldAssist.LeadingIcon="Radio"
-                    FontSize="14"
-                    Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                    Style="{StaticResource BroadcastTextBox}" />
 
                 <!--  الفئة  -->
                 <TextBox
                     x:Name="TxtCategory"
-                    Margin="0,0,0,22"
-                    materialDesign:HintAssist.Foreground="{StaticResource HintBgc}"
+                    Margin="0,16"
                     materialDesign:HintAssist.Hint="الفئة (مثلاً: سياسي، ثقافي)"
                     materialDesign:TextFieldAssist.HasLeadingIcon="True"
                     materialDesign:TextFieldAssist.LeadingIcon="TagMultipleOutline"
-                    FontSize="14"
-                    Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                    Style="{StaticResource BroadcastTextBox}" />
 
                 <!--  وصف البرنامج  -->
                 <TextBox
                     x:Name="TxtDesc"
-                    Height="110"
+                    Height="120"
+                    Margin="0,16"
                     VerticalContentAlignment="Top"
-                    materialDesign:HintAssist.Foreground="{StaticResource HintBgc}"
                     materialDesign:HintAssist.Hint="وصف البرنامج"
                     materialDesign:TextFieldAssist.HasLeadingIcon="True"
                     materialDesign:TextFieldAssist.LeadingIcon="FileDocumentOutline"
                     AcceptsReturn="True"
-                    FontSize="14"
-                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                    Style="{StaticResource BroadcastTextBox}"
                     TextWrapping="Wrap" />
 
             </StackPanel>
         </ScrollViewer>
 
-        <!--  ═══════════ التذييل ═══════════  -->
+        <!--  ═══════════ التذييل (الأزرار) ═══════════  -->
         <Border
             Grid.Row="2"
-            Padding="26,14,26,22"
-            BorderBrush="#2C323E"
+            Margin="10"
+            Padding="0,16,0,0"
+            BorderBrush="{DynamicResource MaterialDesignDivider}"
             BorderThickness="0,1,0,0">
-            <Grid>
+            <Grid Margin="0,16,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
+                <!--  زر الإلغاء (Flat Button باللون الرمادي)  -->
                 <Button
                     Grid.Column="0"
                     Content="إلغاء"
                     IsCancel="True"
-                    Style="{StaticResource BtnCancelStyle}" />
+                    Style="{StaticResource MaterialDesignFlatButton}" />
 
+                <!--  زر الحفظ (باستخدام الـ Style المركزي المتوافق مع المواصفات)  -->
                 <Button
                     x:Name="BtnSave"
                     Grid.Column="2"
                     Click="BtnSave_Click"
-                    Content="حفظ البيانات"
-                    Style="{StaticResource BtnSaveStyle}" />
+                    Style="{StaticResource PrimaryActionButton}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="18"
+                            Height="18"
+                            Margin="0,0,8,0"
+                            VerticalAlignment="Center"
+                            Kind="ContentSaveOutline" />
+                        <TextBlock VerticalAlignment="Center" Text="حفظ البيانات" />
+                    </StackPanel>
+                </Button>
             </Grid>
         </Border>
     </Grid>

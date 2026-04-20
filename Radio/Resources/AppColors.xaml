@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <!--  === هوية الألوان الثابتة (لا تتغير مع الثيم) ===  -->
+    <Color x:Key="OnAirRedColor">#C62828</Color>
+    <SolidColorBrush x:Key="OnAirBrush" Color="{StaticResource OnAirRedColor}" />
+
+    <Color x:Key="ErrorRedColor">#B00020</Color>
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorRedColor}" />
+
+    <Color x:Key="SuccessGreenColor">#2E7D32</Color>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessGreenColor}" />
+
+    <Color x:Key="WarningOrangeColor">#E65100</Color>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningOrangeColor}" />
+
+</ResourceDictionary>

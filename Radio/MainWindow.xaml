@@ -7,850 +7,361 @@
     Title="بث برو | نظام إدارة سير العمل"
     Width="1280"
     Height="800"
-    Background="#080810"
+    Background="#F5F5F5"
     FlowDirection="RightToLeft"
-    FontFamily="Hacen Tunisia"
-    GlowBrush="#7C3AED"
+    ShowCloseButton="False"
+    ShowMaxRestoreButton="False"
+    ShowMinButton="False"
     ShowTitleBar="False"
-    TextElement.Foreground="#EAEAEA"
-    TitleBarHeight="0"
+    Style="{StaticResource BasicWindowStyle}"
     WindowStartupLocation="CenterScreen"
     WindowState="Maximized"
     WindowStyle="None">
 
     <mah:MetroWindow.Resources>
-
-        <!--
-            ═══════════════════════════════════════════════
-            STYLES: Modern Sidebar Menu Item
-            ═══════════════════════════════════════════════
-        -->
-        <Style x:Key="SideNavItem" TargetType="ListBoxItem">
-            <Setter Property="Height" Value="58" />
-            <Setter Property="Margin" Value="10,3,10,3" />
-            <Setter Property="Padding" Value="0" />
+        <!--  نمط التبويبات الأفقية  -->
+        <Style x:Key="HubTabItem" TargetType="RadioButton">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="Padding" Value="20,0" />
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="#616161" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ListBoxItem">
+                    <ControlTemplate TargetType="RadioButton">
                         <Border
-                            x:Name="Root"
-                            Background="Transparent"
-                            CornerRadius="14">
-                            <Grid>
-                                <ContentPresenter Margin="0" />
-                                <!--  Accent left bar  -->
-                                <Border
-                                    x:Name="AccentBar"
-                                    Width="4"
-                                    HorizontalAlignment="Left"
-                                    Background="Transparent"
-                                    CornerRadius="0,4,4,0"
-                                    Opacity="0" />
-                            </Grid>
+                            x:Name="Bd"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="8">
+                            <ContentPresenter VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#1A1A2A" />
+                                <Setter TargetName="Bd" Property="Background" Value="#E0E0E0" />
                             </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Root" Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                            <GradientStop Offset="0" Color="#1E1040" />
-                                            <GradientStop Offset="1" Color="#0D0D1A" />
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter TargetName="AccentBar" Property="Opacity" Value="1" />
-                                <Setter TargetName="AccentBar" Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                            <GradientStop Offset="0" Color="#7C3AED" />
-                                            <GradientStop Offset="1" Color="#00D4FF" />
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#303F9F" />
+                                <Setter Property="Foreground" Value="White" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <!--  Section Label Style  -->
-        <Style x:Key="SectionLabel" TargetType="TextBlock">
-            <Setter Property="Margin" Value="22,20,22,8" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="#4A4A6A" />
-
-        </Style>
-
     </mah:MetroWindow.Resources>
 
-    <materialDesign:DialogHost DialogTheme="Inherit" Identifier="RootDialog">
+    <!--  الهيكل الأساسي: ترويسة، تبويبات، محتوى، شريط سفلي  -->
+    <DockPanel>
+        <!--  ═══════════ الشريط السفلي (Bottom Dock) ═══════════  -->
+        <Border
+            Height="64"
+            VerticalAlignment="Bottom"
+            Background="White"
+            BorderBrush="#E0E0E0"
+            BorderThickness="0,1,0,0"
+            DockPanel.Dock="Bottom">
+            <Grid Margin="24,0">
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="290" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <!--  الأيقونات السريعة  -->
+                    <ColumnDefinition Width="*" />
+                    <!--  مساحة فارغة  -->
+                    <ColumnDefinition Width="Auto" />
+                    <!--  زر ON AIR  -->
+                    <ColumnDefinition Width="*" />
+                    <!--  مساحة فارغة  -->
+                    <ColumnDefinition Width="Auto" />
+                    <!--  زر الخروج  -->
+                </Grid.ColumnDefinitions>
 
-            <!--
-                ═══════════════════════════════════════════════
-                SIDEBAR — Glassmorphism Dark
-                ═══════════════════════════════════════════════
-            -->
-            <Border
-                Grid.Column="0"
-                ClipToBounds="True"
-                CornerRadius="0,20,20,0">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Offset="0" Color="#0E0E1C" />
-                        <GradientStop Offset="0.5" Color="#0B0B17" />
-                        <GradientStop Offset="1" Color="#0D0D1A" />
-                    </LinearGradientBrush>
-                </Border.Background>
-                <Border.Effect>
-                    <DropShadowEffect
-                        BlurRadius="40"
-                        Direction="0"
-                        Opacity="0.5"
-                        ShadowDepth="8"
-                        Color="#7C3AED" />
-                </Border.Effect>
+                <!--  1. أيقونات سريعة (يميناً في RTL)  -->
+                <StackPanel
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="40"
+                        Height="40"
+                        Foreground="#616161"
+                        Style="{StaticResource MaterialDesignIconButton}"
+                        ToolTip="المراسلين">
+                        <materialDesign:PackIcon
+                            Width="20"
+                            Height="20"
+                            Kind="MapMarkerRadius" />
+                    </Button>
+                    <Button
+                        Width="40"
+                        Height="40"
+                        Foreground="#616161"
+                        Style="{StaticResource MaterialDesignIconButton}"
+                        ToolTip="التغطيات">
+                        <materialDesign:PackIcon
+                            Width="20"
+                            Height="20"
+                            Kind="MapMarkerCheck" />
+                    </Button>
+                    <Button
+                        Width="40"
+                        Height="40"
+                        Foreground="#616161"
+                        Style="{StaticResource MaterialDesignIconButton}"
+                        ToolTip="الصلاحيات">
+                        <materialDesign:PackIcon
+                            Width="20"
+                            Height="20"
+                            Kind="ShieldKey" />
+                    </Button>
+                </StackPanel>
 
-                <!--  Decorative blurred orb top  -->
-                <Grid>
-                    <Ellipse
-                        Width="260"
-                        Height="260"
-                        Margin="0,-100,0,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        Opacity="0.07">
-                        <Ellipse.Fill>
-                            <RadialGradientBrush>
-                                <GradientStop Offset="0" Color="#7C3AED" />
-                                <GradientStop Offset="1" Color="Transparent" />
-                            </RadialGradientBrush>
-                        </Ellipse.Fill>
-                    </Ellipse>
+                <!--  2. زر ON AIR في المنتصف تماماً  -->
+                <Button
+                    x:Name="BtnOnAir"
+                    Grid.Column="2"
+                    Width="140"
+                    Height="40"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="ON AIR"
+                    Style="{StaticResource BtnOnAir}" />
 
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <!--  ── USER HEADER ──  -->
-                        <Border
-                            Grid.Row="0"
-                            Margin="16,28,16,16"
-                            CornerRadius="20">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Offset="0" Color="#1A1040" />
-                                    <GradientStop Offset="1" Color="#12121E" />
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <Border.BorderBrush>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Offset="0" Color="#7C3AED" />
-                                    <GradientStop Offset="1" Color="#00D4FF" />
-                                </LinearGradientBrush>
-                            </Border.BorderBrush>
-                            <Border.BorderThickness>1</Border.BorderThickness>
-
-                            <StackPanel Margin="20,24,20,24" HorizontalAlignment="Center">
-
-                                <!--  Avatar Ring  -->
-                                <Grid HorizontalAlignment="Center">
-                                    <!--  Outer glow ring  -->
-                                    <Ellipse Width="96" Height="96">
-                                        <Ellipse.Fill>
-                                            <RadialGradientBrush>
-                                                <GradientStop Offset="0.7" Color="Transparent" />
-                                                <GradientStop Offset="1" Color="#7C3AED" />
-                                            </RadialGradientBrush>
-                                        </Ellipse.Fill>
-                                    </Ellipse>
-                                    <!--  Gradient border ring  -->
-                                    <Ellipse Width="90" Height="90">
-                                        <Ellipse.Stroke>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                <GradientStop Offset="0" Color="#7C3AED" />
-                                                <GradientStop Offset="1" Color="#00D4FF" />
-                                            </LinearGradientBrush>
-                                        </Ellipse.Stroke>
-                                        <Ellipse.StrokeThickness>2.5</Ellipse.StrokeThickness>
-                                        <Ellipse.Fill>Transparent</Ellipse.Fill>
-                                    </Ellipse>
-                                    <!--  Avatar fill  -->
-                                    <Ellipse Width="82" Height="82">
-                                        <Ellipse.Fill>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                <GradientStop Offset="0" Color="#1E1040" />
-                                                <GradientStop Offset="1" Color="#181828" />
-                                            </LinearGradientBrush>
-                                        </Ellipse.Fill>
-                                    </Ellipse>
-                                    <materialDesign:PackIcon
-                                        Width="46"
-                                        Height="46"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Kind="RadioTower">
-                                        <materialDesign:PackIcon.Foreground>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                <GradientStop Offset="0" Color="#7C3AED" />
-                                                <GradientStop Offset="1" Color="#00D4FF" />
-                                            </LinearGradientBrush>
-                                        </materialDesign:PackIcon.Foreground>
-                                    </materialDesign:PackIcon>
-                                    <!--  Online dot  -->
-                                    <Ellipse
-                                        Width="14"
-                                        Height="14"
-                                        Margin="0,0,4,4"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Bottom"
-                                        Fill="#22C55E">
-                                        <Ellipse.Effect>
-                                            <DropShadowEffect
-                                                BlurRadius="8"
-                                                Opacity="0.9"
-                                                ShadowDepth="0"
-                                                Color="#22C55E" />
-                                        </Ellipse.Effect>
-                                    </Ellipse>
-                                </Grid>
-
-                                <TextBlock
-                                    x:Name="TxtUserFullName"
-                                    Margin="0,18,0,4"
-                                    FontSize="17"
-                                    FontWeight="SemiBold"
-                                    Foreground="#FFFFFF"
-                                    Text="اسم المستخدم"
-                                    TextAlignment="Center" />
-
-                                <!--  Role Badge  -->
-                                <Border
-                                    Padding="18,6"
-                                    HorizontalAlignment="Center"
-                                    CornerRadius="20">
-                                    <Border.Background>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                            <GradientStop Offset="0" Color="#3B1FA8" />
-                                            <GradientStop Offset="1" Color="#0E7490" />
-                                        </LinearGradientBrush>
-                                    </Border.Background>
-                                    <materialDesign:Chip
-                                        x:Name="ChipRole"
-                                        Padding="0"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Content="مدير النظام"
-                                        FontSize="12.5"
-                                        FontWeight="Bold"
-                                        Foreground="#E0F2FE" />
-                                </Border>
-
-                            </StackPanel>
-                        </Border>
-
-                        <!--  ── NAVIGATION MENU ──  -->
-                        <ScrollViewer
-                            Grid.Row="1"
-                            Margin="0,4,0,4"
-                            VerticalScrollBarVisibility="Hidden">
-                            <ListBox
-                                x:Name="MenuListBox"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                FontSize="15"
-                                SelectionChanged="MenuListBox_SelectionChanged">
-
-                                <!--  Group: البث  -->
-                                <TextBlock Style="{StaticResource SectionLabel}" Text="● البث والعمليات" />
-
-                                <ListBoxItem
-                                    x:Name="MenuHome"
-                                    IsSelected="True"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="Home">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#1E1040" />
-                                                    <GradientStop Offset="1" Color="#0A1628" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#7C3AED"
-                                                Kind="ViewDashboard" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="لوحة التحكم" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem
-                                    x:Name="MenuPrograms"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="Programs">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#291200" />
-                                                    <GradientStop Offset="1" Color="#1A0A00" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#FF9E00"
-                                                Kind="Television" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="إدارة البرامج" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem
-                                    x:Name="MenuEpisodes"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="Episodes">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#0A1E2A" />
-                                                    <GradientStop Offset="1" Color="#061218" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#4FC3F7"
-                                                Kind="MoviePlay" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="سجل الحلقات" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem
-                                    x:Name="MenuGuests"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="Guests">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#062A14" />
-                                                    <GradientStop Offset="1" Color="#031A0C" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#66DE93"
-                                                Kind="AccountGroup" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="قاعدة الضيوف" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem
-                                    x:Name="MenuCorrespondents"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="Correspondents">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#2A2200" />
-                                                    <GradientStop Offset="1" Color="#1A1500" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#FFEB3B"
-                                                Kind="MapMarkerRadius" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="المراسلين" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem
-                                    x:Name="MenuCoverages"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="CoverageView">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <!--  أيقونة التغطيات بتصميم ذهبي متناسق  -->
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#2A2200" />
-                                                    <GradientStop Offset="1" Color="#1A1500" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#FFEB3B"
-                                                Kind="MapMarkerCheck" />
-                                        </Border>
-
-                                        <!--  نص العنصر  -->
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="سجل التغطيات الميدانية" />
-                                    </Grid>
-                                </ListBoxItem>
-                                <!--  Divider  -->
-                                <Separator
-                                    Height="1"
-                                    Margin="20,14,20,4"
-                                    Background="#7C3AED"
-                                    Opacity="0.08" />
-
-                                <!--  Group: النظام  -->
-                                <TextBlock Style="{StaticResource SectionLabel}" Text="● إدارة النظام" />
-
-                                <ListBoxItem
-                                    x:Name="MenuUsers"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="Users">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#1E0A28" />
-                                                    <GradientStop Offset="1" Color="#14061A" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#BA68C8"
-                                                Kind="AccountMultiple" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="المستخدمين" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem
-                                    x:Name="MenuPermissions"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="Permissions">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#2A0818" />
-                                                    <GradientStop Offset="1" Color="#1A040E" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#F06292"
-                                                Kind="ShieldKey" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="مصفوفة الصلاحيات" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem
-                                    x:Name="MenuReports"
-                                    Style="{StaticResource SideNavItem}"
-                                    Tag="Reports">
-                                    <Grid Margin="18,0,14,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="44" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="36"
-                                            Height="36"
-                                            HorizontalAlignment="Center"
-                                            CornerRadius="10">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Offset="0" Color="#2A2200" />
-                                                    <GradientStop Offset="1" Color="#1A1500" />
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <materialDesign:PackIcon
-                                                Width="20"
-                                                Height="20"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="#FFD54F"
-                                                Kind="ChartBar" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Medium"
-                                            Foreground="#D4D4E8"
-                                            Text="التقارير والإحصائيات" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                            </ListBox>
-                        </ScrollViewer>
-
-                        <!--  ── LOGOUT BUTTON ──  -->
-                        <Border
-                            Grid.Row="2"
-                            Margin="16,10,16,24"
-                            CornerRadius="16">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Offset="0" Color="#2A080E" />
-                                    <GradientStop Offset="1" Color="#1A0408" />
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <Border.BorderBrush>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Offset="0" Color="#FF4444" />
-                                    <GradientStop Offset="1" Color="#FF8080" />
-                                </LinearGradientBrush>
-                            </Border.BorderBrush>
-                            <Border.BorderThickness>1</Border.BorderThickness>
-                            <Button
-                                Height="52"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Click="BtnLogout_Click"
-                                Foreground="#FF6B6B"
-                                Style="{StaticResource MaterialDesignFlatButton}">
-                                <Button.Effect>
-                                    <DropShadowEffect BlurRadius="0" ShadowDepth="0" />
-                                </Button.Effect>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Margin="0,0,12,0"
-                                        Foreground="#FF6B6B"
-                                        Kind="Logout" />
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        FontSize="15"
-                                        FontWeight="SemiBold"
-                                        Foreground="#FF6B6B"
-                                        Text="تسجيل الخروج" />
-                                </StackPanel>
-                            </Button>
-                        </Border>
-
-                    </Grid>
-                </Grid>
-            </Border>
-
-            <!--
-                ═══════════════════════════════════════════════
-                MAIN AREA
-                ═══════════════════════════════════════════════
-            -->
-            <DockPanel Grid.Column="1">
-
-                <!--  ── TOP HEADER ──  -->
-                <Border Height="76" DockPanel.Dock="Top">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                            <GradientStop Offset="0" Color="#0F0F1E" />
-                            <GradientStop Offset="0.6" Color="#0C0C18" />
-                            <GradientStop Offset="1" Color="#0A0A14" />
-                        </LinearGradientBrush>
-                    </Border.Background>
-
-                    <!--  Thin gradient bottom border  -->
-                    <Border.BorderThickness>0,0,0,1</Border.BorderThickness>
-                    <Border.BorderBrush>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                            <GradientStop Offset="0" Color="#7C3AED" />
-                            <GradientStop Offset="0.5" Color="#00D4FF" />
-                            <GradientStop Offset="1" Color="#7C3AED" />
-                        </LinearGradientBrush>
-                    </Border.BorderBrush>
-
-                    <Grid Margin="32,0">
-
-                        <!--  Left: Logo  -->
-                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <!--  Logo badge  -->
-                            <Border
-                                Width="44"
-                                Height="44"
-                                CornerRadius="12">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Offset="0" Color="#7C3AED" />
-                                        <GradientStop Offset="1" Color="#0EA5E9" />
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <Border.Effect>
-                                    <DropShadowEffect
-                                        BlurRadius="16"
-                                        Opacity="0.6"
-                                        ShadowDepth="0"
-                                        Color="#7C3AED" />
-                                </Border.Effect>
-                                <materialDesign:PackIcon
-                                    Width="26"
-                                    Height="26"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Foreground="White"
-                                    Kind="RadioTower" />
-                            </Border>
-
-                            <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                                <TextBlock
-                                    FontSize="20"
-                                    FontWeight="Black"
-                                    Foreground="#FFFFFF"
-                                    Text="بث برو" />
-                                <TextBlock
-                                    FontSize="11"
-                                    FontWeight="Normal"
-                                    Text="نظام إدارة البث المتكامل">
-                                    <TextBlock.Foreground>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                            <GradientStop Offset="0" Color="#7C3AED" />
-                                            <GradientStop Offset="1" Color="#00D4FF" />
-                                        </LinearGradientBrush>
-                                    </TextBlock.Foreground>
-                                </TextBlock>
-                            </StackPanel>
-                        </StackPanel>
-
-                        <!--  Right: Clock + Live Badge  -->
-                        <StackPanel
-                            HorizontalAlignment="Right"
+                <!--  3. زر إغلاق الجلسة (يساراً في RTL)  -->
+                <Button
+                    Grid.Column="4"
+                    Height="40"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Click="BtnLogout_Click"
+                    Foreground="#CF6679"
+                    Style="{StaticResource MaterialDesignFlatButton}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="18"
+                            Height="18"
+                            Margin="0,0,8,0"
+                            Kind="Logout" />
+                        <TextBlock
                             VerticalAlignment="Center"
-                            Orientation="Horizontal">
+                            FontSize="14"
+                            Text="خروج" />
+                    </StackPanel>
+                </Button>
 
+            </Grid>
+        </Border>
 
-                            <!--  Clock  -->
-                            <Border Padding="18,10" CornerRadius="12">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Offset="0" Color="#1A1040" />
-                                        <GradientStop Offset="1" Color="#0E0E1C" />
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <Border.BorderBrush>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Offset="0" Color="#3B1FA8" />
-                                        <GradientStop Offset="1" Color="#0E7490" />
-                                    </LinearGradientBrush>
-                                </Border.BorderBrush>
-                                <Border.BorderThickness>1</Border.BorderThickness>
-                                <TextBlock
-                                    x:Name="TxtClock"
-                                    FontSize="17"
-                                    FontWeight="Medium"
-                                    Text="00:00:00">
-                                    <TextBlock.Foreground>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                            <GradientStop Offset="0" Color="#A78BFA" />
-                                            <GradientStop Offset="1" Color="#38BDF8" />
-                                        </LinearGradientBrush>
-                                    </TextBlock.Foreground>
-                                </TextBlock>
-                            </Border>
-                        </StackPanel>
+        <!--  ═══════════ الترويسة العلوية (Header) ═══════════  -->
+        <Border
+            Height="64"
+            Background="White"
+            BorderBrush="#E0E0E0"
+            BorderThickness="0,0,0,1"
+            DockPanel.Dock="Top">
+            <Grid Margin="24,0">
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <Border
+                        Width="40"
+                        Height="40"
+                        Background="#303F9F"
+                        CornerRadius="8">
+                        <materialDesign:PackIcon
+                            Width="22"
+                            Height="22"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="RadioTower" />
+                    </Border>
+                    <TextBlock
+                        Margin="14,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="Bold"
+                        Foreground="#212121"
+                        Text="بث برو" />
+                    <TextBlock
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="#757575"
+                        Text="|  إذاعة صوت القدس" />
+                </StackPanel>
+
+                <StackPanel
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Border
+                        Margin="0,0,16,0"
+                        Padding="16,8"
+                        Background="#F5F5F5"
+                        CornerRadius="8">
+                        <TextBlock
+                            x:Name="TxtClock"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Foreground="#212121"
+                            Text="00:00:00" />
+                    </Border>
+                    <Grid
+                        Width="36"
+                        Height="36"
+                        Margin="0,0,8,0"
+                        Background="#E8EAF6">
+                        <materialDesign:PackIcon
+                            Width="18"
+                            Height="18"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="#303F9F"
+                            Kind="Account" />
                     </Grid>
-                </Border>
+                    <TextBlock
+                        x:Name="TxtUserFullName"
+                        Margin="0,0,16,0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="#212121"
+                        Text="مدير النظام" />
 
-                <!--  ── CONTENT ──  -->
-                <Grid>
-                    <Grid.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Offset="0" Color="#080810" />
-                            <GradientStop Offset="1" Color="#0A0A14" />
-                        </LinearGradientBrush>
-                    </Grid.Background>
+                    <Button
+                        Width="36"
+                        Height="36"
+                        Click="BtnMinimize_Click"
+                        Foreground="#616161"
+                        Style="{StaticResource MaterialDesignIconButton}">
+                        <materialDesign:PackIcon
+                            Width="16"
+                            Height="16"
+                            Kind="WindowMinimize" />
+                    </Button>
+                    <Button
+                        Width="36"
+                        Height="36"
+                        Click="BtnMaximize_Click"
+                        Foreground="#616161"
+                        Style="{StaticResource MaterialDesignIconButton}">
+                        <materialDesign:PackIcon
+                            Width="16"
+                            Height="16"
+                            Kind="WindowMaximize" />
+                    </Button>
+                    <Button
+                        Width="36"
+                        Height="36"
+                        Click="BtnClose_Click"
+                        Foreground="#B00020"
+                        Style="{StaticResource MaterialDesignIconButton}">
+                        <materialDesign:PackIcon
+                            Width="16"
+                            Height="16"
+                            Kind="Close" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
 
-                    <!--  Subtle corner orb decoration  -->
-                    <Ellipse
-                        Width="500"
-                        Height="500"
-                        Margin="0,0,-150,-150"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Opacity="0.04">
-                        <Ellipse.Fill>
-                            <RadialGradientBrush>
-                                <GradientStop Offset="0" Color="#7C3AED" />
-                                <GradientStop Offset="1" Color="Transparent" />
-                            </RadialGradientBrush>
-                        </Ellipse.Fill>
-                    </Ellipse>
+        <!--  ═══════════ شريط التبويبات الأفقية (Tabs) ═══════════  -->
+        <Border
+            Height="56"
+            Margin="0,1,0,0"
+            Padding="24,8"
+            Background="White"
+            DockPanel.Dock="Top">
+            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                <RadioButton
+                    x:Name="MenuHome"
+                    Click="Tab_Click"
+                    Content="لوحة التحكم"
+                    IsChecked="True"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Home" />
+                <RadioButton
+                    x:Name="MenuPrograms"
+                    Click="Tab_Click"
+                    Content="إدارة البرامج"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Programs" />
+                <RadioButton
+                    x:Name="MenuEpisodes"
+                    Click="Tab_Click"
+                    Content="سجل الحلقات"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Episodes" />
+                <RadioButton
+                    x:Name="MenuGuests"
+                    Click="Tab_Click"
+                    Content="الضيوف"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Guests" />
+                <RadioButton
+                    x:Name="MenuCoverages"
+                    Click="Tab_Click"
+                    Content="المراسلين"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Correspondents" />
+                <RadioButton
+                    x:Name="MenuCorrespondents"
+                    Click="Tab_Click"
+                    Content="التغطيات"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Coverage" />
+                <RadioButton
+                    x:Name="MenuReports"
+                    Click="Tab_Click"
+                    Content="التقارير"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Reports" />
+                <RadioButton
+                    x:Name="MenuUsers"
+                    Click="Tab_Click"
+                    Content="المستخدمين"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Users" />
 
-                    <ContentControl x:Name="MainContentArea" Margin="36" />
+                <RadioButton
+                    x:Name="MenuPermissions"
+                    Click="Tab_Click"
+                    Content="الصلاحيات"
+                    Style="{StaticResource HubTabItem}"
+                    Tag="Permissions" />
+            </StackPanel>
+        </Border>
 
-                    <materialDesign:Snackbar
-                        x:Name="MainSnackbar"
-                        Margin="0,0,0,40"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom"
-                        MessageQueue="{materialDesign:MessageQueue}">
-                        <materialDesign:Snackbar.Resources>
-                            <!--  هذا الستايل يستهدف النص الداخلي للـ Snackbar  -->
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="TextWrapping" Value="Wrap" />
-                                <Setter Property="TextAlignment" Value="Center" />
-                                <Setter Property="FontSize" Value="14" />
-                                <Setter Property="Padding" Value="5" />
-                            </Style>
-                        </materialDesign:Snackbar.Resources>
+        <!--  ═══════════ منطقة العمل الخالية ═══════════  -->
 
-                    </materialDesign:Snackbar>
-                </Grid>
-            </DockPanel>
-        </Grid>
-    </materialDesign:DialogHost>
+        <ContentControl
+            x:Name="MainContentArea"
+            VerticalAlignment="Top"
+            DockPanel.Dock="Top" />
+
+
+
+        <!--  نظام الإشعارات (مثبت في الأسفل فوق الشريط السفلي)  -->
+        <materialDesign:Snackbar
+            x:Name="MainSnackbar"
+            Margin="0,0,0,16"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            DockPanel.Dock="Bottom"
+            MessageQueue="{materialDesign:MessageQueue}">
+            <materialDesign:Snackbar.Resources>
+                <!--  ضبط شكل النص داخل الإشعار ليكون مهندماً مع العربي  -->
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="TextWrapping" Value="Wrap" />
+                    <Setter Property="TextAlignment" Value="Center" />
+                    <Setter Property="FontSize" Value="14" />
+                </Style>
+            </materialDesign:Snackbar.Resources>
+        </materialDesign:Snackbar>
+
+
+
+
+    </DockPanel>
 </mah:MetroWindow>
