@@ -1,70 +1,151 @@
-﻿using DataAccess.Services;
+﻿using DataAccess.DTOs;
+using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using Domain.Models;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace Radio.Views.Users
 {
     /// <summary>
-    /// Interaction logic for PermissionMatrixView.xaml
+    /// شاشة مصفوفة الصلاحيات — تسمح بعرض وتعديل صلاحيات الأدوار.
     /// </summary>
     public partial class PermissionMatrixView
     {
-        private readonly IUserService _userService; // سنضيف دوال الصلاحيات لخدمة المستخدم
+        private readonly IUserService _userService;
         private readonly UserSession _session;
-        private Role? _selectedRole;
+        private RoleDto? _selectedRole;
 
-        // Caller must provide the current UserSession
         public PermissionMatrixView(IUserService userService, UserSession session)
         {
             InitializeComponent();
             _userService = userService;
             _session = session;
-            _ = LoadRoles();
+
+            // ✅ Loaded بدلاً من Fire-and-Forget
+            Loaded += async (_, _) => await LoadRolesAsync();
         }
 
-        private async Task LoadRoles() => LstRoles.ItemsSource = await _userService.GetRolesAsync();
+        #region Data Loading
 
-        private async void LstRoles_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        /// <summary>
+        /// تحميل قائمة الأدوار وربطها بالـ ListBox.
+        /// </summary>
+        private async Task LoadRolesAsync()
         {
-            if (LstRoles.SelectedItem is Role role)
+            try
             {
-                _selectedRole = role;
-                // جلب كل الصلاحيات مع تحديد ما يملكه هذا الدور حالياً
-                var allPermissions = await _userService.GetPermissionsMatrixAsync(role.RoleId);
-                ItemsPermissions.ItemsSource = allPermissions;
+                LstRoles.ItemsSource = await _userService.GetRolesAsync();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError("ليس لديك صلاحية لعرض الأدوار.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل الأدوار.");
             }
         }
 
+        #endregion
+
+        #region Role Selection
+
+        /// <summary>
+        /// عند اختيار دور — تحميل صلاحياته وعرضها في المصفوفة.
+        /// </summary>
+        private async void LstRoles_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LstRoles.SelectedItem is not RoleDto role)
+                return;
+
+            _selectedRole = role;
+
+            try
+            {
+                var allPermissions = await _userService.GetPermissionsMatrixAsync(role.RoleId);
+                ItemsPermissions.ItemsSource = allPermissions;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError("ليس لديك صلاحية لعرض صلاحيات هذا الدور.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل صلاحيات الدور.");
+            }
+        }
+
+        #endregion
+
+        #region Save
+
+        /// <summary>
+        /// حفظ الصلاحيات المحددة للدور الحالي.
+        /// </summary>
         private async void BtnSavePermissions_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedRole == null) return;
-
-            // تجميع الصلاحيات المختارة (IsChecked == true)
-            var selectedIds = new List<int>();
-            foreach (var item in ItemsPermissions.Items)
+            if (_selectedRole is null)
             {
-                if (item is PermissionViewModel vm && vm.IsAssigned)
-                    selectedIds.Add(vm.PermissionId);
+                MessageService.Current.ShowWarning("يرجى اختيار دور أولاً.");
+                return;
+            }
+
+            var selectedIds = ItemsPermissions.Items
+                .OfType<PermissionViewModel>()
+                .Where(vm => vm.IsAssigned)
+                .Select(vm => vm.PermissionId)
+                .ToList();
+
+            // ✅ تحقق أمان — لا تُرسل قائمة فارغة عن طريق الخطأ
+            if (selectedIds.Count == 0)
+            {
+                MessageService.Current.ShowWarning("لم يتم اختيار أي صلاحية. إذا أردت إزالة جميع الصلاحيات، يرجى التواصل مع مسؤول النظام.");
+                return;
             }
 
             try
             {
-                // pass the required UserSession argument
-                await _userService.UpdateRolePermissionsAsync(_selectedRole.RoleId, selectedIds, _session);
-                MessageBox.Show("تم تحديث الصلاحيات بنجاح. سيحتاج المستخدمون لإعادة تسجيل الدخول لتفعيلها.");
+                await _userService.UpdateRolePermissionsAsync(
+                    _selectedRole.RoleId, selectedIds, _session);
+
+                MessageService.Current.ShowSuccess(
+                    "تم تحديث صلاحيات الدور بنجاح. سيحتاج المستخدمون لإعادة تسجيل الدخول لتفعيلها.");
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError("ليس لديك صلاحية لتعديل صلاحيات الأدوار.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حفظ الصلاحيات.");
+            }
         }
-    }
 
-    // ViewModel بسيط للعرض في المصفوفة
-    public class PermissionViewModel
-    {
-        public int PermissionId { get; set; }
-        public string DisplayName { get; set; } = null!; // 👈 يجب أن تكون public
-        public string Module { get; set; } = null!;      // 👈 يجب أن تكون public
-        public bool IsAssigned { get; set; }             // 👈 يجب أن تكون public
+        #endregion
 
-    }
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
+    }  
 }

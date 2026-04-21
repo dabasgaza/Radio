@@ -1,4 +1,6 @@
-﻿<ResourceDictionary
+﻿
+<!--  AppStyles.xaml  -->
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
@@ -44,6 +46,65 @@
         <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
     </Style>
 
+    <!--  ═══════════ ComboBoxes ═══════════  -->
+
+    <Style
+        x:Key="BroadcastComboBox"
+        BasedOn="{StaticResource MaterialDesignOutlinedComboBox}"
+        TargetType="ComboBox">
+
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="12" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  ═══════════ DatePicker ═══════════  -->
+
+    <Style
+        x:Key="BroadcastDatePicker"
+        BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}"
+        TargetType="DatePicker">
+
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="12" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="CalendarMonthOutline" />
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
+
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
+                <Setter Property="BorderThickness" Value="2" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <!--  ═══════════ Cancel / Close Flat Button (تصميم هادئ) ═══════════  -->
     <Style
         x:Key="CancelFlatButton"
@@ -71,9 +132,12 @@
         BasedOn="{StaticResource MaterialDesignFilledTextBox}"
         TargetType="TextBox">
         <Setter Property="FontSize" Value="16" />
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.HasOutlinedTextField" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <!--  الحشوة الداخلية لجعل الحقل أوسع وأريح  -->
-        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Padding" Value="12" />
         <!--  إزالة الحد السفلي المزدوج الافتراضي لجعله أنظف  -->
         <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
     </Style>
@@ -191,15 +255,8 @@
         <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="Margin" Value="8" />
         <Setter Property="Padding" Value="16" />
-        <Setter Property="Effect">
-            <Setter.Value>
-                <DropShadowEffect
-                    BlurRadius="8"
-                    Opacity="0.08"
-                    ShadowDepth="2"
-                    Color="Black" />
-            </Setter.Value>
-        </Setter>
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp3" />
+        <Setter Property="materialDesign:ShadowAssist.Darken" Value="True" />
     </Style>
 
 

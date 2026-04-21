@@ -70,6 +70,8 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
         guest.FullName = dto.FullName;
         guest.Organization = dto.Organization;
         guest.PhoneNumber = dto.PhoneNumber;
+        guest.EmailAddress = dto.EmailAddress;
+
         // ❌ تم إزالة UpdatedAt و UpdatedByUserId لأن الـ Interceptor يفعل ذلك!
 
         try

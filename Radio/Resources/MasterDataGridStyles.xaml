@@ -92,7 +92,8 @@
                     ⚠️ لا تضع BorderThickness هنا — لا يظهر على DataGridRow
                     الـ left border يتم في CellStyle أدناه (الخلية الأولى فقط)
                 -->
-                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueLightForegroundBrush}" />
             </Trigger>
 
             <!--  Disabled  -->
@@ -201,6 +202,8 @@
         <Setter Property="HeadersVisibility" Value="Column" />
         <Setter Property="SelectionMode" Value="Single" />
         <Setter Property="SelectionUnit" Value="FullRow" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Regular" />
 
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
         <Setter Property="GridLinesVisibility" Value="None" />

@@ -7,7 +7,6 @@ namespace DataAccess.Services
 {
     public interface IUserService
     {
-        // ✨ إرجاع DTOs بدلاً من الكيانات
         Task<List<UserDto>> GetAllUsersAsync();
         Task CreateUserAsync(UserDto dto, string plainPassword, UserSession session);
         Task UpdateUserAsync(UserDto dto, string? newPassword, UserSession session);
@@ -17,19 +16,17 @@ namespace DataAccess.Services
         Task UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session);
     }
 
-    // ✨ استخدام Primary Constructor
     public class UserService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IUserService
     {
         #region إدارة المستخدمين
 
         public async Task<List<UserDto>> GetAllUsersAsync()
         {
-            using var context = await contextFactory.CreateDbContextAsync();
+            await using var context = await contextFactory.CreateDbContextAsync();
 
-            // ✨ إرجاع DTO نظيف يحجب الـ PasswordHash عن الواجهة
             return await context.Users
                 .AsNoTracking()
-                .Where(u => u.IsActive) // حماية إضافية
+                .Where(u => u.IsActive)
                 .Select(u => new UserDto
                 {
                     UserId = u.UserId,
@@ -48,12 +45,11 @@ namespace DataAccess.Services
         {
             session.EnsurePermission(AppPermissions.UserManage);
 
-            using var context = await contextFactory.CreateDbContextAsync();
+            await using var context = await contextFactory.CreateDbContextAsync();
 
             if (await context.Users.AnyAsync(u => u.Username == dto.Username))
                 throw new InvalidOperationException("اسم المستخدم موجود بالفعل في النظام.");
 
-            // ✨ إنشاء الكيان داخل الـ Service فقط (حماية من Mass Assignment)
             var user = new User
             {
                 Username = dto.Username,
@@ -63,7 +59,6 @@ namespace DataAccess.Services
                 RoleId = dto.RoleId,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(plainPassword),
                 IsActive = true
-                // ❌ تم إزالة CreatedAt و CreatedByUserId (الـ Interceptor يعمل)
             };
 
             context.Users.Add(user);
@@ -74,22 +69,17 @@ namespace DataAccess.Services
         {
             session.EnsurePermission(AppPermissions.UserManage);
 
-            using var context = await contextFactory.CreateDbContextAsync();
-            var dbUser = await context.Users.FindAsync(dto.UserId);
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var dbUser = await context.Users.FindAsync(dto.UserId)
+                ?? throw new KeyNotFoundException("المستخدم غير موجود.");
 
-            if (dbUser == null) throw new KeyNotFoundException("المستخدم غير موجود.");
-
-            // ✨ تحديث الحقول المسموح بها فقط من الـ DTO
             dbUser.FullName = dto.FullName;
             dbUser.EmailAddress = dto.EmailAddress;
             dbUser.PhoneNumber = dto.PhoneNumber;
             dbUser.RoleId = dto.RoleId;
-            // ❌ تم إزالة UpdatedAt و UpdatedByUserId (الـ Interceptor يعمل)
 
             if (!string.IsNullOrWhiteSpace(newPassword))
-            {
                 dbUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-            }
 
             try
             {
@@ -108,14 +98,11 @@ namespace DataAccess.Services
             if (userId == session.UserId)
                 throw new InvalidOperationException("لا يمكنك تعطيل حسابك الشخصي لأسباب أمنية.");
 
-            using var context = await contextFactory.CreateDbContextAsync();
-            var user = await context.Users.FindAsync(userId);
-
-            if (user == null) throw new KeyNotFoundException("المستخدم غير موجود.");
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var user = await context.Users.FindAsync(userId)
+                ?? throw new KeyNotFoundException("المستخدم غير موجود.");
 
             user.IsActive = isActive;
-            // ❌ تم إزالة UpdatedAt و UpdatedByUserId (الـ Interceptor يعمل)
-
             await context.SaveChangesAsync();
         }
 
@@ -125,9 +112,8 @@ namespace DataAccess.Services
 
         public async Task<List<RoleDto>> GetRolesAsync()
         {
-            using var context = await contextFactory.CreateDbContextAsync();
+            await using var context = await contextFactory.CreateDbContextAsync();
 
-            // ✨ إرجاع DTO بدلاً من الكيان
             return await context.Roles
                 .AsNoTracking()
                 .Where(r => r.IsActive)
@@ -142,10 +128,18 @@ namespace DataAccess.Services
 
         public async Task<List<PermissionViewModel>> GetPermissionsMatrixAsync(int roleId)
         {
-            using var context = await contextFactory.CreateDbContextAsync();
+            await using var context = await contextFactory.CreateDbContextAsync();
 
-            var allPermissions = await context.Permissions.AsNoTracking().OrderBy(p => p.Module).ToListAsync();
-            var assignedIds = await context.RolePermissions.AsNoTracking().Where(rp => rp.RoleId == roleId).Select(rp => rp.PermissionId).ToListAsync();
+            var allPermissions = await context.Permissions
+                .AsNoTracking()
+                .OrderBy(p => p.Module)
+                .ToListAsync();
+
+            var assignedIds = await context.RolePermissions
+                .AsNoTracking()
+                .Where(rp => rp.RoleId == roleId)
+                .Select(rp => rp.PermissionId)
+                .ToListAsync();
 
             return allPermissions.Select(p => new PermissionViewModel
             {
@@ -160,36 +154,33 @@ namespace DataAccess.Services
         {
             session.EnsurePermission(AppPermissions.UserManage);
 
-            using var context = await contextFactory.CreateDbContextAsync();
-            using var transaction = await context.Database.BeginTransactionAsync();
+            await using var context = await contextFactory.CreateDbContextAsync();
 
-            try
+            // ✅ الخطوة 1: حذف الصلاحيات الحالية (SaveChanges منفصل)
+            var existing = await context.RolePermissions
+                .Where(rp => rp.RoleId == roleId)
+                .ToListAsync();
+
+            if (existing.Count > 0)
             {
-                // ✨ استخدام ExecuteDeleteAsync (أداء فائق)
-                await context.RolePermissions
-                    .Where(rp => rp.RoleId == roleId)
-                    .ExecuteDeleteAsync();
+                context.RolePermissions.RemoveRange(existing);
+                await context.SaveChangesAsync();
+            }
 
-                if (selectedPermissionIds != null && selectedPermissionIds.Any())
-                {
-                    var newMappings = selectedPermissionIds.Select(pId => new RolePermission
+            // ✅ الخطوة 2: إضافة الصلاحيات الجديدة (SaveChanges منفصل)
+            if (selectedPermissionIds.Count > 0)
+            {
+                context.RolePermissions.AddRange(
+                    selectedPermissionIds.Select(id => new RolePermission
                     {
                         RoleId = roleId,
-                        PermissionId = pId
-                    });
+                        PermissionId = id
+                    }));
 
-                    await context.RolePermissions.AddRangeAsync(newMappings);
-                    await context.SaveChangesAsync();
-                }
-
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
+                await context.SaveChangesAsync();
             }
         }
+
 
         #endregion
     }

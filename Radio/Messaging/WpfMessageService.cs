@@ -8,14 +8,8 @@ namespace Radio.Messaging;
 
 public class WpfMessageService : IMessageService
 {
-    private readonly ISnackbarMessageQueue _messageQueue;
+    #region Snackbar Messages
 
-    public WpfMessageService(ISnackbarMessageQueue messageQueue)
-    {
-        _messageQueue = messageQueue;
-    }
-
-    // 1. الإشعارات العابرة (Snackbars)
     public void ShowSuccess(string message, string title = "نجاح")
         => EnqueueMessage($"✅ {title}: {message}");
 
@@ -30,34 +24,39 @@ public class WpfMessageService : IMessageService
 
     private void EnqueueMessage(string content)
     {
-        // ضمان العمل على الـ UI Thread
         Application.Current.Dispatcher.Invoke(() =>
         {
-            _messageQueue.Enqueue(content, null, null, null, false, true, TimeSpan.FromSeconds(4));
+            var snackbar = FindActiveSnackbar();
+            snackbar?.MessageQueue?.Enqueue(content, null, null, null, false, true, TimeSpan.FromSeconds(4));
         });
     }
 
-    // 2. رسالة التأكيد (نعم/لا) باستخدام DialogHost
+    #endregion
+
+    #region Confirmation Dialog
+
     public async Task<bool> ShowConfirmationAsync(string message, string title = "تأكيد")
     {
-        // ✨ نقوم ببناء الواجهة على الـ UI Thread مباشرة لتجنب تعقيدات الـ Nested Async
-        return await Application.Current.Dispatcher.InvokeAsync(async () =>
+        try
         {
             var view = new StackPanel
             {
                 Margin = new Thickness(25),
                 MinWidth = 300,
-                FlowDirection = FlowDirection.RightToLeft // ✨ دعم RTL للعربية
+                FlowDirection = FlowDirection.RightToLeft
             };
 
-            // ✨ استخدام أنماط Material Design الديناميكية بدلاً من الألوان الثابتة
+            // ✅ ألوان آمنة — تعمل داخل DialogHost Popup بغض النظر عن الثيم
+            var titleBrush = new SolidColorBrush(Color.FromRgb(0x30, 0x3F, 0x9F)); // Indigo 700
+            var bodyBrush = new SolidColorBrush(Color.FromRgb(0x21, 0x21, 0x21)); // Dark Gray
+
             view.Children.Add(new TextBlock
             {
                 Text = title,
                 FontSize = 20,
                 FontWeight = FontWeights.Bold,
                 Margin = new Thickness(0, 0, 0, 15),
-                Foreground = (Brush)Application.Current.FindResource("PrimaryHueMidBrush") // يتكيف مع الثيم
+                Foreground = titleBrush
             });
 
             view.Children.Add(new TextBlock
@@ -66,24 +65,22 @@ public class WpfMessageService : IMessageService
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 16,
                 Margin = new Thickness(0, 0, 0, 25),
-                Foreground = (Brush)Application.Current.FindResource("MaterialDesignBody") // يتكيف مع الثيم
+                Foreground = bodyBrush
             });
 
             var btns = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
-                HorizontalAlignment = HorizontalAlignment.Left, // ✨ Left في RTL يعني يمين الشاشة
+                HorizontalAlignment = HorizontalAlignment.Left,
             };
 
             var btnNo = new Button
             {
                 Content = "إلغاء",
                 Style = (Style)Application.Current.FindResource("MaterialDesignOutlinedButton"),
-                Margin = new Thickness(0, 0, 10, 0), // تعديل الهامش ليناسب RTL
+                Margin = new Thickness(0, 0, 10, 0),
                 Command = DialogHost.CloseDialogCommand,
                 CommandParameter = false,
-                Foreground = (Brush)Application.Current.FindResource("MaterialDesignBodyLight"),
-                BorderBrush = (Brush)Application.Current.FindResource("MaterialDesignBodyLight")
             };
 
             var btnYes = new Button
@@ -95,12 +92,70 @@ public class WpfMessageService : IMessageService
                 CommandParameter = true,
             };
 
-            btns.Children.Add(btnYes); // ✨ زر "نعم" أولاً (يمين) في RTL
-            btns.Children.Add(btnNo);  // زر "إلغاء" ثانياً (يسار) في RTL
+            btns.Children.Add(btnYes);
+            btns.Children.Add(btnNo);
             view.Children.Add(btns);
 
-            var result = await DialogHost.Show(view, "RootDialog");
+            var result = await DialogHost.Show(view);
+
             return result is bool boolResult && boolResult;
-        }).Task.Unwrap(); // ✨ استخدام Unwrap لفك الـ Task الداخلي بسلاسة
+        }
+        catch
+        {
+            return false;
+        }
     }
+    #endregion
+
+    #region Visual Tree Helpers
+
+    /// <summary>
+    /// البحث عن Snackbar في النافذة النشطة حالياً.
+    /// </summary>
+    private static Snackbar? FindActiveSnackbar()
+    {
+        var window = Application.Current.Windows
+            .OfType<Window>()
+            .LastOrDefault(w => w.IsActive)
+            ?? Application.Current.Windows.OfType<Window>().LastOrDefault();
+
+        if (window is null) return null;
+        return FindVisualChild<Snackbar>(window);
+    }
+
+    /// <summary>
+    /// البحث عن DialogHost في النافذة النشطة حالياً.
+    /// </summary>
+    private static DialogHost? FindActiveDialogHost()
+    {
+        var window = Application.Current.Windows
+            .OfType<Window>()
+            .LastOrDefault(w => w.IsActive)
+            ?? Application.Current.Windows.OfType<Window>().LastOrDefault();
+
+        if (window is null) return null;
+        return FindVisualChild<DialogHost>(window);
+    }
+
+    /// <summary>
+    /// البحث العودي عن عنصر في شجرة العناصر المرئية.
+    /// </summary>
+    private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+
+            if (child is T result)
+                return result;
+
+            var found = FindVisualChild<T>(child);
+            if (found is not null)
+                return found;
+        }
+
+        return null;
+    }
+
+    #endregion
 }

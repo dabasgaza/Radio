@@ -33,11 +33,11 @@ namespace Radio
 
             InitializeComponent();
 
-            TxtUserFullName.Text = _session.FullName;
+            //TxtUserFullName.Text = _session.FullName;
             //ChipRole.Content = TranslateRole(_session.RoleName);
 
             // 👈 تهيئة نظام الإشعارات المركزي وربطه بالـ Snackbar الخاص بهذه النافذة
-            var wpfMessaging = new WpfMessageService(MainSnackbar.MessageQueue!);
+            var wpfMessaging = new WpfMessageService();
             MessageService.Initialize(wpfMessaging);
 
             InitializeUI();
@@ -46,7 +46,7 @@ namespace Radio
         private void InitializeUI()
         {
             // Set User Info in Header
-            TxtUserFullName.Text = _session.FullName;
+            //TxtUserFullName.Text = _session.FullName;
             //ChipRole.Content = TranslateRole(_session.RoleName);
 
             // استدعاء نظام الأمان الجديد

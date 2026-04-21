@@ -54,314 +54,317 @@
         </Style>
     </mah:MetroWindow.Resources>
 
-    <!--  الهيكل الأساسي: ترويسة، تبويبات، محتوى، شريط سفلي  -->
-    <DockPanel>
-        <!--  ═══════════ الشريط السفلي (Bottom Dock) ═══════════  -->
-        <Border
-            Height="64"
-            VerticalAlignment="Bottom"
-            Background="White"
-            BorderBrush="#E0E0E0"
-            BorderThickness="0,1,0,0"
-            DockPanel.Dock="Bottom">
-            <Grid Margin="24,0">
+    <materialDesign:DialogHost>
+        <DockPanel>
+            <!--  ═══════════ الشريط السفلي (Bottom Dock) ═══════════  -->
+            <Border
+                Height="64"
+                VerticalAlignment="Bottom"
+                Background="White"
+                BorderBrush="#E0E0E0"
+                BorderThickness="0,1,0,0"
+                DockPanel.Dock="Bottom">
+                <Grid Margin="24,0">
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <!--  الأيقونات السريعة  -->
-                    <ColumnDefinition Width="*" />
-                    <!--  مساحة فارغة  -->
-                    <ColumnDefinition Width="Auto" />
-                    <!--  زر ON AIR  -->
-                    <ColumnDefinition Width="*" />
-                    <!--  مساحة فارغة  -->
-                    <ColumnDefinition Width="Auto" />
-                    <!--  زر الخروج  -->
-                </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <!--  الأيقونات السريعة  -->
+                        <ColumnDefinition Width="*" />
+                        <!--  مساحة فارغة  -->
+                        <ColumnDefinition Width="Auto" />
+                        <!--  زر ON AIR  -->
+                        <ColumnDefinition Width="*" />
+                        <!--  مساحة فارغة  -->
+                        <ColumnDefinition Width="Auto" />
+                        <!--  زر الخروج  -->
+                    </Grid.ColumnDefinitions>
 
-                <!--  1. أيقونات سريعة (يميناً في RTL)  -->
-                <StackPanel
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal">
-                    <Button
-                        Width="40"
-                        Height="40"
-                        Foreground="#616161"
-                        Style="{StaticResource MaterialDesignIconButton}"
-                        ToolTip="المراسلين">
-                        <materialDesign:PackIcon
-                            Width="20"
-                            Height="20"
-                            Kind="MapMarkerRadius" />
-                    </Button>
-                    <Button
-                        Width="40"
-                        Height="40"
-                        Foreground="#616161"
-                        Style="{StaticResource MaterialDesignIconButton}"
-                        ToolTip="التغطيات">
-                        <materialDesign:PackIcon
-                            Width="20"
-                            Height="20"
-                            Kind="MapMarkerCheck" />
-                    </Button>
-                    <Button
-                        Width="40"
-                        Height="40"
-                        Foreground="#616161"
-                        Style="{StaticResource MaterialDesignIconButton}"
-                        ToolTip="الصلاحيات">
-                        <materialDesign:PackIcon
-                            Width="20"
-                            Height="20"
-                            Kind="ShieldKey" />
-                    </Button>
-                </StackPanel>
-
-                <!--  2. زر ON AIR في المنتصف تماماً  -->
-                <Button
-                    x:Name="BtnOnAir"
-                    Grid.Column="2"
-                    Width="140"
-                    Height="40"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Content="ON AIR"
-                    Style="{StaticResource BtnOnAir}" />
-
-                <!--  3. زر إغلاق الجلسة (يساراً في RTL)  -->
-                <Button
-                    Grid.Column="4"
-                    Height="40"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    Click="BtnLogout_Click"
-                    Foreground="#CF6679"
-                    Style="{StaticResource MaterialDesignFlatButton}">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon
-                            Width="18"
-                            Height="18"
-                            Margin="0,0,8,0"
-                            Kind="Logout" />
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            Text="خروج" />
+                    <!--  1. أيقونات سريعة (يميناً في RTL)  -->
+                    <StackPanel
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Button
+                            Width="40"
+                            Height="40"
+                            Foreground="#616161"
+                            Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="المراسلين">
+                            <materialDesign:PackIcon
+                                Width="20"
+                                Height="20"
+                                Kind="MapMarkerRadius" />
+                        </Button>
+                        <Button
+                            Width="40"
+                            Height="40"
+                            Foreground="#616161"
+                            Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="التغطيات">
+                            <materialDesign:PackIcon
+                                Width="20"
+                                Height="20"
+                                Kind="MapMarkerCheck" />
+                        </Button>
+                        <Button
+                            Width="40"
+                            Height="40"
+                            Foreground="#616161"
+                            Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="الصلاحيات">
+                            <materialDesign:PackIcon
+                                Width="20"
+                                Height="20"
+                                Kind="ShieldKey" />
+                        </Button>
                     </StackPanel>
-                </Button>
 
-            </Grid>
-        </Border>
-
-        <!--  ═══════════ الترويسة العلوية (Header) ═══════════  -->
-        <Border
-            Height="64"
-            Background="White"
-            BorderBrush="#E0E0E0"
-            BorderThickness="0,0,0,1"
-            DockPanel.Dock="Top">
-            <Grid Margin="24,0">
-                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                    <Border
-                        Width="40"
+                    <!--  2. زر ON AIR في المنتصف تماماً  -->
+                    <Button
+                        x:Name="BtnOnAir"
+                        Grid.Column="2"
+                        Width="140"
                         Height="40"
-                        Background="#303F9F"
-                        CornerRadius="8">
-                        <materialDesign:PackIcon
-                            Width="22"
-                            Height="22"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Foreground="White"
-                            Kind="RadioTower" />
-                    </Border>
-                    <TextBlock
-                        Margin="14,0,0,0"
+                        HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        FontSize="20"
-                        FontWeight="Bold"
-                        Foreground="#212121"
-                        Text="بث برو" />
-                    <TextBlock
-                        Margin="8,0,0,0"
-                        VerticalAlignment="Center"
-                        FontSize="14"
-                        Foreground="#757575"
-                        Text="|  إذاعة صوت القدس" />
-                </StackPanel>
+                        Content="ON AIR"
+                        Style="{StaticResource BtnOnAir}" />
 
-                <StackPanel
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal">
-                    <Border
-                        Margin="0,0,16,0"
-                        Padding="16,8"
-                        Background="#F5F5F5"
-                        CornerRadius="8">
+                    <!--  3. زر إغلاق الجلسة (يساراً في RTL)  -->
+                    <Button
+                        Grid.Column="4"
+                        Height="40"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Click="BtnLogout_Click"
+                        Foreground="#CF6679"
+                        Style="{StaticResource MaterialDesignFlatButton}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="18"
+                                Height="18"
+                                Margin="0,0,8,0"
+                                Kind="Logout" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Text="خروج" />
+                        </StackPanel>
+                    </Button>
+
+                </Grid>
+            </Border>
+
+            <!--  ═══════════ الترويسة العلوية (Header) ═══════════  -->
+            <Border
+                Height="64"
+                Background="White"
+                BorderBrush="#E0E0E0"
+                BorderThickness="0,0,0,1"
+                DockPanel.Dock="Top">
+                <Grid Margin="24,0">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Border
+                            Width="40"
+                            Height="40"
+                            Background="#303F9F"
+                            CornerRadius="8">
+                            <materialDesign:PackIcon
+                                Width="22"
+                                Height="22"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Foreground="White"
+                                Kind="RadioTower" />
+                        </Border>
                         <TextBlock
-                            x:Name="TxtClock"
-                            FontSize="16"
+                            Margin="14,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="20"
                             FontWeight="Bold"
                             Foreground="#212121"
-                            Text="00:00:00" />
-                    </Border>
-                    <Grid
-                        Width="36"
-                        Height="36"
-                        Margin="0,0,8,0"
-                        Background="#E8EAF6">
-                        <materialDesign:PackIcon
-                            Width="18"
-                            Height="18"
-                            HorizontalAlignment="Center"
+                            Text="بث برو" />
+                        <TextBlock
+                            Margin="8,0,0,0"
                             VerticalAlignment="Center"
-                            Foreground="#303F9F"
-                            Kind="Account" />
-                    </Grid>
-                    <TextBlock
-                        x:Name="TxtUserFullName"
-                        Margin="0,0,16,0"
+                            FontSize="14"
+                            Foreground="#757575"
+                            Text="|  إذاعة صوت القدس" />
+                    </StackPanel>
+
+                    <StackPanel
+                        HorizontalAlignment="Right"
                         VerticalAlignment="Center"
-                        FontSize="14"
-                        Foreground="#212121"
-                        Text="مدير النظام" />
+                        Orientation="Horizontal">
+                        <Border
+                            Margin="0,0,16,0"
+                            Padding="16,8"
+                            Background="#F5F5F5"
+                            CornerRadius="8">
+                            <TextBlock
+                                x:Name="TxtClock"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Foreground="#212121"
+                                Text="00:00:00" />
+                        </Border>
+                        <Grid
+                            Width="36"
+                            Height="36"
+                            Margin="0,0,8,0"
+                            Background="#E8EAF6">
+                            <materialDesign:PackIcon
+                                Width="18"
+                                Height="18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Foreground="#303F9F"
+                                Kind="Account" />
+                        </Grid>
+                        <TextBlock
+                            x:Name="TxtUserFullName"
+                            Margin="0,0,16,0"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#212121"
+                            Text="مدير النظام" />
 
-                    <Button
-                        Width="36"
-                        Height="36"
-                        Click="BtnMinimize_Click"
-                        Foreground="#616161"
-                        Style="{StaticResource MaterialDesignIconButton}">
-                        <materialDesign:PackIcon
-                            Width="16"
-                            Height="16"
-                            Kind="WindowMinimize" />
-                    </Button>
-                    <Button
-                        Width="36"
-                        Height="36"
-                        Click="BtnMaximize_Click"
-                        Foreground="#616161"
-                        Style="{StaticResource MaterialDesignIconButton}">
-                        <materialDesign:PackIcon
-                            Width="16"
-                            Height="16"
-                            Kind="WindowMaximize" />
-                    </Button>
-                    <Button
-                        Width="36"
-                        Height="36"
-                        Click="BtnClose_Click"
-                        Foreground="#B00020"
-                        Style="{StaticResource MaterialDesignIconButton}">
-                        <materialDesign:PackIcon
-                            Width="16"
-                            Height="16"
-                            Kind="Close" />
-                    </Button>
+                        <Button
+                            Width="36"
+                            Height="36"
+                            Click="BtnMinimize_Click"
+                            Foreground="#616161"
+                            Style="{StaticResource MaterialDesignIconButton}">
+                            <materialDesign:PackIcon
+                                Width="16"
+                                Height="16"
+                                Kind="WindowMinimize" />
+                        </Button>
+                        <Button
+                            Width="36"
+                            Height="36"
+                            Click="BtnMaximize_Click"
+                            Foreground="#616161"
+                            Style="{StaticResource MaterialDesignIconButton}">
+                            <materialDesign:PackIcon
+                                Width="16"
+                                Height="16"
+                                Kind="WindowMaximize" />
+                        </Button>
+                        <Button
+                            Width="36"
+                            Height="36"
+                            Click="BtnClose_Click"
+                            Foreground="#B00020"
+                            Style="{StaticResource MaterialDesignIconButton}">
+                            <materialDesign:PackIcon
+                                Width="16"
+                                Height="16"
+                                Kind="Close" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  ═══════════ شريط التبويبات الأفقية (Tabs) ═══════════  -->
+            <Border
+                Height="56"
+                Margin="0,1,0,0"
+                Padding="24,8"
+                Background="White"
+                DockPanel.Dock="Top">
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <RadioButton
+                        x:Name="MenuHome"
+                        Click="Tab_Click"
+                        Content="لوحة التحكم"
+                        IsChecked="True"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Home" />
+                    <RadioButton
+                        x:Name="MenuPrograms"
+                        Click="Tab_Click"
+                        Content="إدارة البرامج"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Programs" />
+                    <RadioButton
+                        x:Name="MenuEpisodes"
+                        Click="Tab_Click"
+                        Content="سجل الحلقات"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Episodes" />
+                    <RadioButton
+                        x:Name="MenuGuests"
+                        Click="Tab_Click"
+                        Content="الضيوف"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Guests" />
+                    <RadioButton
+                        x:Name="MenuCoverages"
+                        Click="Tab_Click"
+                        Content="المراسلين"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Correspondents" />
+                    <RadioButton
+                        x:Name="MenuCorrespondents"
+                        Click="Tab_Click"
+                        Content="التغطيات"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Coverage" />
+                    <RadioButton
+                        x:Name="MenuReports"
+                        Click="Tab_Click"
+                        Content="التقارير"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Reports" />
+                    <RadioButton
+                        x:Name="MenuUsers"
+                        Click="Tab_Click"
+                        Content="المستخدمين"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Users" />
+
+                    <RadioButton
+                        x:Name="MenuPermissions"
+                        Click="Tab_Click"
+                        Content="الصلاحيات"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Permissions" />
                 </StackPanel>
-            </Grid>
-        </Border>
+            </Border>
 
-        <!--  ═══════════ شريط التبويبات الأفقية (Tabs) ═══════════  -->
-        <Border
-            Height="56"
-            Margin="0,1,0,0"
-            Padding="24,8"
-            Background="White"
-            DockPanel.Dock="Top">
-            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                <RadioButton
-                    x:Name="MenuHome"
-                    Click="Tab_Click"
-                    Content="لوحة التحكم"
-                    IsChecked="True"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Home" />
-                <RadioButton
-                    x:Name="MenuPrograms"
-                    Click="Tab_Click"
-                    Content="إدارة البرامج"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Programs" />
-                <RadioButton
-                    x:Name="MenuEpisodes"
-                    Click="Tab_Click"
-                    Content="سجل الحلقات"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Episodes" />
-                <RadioButton
-                    x:Name="MenuGuests"
-                    Click="Tab_Click"
-                    Content="الضيوف"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Guests" />
-                <RadioButton
-                    x:Name="MenuCoverages"
-                    Click="Tab_Click"
-                    Content="المراسلين"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Correspondents" />
-                <RadioButton
-                    x:Name="MenuCorrespondents"
-                    Click="Tab_Click"
-                    Content="التغطيات"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Coverage" />
-                <RadioButton
-                    x:Name="MenuReports"
-                    Click="Tab_Click"
-                    Content="التقارير"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Reports" />
-                <RadioButton
-                    x:Name="MenuUsers"
-                    Click="Tab_Click"
-                    Content="المستخدمين"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Users" />
+            <!--  ═══════════ منطقة العمل الخالية ═══════════  -->
 
-                <RadioButton
-                    x:Name="MenuPermissions"
-                    Click="Tab_Click"
-                    Content="الصلاحيات"
-                    Style="{StaticResource HubTabItem}"
-                    Tag="Permissions" />
-            </StackPanel>
-        </Border>
-
-        <!--  ═══════════ منطقة العمل الخالية ═══════════  -->
-
-        <ContentControl
-            x:Name="MainContentArea"
-            VerticalAlignment="Top"
-            DockPanel.Dock="Top" />
+            <ContentControl
+                x:Name="MainContentArea"
+                VerticalAlignment="Top"
+                DockPanel.Dock="Top" />
 
 
 
-        <!--  نظام الإشعارات (مثبت في الأسفل فوق الشريط السفلي)  -->
-        <materialDesign:Snackbar
-            x:Name="MainSnackbar"
-            Margin="0,0,0,16"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Bottom"
-            DockPanel.Dock="Bottom"
-            MessageQueue="{materialDesign:MessageQueue}">
-            <materialDesign:Snackbar.Resources>
-                <!--  ضبط شكل النص داخل الإشعار ليكون مهندماً مع العربي  -->
-                <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="TextWrapping" Value="Wrap" />
-                    <Setter Property="TextAlignment" Value="Center" />
-                    <Setter Property="FontSize" Value="14" />
-                </Style>
-            </materialDesign:Snackbar.Resources>
-        </materialDesign:Snackbar>
+            <!--  نظام الإشعارات (مثبت في الأسفل فوق الشريط السفلي)  -->
+            <materialDesign:Snackbar
+                x:Name="MainSnackbar"
+                Margin="0,0,0,16"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                DockPanel.Dock="Bottom"
+                MessageQueue="{materialDesign:MessageQueue}">
+                <materialDesign:Snackbar.Resources>
+                    <!--  ضبط شكل النص داخل الإشعار ليكون مهندماً مع العربي  -->
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="TextWrapping" Value="Wrap" />
+                        <Setter Property="TextAlignment" Value="Center" />
+                        <Setter Property="FontSize" Value="14" />
+                    </Style>
+                </materialDesign:Snackbar.Resources>
+            </materialDesign:Snackbar>
 
 
 
 
-    </DockPanel>
+        </DockPanel>
+
+    </materialDesign:DialogHost>
+    <!--  الهيكل الأساسي: ترويسة، تبويبات، محتوى، شريط سفلي  -->
 </mah:MetroWindow>

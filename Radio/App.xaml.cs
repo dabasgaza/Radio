@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Radio.Forms;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -29,6 +30,7 @@ namespace Radio
         {
             // ✅ النهج الحديث في .NET 10 (بدلاً من CreateDefaultBuilder)
             var builder = Host.CreateApplicationBuilder();
+
 
             // 1. Database Context Factory (EF Core 10)
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
@@ -54,6 +56,7 @@ namespace Radio
             builder.Services.AddTransient<IReportsService, ReportsService>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<ICoverageService, CoverageService>();
+            builder.Services.AddSingleton<IMessageService, WpfMessageService>();
             // ... باقي الخدمات ...
 
             // 4. UI
@@ -92,6 +95,10 @@ namespace Radio
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+
+            // ✅ تهيئة MessageService من DI
+            MessageService.Initialize(AppHost.Services.GetRequiredService<IMessageService>());
 
             var loginWindow = AppHost.Services.GetRequiredService<LoginWindow>();
             loginWindow.Show();

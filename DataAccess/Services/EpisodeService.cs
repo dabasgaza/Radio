@@ -2,6 +2,7 @@
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace DataAccess.Services;
 
@@ -20,6 +21,7 @@ public interface IEpisodeService
     Task CreateEpisodeAsync(EpisodeDto dto, UserSession session);
     Task UpdateEpisodeAsync(EpisodeDto dto, UserSession session);
     Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session);
+    Task DeleteEpisodeAsync(int episodeId, UserSession session);
 }
 
 // ✨ استخدام C# 13 Primary Constructor
@@ -128,5 +130,28 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         {
             throw new InvalidOperationException("فشل التحديث: قام مستخدم آخر بتعديل حالة هذه الحلقة للتو.");
         }
+    }
+
+    public async Task DeleteEpisodeAsync(int episodeId, UserSession session)
+    {
+        session.EnsurePermission(AppPermissions.EpisodeManage);
+
+        await using var context = await contextFactory.CreateDbContextAsync();
+
+        var episode = await context.Episodes
+            .FindAsync(episodeId)
+            ?? throw new InvalidOperationException("الحلقة المحددة غير موجودة أو تم حذفها مسبقاً.");
+
+        // ✅ قاعدة عمل: منع حذف الحلقات المنفّذة أو المنشورة
+        if (episode.ExecutionLogs.Any())
+            throw new InvalidOperationException("لا يمكن حذف حلقة تم تنفيذها، يُرجى إلغاء التنفيذ أولاً.");
+
+        if (episode.PublishingLogs.Any())
+            throw new InvalidOperationException("لا يمكن حذف حلقة تم نشرها، يُرجى إلغاء النشر أولاً.");
+
+        episode.IsActive = false;
+
+        await context.SaveChangesAsync();
+
     }
 }

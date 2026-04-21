@@ -2,421 +2,245 @@
     x:Class="Radio.Views.Reports.ReportsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="800"
+    d:DesignWidth="1000"
     FlowDirection="RightToLeft"
-    Language="ar-SA"
-    Style="{Binding UserControlStyle}">
+    Style="{StaticResource UserControlStyle}"
+    mc:Ignorable="d">
 
-    <UserControl.Resources>
-        <!--  خلفية الشاشة الرئيسية  -->
-        <SolidColorBrush x:Key="MainBg" Color="#131226" />
-        <!--  لون السطح المرفوع (البطاقات)  -->
-        <SolidColorBrush x:Key="CardSurface" Color="#25243A" />
+    <Grid Background="{DynamicResource MaterialDesignPaper}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <!--  تنسيقات النصوص الموحدة  -->
-        <Style x:Key="BodyText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#E0DEF4" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        </Style>
-        <Style
-            x:Key="RightText"
-            BasedOn="{StaticResource BodyText}"
-            TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="Margin" Value="12,0,0,0" />
-        </Style>
-        <Style
-            x:Key="CenterText"
-            BasedOn="{StaticResource BodyText}"
-            TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Center" />
-        </Style>
-    </UserControl.Resources>
+        <materialDesign:ColorZone
+            Padding="24,20"
+            materialDesign:ElevationAssist.Elevation="Dp2"
+            Mode="PrimaryMid">
+            <StackPanel >
+                <TextBlock
+                    FontSize="28"
+                    Foreground="White"
+                    Style="{StaticResource HeadlineLarge}"
+                    Text="مركز التقارير والإحصائيات" />
+                <TextBlock
+                    Foreground="White"
+                    Opacity="0.8"
+                    Style="{StaticResource BodyMedium}"
+                    Text="ملخص أداء البث، حالة النشر، وتحليلات البرامج الإذاعية" />
+            </StackPanel>
+        </materialDesign:ColorZone>
 
-    <!--  خلفية أساسية داكنة جداً  -->
-    <ScrollViewer
-        Padding="20"
-        Background="{StaticResource MainBg}"
-        VerticalScrollBarVisibility="Auto">
-        <Grid Margin="5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <ScrollViewer
+            Grid.Row="1"
+            Padding="24,15"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10 15">
 
-            <!--  =================================================  -->
-            <!--  1. بطاقات الإحصائيات (بتصميم الأيقونة العائمة)  -->
-            <!--  =================================================  -->
-            <UniformGrid
-                Grid.Row="0"
-                Margin="0,10,0,35"
-                Columns="3">
-
-                <!--  بطاقة: قيد التخطيط (بنفسجي)  -->
-                <materialDesign:Card
-                    Margin="12"
-                    materialDesign:ElevationAssist.Elevation="Dp4"
-                    Background="{StaticResource CardSurface}"
-                    UniformCornerRadius="20">
-                    <StackPanel Margin="28,24" HorizontalAlignment="Center">
-                        <!--  أيقونة داخل مربع دائري ناعم  -->
-                        <Border
-                            Width="52"
-                            Height="52"
-                            HorizontalAlignment="Center"
-                            Background="#3D3B5C"
-                            CornerRadius="14">
+                <UniformGrid Margin="0,10,0,30" Columns="3">
+                    <materialDesign:Card
+                        Margin="8"
+                        Padding="20"
+                        materialDesign:ElevationAssist.Elevation="Dp1"
+                        UniformCornerRadius="12">
+                        <StackPanel>
                             <materialDesign:PackIcon
-                                Width="26"
-                                Height="26"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Foreground="#B69DF8"
+                                Width="28"
+                                Height="28"
+                                Foreground="{DynamicResource PrimaryHueMidBrush}"
                                 Kind="CalendarClock" />
-                        </Border>
-                        <TextBlock
-                            Margin="0,18,0,6"
-                            HorizontalAlignment="Center"
-                            FontSize="14"
-                            Foreground="#9E9CB8"
-                            Text="قيد التخطيط" />
-                        <TextBlock
-                            x:Name="TxtPlannedCount"
-                            Margin="0,0,0,12"
-                            HorizontalAlignment="Center"
-                            FontSize="40"
-                            FontWeight="Bold"
-                            Foreground="#FFFFFF"
-                            Text="0" />
-                        <!--  خط ملون سفلي كلمسة فنية  -->
-                        <Rectangle
-                            Width="45"
-                            Height="4"
-                            HorizontalAlignment="Center"
-                            Fill="#B69DF8"
-                            RadiusX="2"
-                            RadiusY="2" />
-                    </StackPanel>
-                </materialDesign:Card>
+                            <TextBlock
+                                Margin="0,12,0,4"
+                                FontSize="12"
+                                Opacity="0.6"
+                                Text="حلقات قيد التخطيط" />
+                            <TextBlock
+                                x:Name="TxtPlannedCount"
+                                FontSize="32"
+                                FontWeight="Bold"
+                                Foreground="{DynamicResource MaterialDesignBody}"
+                                Text="0" />
+                            <ProgressBar
+                                Height="2"
+                                Margin="0,8,0,0"
+                                Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                Value="100" />
+                        </StackPanel>
+                    </materialDesign:Card>
 
-                <!--  بطاقة: تم تنفيذها (أخضر مينت)  -->
-                <materialDesign:Card
-                    Margin="12"
-                    materialDesign:ElevationAssist.Elevation="Dp4"
-                    Background="{StaticResource CardSurface}"
-                    UniformCornerRadius="20">
-                    <StackPanel Margin="28,24" HorizontalAlignment="Center">
-                        <Border
-                            Width="52"
-                            Height="52"
-                            HorizontalAlignment="Right"
-                            Background="#1E3A38"
-                            CornerRadius="14">
+                    <materialDesign:Card
+                        Margin="8"
+                        Padding="20"
+                        materialDesign:ElevationAssist.Elevation="Dp1"
+                        UniformCornerRadius="12">
+                        <StackPanel>
                             <materialDesign:PackIcon
-                                Width="26"
-                                Height="26"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Foreground="#80CBC4"
-                                Kind="MovieCheck" />
-                        </Border>
-                        <TextBlock
-                            Margin="0,18,0,6"
-                            HorizontalAlignment="Center"
-                            FontSize="14"
-                            Foreground="#9E9CB8"
-                            Text="تم تنفيذها" />
-                        <TextBlock
-                            x:Name="TxtExecutedCount"
-                            Margin="0,0,0,12"
-                            HorizontalAlignment="Center"
-                            FontSize="40"
-                            FontWeight="Bold"
-                            Foreground="#FFFFFF"
-                            Text="0" />
-                        <Rectangle
-                            Width="45"
-                            Height="4"
-                            HorizontalAlignment="Center"
-                            Fill="#80CBC4"
-                            RadiusX="2"
-                            RadiusY="2" />
-                    </StackPanel>
-                </materialDesign:Card>
+                                Width="28"
+                                Height="28"
+                                Foreground="{DynamicResource SuccessBrush}"
+                                Kind="CheckDecagramOutline" />
+                            <TextBlock
+                                Margin="0,12,0,4"
+                                FontSize="12"
+                                Opacity="0.6"
+                                Text="إجمالي الحلقات المنفذة" />
+                            <TextBlock
+                                x:Name="TxtExecutedCount"
+                                FontSize="32"
+                                FontWeight="Bold"
+                                Foreground="{DynamicResource MaterialDesignBody}"
+                                Text="0" />
+                            <ProgressBar
+                                Height="2"
+                                Margin="0,8,0,0"
+                                Foreground="{DynamicResource SuccessBrush}"
+                                Value="100" />
+                        </StackPanel>
+                    </materialDesign:Card>
 
-                <!--  بطاقة: تم نشرها (برتقالي مرجاني)  -->
-                <materialDesign:Card
-                    Margin="12"
-                    materialDesign:ElevationAssist.Elevation="Dp4"
-                    Background="{StaticResource CardSurface}"
-                    UniformCornerRadius="20">
-                    <StackPanel Margin="28,24" HorizontalAlignment="Center">
-                        <Border
-                            Width="52"
-                            Height="52"
-                            HorizontalAlignment="Center"
-                            Background="#3D2B2B"
-                            CornerRadius="14">
+                    <materialDesign:Card
+                        Margin="8"
+                        Padding="20"
+                        materialDesign:ElevationAssist.Elevation="Dp1"
+                        UniformCornerRadius="12">
+                        <StackPanel>
                             <materialDesign:PackIcon
-                                Width="26"
-                                Height="26"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Foreground="#FFAB91"
-                                Kind="CloudUpload" />
-                        </Border>
-                        <TextBlock
-                            Margin="0,18,0,6"
-                            FontSize="14"
-                            Foreground="#9E9CB8"
-                            Text="تم نشرها" />
-                        <TextBlock
-                            x:Name="TxtPublishedCount"
-                            Margin="0,0,0,12"
-                            HorizontalAlignment="Center"
-                            FontSize="40"
-                            FontWeight="Bold"
-                            Foreground="#FFFFFF"
-                            Text="0" />
-                        <Rectangle
-                            Width="45"
-                            Height="4"
-                            HorizontalAlignment="Center"
-                            Fill="#FFAB91"
-                            RadiusX="2"
-                            RadiusY="2" />
-                    </StackPanel>
-                </materialDesign:Card>
+                                Width="28"
+                                Height="28"
+                                Foreground="{DynamicResource SecondaryHueMidBrush}"
+                                Kind="CloudCheckOutline" />
+                            <TextBlock
+                                Margin="0,12,0,4"
+                                FontSize="12"
+                                Opacity="0.6"
+                                Text="تم نشرها رقمياً" />
+                            <TextBlock
+                                x:Name="TxtPublishedCount"
+                                FontSize="32"
+                                FontWeight="Bold"
+                                Foreground="{DynamicResource MaterialDesignBody}"
+                                Text="0" />
+                            <ProgressBar
+                                Height="2"
+                                Margin="0,8,0,0"
+                                Foreground="{DynamicResource SecondaryHueMidBrush}"
+                                Value="100" />
+                        </StackPanel>
+                    </materialDesign:Card>
+                </UniformGrid>
 
-            </UniformGrid>
-
-            <!--  =================================================  -->
-            <!--  2. جدول بث اليوم  -->
-            <!--  =================================================  -->
-            <StackPanel Grid.Row="1" Margin="12,0,12,40">
-                <!--  عنوان القسم بتصميم حبوبة (Pill Shape)  -->
-                <Border
-                    Margin="0,0,0,15"
-                    Padding="20,8"
-                    HorizontalAlignment="Right"
-                    Background="#1E1D33"
-                    CornerRadius="30">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon
-                            Width="20"
-                            Height="20"
-                            Margin="0,0,10,0"
-                            VerticalAlignment="Center"
-                            Foreground="#B69DF8"
-                            Kind="CalendarToday" />
-                        <TextBlock
-                            FontSize="15"
-                            FontWeight="SemiBold"
-                            Foreground="#E0DEF4"
-                            Text="جدول بث اليوم" />
-                    </StackPanel>
-                </Border>
-
+                <TextBlock
+                    Margin="8,0,0,12"
+                    Style="{StaticResource TitleLarge}"
+                    Text="جدول بث اليوم" />
                 <materialDesign:Card
-                    materialDesign:ElevationAssist.Elevation="Dp2"
-                    Background="#1E1D33"
-                    UniformCornerRadius="16">
+                    Margin="0,0,0,30"
+                    materialDesign:ElevationAssist.Elevation="Dp1"
+                    UniformCornerRadius="12">
                     <DataGrid
                         x:Name="DgToday"
-                        AlternatingRowBackground="#252440"
-                        AutoGenerateColumns="False"
-                        Background="Transparent"
-                        CanUserAddRows="False"
-                        GridLinesVisibility="None"
-                        HeadersVisibility="Column"
-                        IsReadOnly="True"
-                        RowBackground="Transparent"
-                        RowHeight="48"
-                        SelectionUnit="FullRow">
-
-                        <DataGrid.RowStyle>
-                            <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#2E2D4A" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.RowStyle>
-
-                        <DataGrid.ColumnHeaderStyle>
-                            <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Foreground" Value="#B69DF8" />
-                                <Setter Property="FontSize" Value="13" />
-                                <Setter Property="FontWeight" Value="Medium" />
-                                <Setter Property="Padding" Value="15,10" />
-                                <Setter Property="BorderThickness" Value="0,0,0,1" />
-                                <Setter Property="BorderBrush" Value="#3D3B5C" />
-                                <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            </Style>
-                        </DataGrid.ColumnHeaderStyle>
-
+                        MinHeight="200"
+                        CellStyle="{StaticResource BroadcastPro.DataGridCell}"
+                        ColumnHeaderStyle="{StaticResource BroadcastPro.DataGridColumnHeader}"
+                        RowStyle="{StaticResource BroadcastPro.DataGridRow}"
+                        Style="{StaticResource BroadcastProDataGrid}">
                         <DataGrid.Columns>
                             <DataGridTextColumn
                                 Width="100"
                                 Binding="{Binding ScheduledExecutionTime, StringFormat='hh:mm tt'}"
-                                ElementStyle="{StaticResource CenterText}"
                                 Header="الوقت" />
-                            <DataGridTextColumn
-                                Width="150"
-                                Binding="{Binding ProgramName}"
-                                ElementStyle="{StaticResource RightText}"
-                                Header="البرنامج">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
-                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Width="180" Header="البرنامج">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon
+                                                VerticalAlignment="Center"
+                                                Kind="RadioTower"
+                                                Opacity="0.5" />
+                                            <TextBlock
+                                                Margin="8,0"
+                                                VerticalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding ProgramName}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn
                                 Width="*"
                                 Binding="{Binding EpisodeName}"
-                                ElementStyle="{StaticResource RightText}"
-                                Header="عنوان الحلقة">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
-                            </DataGridTextColumn>
-                            <DataGridTextColumn
-                                Width="150"
-                                Binding="{Binding GuestName}"
-                                ElementStyle="{StaticResource CenterText}"
-                                Header="الضيف" />
-                            <DataGridTextColumn
-                                Width="110"
-                                Binding="{Binding StatusText}"
-                                ElementStyle="{StaticResource CenterText}"
-                                Header="الحالة" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </materialDesign:Card>
-            </StackPanel>
-
-            <!--  =================================================  -->
-            <!--  3. تحليل أداء البرامج  -->
-            <!--  =================================================  -->
-            <StackPanel Grid.Row="2" Margin="12,0,12,20">
-                <!--  عنوان القسم بلون مختلف (مينت)  -->
-                <Border
-                    Margin="0,0,0,15"
-                    Padding="20,8"
-                    HorizontalAlignment="Right"
-                    Background="#1A2D2B"
-                    CornerRadius="30">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon
-                            Width="20"
-                            Height="20"
-                            Margin="0,0,10,0"
-                            VerticalAlignment="Center"
-                            Foreground="#80CBC4"
-                            Kind="ChartBar" />
-                        <TextBlock
-                            FontSize="15"
-                            FontWeight="SemiBold"
-                            Foreground="#E0DEF4"
-                            Text="البرامج الأكثر إنتاجاً" />
-                    </StackPanel>
-                </Border>
-
-                <materialDesign:Card
-                    materialDesign:ElevationAssist.Elevation="Dp2"
-                    Background="#1A2D2B"
-                    UniformCornerRadius="16">
-                    <DataGrid
-                        x:Name="DgProgramStats"
-                        AlternatingRowBackground="#213835"
-                        AutoGenerateColumns="False"
-                        Background="Transparent"
-                        CanUserAddRows="False"
-                        GridLinesVisibility="None"
-                        HeadersVisibility="Column"
-                        IsReadOnly="True"
-                        RowBackground="Transparent"
-                        RowHeight="48"
-                        SelectionUnit="FullRow">
-
-                        <DataGrid.RowStyle>
-                            <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#2A4845" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.RowStyle>
-
-                        <DataGrid.ColumnHeaderStyle>
-                            <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Foreground" Value="#80CBC4" />
-                                <Setter Property="FontSize" Value="13" />
-                                <Setter Property="FontWeight" Value="Medium" />
-                                <Setter Property="Padding" Value="15,10" />
-                                <Setter Property="BorderThickness" Value="0,0,0,1" />
-                                <Setter Property="BorderBrush" Value="#2E5450" />
-                                <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            </Style>
-                        </DataGrid.ColumnHeaderStyle>
-
-                        <DataGrid.Columns>
-                            <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding ProgramName}"
-                                ElementStyle="{StaticResource RightText}"
-                                Header="اسم البرنامج">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
-                            </DataGridTextColumn>
-                            <DataGridTextColumn
-                                Width="150"
-                                Binding="{Binding Category}"
-                                ElementStyle="{StaticResource CenterText}"
-                                Header="الفئة" />
-                            <DataGridTextColumn
-                                Width="130"
-                                Binding="{Binding TotalEpisodes}"
-                                ElementStyle="{StaticResource CenterText}"
-                                Header="إجمالي الحلقات" />
-
-                            <!--  عمود المنشورة كـ Badge متطابق مع لون القسم  -->
-                            <DataGridTemplateColumn Width="120" Header="المنشورة">
+                                Header="عنوان الحلقة" />
+                            <DataGridTemplateColumn Width="120" Header="الحالة">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border
-                                            Padding="16,4"
+                                        <materialDesign:Chip
                                             HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Background="#26403D"
-                                            CornerRadius="14">
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                FontSize="14"
-                                                FontWeight="SemiBold"
-                                                Foreground="#80CBC4"
-                                                Text="{Binding PublishedEpisodes}" />
-                                        </Border>
+                                            Background="{DynamicResource MaterialDesignDivider}"
+                                            Content="{Binding StatusText}"
+                                            FontSize="11" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </materialDesign:Card>
-            </StackPanel>
 
-        </Grid>
-    </ScrollViewer>
+                <TextBlock
+                    Margin="8,0,0,12"
+                    Style="{StaticResource TitleLarge}"
+                    Text="إحصائيات البرامج الأكثر إنتاجاً" />
+                <materialDesign:Card
+                    Margin="0,0,0,20"
+                    materialDesign:ElevationAssist.Elevation="Dp1"
+                    UniformCornerRadius="12">
+                    <DataGrid
+                        x:Name="DgProgramStats"
+                        MinHeight="200"
+                        CellStyle="{StaticResource BroadcastPro.DataGridCell}"
+                        RowStyle="{StaticResource BroadcastPro.DataGridRow}"
+                        Style="{StaticResource BroadcastProDataGrid}">
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style BasedOn="{StaticResource BroadcastPro.DataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#455A64" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="BorderBrush" Value="#37474F" />
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding ProgramName}"
+                                CellStyle="{StaticResource BroadcastPro.DataGridCell.FirstColumn}"
+                                Header="اسم البرنامج" />
+                            <DataGridTextColumn
+                                Width="150"
+                                Binding="{Binding Category}"
+                                Header="الفئة" />
+                            <DataGridTextColumn
+                                Width="130"
+                                Binding="{Binding TotalEpisodes}"
+                                Header="إجمالي الحلقات" />
+                            <DataGridTemplateColumn Width="120" Header="المنشورة">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <materialDesign:Chip
+                                            HorizontalAlignment="Center"
+                                            Background="{DynamicResource SuccessBrush}"
+                                            Content="{Binding PublishedEpisodes}"
+                                            Foreground="White" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </materialDesign:Card>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>
