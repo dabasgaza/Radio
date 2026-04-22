@@ -2,7 +2,6 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Domain.Models;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -23,7 +22,7 @@ namespace Radio.Views.Guests
             _guestService = guestService;
             _session = session;
 
-            // ✅ استخدام AppPermissions بدلاً من نص ثابت
+            // ✅ AppPermissions بدلاً من نص ثابت
             BtnAddGuest.Visibility = _session.HasPermission(AppPermissions.GuestManage)
                 ? Visibility.Visible
                 : Visibility.Collapsed;
@@ -89,17 +88,17 @@ namespace Radio.Views.Guests
         /// <summary>
         /// فتح نافذة إضافة ضيف جديد.
         /// </summary>
-        private void BtnAddGuest_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddGuest_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new GuestFormDialog(null, _guestService, _session);
             if (dialog.ShowDialog() == true)
-                _ = LoadDataAsync();
+                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
         }
 
         /// <summary>
         /// فتح نافذة تعديل ضيف موجود.
         /// </summary>
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             // ✅ DTO بدلاً من Entity
             if (sender is not Button btn || btn.DataContext is not GuestDto guest)
@@ -107,7 +106,7 @@ namespace Radio.Views.Guests
 
             var dialog = new GuestFormDialog(guest, _guestService, _session);
             if (dialog.ShowDialog() == true)
-                _ = LoadDataAsync();
+                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
         }
 
         /// <summary>

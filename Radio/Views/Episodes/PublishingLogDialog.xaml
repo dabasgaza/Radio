@@ -74,7 +74,7 @@
             Grid.Row="1"
             Padding="20"
             VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="10 15">
+            <StackPanel Margin="10,15">
                 <Grid Margin="0,0,0,16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -193,7 +193,10 @@
                     Background="{DynamicResource MaterialDesignDivider}"
                     CornerRadius="10">
                     <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="Information" Opacity="0.7" Foreground="#1565C0" />
+                        <materialDesign:PackIcon
+                            Foreground="#1565C0"
+                            Kind="Information"
+                            Opacity="0.7" />
                         <TextBlock
                             Margin="12,0"
                             VerticalAlignment="Center"

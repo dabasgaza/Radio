@@ -36,7 +36,7 @@ namespace Radio.Views.Episodes
             _serviceProvider = serviceProvider;
             _guestService = guestService;
 
-            // ✅ استخدام AppPermissions بدلاً من نصوص ثابتة
+            // ✅ AppPermissions بدلاً من نصوص ثابتة
             BtnAddEpisode.Visibility = _session.HasPermission(AppPermissions.EpisodeManage)
                 ? Visibility.Visible
                 : Visibility.Collapsed;
@@ -55,7 +55,6 @@ namespace Radio.Views.Episodes
             {
                 _allEpisodes = (await _episodeService.GetActiveEpisodesAsync()).ToList();
                 DgEpisodes.ItemsSource = _allEpisodes;
-                UpdateStats(_allEpisodes);
             }
             catch (UnauthorizedAccessException)
             {
@@ -69,16 +68,6 @@ namespace Radio.Views.Episodes
             {
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل الحلقات.");
             }
-        }
-
-        /// <summary>
-        /// تحديث إحصائيات الحلقات (مجدولة / منفّذة / منشورة).
-        /// </summary>
-        private void UpdateStats(IEnumerable<ActiveEpisodeDto> data)
-        {
-            //TxtTotal.Text = data.Count(ep => ep.StatusText == "مجدولة").ToString();
-            //TxtExecuted.Text = data.Count(ep => ep.StatusText == "منفّذة").ToString();
-            //TxtPublished.Text = data.Count(ep => ep.StatusText == "منشورة").ToString();
         }
 
         #endregion
@@ -95,16 +84,13 @@ namespace Radio.Views.Episodes
 
             string keyword = textBox.Text.Trim();
 
-            // ✅ StringComparison بدلاً من ToLower()
             var filtered = string.IsNullOrWhiteSpace(keyword)
                 ? _allEpisodes
                 : _allEpisodes.Where(ep =>
                     (ep.EpisodeName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
                     (ep.GuestName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false));
 
-            var result = filtered.ToList();
-            DgEpisodes.ItemsSource = result;
-            UpdateStats(result);
+            DgEpisodes.ItemsSource = filtered.ToList();
         }
 
         #endregion
@@ -114,43 +100,29 @@ namespace Radio.Views.Episodes
         /// <summary>
         /// فتح نافذة إضافة حلقة جديدة.
         /// </summary>
-        private void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var dialog = new EpisodeFormDialog(
-                    _episodeService, _programService, _guestService, _session);
+            var dialog = new EpisodeFormDialog(
+                _episodeService, _programService, _guestService, _session);
 
-                if (dialog.ShowDialog() == true)
-                    _ = LoadDataAsync();
-            }
-            catch (Exception)
-            {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة إضافة الحلقة.");
-            }
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
         }
 
         /// <summary>
         /// فتح نافذة تعديل حلقة موجودة.
         /// </summary>
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto selectedEpisode)
                 return;
 
-            try
-            {
-                var dialog = new EpisodeFormDialog(
-                    _episodeService, _programService, _guestService,
-                    _session, selectedEpisode);
+            var dialog = new EpisodeFormDialog(
+                _episodeService, _programService, _guestService,
+                _session, selectedEpisode);
 
-                if (dialog.ShowDialog() == true)
-                    _ = LoadDataAsync();
-            }
-            catch (Exception)
-            {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة تعديل الحلقة.");
-            }
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
         }
 
         /// <summary>
@@ -169,7 +141,6 @@ namespace Radio.Views.Episodes
                 return;
             }
 
-            // ✅ MessageService بدلاً من MessageBox
             bool isConfirmed = await MessageService.Current.ShowConfirmationAsync(
                 $"هل أنت متأكد من حذف الحلقة: {selectedEpisode.EpisodeName}؟",
                 "تأكيد الحذف");
@@ -204,7 +175,7 @@ namespace Radio.Views.Episodes
         /// <summary>
         /// فتح نافذة تسجيل تنفيذ حلقة (للحلقات المجدولة فقط).
         /// </summary>
-        private void BtnMarkExecuted_Click(object sender, RoutedEventArgs e)
+        private async void BtnMarkExecuted_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
                 return;
@@ -212,24 +183,17 @@ namespace Radio.Views.Episodes
             if (ep.StatusText != "مجدولة")
                 return;
 
-            try
-            {
-                var execService = _serviceProvider.GetRequiredService<IExecutionService>();
-                var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
+            var execService = _serviceProvider.GetRequiredService<IExecutionService>();
+            var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
 
-                if (dialog.ShowDialog() == true)
-                    _ = LoadDataAsync();
-            }
-            catch (Exception)
-            {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة تسجيل التنفيذ.");
-            }
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
         }
 
         /// <summary>
         /// فتح نافذة تسجيل نشر حلقة (للحلقات المنفّذة فقط).
         /// </summary>
-        private void BtnMarkPublished_Click(object sender, RoutedEventArgs e)
+        private async void BtnMarkPublished_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
                 return;
@@ -237,18 +201,11 @@ namespace Radio.Views.Episodes
             if (ep.StatusText != "منفّذة")
                 return;
 
-            try
-            {
-                var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
-                var dialog = new PublishingLogDialog(ep.EpisodeId, pubService, _session);
+            var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
+            var dialog = new PublishingLogDialog(ep.EpisodeId, pubService, _session);
 
-                if (dialog.ShowDialog() == true)
-                    _ = LoadDataAsync();
-            }
-            catch (Exception)
-            {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة تسجيل النشر.");
-            }
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
         }
 
         #endregion

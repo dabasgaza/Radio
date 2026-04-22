@@ -35,15 +35,11 @@ namespace Radio.Views.Episodes
             _session = session;
 
             IsWindowDraggable = true;
-
-            // ✅ عنوان ديناميكي حسب نوع العملية
             Title = _existingEpisode is not null ? "تعديل بيانات الحلقة" : "إضافة حلقة جديدة";
 
-            // القيم الافتراضية
             DpDate.SelectedDate = DateTime.Today;
             TpTime.SelectedTime = DateTime.Now;
 
-            // ✅ Loaded بدلاً من Fire-and-Forget
             Loaded += async (_, _) => await LoadInitialDataAsync();
         }
 
@@ -56,13 +52,15 @@ namespace Radio.Views.Episodes
         {
             try
             {
+                // ✅ تشغيل متوازي + await منفصل بدلاً من .Result
                 var programsTask = _programService.GetAllActiveAsync();
                 var guestsTask = _guestService.GetAllActiveAsync();
 
-                await Task.WhenAll(programsTask, guestsTask);
+                var programs = await programsTask;
+                var guests = await guestsTask;
 
-                CboPrograms.ItemsSource = programsTask.Result;
-                CboGuests.ItemsSource = guestsTask.Result;
+                CboPrograms.ItemsSource = programs;
+                CboGuests.ItemsSource = guests;
 
                 if (_existingEpisode is not null)
                 {
@@ -101,7 +99,6 @@ namespace Radio.Views.Episodes
         /// </summary>
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // دمج التاريخ والوقت
             DateTime? scheduledTime = null;
             if (DpDate.SelectedDate.HasValue && TpTime.SelectedTime.HasValue)
             {
@@ -121,7 +118,6 @@ namespace Radio.Views.Episodes
 
             try
             {
-                // ✅ تحقق عبر Pipeline
                 ValidationPipeline.ValidateEpisode(dto);
 
                 BtnSave.IsEnabled = false;

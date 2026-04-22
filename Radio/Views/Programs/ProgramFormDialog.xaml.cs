@@ -1,7 +1,8 @@
 ﻿using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using System;
+using DataAccess.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Programs
@@ -10,19 +11,19 @@ namespace Radio.Views.Programs
     {
         private readonly IProgramService _programService;
         private readonly UserSession _session;
-        private readonly ProgramDto _originalDto;
+        private readonly ProgramDto? _originalDto;
 
-        // ⚠️ التعديل الهيكلي: استقبال DTO فقط وليس كيان الـ Database
-        public ProgramFormDialog(ProgramDto dtoForEdit, IProgramService programService, UserSession session)
+        public ProgramFormDialog(ProgramDto? dtoForEdit, IProgramService programService, UserSession session)
         {
             InitializeComponent();
             _programService = programService;
             _session = session;
             _originalDto = dtoForEdit;
 
-            if (_originalDto != null)
+            Title = _originalDto is not null ? "تعديل البرنامج" : "إضافة برنامج جديد";
+
+            if (_originalDto is not null)
             {
-                TxtTitle.Text = "تعديل البرنامج";
                 TxtName.Text = _originalDto.ProgramName;
                 TxtCategory.Text = _originalDto.Category;
                 TxtDesc.Text = _originalDto.ProgramDescription;
@@ -31,55 +32,48 @@ namespace Radio.Views.Programs
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Validation (UI Level)
-            if (string.IsNullOrWhiteSpace(TxtName.Text))
-            {
-                MessageService.Current.ShowWarning("يرجى إدخال اسم البرنامج.");
-                return;
-            }
-
-            // 2. تجهيز الـ DTO
             var dto = new ProgramDto(
                 _originalDto?.ProgramId ?? 0,
                 TxtName.Text.Trim(),
                 TxtCategory.Text.Trim(),
-                TxtDesc.Text.Trim()
-            );
-
-            // 3. إدارة حالة الواجهة (منع الإرسال المتكرر)
-            SetLoading(true);
+                TxtDesc.Text.Trim());
 
             try
             {
-                // 4. استدعاء الخدمة (النجاح يعني عدم رمي استثناء)
-                if (_originalDto == null)
+                ValidationPipeline.ValidateProgram(dto);
+
+                SetLoading(true);
+
+                if (_originalDto is null)
                     await _programService.CreateProgramAsync(dto, _session);
                 else
                     await _programService.UpdateProgramAsync(dto, _session);
 
-                MessageService.Current.ShowSuccess(_originalDto == null ? "تم إضافة البرنامج بنجاح" : "تم تعديل البرنامج بنجاح");
+                MessageService.Current.ShowSuccess(
+                    _originalDto is null
+                        ? "تم إضافة البرنامج بنجاح."
+                        : "تم تعديل البرنامج بنجاح.");
 
-                this.DialogResult = true;
-                this.Close();
+                DialogResult = true;
+            }
+            catch (ValidationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
             }
             catch (UnauthorizedAccessException)
             {
-                // خطأ صلاحيات (مثلاً: المستخدم ليس لديه صلاحية الإضافة)
                 MessageService.Current.ShowError("ليس لديك صلاحية لتنفيذ هذه العملية.");
             }
             catch (InvalidOperationException ex)
             {
-                // خطأ في قواعد العمل (مثلاً: اسم البرنامج مكرر، أو قيمة غير صالحة)
                 MessageService.Current.ShowWarning(ex.Message);
             }
             catch (Exception)
             {
-                // خطأ النظام (شبكة، قاعدة بيانات)
                 MessageService.Current.ShowError("حدث خطأ أثناء حفظ البيانات.");
             }
             finally
             {
-                // 5. إعادة تفعيل الواجهة في كل الأحوال
                 SetLoading(false);
             }
         }
@@ -94,12 +88,12 @@ namespace Radio.Views.Programs
 
         private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 1) this.DragMove();
+            DragMove();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

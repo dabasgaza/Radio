@@ -1,12 +1,14 @@
 ﻿using DataAccess.DTOs;
 using DataAccess.Services;
-using Domain.Models;
+using DataAccess.Services.Messaging;
+using DataAccess.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Users
 {
     /// <summary>
-    /// Interaction logic for UserFormDialog.xaml
+    /// نافذة إضافة/تعديل مستخدم — تتولى جمع البيانات والتحقق منها ثم إرسالها لـ UserService.
     /// </summary>
     public partial class UserFormDialog
     {
@@ -21,69 +23,117 @@ namespace Radio.Views.Users
             _userService = userService;
             _session = session;
 
-            _ = LoadRoles();
+            IsWindowDraggable = true;
 
-            if (_existing != null)
+            // ✅ عنوان ديناميكي حسب نوع العملية
+            Title = _existing is not null ? "تعديل بيانات المستخدم" : "إضافة مستخدم جديد";
+
+            // ✅ تعبئة الحقول في حالة التعديل
+            if (_existing is not null)
             {
-                TxtTitle.Text = "تعديل مستخدم";
                 TxtFullName.Text = _existing.FullName;
                 TxtUsername.Text = _existing.Username;
-                TxtUsername.IsEnabled = false; // لا يسمح بتغيير اسم المستخدم
+                TxtUsername.IsEnabled = false;
                 TxtPhone.Text = _existing.PhoneNumber;
                 TxtEmail.Text = _existing.EmailAddress;
                 TxtPwdHint.Visibility = Visibility.Visible;
                 CboRoles.SelectedValue = _existing.RoleId;
             }
+
+            // ✅ Loaded بدلاً من Fire-and-Forget
+            Loaded += async (_, _) => await LoadRolesAsync();
         }
 
-        private async Task LoadRoles() => CboRoles.ItemsSource = await _userService.GetRolesAsync();
+        #region Data Loading
 
+        /// <summary>
+        /// تحميل قائمة الأدوار لملء الـ ComboBox.
+        /// </summary>
+        private async Task LoadRolesAsync()
+        {
+            try
+            {
+                CboRoles.ItemsSource = await _userService.GetRolesAsync();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError("ليس لديك صلاحية لعرض قائمة الأدوار.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل الأدوار.");
+            }
+        }
+
+        #endregion
+
+        #region Save
+
+        /// <summary>
+        /// حفظ المستخدم (إضافة أو تعديل) بعد التحقق من صحة المدخلات.
+        /// </summary>
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TxtFullName.Text) || CboRoles.SelectedValue == null) return;
-
-            var user = _existing ?? new UserDto();
-            user.FullName = TxtFullName.Text;
-            user.Username = TxtUsername.Text;
-            user.RoleId = (int)CboRoles.SelectedValue;
-            user.PhoneNumber = TxtPhone.Text;
-            user.EmailAddress = TxtEmail.Text;
+            var dto = _existing ?? new UserDto();
+            dto.FullName = TxtFullName.Text.Trim();
+            dto.Username = TxtUsername.Text.Trim();
+            dto.RoleId = CboRoles.SelectedValue is int roleId ? roleId : 0;
+            dto.PhoneNumber = TxtPhone.Text.Trim();
+            dto.EmailAddress = TxtEmail.Text.Trim();
 
             try
             {
-                if (_existing == null)
+                // ✅ التحقق عبر ValidationPipeline
+                ValidationPipeline.ValidateUser(dto, TxtPassword.Password);
+
+                BtnSave.IsEnabled = false;
+
+                if (_existing is null)
                 {
-                    if (string.IsNullOrWhiteSpace(TxtPassword.Password)) throw new Exception("كلمة المرور مطلوبة للمستخدم الجديد.");
-                    await _userService.CreateUserAsync(user, TxtPassword.Password, _session);
+                    await _userService.CreateUserAsync(dto, TxtPassword.Password, _session);
+                    MessageService.Current.ShowSuccess("تمت إضافة المستخدم بنجاح.");
                 }
                 else
                 {
-                    await _userService.UpdateUserAsync(user, TxtPassword.Password, _session);
+                    await _userService.UpdateUserAsync(dto, TxtPassword.Password, _session);
+                    MessageService.Current.ShowSuccess("تم تعديل بيانات المستخدم بنجاح.");
                 }
+
                 DialogResult = true;
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (ValidationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError(
+                    _existing is null
+                        ? "ليس لديك صلاحية لإضافة مستخدم جديد."
+                        : "ليس لديك صلاحية لتعديل بيانات المستخدمين.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حفظ بيانات المستخدم.");
+            }
+            finally
+            {
+                BtnSave.IsEnabled = true;
+            }
         }
 
-        /// <summary>
-        /// استدعِ هذا عند فتح النافذة للتعديل
-        /// </summary>
-        public void SetEditMode()
-        {
-            // تغيير العنوان والأيقونة
-            TxtTitle.Text = "تعديل بيانات المستخدم";
-            TxtSubtitle.Text = "قم بتحديث البيانات المطلوبة ثم اضغط حفظ";
+        #endregion
 
-            // إظهار ملاحظة كلمة المرور
-            PwdHintCard.Visibility = Visibility.Visible;
+        #region UI Events
 
-            // تغيير أيقونة الرأس
-            // (يمكنك تغييرها برمجياً أو بإضافة أيقونة أخرى في XAML)
-        }
-
-        /// <summary>
-        /// تأثير بسيط لإظهار خطأ في الحقل
-        /// </summary>
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
@@ -91,7 +141,10 @@ namespace Radio.Views.Users
 
         private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            DragMove();
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+                DragMove();
         }
+
+        #endregion
     }
 }

@@ -343,23 +343,12 @@
 
 
             <!--  نظام الإشعارات (مثبت في الأسفل فوق الشريط السفلي)  -->
-            <materialDesign:Snackbar
-                x:Name="MainSnackbar"
-                Margin="0,0,0,16"
+            <StackPanel
+                x:Name="NotificationHost"
+                Margin="0,10,0,0"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
-                DockPanel.Dock="Bottom"
-                MessageQueue="{materialDesign:MessageQueue}">
-                <materialDesign:Snackbar.Resources>
-                    <!--  ضبط شكل النص داخل الإشعار ليكون مهندماً مع العربي  -->
-                    <Style TargetType="{x:Type TextBlock}">
-                        <Setter Property="TextWrapping" Value="Wrap" />
-                        <Setter Property="TextAlignment" Value="Center" />
-                        <Setter Property="FontSize" Value="14" />
-                    </Style>
-                </materialDesign:Snackbar.Resources>
-            </materialDesign:Snackbar>
-
+                VerticalAlignment="Top"
+                DockPanel.Dock="Top" />
 
 
 

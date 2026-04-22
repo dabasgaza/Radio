@@ -1,7 +1,7 @@
-﻿using DataAccess.DTOs;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Domain.Models;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -9,7 +9,7 @@ using System.Windows.Controls.Primitives;
 namespace Radio.Views.Users
 {
     /// <summary>
-    /// Interaction logic for UsersView.xaml
+    /// شاشة إدارة المستخدمين — تعرض قائمة المستخدمين مع إمكانية الإضافة والتعديل وتفعيل/تعطيل الحسابات.
     /// </summary>
     public partial class UsersView : UserControl
     {
@@ -22,14 +22,19 @@ namespace Radio.Views.Users
             _userService = userService;
             _session = session;
 
-            // فقط "المسؤول" يمكنه إضافة مستخدمين
-            BtnAddUser.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            // ✅ AppPermissions بدلاً من فحص IsAdmin مباشرة
+            BtnAddUser.Visibility = _session.HasPermission(AppPermissions.UserManage)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
 
-            _ = LoadDataAsync();
+            // ✅ Loaded بدلاً من Fire-and-Forget
+            Loaded += async (_, _) => await LoadDataAsync();
         }
 
+        #region Data Loading
+
         /// <summary>
-        /// تحميل قائمة المستخدمين من قاعدة البيانات
+        /// تحميل قائمة المستخدمين وربطهم بالـ DataGrid مع تحديث الإحصائيات.
         /// </summary>
         private async Task LoadDataAsync()
         {
@@ -37,90 +42,133 @@ namespace Radio.Views.Users
             {
                 var users = await _userService.GetAllUsersAsync();
                 DgUsers.ItemsSource = users;
+                UpdateStats();
             }
-            catch (Exception ex)
+            catch (UnauthorizedAccessException)
             {
-                // استخدام خدمة الرسائل بدلاً من MessageBox
-                MessageService.Current.ShowError("خطأ في تحميل قائمة المستخدمين: " + ex.Message);
+                MessageService.Current.ShowError("ليس لديك صلاحية لعرض بيانات المستخدمين.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل قائمة المستخدمين.");
             }
         }
 
+        #endregion
+
+        #region CRUD Operations
+
         /// <summary>
-        /// فتح نافذة إضافة مستخدم جديد
+        /// فتح نافذة إضافة مستخدم جديد.
         /// </summary>
         private async void BtnAddUser_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new UserFormDialog(null, _userService, _session);
             if (dialog.ShowDialog() == true)
-            {
                 await LoadDataAsync();
-                UpdateStats();
-            }
         }
 
         /// <summary>
-        /// فتح نافذة تعديل بيانات مستخدم موجود
+        /// فتح نافذة تعديل بيانات مستخدم موجود.
         /// </summary>
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is UserDto user)
-            {
-                var dialog = new UserFormDialog(user, _userService, _session);
-                if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync();
-                    UpdateStats();
-                }
-            }
+            if (sender is not Button btn || btn.DataContext is not UserDto user)
+                return;
+
+            var dialog = new UserFormDialog(user, _userService, _session);
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();
         }
 
+        #endregion
+
+        #region Status Toggle
+
         /// <summary>
-        /// معالجة تغيير حالة المستخدم (تفعيل/تعطيل) من الـ ToggleButton
+        /// تفعيل أو تعطيل حساب مستخدم مع مزامنة حالة الزر وعرض الرسالة المناسبة.
         /// </summary>
         private async void Status_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is ToggleButton toggle && toggle.DataContext is User user)
-            {
-                bool newStatus = toggle.IsChecked ?? false;
+            // ✅ DTO بدلاً من Entity
+            if (sender is not ToggleButton toggle || toggle.DataContext is not UserDto user)
+                return;
 
+            bool newStatus = toggle.IsChecked ?? false;
+
+            try
+            {
+                await _userService.ToggleUserStatusAsync(user.UserId, newStatus, _session);
+                MessageService.Current.ShowSuccess(
+                    newStatus
+                        ? $"تم تفعيل حساب المستخدم «{user.FullName}» بنجاح."
+                        : $"تم تعطيل حساب المستخدم «{user.FullName}» بنجاح.");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError("ليس لديك صلاحية لتغيير حالة المستخدمين.");
+                toggle.IsChecked = !newStatus;
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+                toggle.IsChecked = !newStatus;
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تغيير حالة المستخدم.");
+                toggle.IsChecked = !newStatus;
+            }
+            finally
+            {
+                await LoadDataAsync();
+            }
+        }
+
+        #endregion
+
+        #region Stats
+
+        /// <summary>
+        /// تحديث إحصائيات المستخدمين (الإجمالي / النشط / المعطّل).
+        /// </summary>
+        private void UpdateStats()
+        {
+            if (DgUsers.ItemsSource is not IEnumerable<UserDto> users)
+                return;
+
+            var list = users.ToList();
+            TxtTotalUsers.Text = list.Count.ToString();
+            TxtActiveUsers.Text = list.Count(u => u.IsActive).ToString();
+            TxtInactiveUsers.Text = list.Count(u => !u.IsActive).ToString();
+        }
+
+        #endregion
+
+        private async void BtnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is UserDto user)
+            {
+                bool isConfirmed = await MessageService.Current.ShowConfirmationAsync(
+                $"هل أنت متأكد من رغبتك بحذف المستخدم: {user.FullName}؟\nلا يمكن التراجع عن هذا الإجراء.",
+                "تأكيد الحذف");
+
+                if (!isConfirmed)
+                    return;
                 try
                 {
-                    // محاولة تغيير الحالة عبر الخدمة
-                    await _userService.ToggleUserStatusAsync(user.UserId, newStatus, _session);
+                    await _userService.DeleteUserAsync(user.UserId, _session);
+                    await LoadDataAsync();
                 }
                 catch (Exception ex)
                 {
-                    // في حال فشل العملية (مثلاً محاولة تعطيل حسابه الشخصي)
-                    MessageService.Current.ShowWarning("تنبيه: " + ex.Message);
-
-                    // إعادة الزر لحالته الأصلية لأن العملية فشلت
-                    toggle.IsChecked = !newStatus;
-                }
-                finally
-                {
-                    // تحديث القائمة لضمان مزامنة البيانات
-                    await LoadDataAsync();
+                    MessageService.Current.ShowError("فشل الحذف: " + ex.Message);
                 }
             }
-        }
-
-        // تحديث الإحصائيات بعد كل عملية
-        private void UpdateStats()
-        {
-            var items = DgUsers.ItemsSource;
-            if (items != null)
-            {
-                var list = items.Cast<dynamic>().ToList();
-                TxtTotalUsers.Text = list.Count.ToString();
-                TxtActiveUsers.Text = list.Count(u => u.IsActive == true).ToString();
-                TxtInactiveUsers.Text = list.Count(u => u.IsActive == false).ToString();
-            }
-        }
-
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
-
 }

@@ -116,7 +116,6 @@
                         materialDesign:HintAssist.Hint="من تاريخ"
                         materialDesign:TextFieldAssist.LeadingIcon="CalendarImportOutline"
                         BorderThickness="0"
-                        SelectedDateChanged="FilterDates_Changed"
                         Style="{StaticResource BroadcastDatePicker}" />
 
                     <materialDesign:PackIcon
@@ -132,7 +131,6 @@
                         materialDesign:HintAssist.Hint="إلى تاريخ"
                         materialDesign:TextFieldAssist.LeadingIcon="CalendarExportOutline"
                         BorderThickness="0"
-                        SelectedDateChanged="FilterDates_Changed"
                         Style="{StaticResource BroadcastDatePicker}" />
                 </Grid>
             </materialDesign:Card>
@@ -219,7 +217,10 @@
                         CellStyle="{StaticResource CenterCellAligned}"
                         Header="موقع التغطية" />
 
-                    <DataGridTemplateColumn Width="140" Header="موعد المهمة" CellStyle="{StaticResource CenterCellAligned}">
+                    <DataGridTemplateColumn
+                        Width="140"
+                        CellStyle="{StaticResource CenterCellAligned}"
+                        Header="موعد المهمة">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

@@ -1,16 +1,20 @@
 ﻿using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Domain.Models;
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace Radio.Views.Episodes
 {
     /// <summary>
-    /// Interaction logic for ExecutionLogDialog.xaml
+    /// نافذة تسجيل تنفيذ حلقة — تجمع بيانات المدة والملاحظات والمشاكل وتحفظها عبر ExecutionService.
     /// </summary>
     public partial class ExecutionLogDialog
     {
+        // ✅ RegexOptions.Compiled — محسّن مرة واحدة، أفضل أداء
+        private static readonly Regex NumericOnlyRegex = new(@"^[0-9.]$", RegexOptions.Compiled);
+
         private readonly int _episodeId;
         private readonly IExecutionService _executionService;
         private readonly UserSession _session;
@@ -22,44 +26,55 @@ namespace Radio.Views.Episodes
             _executionService = executionService;
             _session = session;
 
+            IsWindowDraggable = true;
+
+            // ✅ Regex محسّن مسبقاً — لا يُنشئ كائن جديد عند كل ضغطة
             TxtDuration.PreviewTextInput += (s, e) =>
             {
-                e.Handled = !System.Text.RegularExpressions.Regex.IsMatch(e.Text, @"^[0-9.]$");
+                e.Handled = !NumericOnlyRegex.IsMatch(e.Text);
             };
         }
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // 1. التحقق من إدخال مدة الحلقة بشكل صحيح
             if (!int.TryParse(TxtDuration.Text, out int duration))
             {
-                MessageService.Current.ShowWarning("يرجى إدخال مدة الحلقة بشكل صحيح (أرقام فقط)");
+                MessageService.Current.ShowWarning("يرجى إدخال مدة الحلقة بشكل صحيح (أرقام فقط).");
                 return;
             }
 
-            // 2. تجهيز كائن السجل
             var log = new ExecutionLogDto
             {
                 EpisodeId = _episodeId,
                 DurationMinutes = duration,
                 ExecutionNotes = TxtNotes.Text.Trim(),
-                IssuesEncountered = TxtIssues.Text.Trim(),
-                //CreatedAt = DateTime.UtcNow
+                IssuesEncountered = TxtIssues.Text.Trim()
             };
 
             try
             {
-                BtnSave.IsEnabled = false; // تعطيل الزر لتجنب النقرات المتعددة
+                BtnSave.IsEnabled = false;
 
-                // 3. استدعاء خدمة التنفيذ (التي تقوم بحفظ السجل وتحديث حالة الحلقة في Transaction واحد)
                 await _executionService.LogExecutionAsync(log, _session);
 
-                this.DialogResult = true; // إغلاق النافذة بنجاح
-                this.Close();
+                MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
+                DialogResult = true;   // ✅ يُغلق النافذة تلقائياً — لا حاجة لـ Close()
             }
-            catch (Exception ex)
+            catch (ValidationException ex)
             {
-                MessageService.Current.ShowError("حدث خطأ أثناء تسجيل التنفيذ: " + ex.Message);
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError("ليس لديك صلاحية لتسجيل تنفيذ الحلقات.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تسجيل التنفيذ.");
             }
             finally
             {
@@ -69,12 +84,13 @@ namespace Radio.Views.Episodes
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DragMove();
         }
+
     }
 }

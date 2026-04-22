@@ -23,7 +23,8 @@ namespace Radio.Views.Correspondents
             _service = service;
             _session = session;
 
-            // تعبئة الحقول في حالة التعديل
+            IsWindowDraggable = true;
+
             if (_existing is not null)
             {
                 Title = "تعديل بيانات المراسل";
@@ -50,8 +51,9 @@ namespace Radio.Views.Correspondents
 
             try
             {
-                // ✅ التحقق عبر ValidationPipeline — يطرح ValidationException
                 ValidationPipeline.ValidateCorrespondent(dto);
+
+                BtnSave.IsEnabled = false;   // ✅ منع النقرات المتكررة
 
                 if (_existing is null)
                     await _service.CreateAsync(dto, _session);
@@ -67,7 +69,6 @@ namespace Radio.Views.Correspondents
             }
             catch (ValidationException ex)
             {
-                // ✅ أخطاء التحقق من المدخلات — تعرض كتحذير
                 MessageService.Current.ShowWarning(ex.Message);
             }
             catch (UnauthorizedAccessException)
@@ -85,20 +86,18 @@ namespace Radio.Views.Correspondents
             {
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حفظ بيانات المراسل.");
             }
+            finally
+            {
+                BtnSave.IsEnabled = true;    // ✅ إعادة تفعيل الزر دائماً
+            }
         }
 
-        /// <summary>
-        /// سحب النافذة عبر شريط العنوان (مع حماية من خطأ أثناء التصميم).
-        /// </summary>
         private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
                 DragMove();
         }
 
-        /// <summary>
-        /// إغلاق النافذة.
-        /// </summary>
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
             Close();

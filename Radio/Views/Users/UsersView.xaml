@@ -242,16 +242,19 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="180" Header="الصلاحية" CellStyle="{StaticResource CenterCellAligned}">
+                    <DataGridTemplateColumn
+                        Width="180"
+                        CellStyle="{StaticResource CenterCellAligned}"
+                        Header="الصلاحية">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <materialDesign:Chip
                                     x:Name="RoleChip"
-                                    Content="{Binding RoleName}"
-                                    FontSize="15"
                                     MinWidth="50"
                                     HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"
+                                    Content="{Binding RoleName}"
+                                    FontSize="15"
                                     Icon="{materialDesign:PackIcon Kind=BadgeAccountOutline}">
                                     <materialDesign:Chip.Style>
                                         <Style BasedOn="{StaticResource {x:Type materialDesign:Chip}}" TargetType="materialDesign:Chip">

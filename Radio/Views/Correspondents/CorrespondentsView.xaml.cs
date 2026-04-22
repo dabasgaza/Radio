@@ -2,7 +2,6 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Domain.Models;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -22,13 +21,14 @@ namespace Radio.Views.Correspondents
             _service = service;
             _session = session;
 
-            // التحكم بصلاحية الإضافة بناءً على صلاحية المستخدم الحالي
             BtnAdd.Visibility = _session.HasPermission(AppPermissions.CoordinationManage)
                 ? Visibility.Visible
                 : Visibility.Collapsed;
 
             Loaded += async (_, _) => await LoadDataAsync();
         }
+
+        #region Data Loading
 
         /// <summary>
         /// تحميل جميع المراسلين النشطين وربطهم بالـ DataGrid.
@@ -53,31 +53,18 @@ namespace Radio.Views.Correspondents
             }
         }
 
+        #endregion
+
+        #region CRUD Operations
+
         /// <summary>
         /// فتح نافذة إضافة مراسل جديد.
         /// </summary>
         private async void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var dialog = new CorrespondentFormDialog(null, _service, _session);
-                if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync(); // سيعرض رسالة النجاح الخاصة بالتحميل
-                }
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لإضافة مراسل جديد.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-            }
-            catch (Exception)
-            {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة إضافة المراسل.");
-            }
+            var dialog = new CorrespondentFormDialog(null, _service, _session);
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();
         }
 
         /// <summary>
@@ -88,26 +75,9 @@ namespace Radio.Views.Correspondents
             if (sender is not Button btn || btn.DataContext is not CorrespondentDto cor)
                 return;
 
-            try
-            {
-                var dialog = new CorrespondentFormDialog(cor, _service, _session);
-                if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync(); // سيعرض رسالة النجاح الخاصة بالتحميل
-                }
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لتعديل بيانات المراسلين.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-            }
-            catch (Exception)
-            {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة تعديل المراسل.");
-            }
+            var dialog = new CorrespondentFormDialog(cor, _service, _session);
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();
         }
 
         /// <summary>
@@ -115,7 +85,8 @@ namespace Radio.Views.Correspondents
         /// </summary>
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button btn || btn.DataContext is not Correspondent cor)
+            // ✅ DTO بدلاً من Entity
+            if (sender is not Button btn || btn.DataContext is not CorrespondentDto cor)
                 return;
 
             bool isConfirmed = await MessageService.Current.ShowConfirmationAsync(
@@ -145,17 +116,26 @@ namespace Radio.Views.Correspondents
             }
         }
 
+        #endregion
+
+        #region Navigation
+
         /// <summary>
         /// فتح نافذة إدارة تغطيات المراسل المحدد.
         /// </summary>
         private void BtnCoverage_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button btn || btn.DataContext is not Correspondent cor)
+            // ✅ DTO بدلاً من Entity
+            if (sender is not Button btn || btn.DataContext is not CorrespondentDto cor)
                 return;
 
             MessageService.Current.ShowInfo(
                 $"ميزة إدارة تغطيات المراسل: {cor.FullName} — قيد التطوير.");
         }
+
+        #endregion
+
+        #region Search
 
         /// <summary>
         /// البحث في قائمة المراسلين حسب الاسم.
@@ -167,7 +147,8 @@ namespace Radio.Views.Correspondents
 
             string keyword = textBox.Text.Trim();
 
-            if (DgCorrespondents.ItemsSource is IEnumerable<Correspondent> correspondents)
+            // ✅ DTO بدلاً من Entity
+            if (DgCorrespondents.ItemsSource is IEnumerable<CorrespondentDto> correspondents)
             {
                 var filtered = string.IsNullOrWhiteSpace(keyword)
                     ? correspondents
@@ -177,5 +158,7 @@ namespace Radio.Views.Correspondents
                 DgCorrespondents.ItemsSource = filtered.ToList();
             }
         }
+
+        #endregion
     }
 }

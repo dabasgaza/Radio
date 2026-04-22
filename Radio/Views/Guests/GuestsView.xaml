@@ -160,24 +160,31 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
                                         VerticalAlignment="Center"
+                                        Foreground="{DynamicResource SuccessBrush}"
                                         Kind="AccountCircleOutline"
                                         Opacity="0.5" />
                                     <TextBlock
                                         Margin="12,0"
                                         VerticalAlignment="Center"
-                                        FontWeight="SemiBold"
                                         Text="{Binding FullName}" />
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="180" Header="جهة العمل">
+                    <DataGridTemplateColumn
+                        Width="180"
+                        CellStyle="{StaticResource CenterCellAligned}"
+                        Header="جهة العمل">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <materialDesign:Chip
-                                    HorizontalAlignment="Left"
+                                    MinWidth="80"
+                                    HorizontalAlignment="Center"
+                                    HorizontalContentAlignment="Center"
                                     Background="{DynamicResource MaterialDesignDivider}"
                                     Content="{Binding Organization}"
                                     FontSize="11" />

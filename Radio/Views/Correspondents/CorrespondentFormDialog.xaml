@@ -9,17 +9,18 @@
     Height="580"
     AllowsTransparency="True"
     Background="Transparent"
-    WindowStyle="None"
-    UseNoneWindowStyle="True"
-    ShowTitleBar="False"
     FlowDirection="RightToLeft"
+    ShowTitleBar="False"
     Style="{StaticResource BasicWindowStyle}"
-    WindowStartupLocation="CenterScreen">
+    UseNoneWindowStyle="True"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None">
 
-    <materialDesign:Card Margin="30" 
-                         UniformCornerRadius="16" 
-                         materialDesign:ElevationAssist.Elevation="Dp2"
-                         Background="{DynamicResource MaterialDesignPaper}">
+    <materialDesign:Card
+        Margin="30"
+        materialDesign:ElevationAssist.Elevation="Dp2"
+        Background="{DynamicResource MaterialDesignPaper}"
+        UniformCornerRadius="16">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -45,64 +46,83 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <materialDesign:PackIcon Kind="AccountTie" Width="35" Height="35" VerticalAlignment="Center" />
+                    <materialDesign:PackIcon
+                        Width="35"
+                        Height="35"
+                        VerticalAlignment="Center"
+                        Kind="AccountTie" />
 
                     <StackPanel Grid.Column="1" Margin="18,0">
-                        <TextBlock x:Name="TxtHeader" 
-                                   Text="بيانات المراسل الميداني" 
-                                   Style="{StaticResource TitleLarge}" 
-                                   Foreground="White" 
-                                   FontWeight="Bold" />
-                        <TextBlock Text="سجّل بيانات التواصل والمناطق الجغرافية المكلف بها" 
-                                   FontSize="11" 
-                                   Opacity="0.8" 
-                                   Foreground="White" />
+                        <TextBlock
+                            x:Name="TxtHeader"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Style="{StaticResource TitleLarge}"
+                            Text="بيانات المراسل الميداني" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="White"
+                            Opacity="0.8"
+                            Text="سجّل بيانات التواصل والمناطق الجغرافية المكلف بها" />
                     </StackPanel>
 
-                    <Button Grid.Column="2" 
-                            Click="BtnClose_Click" 
-                            Style="{StaticResource MaterialDesignIconButton}" 
-                            Foreground="White" Opacity="0.6">
+                    <Button
+                        Grid.Column="2"
+                        Click="BtnClose_Click"
+                        Foreground="White"
+                        Opacity="0.6"
+                        Style="{StaticResource MaterialDesignIconButton}">
                         <materialDesign:PackIcon Kind="Close" />
                     </Button>
                 </Grid>
             </materialDesign:ColorZone>
 
-            <ScrollViewer Grid.Row="1" Padding="28,20" VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="10 15">
+            <ScrollViewer
+                Grid.Row="1"
+                Padding="28,20"
+                VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="10,15">
 
-                    <TextBox x:Name="TxtName"
-                             Margin="0,0,0,24"
-                             materialDesign:HintAssist.Hint="اسم المراسل الثلاثي *"
-                             materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                             materialDesign:TextFieldAssist.LeadingIcon="AccountOutline"
-                             Style="{StaticResource BroadcastTextBox}" />
+                    <TextBox
+                        x:Name="TxtName"
+                        Margin="0,0,0,24"
+                        materialDesign:HintAssist.Hint="اسم المراسل الثلاثي *"
+                        materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                        materialDesign:TextFieldAssist.LeadingIcon="AccountOutline"
+                        Style="{StaticResource BroadcastTextBox}" />
 
-                    <TextBox x:Name="TxtPhone"
-                             Margin="0,0,0,24"
-                             materialDesign:HintAssist.Hint="رقم التواصل (هاتف/واتساب) *"
-                             materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                             materialDesign:TextFieldAssist.LeadingIcon="PhoneOutline"
-                             Style="{StaticResource BroadcastTextBox}" />
+                    <TextBox
+                        x:Name="TxtPhone"
+                        Margin="0,0,0,24"
+                        materialDesign:HintAssist.Hint="رقم التواصل (هاتف/واتساب) *"
+                        materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                        materialDesign:TextFieldAssist.LeadingIcon="PhoneOutline"
+                        Style="{StaticResource BroadcastTextBox}" />
 
-                    <TextBox x:Name="TxtLocations"
-                             Height="120"
-                             AcceptsReturn="True"
-                             TextWrapping="Wrap"
-                             VerticalContentAlignment="Top"
-                             materialDesign:HintAssist.Hint="النطاق الجغرافي للتغطية"
-                             materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                             materialDesign:TextFieldAssist.LeadingIcon="MapMarkerRadiusOutline"
-                             Style="{StaticResource BroadcastTextBox}" />
+                    <TextBox
+                        x:Name="TxtLocations"
+                        Height="120"
+                        VerticalContentAlignment="Top"
+                        materialDesign:HintAssist.Hint="النطاق الجغرافي للتغطية"
+                        materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                        materialDesign:TextFieldAssist.LeadingIcon="MapMarkerRadiusOutline"
+                        AcceptsReturn="True"
+                        Style="{StaticResource BroadcastTextBox}"
+                        TextWrapping="Wrap" />
 
-                    <TextBlock Text="* الحقول المطلوبة لضمان دقة قاعدة بيانات الكوادر." 
-                               FontSize="10" 
-                               Opacity="0.6" 
-                               Margin="5,10,0,0"/>
+                    <TextBlock
+                        Margin="5,10,0,0"
+                        FontSize="10"
+                        Opacity="0.6"
+                        Text="* الحقول المطلوبة لضمان دقة قاعدة بيانات الكوادر." />
                 </StackPanel>
             </ScrollViewer>
 
-            <Border Grid.Row="2" Padding="28,24" Background="{DynamicResource MaterialDesignDivider}" CornerRadius="0,0,16,16">
+            <Border
+                Grid.Row="2"
+                Padding="28,24"
+                Background="{DynamicResource MaterialDesignDivider}"
+                CornerRadius="0,0,16,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -110,25 +130,30 @@
                         <ColumnDefinition Width="1.5*" />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0"
-                            Content="تجاهل"
-                            IsCancel="True"
-                            Style="{StaticResource CancelFlatButton}" />
+                    <Button
+                        Grid.Column="0"
+                        Content="تجاهل"
+                        IsCancel="True"
+                        Style="{StaticResource CancelFlatButton}" />
 
-                    <Button x:Name="BtnSave"
-                            Grid.Column="2"
-                            Click="BtnSave_Click"
-                            Content="اعتماد وحفظ البيانات"
-                            Background="#673AB7"
-                            BorderBrush="#673AB7"
-                            materialDesign:ButtonAssist.CornerRadius="8"
-                            materialDesign:ElevationAssist.Elevation="Dp2"
-                            Style="{StaticResource PrimaryActionButton}">
+                    <Button
+                        x:Name="BtnSave"
+                        Grid.Column="2"
+                        materialDesign:ButtonAssist.CornerRadius="8"
+                        materialDesign:ElevationAssist.Elevation="Dp2"
+                        Background="#673AB7"
+                        BorderBrush="#673AB7"
+                        Click="BtnSave_Click"
+                        Content="اعتماد وحفظ البيانات"
+                        Style="{StaticResource PrimaryActionButton}">
                         <Button.ContentTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="AccountCheckOutline" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding}" Margin="10,0,0,0" VerticalAlignment="Center" />
+                                    <materialDesign:PackIcon VerticalAlignment="Center" Kind="AccountCheckOutline" />
+                                    <TextBlock
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding}" />
                                 </StackPanel>
                             </DataTemplate>
                         </Button.ContentTemplate>

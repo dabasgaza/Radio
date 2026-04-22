@@ -1,9 +1,6 @@
 ﻿using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Domain.Models;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -24,7 +21,8 @@ namespace Radio.Views.Users
             _userService = userService;
             _session = session;
 
-            // ✅ Loaded بدلاً من Fire-and-Forget
+            IsWindowDraggable = true;
+
             Loaded += async (_, _) => await LoadRolesAsync();
         }
 
@@ -107,7 +105,6 @@ namespace Radio.Views.Users
                 .Select(vm => vm.PermissionId)
                 .ToList();
 
-            // ✅ تحقق أمان — لا تُرسل قائمة فارغة عن طريق الخطأ
             if (selectedIds.Count == 0)
             {
                 MessageService.Current.ShowWarning("لم يتم اختيار أي صلاحية. إذا أردت إزالة جميع الصلاحيات، يرجى التواصل مع مسؤول النظام.");
@@ -116,6 +113,8 @@ namespace Radio.Views.Users
 
             try
             {
+                BtnSavePermissions.IsEnabled = false;
+
                 await _userService.UpdateRolePermissionsAsync(
                     _selectedRole.RoleId, selectedIds, _session);
 
@@ -134,9 +133,15 @@ namespace Radio.Views.Users
             {
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حفظ الصلاحيات.");
             }
+            finally
+            {
+                BtnSavePermissions.IsEnabled = true;
+            }
         }
 
         #endregion
+
+        #region UI Events
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
@@ -145,7 +150,10 @@ namespace Radio.Views.Users
 
         private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            DragMove();
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+                DragMove();
         }
-    }  
+
+        #endregion
+    }
 }

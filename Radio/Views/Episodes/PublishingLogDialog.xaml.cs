@@ -1,6 +1,6 @@
 ﻿using DataAccess.DTOs;
 using DataAccess.Services;
-using Domain.Models;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace Radio.Views.Episodes
@@ -13,6 +13,9 @@ namespace Radio.Views.Episodes
         private readonly int _episodeId;
         private readonly IPublishingService _publishingService;
         private readonly UserSession _session;
+
+        // ✅ RegexOptions.Compiled — محسّن مرة واحدة، أفضل أداء
+        private static readonly Regex NumericOnlyRegex = new(@"^[0-9.]$", RegexOptions.Compiled);
 
         public PublishingLogDialog(int episodeId, IPublishingService publishingService, UserSession session)
         {

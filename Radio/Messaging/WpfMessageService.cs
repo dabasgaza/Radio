@@ -8,28 +8,19 @@ namespace Radio.Messaging;
 
 public class WpfMessageService : IMessageService
 {
-    #region Snackbar Messages
+    #region Toast Notifications
 
     public void ShowSuccess(string message, string title = "نجاح")
-        => EnqueueMessage($"✅ {title}: {message}");
+        => NotificationManager.Show(NotificationType.Success, title, message);
 
     public void ShowError(string message, string title = "خطأ")
-        => EnqueueMessage($"❌ {title}: {message}");
+        => NotificationManager.Show(NotificationType.Error, title, message);
 
     public void ShowWarning(string message, string title = "تحذير")
-        => EnqueueMessage($"⚠️ {title}: {message}");
+        => NotificationManager.Show(NotificationType.Warning, title, message);
 
     public void ShowInfo(string message, string title = "معلومة")
-        => EnqueueMessage($"ℹ️ {title}: {message}");
-
-    private void EnqueueMessage(string content)
-    {
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            var snackbar = FindActiveSnackbar();
-            snackbar?.MessageQueue?.Enqueue(content, null, null, null, false, true, TimeSpan.FromSeconds(4));
-        });
-    }
+        => NotificationManager.Show(NotificationType.Info, title, message);
 
     #endregion
 
@@ -46,9 +37,8 @@ public class WpfMessageService : IMessageService
                 FlowDirection = FlowDirection.RightToLeft
             };
 
-            // ✅ ألوان آمنة — تعمل داخل DialogHost Popup بغض النظر عن الثيم
-            var titleBrush = new SolidColorBrush(Color.FromRgb(0x30, 0x3F, 0x9F)); // Indigo 700
-            var bodyBrush = new SolidColorBrush(Color.FromRgb(0x21, 0x21, 0x21)); // Dark Gray
+            var titleBrush = new SolidColorBrush(Color.FromRgb(0x30, 0x3F, 0x9F));
+            var bodyBrush = new SolidColorBrush(Color.FromRgb(0x21, 0x21, 0x21));
 
             view.Children.Add(new TextBlock
             {
@@ -97,64 +87,12 @@ public class WpfMessageService : IMessageService
             view.Children.Add(btns);
 
             var result = await DialogHost.Show(view);
-
             return result is bool boolResult && boolResult;
         }
         catch
         {
             return false;
         }
-    }
-    #endregion
-
-    #region Visual Tree Helpers
-
-    /// <summary>
-    /// البحث عن Snackbar في النافذة النشطة حالياً.
-    /// </summary>
-    private static Snackbar? FindActiveSnackbar()
-    {
-        var window = Application.Current.Windows
-            .OfType<Window>()
-            .LastOrDefault(w => w.IsActive)
-            ?? Application.Current.Windows.OfType<Window>().LastOrDefault();
-
-        if (window is null) return null;
-        return FindVisualChild<Snackbar>(window);
-    }
-
-    /// <summary>
-    /// البحث عن DialogHost في النافذة النشطة حالياً.
-    /// </summary>
-    private static DialogHost? FindActiveDialogHost()
-    {
-        var window = Application.Current.Windows
-            .OfType<Window>()
-            .LastOrDefault(w => w.IsActive)
-            ?? Application.Current.Windows.OfType<Window>().LastOrDefault();
-
-        if (window is null) return null;
-        return FindVisualChild<DialogHost>(window);
-    }
-
-    /// <summary>
-    /// البحث العودي عن عنصر في شجرة العناصر المرئية.
-    /// </summary>
-    private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
-    {
-        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-        {
-            var child = VisualTreeHelper.GetChild(parent, i);
-
-            if (child is T result)
-                return result;
-
-            var found = FindVisualChild<T>(child);
-            if (found is not null)
-                return found;
-        }
-
-        return null;
     }
 
     #endregion

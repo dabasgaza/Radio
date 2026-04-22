@@ -175,7 +175,7 @@
         x:Key="BroadcastPro.DataGridCell.FirstColumn"
         BasedOn="{StaticResource BroadcastPro.DataGridCell}"
         TargetType="DataGridCell">
-
+        <Setter Property="FontSize" Value="15" />
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="BorderThickness" Value="3,0,0,0" />

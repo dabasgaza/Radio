@@ -34,12 +34,10 @@ namespace Radio.Views.Correspondents
 
             InitializeComponent();
 
-            // ✅ عنوان ديناميكي حسب نوع العملية
             Title = _existingCoverage is null
                 ? "إضافة تغطية ميدانية جديدة"
                 : "تعديل بيانات التغطية الميدانية";
 
-            // ✅ نستخدم Loaded بدلاً من Fire-and-Forget
             Loaded += async (_, _) => await LoadInitialDataAsync();
         }
 
@@ -50,16 +48,16 @@ namespace Radio.Views.Correspondents
         {
             try
             {
-                // ✅ تحميل البيانات بالتوازي لتحسين الأداء
+                // ✅ تحميل متوازي + await مباشر بدلاً من .Result
                 var correspondentsTask = _correspondentService.GetAllActiveAsync();
                 var guestsTask = _guestService.GetAllActiveAsync();
 
-                await Task.WhenAll(correspondentsTask, guestsTask);
+                var correspondents = await correspondentsTask;
+                var guests = await guestsTask;
 
-                CboCorrespondents.ItemsSource = correspondentsTask.Result;
-                CboGuests.ItemsSource = guestsTask.Result;
+                CboCorrespondents.ItemsSource = correspondents;
+                CboGuests.ItemsSource = guests;
 
-                // تعبئة الحقول في حالة التعديل
                 if (_existingCoverage is not null)
                 {
                     CboCorrespondents.SelectedValue = _existingCoverage.CorrespondentId;
@@ -101,7 +99,6 @@ namespace Radio.Views.Correspondents
 
             try
             {
-                // ✅ التحقق عبر ValidationPipeline
                 ValidationPipeline.ValidateCoverage(dto);
 
                 BtnSave.IsEnabled = false;
@@ -143,18 +140,12 @@ namespace Radio.Views.Correspondents
             }
         }
 
-        /// <summary>
-        /// سحب النافذة عبر شريط العنوان.
-        /// </summary>
         private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
                 DragMove();
         }
 
-        /// <summary>
-        /// إغلاق النافذة.
-        /// </summary>
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
             Close();

@@ -14,6 +14,7 @@ namespace DataAccess.Services
         Task<List<RoleDto>> GetRolesAsync();
         Task<List<PermissionViewModel>> GetPermissionsMatrixAsync(int roleId);
         Task UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session);
+        Task DeleteUserAsync(int userId, UserSession session);
     }
 
     public class UserService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IUserService
@@ -179,6 +180,10 @@ namespace DataAccess.Services
 
                 await context.SaveChangesAsync();
             }
+        }
+        public Task DeleteUserAsync(int userId, UserSession session)
+        {
+            throw new NotImplementedException();
         }
 
 

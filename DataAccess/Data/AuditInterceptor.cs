@@ -134,10 +134,31 @@ namespace DataAccess.Data
 
             if (auditEntries.Any())
             {
-                context.Set<AuditLog>().AddRange(auditEntries);
+                TryAddAuditLogs(context, auditEntries);
             }
 
             return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+
+
+        /// <summary>
+        /// محاولة تسجيل التغييرات في جدول AuditLogs بأمان.
+        /// إذا فشل التسجيل، لا يمنع العملية الأساسية بل يُسجّل الخطأ في Debug Output.
+        /// </summary>
+        private void TryAddAuditLogs(DbContext context, List<AuditLog> entries)
+        {
+            try
+            {
+                context.Set<AuditLog>().AddRange(entries);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("═══════════════════════════════════════");
+                System.Diagnostics.Debug.WriteLine($"⚠️ فشل تسجيل التدقيق (Audit)");
+                System.Diagnostics.Debug.WriteLine($"السبب: {ex.GetBaseException().Message}");
+                System.Diagnostics.Debug.WriteLine($"عدد السجلات المتأثرة: {entries.Count}");
+                System.Diagnostics.Debug.WriteLine("═══════════════════════════════════════");
+            }
         }
     }
 }

@@ -1,19 +1,20 @@
-﻿using DataAccess.DTOs;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using DataAccess.Services;
-using Domain.Models;
+using DataAccess.Services.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace Radio.Views.Programs
 {
     /// <summary>
-    /// Interaction logic for ProgramsView.xaml
+    /// شاشة إدارة البرامج — تعرض قائمة البرامج النشطة مع إمكانية الإضافة والتعديل والحذف والبحث.
     /// </summary>
     public partial class ProgramsView : UserControl
     {
         private readonly IProgramService _programService;
         private readonly UserSession _session;
-        private List<ProgramDto> _allPrograms = new();
+        private List<ProgramDto> _allPrograms = [];
 
         public ProgramsView(IProgramService programService, UserSession session)
         {
@@ -21,72 +22,139 @@ namespace Radio.Views.Programs
             _programService = programService;
             _session = session;
 
-            // فقط قسم التنسيق يمكنه إضافة برامج جديدة
-            BtnAddProgram.Visibility = _session.HasPermission("PROGRAM_MANAGE") ? Visibility.Visible : Visibility.Collapsed;
+            BtnAddProgram.Visibility = _session.HasPermission(AppPermissions.ProgramManage)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
 
-            _ = LoadDataAsync();
+            // ✅ Loaded بدلاً من Fire-and-Forget
+            Loaded += async (_, _) => await LoadDataAsync();
         }
 
+        #region Data Loading
+
+        /// <summary>
+        /// تحميل جميع البرامج النشطة وربطها بالـ DataGrid.
+        /// </summary>
         private async Task LoadDataAsync()
         {
             try
             {
-                _allPrograms = await _programService.GetAllActiveAsync();
+                _allPrograms = (await _programService.GetAllActiveAsync()).ToList();
                 DgPrograms.ItemsSource = _allPrograms;
             }
-            catch (Exception ex)
+            catch (UnauthorizedAccessException)
             {
-                MessageBox.Show("خطأ في تحميل البرامج: " + ex.Message);
+                MessageService.Current.ShowError("ليس لديك صلاحية لعرض البرامج.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل البرامج.");
             }
         }
 
-        private async void BtnAddProgram_Click(object sender, RoutedEventArgs e)
+        #endregion
+
+        #region Search
+
+        /// <summary>
+        /// البحث في قائمة البرامج حسب اسم البرنامج.
+        /// </summary>
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var dialog = new ProgramFormDialog(null, _programService, _session);
-            if (dialog.ShowDialog() == true)
+            if (sender is not TextBox textBox)
+                return;
+
+            string keyword = textBox.Text.Trim();
+
+            // ✅ StringComparison بدلاً من ToLower()
+            var filtered = string.IsNullOrWhiteSpace(keyword)
+                ? _allPrograms
+                : _allPrograms.Where(p =>
+                    p.ProgramName.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+            DgPrograms.ItemsSource = filtered.ToList();
+        }
+
+        #endregion
+
+        #region CRUD Operations
+
+        /// <summary>
+        /// فتح نافذة إضافة برنامج جديد.
+        /// </summary>
+        private void BtnAddProgram_Click(object sender, RoutedEventArgs e)
+        {
+            try
             {
-                await LoadDataAsync();
+                var dialog = new ProgramFormDialog(null, _programService, _session);
+                if (dialog.ShowDialog() == true)
+                    _ = LoadDataAsync();
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة إضافة البرنامج.");
             }
         }
 
-        private async void BtnEdit_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// فتح نافذة تعديل برنامج موجود.
+        /// </summary>
+        private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is ProgramDto prog)
+            if (sender is not Button btn || btn.DataContext is not ProgramDto prog)
+                return;
+
+            try
             {
                 var dialog = new ProgramFormDialog(prog, _programService, _session);
                 if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync();
-                }
+                    _ = LoadDataAsync();
             }
-        }
-
-        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            string keyword = TxtSearch.Text.Trim().ToLower();
-
-            if (string.IsNullOrWhiteSpace(keyword))
+            catch (Exception)
             {
-                string filter = TxtSearch.Text.ToLower();
-
-                DgPrograms.ItemsSource = _allPrograms.Where(g =>
-                    g.ProgramName.ToLower().Contains(filter)).ToList();
-
-            }
-            else
-            {
-                var filtered = _allPrograms
-                    .Where(p => p.ProgramName.ToLower().Contains(keyword))
-                    .ToList();
-
-                DgPrograms.ItemsSource = filtered;
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة تعديل البرنامج.");
             }
         }
 
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// حذف برنامج بعد تأكيد المستخدم.
+        /// </summary>
+        private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
+            if (sender is not Button btn || btn.DataContext is not ProgramDto prog)
+                return;
 
+            bool isConfirmed = await MessageService.Current.ShowConfirmationAsync(
+                $"هل أنت متأكد من حذف البرنامج: {prog.ProgramName}؟\nلا يمكن التراجع عن هذا الإجراء.",
+                "تأكيد الحذف");
+
+            if (!isConfirmed)
+                return;
+
+            try
+            {
+                await _programService.SoftDeleteAsync(prog.ProgramId, _session);
+                await LoadDataAsync();
+                MessageService.Current.ShowSuccess($"تم حذف البرنامج «{prog.ProgramName}» بنجاح.");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError("ليس لديك صلاحية لحذف البرامج.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حذف البرنامج.");
+            }
         }
+
+        #endregion
     }
-
 }

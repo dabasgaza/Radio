@@ -1,6 +1,5 @@
 ﻿using DataAccess.Common;
 using DataAccess.Services;
-using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Forms;
 using Radio.Messaging;
@@ -36,9 +35,7 @@ namespace Radio
             //TxtUserFullName.Text = _session.FullName;
             //ChipRole.Content = TranslateRole(_session.RoleName);
 
-            // 👈 تهيئة نظام الإشعارات المركزي وربطه بالـ Snackbar الخاص بهذه النافذة
-            var wpfMessaging = new WpfMessageService();
-            MessageService.Initialize(wpfMessaging);
+            Loaded += (_, _) => NotificationManager.RegisterHost(NotificationHost);
 
             InitializeUI();
         }

@@ -3,9 +3,8 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
-using Domain.Models;
-using Radio.Common;
 using Radio.Views.Common;
+using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Guests
@@ -26,7 +25,8 @@ namespace Radio.Views.Guests
             _guestService = guestService;
             _session = session;
 
-            // ✅ عنوان ديناميكي حسب نوع العملية
+            IsWindowDraggable = true;
+
             Title = _existingGuest is not null ? "تعديل بيانات الضيف" : "إضافة ضيف جديد";
 
             if (_existingGuest is not null)
@@ -54,7 +54,6 @@ namespace Radio.Views.Guests
 
             try
             {
-                // ✅ تحقق أولي من المدخلات عبر Pipeline
                 ValidationPipeline.ValidateGuest(dto);
 
                 BtnSave.IsEnabled = false;
@@ -64,7 +63,6 @@ namespace Radio.Views.Guests
                 else
                     await _guestService.UpdateGuestAsync(dto, _session);
 
-                // ✅ رسالة نجاح
                 MessageService.Current.ShowSuccess(
                     _existingGuest is null
                         ? "تمت إضافة الضيف بنجاح."
@@ -74,15 +72,13 @@ namespace Radio.Views.Guests
             }
             catch (ConcurrencyException ex)
             {
-                // ✅ عرض نافذة المقارنة وإعادة المحاولة تلقائياً
                 var diag = new ConcurrencyDialog(ex.DatabaseValues);
 
                 if (diag.ShowDialog() == true)
                 {
-                    // المستخدم اختار "الدهس" — إعادة محاولة الحفظ
-                    BtnSave.IsEnabled = false;
                     try
                     {
+                        // ✅ لا حاجة لإعادة BtnSave.IsEnabled = false — finally الخارجي يكفي
                         if (_existingGuest is null)
                             await _guestService.CreateGuestAsync(dto, _session);
                         else
@@ -100,10 +96,7 @@ namespace Radio.Views.Guests
                     {
                         MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء إعادة المحاولة.");
                     }
-                    finally
-                    {
-                        BtnSave.IsEnabled = true;
-                    }
+                    // ✅ إزالة finally الداخلي — finally الخارجي يعيد تفعيل الزر
                 }
                 else
                 {
@@ -113,9 +106,8 @@ namespace Radio.Views.Guests
             }
             catch (ValidationException ex)
             {
-                // ✅ أخطاء التحقق — عرض جميع الأخطاء
-                string allErrors = string.Join("\n", ex.Errors);
-                MessageService.Current.ShowWarning(allErrors, "تنبيه في البيانات");
+                string allErrors = string.Join("\n", ex.Message);
+                MessageService.Current.ShowWarning(allErrors);
             }
             catch (UnauthorizedAccessException)
             {

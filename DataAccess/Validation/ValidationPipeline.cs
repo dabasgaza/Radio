@@ -106,6 +106,42 @@ namespace DataAccess.Validation
 
             ThrowIfHasErrors(errors);
         }
+        public static void ValidateProgram(ProgramDto dto)
+        {
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(dto.ProgramName))
+                errors.Add("اسم البرنامج مطلوب.");
+
+            ThrowIfHasErrors(errors);
+
+        }
+        /// <summary>
+        /// التحقق من بيانات المستخدم قبل الحفظ.
+        /// </summary>
+        public static void ValidateUser(UserDto dto, string? password)
+        {
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(dto.FullName))
+                errors.Add("اسم المستخدم مطلوب.");
+
+            if (string.IsNullOrWhiteSpace(dto.Username))
+                errors.Add("اسم الدخول مطلوب.");
+
+            if (dto.RoleId <= 0)
+                errors.Add("يرجى اختيار دور للمستخدم.");
+
+            // كلمة المرور مطلوبة فقط عند الإضافة
+            if (dto.UserId == 0 && string.IsNullOrWhiteSpace(password))
+                errors.Add("كلمة المرور مطلوبة للمستخدم الجديد.");
+
+            // إذا أُدخلت كلمة مرور، تحقق من قوتها
+            if (!string.IsNullOrWhiteSpace(password) && password.Length < 6)
+                errors.Add("كلمة المرور يجب أن تكون 6 أحرف على الأقل.");
+
+            ThrowIfHasErrors(errors);
+        }
 
         #endregion
     }

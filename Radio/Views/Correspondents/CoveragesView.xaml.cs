@@ -31,7 +31,6 @@ namespace Radio.Views.Correspondents
                 ? Visibility.Visible
                 : Visibility.Collapsed;
 
-            // ✅ Loaded بدلاً من Fire-and-Forget
             Loaded += async (_, _) => await LoadDataAsync();
         }
 
@@ -70,21 +69,14 @@ namespace Radio.Views.Correspondents
         /// </summary>
         private async void BtnAddCoverage_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var dialog = new CoverageFormDialog(
-                    _coverageService,
-                    _serviceProvider.GetRequiredService<ICorrespondentService>(),
-                    _serviceProvider.GetRequiredService<IGuestService>(),
-                    _session);
+            var dialog = new CoverageFormDialog(
+                _coverageService,
+                _serviceProvider.GetRequiredService<ICorrespondentService>(),
+                _serviceProvider.GetRequiredService<IGuestService>(),
+                _session);
 
-                if (dialog.ShowDialog() == true)
-                    await LoadDataAsync();
-            }
-            catch (Exception)
-            {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة إضافة التغطية.");
-            }
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();
         }
 
         /// <summary>
@@ -95,21 +87,14 @@ namespace Radio.Views.Correspondents
             if (sender is not Button btn || btn.DataContext is not CoverageDto dto)
                 return;
 
-            try
-            {
-                var dialog = new CoverageFormDialog(
-                    _coverageService,
-                    _serviceProvider.GetRequiredService<ICorrespondentService>(),
-                    _serviceProvider.GetRequiredService<IGuestService>(),
-                    _session, dto);
+            var dialog = new CoverageFormDialog(
+                _coverageService,
+                _serviceProvider.GetRequiredService<ICorrespondentService>(),
+                _serviceProvider.GetRequiredService<IGuestService>(),
+                _session, dto);
 
-                if (dialog.ShowDialog() == true)
-                    await LoadDataAsync();
-            }
-            catch (Exception)
-            {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة تعديل التغطية.");
-            }
+            if (dialog.ShowDialog() == true)
+                await LoadDataAsync();
         }
 
         /// <summary>
@@ -151,41 +136,21 @@ namespace Radio.Views.Correspondents
 
         #region Search & Filtering
 
-        /// <summary>
-        /// البحث النصي في التغطيات.
-        /// </summary>
         private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
             ApplyFilters();
         }
 
-        /// <summary>
-        /// تصفية حسب الموقع.
-        /// </summary>
         private void CboLocation_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ApplyFilters();
         }
 
-        /// <summary>
-        /// تصفية حسب تاريخ محدد.
-        /// </summary>
-        private void DpDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFilters();
-        }
-
-        /// <summary>
-        /// تصفية حسب تاريخ البداية.
-        /// </summary>
         private void DpFromDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             ApplyFilters();
         }
 
-        /// <summary>
-        /// تصفية حسب تاريخ النهاية.
-        /// </summary>
         private void DpToDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             ApplyFilters();
@@ -200,16 +165,6 @@ namespace Radio.Views.Correspondents
             CboLocation.SelectedIndex = -1;
             DpFromDate.SelectedDate = null;
             DpToDate.SelectedDate = null;
-            // ApplyFilters() سيُستدعى تلقائياً من أحداث التغيير
-        }
-
-        /// <summary>
-        /// تبديل حالة فلتر نطاق التواريخ (من/إلى).
-        /// </summary>
-        private void ToggleDateFilter_Click(object sender, RoutedEventArgs e)
-        {
-            // ✅ TODO: تبديل رؤية حقلَي DpFromDate و DpToDate حسب حالة Toggle
-            // حالياً يعتمد التنفيذ على ملف XAML
         }
 
         /// <summary>
@@ -224,7 +179,6 @@ namespace Radio.Views.Correspondents
             }
 
             string keyword = TxtSearch.Text.Trim();
-
             var filtered = _allCoverages.AsEnumerable();
 
             // ✅ بحث نصي — اسم المراسل أو الموضوع أو الموقع
@@ -237,20 +191,14 @@ namespace Radio.Views.Correspondents
             }
 
             // ✅ تصفية حسب الموقع
-            if (CboLocation.SelectedItem is string selectedLocation && !string.IsNullOrWhiteSpace(selectedLocation))
+            if (CboLocation.SelectedItem is string selectedLocation
+                && !string.IsNullOrWhiteSpace(selectedLocation))
             {
                 filtered = filtered.Where(c =>
                     c.Location?.Equals(selectedLocation, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-            // ✅ تصفية حسب تاريخ محدد
-            if (DpToDate.SelectedDate is DateTime specificDate)
-            {
-                filtered = filtered.Where(c =>
-                    c.ScheduledTime?.Date == specificDate.Date);
-            }
-
-            // ✅ تصفية حسب نطاق تواريخ
+            // ✅ تصفية حسب نطاق تواريخ — من/إلى (DpFromDate و DpToDate)
             if (DpFromDate.SelectedDate is DateTime fromDate)
             {
                 filtered = filtered.Where(c =>
@@ -267,16 +215,5 @@ namespace Radio.Views.Correspondents
         }
 
         #endregion
-
-        #region Dead Code Removed
-
-        // ✅ تم إزالة BtnAdd_Click الفارغ — BtnAddCoverage_Click هو المُستخدم
-
-        #endregion
-
-        private void FilterDates_Changed(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFilters();
-        }
     }
 }
