@@ -1,0 +1,190 @@
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                          TextBox.xaml                                   ║
+    ║         حقول النصوص وكلمة المرور — WPF + MaterialDesignInXAML           ║
+    ║  الأنواع:                                                                ║
+    ║   • Input.Text          — الحقل الأساسي المستخدم في النماذج             ║
+    ║   • Input.Text.Multiline — حقل النص متعدد الأسطر                       ║
+    ║   • Input.Search        — حقل البحث مع أيقونة                          ║
+    ║   • Input.Password      — حقل كلمة المرور                              ║
+    ║   • Input.ReadOnly      — حقل للعرض فقط                                ║
+    ║                                                                          ║
+    ║  التبعيات: AppColors.xaml                                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+
+    <!--  لضمان ظهور أخطاء التحقق بشكل أنيق يتناسب مع MDIX  -->
+    <Style TargetType="TextBox">
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource MaterialDesignValidationErrorTemplate}" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.Text — الحقل الأساسي للنماذج
+        مواصفات: Outlined + Floating Hint + Rounded Corners
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.Text"
+        BasedOn="{StaticResource MaterialDesignOutlinedTextBox}"
+        TargetType="TextBox">
+
+        <!--  الأبعاد والحشوة  -->
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+
+        <!--  الألوان  -->
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="CaretBrush" Value="{StaticResource PrimaryMainBrush}" />
+
+        <!--  Material Design Hints  -->
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
+
+        <Style.Triggers>
+            <!--  تغيير إطار الحقل عند التركيز  -->
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+            <!--  حالة الخطأ — يُفعَّل عبر Validation.HasError  -->
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+                <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ErrorBrush}" />
+            </Trigger>
+            <!--  حالة تعطيل  -->
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+                <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.Text.Multiline — حقل نص متعدد الأسطر
+        الاستخدام: الملاحظات، الوصف، النبذة التعريفية
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.Text.Multiline"
+        BasedOn="{StaticResource Input.Text}"
+        TargetType="TextBox">
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="MinHeight" Value="100" />
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <!--  تعطيل زر المسح في حقول متعددة الأسطر  -->
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="False" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.Search — حقل البحث
+        الاستخدام: شريط البحث في Views (برامج، ضيوف، ...)
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.Search"
+        BasedOn="{StaticResource MaterialDesignOutlinedTextBox}"
+        TargetType="TextBox">
+        <Setter Property="Height" Value="48" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="CaretBrush" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+
+        <!--  أيقونة البحث دائماً مرئية  -->
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="Magnify" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="20" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="24" />
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
+        <!--<Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="Transparent" />-->
+
+        <!--<Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+        </Style.Triggers>-->
+
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.Password — حقل كلمة المرور
+        الاستخدام: نماذج تسجيل الدخول وإدارة المستخدمين
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.Password"
+        BasedOn="{StaticResource MaterialDesignOutlinedPasswordBox}"
+        TargetType="PasswordBox">
+
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="LockOutline" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="20" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+                <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.ReadOnly — حقل قراءة فقط
+        الاستخدام: عرض بيانات غير قابلة للتعديل
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.ReadOnly"
+        BasedOn="{StaticResource Input.Text}"
+        TargetType="TextBox">
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="Background" Value="{StaticResource SurfaceVariantBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="Cursor" Value="Arrow" />
+        <!--  تعطيل زر المسح في حقول القراءة  -->
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="False" />
+        <Style.Triggers>
+            <!--  إلغاء التأثيرات التفاعلية  -->
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

@@ -8,7 +8,7 @@
     d:DesignHeight="800"
     d:DesignWidth="1000"
     FlowDirection="RightToLeft"
-    Style="{StaticResource UserControlStyle}"
+    Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
     <Grid Background="{DynamicResource MaterialDesignPaper}">
@@ -20,18 +20,11 @@
         <materialDesign:ColorZone
             Padding="24,20"
             materialDesign:ElevationAssist.Elevation="Dp2"
-            Mode="PrimaryMid">
+            Style="{StaticResource Zone.Header.Primary}">
             <StackPanel>
-                <TextBlock
-                    FontSize="28"
-                    Foreground="White"
-                    Style="{StaticResource HeadlineLarge}"
-                    Text="مركز التقارير والإحصائيات" />
-                <TextBlock
-                    Foreground="White"
-                    Opacity="0.8"
-                    Style="{StaticResource BodyMedium}"
-                    Text="ملخص أداء البث، حالة النشر، وتحليلات البرامج الإذاعية" />
+
+                <TextBlock Style="{StaticResource Type.Headline.OnColor}" Text="مركز التقارير والإحصائيات" />
+                <TextBlock Style="{StaticResource Type.BodyMedium.OnColor}" Text="ملخص أداء البث، حالة النشر، وتحليلات البرامج الإذاعية" />
             </StackPanel>
         </materialDesign:ColorZone>
 
@@ -46,6 +39,8 @@
                         Margin="8"
                         Padding="20"
                         materialDesign:ElevationAssist.Elevation="Dp1"
+                        Background="{StaticResource InfoLightBrush}"
+                        Style="{StaticResource Card.Form}"
                         UniformCornerRadius="12">
                         <StackPanel>
                             <materialDesign:PackIcon
@@ -76,6 +71,7 @@
                         Margin="8"
                         Padding="20"
                         materialDesign:ElevationAssist.Elevation="Dp1"
+                        Background="{StaticResource SuccessLightBrush}"
                         UniformCornerRadius="12">
                         <StackPanel>
                             <materialDesign:PackIcon
@@ -106,6 +102,7 @@
                         Margin="8"
                         Padding="20"
                         materialDesign:ElevationAssist.Elevation="Dp1"
+                        Background="{StaticResource WarningLightBrush}"
                         UniformCornerRadius="12">
                         <StackPanel>
                             <materialDesign:PackIcon
@@ -135,7 +132,7 @@
 
                 <TextBlock
                     Margin="8,0,0,12"
-                    Style="{StaticResource TitleLarge}"
+                    Style="{StaticResource Type.BodyLarge}"
                     Text="جدول بث اليوم" />
                 <materialDesign:Card
                     Margin="0,0,0,30"
@@ -144,10 +141,10 @@
                     <DataGrid
                         x:Name="DgToday"
                         MinHeight="200"
-                        CellStyle="{StaticResource BroadcastPro.DataGridCell}"
-                        ColumnHeaderStyle="{StaticResource BroadcastPro.DataGridColumnHeader}"
-                        RowStyle="{StaticResource BroadcastPro.DataGridRow}"
-                        Style="{StaticResource BroadcastProDataGrid}">
+                        CellStyle="{StaticResource DataGrid.Cell}"
+                        ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader}"
+                        RowStyle="{StaticResource DataGrid.Row}"
+                        Style="{StaticResource DataGrid.Main}">
                         <DataGrid.Columns>
                             <DataGridTextColumn
                                 Width="100"
@@ -191,7 +188,7 @@
 
                 <TextBlock
                     Margin="8,0,0,12"
-                    Style="{StaticResource TitleLarge}"
+                    Style="{StaticResource Type.TitleMedium}"
                     Text="إحصائيات البرامج الأكثر إنتاجاً" />
                 <materialDesign:Card
                     Margin="0,0,0,20"
@@ -200,12 +197,10 @@
                     <DataGrid
                         x:Name="DgProgramStats"
                         MinHeight="200"
-                        CellStyle="{StaticResource BroadcastPro.DataGridCell}"
-                        RowStyle="{StaticResource BroadcastPro.DataGridRow}"
-                        Style="{StaticResource BroadcastProDataGrid}">
+                        Style="{StaticResource DataGrid.Main}">
 
                         <DataGrid.ColumnHeaderStyle>
-                            <Style BasedOn="{StaticResource BroadcastPro.DataGridColumnHeader}" TargetType="DataGridColumnHeader">
+                            <Style BasedOn="{StaticResource DataGrid.ColumnHeader}" TargetType="DataGridColumnHeader">
                                 <Setter Property="Background" Value="#455A64" />
                                 <Setter Property="Foreground" Value="White" />
                                 <Setter Property="BorderBrush" Value="#37474F" />
@@ -215,7 +210,7 @@
                             <DataGridTextColumn
                                 Width="*"
                                 Binding="{Binding ProgramName}"
-                                CellStyle="{StaticResource BroadcastPro.DataGridCell.FirstColumn}"
+                                CellStyle="{StaticResource DataGrid.Cell.First}"
                                 Header="اسم البرنامج" />
                             <DataGridTextColumn
                                 Width="150"

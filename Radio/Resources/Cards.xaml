@@ -1,0 +1,175 @@
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                          Cards.xaml                                     ║
+    ║           بطاقات العرض — WPF + MaterialDesignInXAML                     ║
+    ║  الأنواع:                                                                ║
+    ║   • Card.Default       — البطاقة الأساسية                              ║
+    ║   • Card.Flat          — بطاقة مسطحة بدون ظل                           ║
+    ║   • Card.Elevated      — بطاقة مرفوعة ذات ظل عميق                     ║
+    ║   • Card.Stat          — بطاقة الإحصاء (أرقام + أيقونة)               ║
+    ║   • Card.Form          — بطاقة غلاف النافذة الحوارية                  ║
+    ║   • Card.Info          — بطاقة معلوماتية (تلميح / تنبيه)              ║
+    ║   • StatIcon.Container — حاوية أيقونة الإحصاء                         ║
+    ║                                                                          ║
+    ║  التبعيات: AppColors.xaml                                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Card.Default — البطاقة الأساسية
+        الاستخدام: الغالبية العظمى من البطاقات في الواجهة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Card.Default" TargetType="materialDesign:Card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="UniformCornerRadius" Value="12" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp2" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Card.Flat — بطاقة مسطحة بإطار خفيف
+        الاستخدام: قوائم داخل لوحات، أقسام فرعية
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Card.Flat" TargetType="materialDesign:Card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="UniformCornerRadius" Value="10" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Card.Elevated — بطاقة مرفوعة
+        الاستخدام: جداول البيانات الرئيسية، لوحة المحتوى
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Card.Elevated" TargetType="materialDesign:Card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="UniformCornerRadius" Value="16" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp3" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Card.Stat — بطاقة الإحصاء
+        الاستخدام: بطاقات الأرقام (إجمالي البرامج، إجمالي الضيوف...)
+        المحتوى المتوقع: أيقونة + رقم كبير + تسمية
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Card.Stat" TargetType="materialDesign:Card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="UniformCornerRadius" Value="12" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Card.Form — بطاقة غلاف النافذة الحوارية
+        الاستخدام: ProgramFormDialog, UserFormDialog, ...
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Card.Form" TargetType="materialDesign:Card">
+        <Setter Property="Margin" Value="30" />
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="UniformCornerRadius" Value="20" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp4" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Card.Info — بطاقة المعلومات / التنبيه / الإرشاد
+        الاستخدام: تلميحات في النماذج، رسائل نظام
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Card.Info" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource InfoLightBrush}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="BorderBrush" Value="{StaticResource InfoBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="Card.Warning" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="Card.Success" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="Card.Error" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         StatIcon.Container — حاوية أيقونة الإحصاء
+         الاستخدام: داخل Card.Stat كحاوية دائرية/مربعة للأيقونة
+         مثال: <Border Style="{StaticResource StatIcon.Primary}">
+         ═══════════════════════════════════════════════════════════-->
+    <Style x:Key="StatIcon.Primary" TargetType="Border">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+    </Style>
+
+    <Style x:Key="StatIcon.Success" TargetType="Border">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
+    </Style>
+
+    <Style x:Key="StatIcon.Warning" TargetType="Border">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
+    </Style>
+
+    <Style x:Key="StatIcon.Info" TargetType="Border">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Background" Value="{StaticResource InfoLightBrush}" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Footer.Form — تذييل نماذج الحوار (زر حفظ + إلغاء)
+        الاستخدام: الـ Row الأخير في النوافذ الحوارية
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Footer.Form" TargetType="Border">
+        <Setter Property="Padding" Value="28,20" />
+        <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+        <Setter Property="CornerRadius" Value="0,0,20,20" />
+    </Style>
+
+</ResourceDictionary>

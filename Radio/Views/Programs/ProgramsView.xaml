@@ -8,7 +8,7 @@
     d:DesignHeight="650"
     d:DesignWidth="1000"
     FlowDirection="RightToLeft"
-    Style="{StaticResource UserControlStyle}"
+    Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
     <Grid Background="{DynamicResource MaterialDesignPaper}">
@@ -21,13 +21,8 @@
         <materialDesign:ColorZone
             Padding="30,24"
             materialDesign:ElevationAssist.Elevation="Dp3"
+            Background="{StaticResource HeaderGradientBrush}"
             Mode="Custom">
-            <materialDesign:ColorZone.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0" Color="#1A237E" />
-                    <GradientStop Offset="1" Color="#3F51B5" />
-                </LinearGradientBrush>
-            </materialDesign:ColorZone.Background>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -44,9 +39,7 @@
                             Kind="RadioTower" />
                         <TextBlock
                             Margin="15,0"
-                            FontSize="28"
-                            FontWeight="Bold"
-                            Foreground="White"
+                            Style="{StaticResource Type.Headline.OnColor}"
                             Text="منظومة إدارة البرامج" />
                     </StackPanel>
                     <TextBlock
@@ -59,24 +52,10 @@
                 <Button
                     x:Name="BtnAddProgram"
                     Grid.Column="1"
-                    Height="45"
-                    Padding="20,0"
                     VerticalAlignment="Center"
-                    materialDesign:ButtonAssist.CornerRadius="10"
-                    materialDesign:ElevationAssist.Elevation="Dp2"
-                    Background="White"
-                    BorderThickness="0"
                     Click="BtnAddProgram_Click"
-                    Foreground="#1A237E">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon VerticalAlignment="Center" Kind="PlusThick" />
-                        <TextBlock
-                            Margin="10,0,0,0"
-                            VerticalAlignment="Center"
-                            FontWeight="Bold"
-                            Text="برنامج جديد" />
-                    </StackPanel>
-                </Button>
+                    Content="إضافة برنامج جديد"
+                    Style="{StaticResource Btn.AddNew}" />
             </Grid>
         </materialDesign:ColorZone>
 
@@ -91,11 +70,8 @@
                 x:Name="TxtSearch"
                 Grid.Column="0"
                 Margin="0,0,20,0"
-                VerticalAlignment="Center"
                 materialDesign:HintAssist.Hint="بحث سريع بالاسم أو الفئة..."
-                materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                materialDesign:TextFieldAssist.LeadingIcon="Magnify"
-                Style="{StaticResource BroadcastTextBox}"
+                Style="{StaticResource Input.Search}"
                 TextChanged="TxtSearch_TextChanged" />
 
             <materialDesign:Card
@@ -103,17 +79,18 @@
                 Margin="5"
                 Padding="15,12"
                 materialDesign:ElevationAssist.Elevation="Dp1"
+                Background="{StaticResource InfoLightBrush}"
                 UniformCornerRadius="12">
                 <StackPanel Orientation="Horizontal">
                     <Border
                         Width="40"
                         Height="40"
-                        Background="#101A237E"
+                        Background="{StaticResource AppBackgroundBrush}"
                         CornerRadius="8">
                         <materialDesign:PackIcon
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Foreground="#1A237E"
+                            Foreground="{StaticResource InfoBrush}"
                             Kind="PlaylistMusicOutline" />
                     </Border>
                     <StackPanel Margin="15,0">
@@ -123,6 +100,7 @@
                             Text="إجمالي البرامج" />
                         <TextBlock
                             x:Name="TxtTotal"
+                            HorizontalAlignment="Center"
                             FontSize="20"
                             FontWeight="Bold"
                             Text="0" />
@@ -135,17 +113,18 @@
                 Margin="5"
                 Padding="15,12"
                 materialDesign:ElevationAssist.Elevation="Dp1"
+                Background="{StaticResource SuccessLightBrush}"
                 UniformCornerRadius="12">
                 <StackPanel Orientation="Horizontal">
                     <Border
                         Width="40"
                         Height="40"
-                        Background="#100097A7"
+                        Background="{StaticResource AppBackgroundBrush}"
                         CornerRadius="8">
                         <materialDesign:PackIcon
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Foreground="#0097A7"
+                            Foreground="{StaticResource SuccessBrush}"
                             Kind="TagMultiple" />
                     </Border>
                     <StackPanel Margin="15,0">
@@ -155,9 +134,9 @@
                             Text="الفئات النشطة" />
                         <TextBlock
                             x:Name="TxtCategories"
+                            HorizontalAlignment="Center"
                             FontSize="20"
                             FontWeight="Bold"
-                            Foreground="#0097A7"
                             Text="0" />
                     </StackPanel>
                 </StackPanel>
@@ -171,10 +150,10 @@
             UniformCornerRadius="15">
             <DataGrid
                 x:Name="DgPrograms"
-                CellStyle="{StaticResource BroadcastPro.DataGridCell}"
-                ColumnHeaderStyle="{StaticResource BroadcastPro.DataGridColumnHeader}"
-                RowStyle="{StaticResource BroadcastPro.DataGridRow}"
-                Style="{StaticResource BroadcastProDataGrid}">
+                CellStyle="{StaticResource DataGrid.Cell}"
+                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader}"
+                RowStyle="{StaticResource DataGrid.Row}"
+                Style="{StaticResource DataGrid.Main}">
 
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Width="*" Header="البرنامج">

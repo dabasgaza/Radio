@@ -1,19 +1,238 @@
-﻿
-<!--  AppColors.xaml  -->
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                         AppColors.xaml                                  ║
+    ║                 نظام الألوان والـ Design Tokens                          ║
+    ║  المصدر: Material Design 3 + WCAG 2.1 AA                                ║
+    ║  الثيم:  Indigo Primary / Light Blue Secondary / Light Mode              ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <!--
+        ═══════════════════════════════════════════════════════════
+        1. BRAND PALETTE — الألوان الأساسية الثابتة
+        ═══════════════════════════════════════════════════════════
+    -->
 
-    <!--  === هوية الألوان الثابتة (لا تتغير مع الثيم) ===  -->
-    <Color x:Key="OnAirRedColor">#C62828</Color>
-    <SolidColorBrush x:Key="OnAirBrush" Color="{StaticResource OnAirRedColor}" />
+    <!--  Primary — Indigo  -->
+    <Color x:Key="Primary900Color">#0D0D4F</Color>
+    <Color x:Key="Primary800Color">#1A237E</Color>
+    <Color x:Key="Primary700Color">#283593</Color>
+    <Color x:Key="Primary600Color">#303F9F</Color>
+    <Color x:Key="Primary500Color">#3F51B5</Color>
+    <Color x:Key="Primary400Color">#5C6BC0</Color>
+    <Color x:Key="Primary300Color">#7986CB</Color>
+    <Color x:Key="Primary200Color">#9FA8DA</Color>
+    <Color x:Key="Primary100Color">#C5CAE9</Color>
+    <Color x:Key="Primary50Color">#E8EAF6</Color>
 
-    <Color x:Key="ErrorRedColor">#B00020</Color>
-    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorRedColor}" />
+    <!--  Secondary — Light Blue  -->
+    <Color x:Key="Secondary700Color">#0277BD</Color>
+    <Color x:Key="Secondary500Color">#03A9F4</Color>
+    <Color x:Key="Secondary300Color">#4FC3F7</Color>
+    <Color x:Key="Secondary100Color">#B3E5FC</Color>
+    <Color x:Key="Secondary50Color">#E1F5FE</Color>
 
-    <Color x:Key="SuccessGreenColor">#2E7D32</Color>
-    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessGreenColor}" />
+    <!--  Neutral — Grey Scale  -->
+    <Color x:Key="Neutral900Color">#212121</Color>
+    <Color x:Key="Neutral800Color">#424242</Color>
+    <Color x:Key="Neutral700Color">#616161</Color>
+    <Color x:Key="Neutral600Color">#757575</Color>
+    <Color x:Key="Neutral400Color">#BDBDBD</Color>
+    <Color x:Key="Neutral300Color">#E0E0E0</Color>
+    <Color x:Key="Neutral200Color">#EEEEEE</Color>
+    <Color x:Key="Neutral100Color">#F5F5F5</Color>
+    <Color x:Key="Neutral50Color">#FAFAFA</Color>
 
-    <Color x:Key="WarningOrangeColor">#E65100</Color>
-    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningOrangeColor}" />
+    <!--  Surface / Background  -->
+    <Color x:Key="SurfaceColor">#FFFFFF</Color>
+    <Color x:Key="SurfaceVariantColor">#F8F9FF</Color>
+    <Color x:Key="BackgroundColor">#F4F6FB</Color>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        2. SEMANTIC COLORS — ألوان الحالة والمعنى
+        ═══════════════════════════════════════════════════════════
+    -->
+
+    <!--  Success — Green  -->
+    <Color x:Key="SuccessColor">#2E7D32</Color>
+    <Color x:Key="SuccessLightColor">#E8F5E9</Color>
+    <Color x:Key="SuccessDarkColor">#1B5E20</Color>
+
+    <!--  Warning — Amber  -->
+    <Color x:Key="WarningColor">#F57F17</Color>
+    <Color x:Key="WarningLightColor">#FFFDE7</Color>
+    <Color x:Key="WarningDarkColor">#E65100</Color>
+
+    <!--  Error — Red  -->
+    <Color x:Key="ErrorColor">#C62828</Color>
+    <Color x:Key="ErrorLightColor">#FFEBEE</Color>
+    <Color x:Key="ErrorDarkColor">#B71C1C</Color>
+
+    <!--  Info — Blue  -->
+    <Color x:Key="InfoColor">#0277BD</Color>
+    <Color x:Key="InfoLightColor">#E1F5FE</Color>
+
+    <!--  On-Air — Live Broadcast Red  -->
+    <Color x:Key="OnAirColor">#D32F2F</Color>
+    <Color x:Key="OnAirGlowColor">#FF5252</Color>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        3. ROLE-BASED BRUSHES — الفراشي المعيارية
+        ═══════════════════════════════════════════════════════════
+    -->
+
+    <!--  Primary Brushes  -->
+    <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource Primary800Color}" />
+    <SolidColorBrush x:Key="PrimaryMainBrush" Color="{StaticResource Primary600Color}" />
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource Primary400Color}" />
+    <SolidColorBrush x:Key="PrimaryXLightBrush" Color="{StaticResource Primary50Color}" />
+
+    <!--  Secondary Brushes  -->
+    <SolidColorBrush x:Key="SecondaryMainBrush" Color="{StaticResource Secondary500Color}" />
+    <SolidColorBrush x:Key="SecondaryLightBrush" Color="{StaticResource Secondary100Color}" />
+
+    <!--  Surface / Background Brushes  -->
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+    <SolidColorBrush x:Key="SurfaceVariantBrush" Color="{StaticResource SurfaceVariantColor}" />
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="{StaticResource BackgroundColor}" />
+
+    <!--  Text Brushes  -->
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource Neutral900Color}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource Neutral700Color}" />
+    <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource Neutral400Color}" />
+    <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="TextHintBrush" Color="{StaticResource Neutral600Color}" />
+
+    <!--  Border / Divider Brushes  -->
+    <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource Neutral300Color}" />
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="{StaticResource Primary600Color}" />
+    <SolidColorBrush x:Key="DividerBrush" Color="{StaticResource Neutral200Color}" />
+
+    <!--  State Brushes  -->
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="#0F3F51B5" />
+    <SolidColorBrush x:Key="PressedOverlayBrush" Color="#1F3F51B5" />
+    <SolidColorBrush x:Key="SelectedBrush" Color="{StaticResource Primary50Color}" />
+    <SolidColorBrush x:Key="FocusRingBrush" Color="{StaticResource Primary400Color}" />
+
+    <!--  Semantic Brushes  -->
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
+    <SolidColorBrush x:Key="SuccessLightBrush" Color="{StaticResource SuccessLightColor}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+    <SolidColorBrush x:Key="WarningLightBrush" Color="{StaticResource WarningLightColor}" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
+    <SolidColorBrush x:Key="ErrorLightBrush" Color="{StaticResource ErrorLightColor}" />
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}" />
+    <SolidColorBrush x:Key="InfoLightBrush" Color="{StaticResource InfoLightColor}" />
+
+    <!--  On-Air Brushes  -->
+    <SolidColorBrush x:Key="OnAirBrush" Color="{StaticResource OnAirColor}" />
+    <SolidColorBrush x:Key="OnAirGlowBrush" Color="{StaticResource OnAirGlowColor}" />
+
+
+    <!--  Row State Brushes (للجداول)  -->
+    <SolidColorBrush x:Key="RowAlternateBrush" Color="#F4F6FB" />
+    <!--  خلفية صفوف متناوبة خفيفة جداً  -->
+    <SolidColorBrush x:Key="RowHoverBrush" Color="#E8EAF6" />
+    <!--  خلفية عند تمرير الماوس (نفس Primary50 تقريباً)  -->
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        4. GRADIENT BRUSHES — التدرجات الموحّدة
+        ═══════════════════════════════════════════════════════════
+    -->
+
+    <!--  Gradient أساسي للهيدر والـ ColorZone (موجود مسبقاً)  -->
+    <LinearGradientBrush x:Key="HeaderGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource Primary800Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Primary500Color}" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HeaderGreenGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource SuccessColor}" />
+        <GradientStop Offset="1.0" Color="{StaticResource SuccessColor}" />
+    </LinearGradientBrush>
+    <!--  ═════════════════════ DIALOG HEADER GRADIENTS ═════════════════════  -->
+
+    <!--
+        Dialog Header — الأساسي (Primary)
+        الاستخدام: حوارات الإجراءات العامة (حفظ، تعديل، تأكيد)
+        ملاحظة: أغمق من الهيدر الرئيسي ليعطي إحساس بالتركيز والأهمية
+    -->
+    <LinearGradientBrush x:Key="DialogHeaderPrimaryBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Offset="0.0" Color="{StaticResource Primary900Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Primary600Color}" />
+    </LinearGradientBrush>
+
+    <!--
+        Dialog Header — المعلوماتي (Info Blend)
+        الاستخدام: حوارات إظهار التفاصيل، المساعدة، أو الإشعارات
+        ملاحظة: يدمج بين الـ Indigo والـ Light Blue لإعطاء شعور بالمعلوماتية والهدوء
+    -->
+    <LinearGradientBrush x:Key="DialogHeaderInfoBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Offset="0.0" Color="{StaticResource Primary700Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Secondary500Color}" />
+    </LinearGradientBrush>
+
+    <!--
+        Dialog Header — الناعم (Subtle)
+        الاستخدام: حوارات الإعدادات أو النوافذ المنبثقة الثانوية
+        ملاحظة: تدرج أفقي خفيف جداً باستخدام درجات الـ Primary المتوسطة
+    -->
+    <LinearGradientBrush x:Key="DialogHeaderSubtleBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Offset="0.0" Color="{StaticResource Primary600Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Primary400Color}" />
+    </LinearGradientBrush>
+
+    <!--
+        Dialog Header — التأكيد/الحذف (Danger)
+        الاستخدام: حوارات حذف البيانات، أو التحذيرات المهمة
+        ملاحظة: يعتمد على ألوان الـ Error المعرّفة لديك لتنبيه المستتبار للمخاطرة
+    -->
+    <LinearGradientBrush x:Key="DialogHeaderDangerBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Offset="0.0" Color="{StaticResource ErrorDarkColor}" />
+        <GradientStop Offset="1.0" Color="{StaticResource ErrorColor}" />
+    </LinearGradientBrush>
+
+    <!--  ═════════════════════ END DIALOG GRADIENTS ═════════════════════  -->
+
+
+    <!--  Gradient خفيف للبطاقات والخلفيات الفرعية (موجود مسبقاً)  -->
+    <LinearGradientBrush x:Key="CardGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource Primary50Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Secondary50Color}" />
+    </LinearGradientBrush>
+    <!--
+        ═══════════════════════════════════════════════════════════
+        5. ELEVATION SHADOWS — ظلال الطبقات
+        ═══════════════════════════════════════════════════════════
+    -->
+
+    <!--
+        توجيه: استخدم materialDesign:ElevationAssist.Elevation من MDIX
+        Dp0 → لا ظل     | Dp1 → بطاقة مسطحة
+        Dp2 → بطاقة عادية | Dp3 → بطاقة رئيسية
+        Dp4 → حوار / نافذة فرعية
+    -->
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        6. SPACING & RADIUS TOKENS — الأبعاد والزوايا
+        ═══════════════════════════════════════════════════════════
+    -->
+
+    <CornerRadius x:Key="RadiusSmall">4</CornerRadius>
+    <CornerRadius x:Key="RadiusMedium">8</CornerRadius>
+    <CornerRadius x:Key="RadiusLarge">12</CornerRadius>
+    <CornerRadius x:Key="RadiusXLarge">16</CornerRadius>
+    <CornerRadius x:Key="RadiusFull">24</CornerRadius>
+
+    <Thickness x:Key="SpacingXSmall">4</Thickness>
+    <Thickness x:Key="SpacingSmall">8</Thickness>
+    <Thickness x:Key="SpacingMedium">16</Thickness>
+    <Thickness x:Key="SpacingLarge">24</Thickness>
+    <Thickness x:Key="SpacingXLarge">32</Thickness>
 
 </ResourceDictionary>

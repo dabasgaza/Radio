@@ -1,0 +1,454 @@
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                         Buttons.xaml                                    ║
+    ║           نظام الأزرار الموحّد — WPF + MaterialDesignInXAML             ║
+    ║  الأنواع:                                                                ║
+    ║   • Btn.Primary        — الزر الأساسي المرفوع                           ║
+    ║   • Btn.Secondary      — الزر الثانوي المحاط بإطار                      ║
+    ║   • Btn.Ghost          — الزر الشفاف (Flat/Text)                        ║
+    ║   • Btn.Danger         — زر الحذف والإجراءات الخطرة                    ║
+    ║   • Btn.DangerOutlined — زر الخطر بإطار (إلغاء / تراجع)               ║
+    ║   • Btn.Cancel         — زر الإلغاء الهادئ                             ║
+    ║   • Btn.Icon           — زر أيقونة فقط                                  ║
+    ║   • Btn.IconSmall      — زر أيقونة صغير (شريط الأدوات)                 ║
+    ║   • Btn.OnAir          — زر البث المباشر مع نبض                         ║
+    ║   • Btn.Tab            — تبويب التنقل (RadioButton)                     ║
+    ║                                                                          ║
+    ║  التبعيات: AppColors.xaml                                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        BASE — خصائص مشتركة (لا تستخدم مباشرة، وراثة فقط)
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Btn.Base" TargetType="Button">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="20,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.Primary — الزر الأساسي المرفوع
+        الاستخدام: حفظ، تأكيد، الإجراء الرئيسي في كل نموذج
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.Primary"
+        BasedOn="{StaticResource MaterialDesignRaisedButton}"
+        TargetType="Button">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="24,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Background" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp2" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <!--  تمت إزالة تغيير الـ Background لتفعيل طبقة الـ Overlay الشفافة الخاصة بـ MDIX بشكل سلس  -->
+                <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp4" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.42" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.Secondary — الزر الثانوي بإطار
+        الاستخدام: عمليات ثانوية، تحرير، تصدير
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.Secondary"
+        BasedOn="{StaticResource MaterialDesignOutlinedButton}"
+        TargetType="Button">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="20,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <!--  الأزرار المحاطة بإطار تحتاج لتغيير الخلفية عند التمرير لأنها شفافة  -->
+                <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                <!--  تم تعديل لون الإطار ليبقى متناسقاً ولا يحدث قفزة لونية حادة  -->
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.42" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.Ghost — الزر الشفاف
+        الاستخدام: روابط داخلية، إجراءات ثانوية خفية
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.Ghost"
+        BasedOn="{StaticResource MaterialDesignFlatButton}"
+        TargetType="Button">
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="6" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.42" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.Danger — زر الحذف والإجراءات الخطرة
+        الاستخدام: حذف سجل، تأكيد إجراء لا يمكن التراجع عنه
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.Danger"
+        BasedOn="{StaticResource MaterialDesignRaisedButton}"
+        TargetType="Button">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="20,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Background" Value="{StaticResource ErrorBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp2" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp4" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.42" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.DangerOutlined — زر الخطر بإطار
+        الاستخدام: تحذيرات، إجراءات تحتاج تأكيد مزدوج
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.DangerOutlined"
+        BasedOn="{StaticResource MaterialDesignOutlinedButton}"
+        TargetType="Button">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="20,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.42" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.Cancel — زر الإلغاء الهادئ
+        الاستخدام: إلغاء، تراجع، غلق بدون حفظ
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.Cancel"
+        BasedOn="{StaticResource MaterialDesignFlatButton}"
+        TargetType="Button">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource BorderDefaultBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.42" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.Icon — زر أيقونة فقط (حجم 40×40)
+        الاستخدام: تعديل، حذف، بحث في شريط الأدوات
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.Icon"
+        BasedOn="{StaticResource MaterialDesignIconButton}"
+        TargetType="Button">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  زر أيقونة للتعديل (أزرق)  -->
+    <Style
+        x:Key="Btn.Icon.Edit"
+        BasedOn="{StaticResource Btn.Icon}"
+        TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="ToolTip" Value="تعديل" />
+    </Style>
+
+    <!--  زر أيقونة للحذف (أحمر)  -->
+    <Style
+        x:Key="Btn.Icon.Delete"
+        BasedOn="{StaticResource Btn.Icon}"
+        TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
+        <Setter Property="ToolTip" Value="حذف" />
+    </Style>
+
+    <!--  زر أيقونة للإغلاق (شفاف / رمادي)  -->
+    <Style
+        x:Key="Btn.Icon.Close"
+        BasedOn="{StaticResource Btn.Icon}"
+        TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="ToolTip" Value="إغلاق" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.IconSmall — زر أيقونة صغير (32×32)
+        الاستخدام: شريط الأدوات، header النافذة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.IconSmall"
+        BasedOn="{StaticResource MaterialDesignIconButton}"
+        TargetType="Button">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="6" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.OnAir — زر البث المباشر مع تأثير النبض
+        الاستخدام: زر ON AIR في الشريط السفلي فقط
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.OnAir"
+        BasedOn="{StaticResource MaterialDesignRaisedButton}"
+        TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource OnAirBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Width" Value="140" />
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="22" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <!--  حلقة النبض  -->
+                        <Ellipse
+                            x:Name="PulseRing"
+                            Width="150"
+                            Height="56"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Opacity="0.5"
+                            Stroke="{StaticResource OnAirGlowBrush}"
+                            StrokeThickness="2">
+                            <Ellipse.RenderTransform>
+                                <ScaleTransform x:Name="PulseScale" CenterX="75" CenterY="28" />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                        <!--  زر البث الفعلي  -->
+                        <Border
+                            x:Name="ButtonBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="22"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!--  تشغيل النبض عند تحميل الزر  -->
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard RepeatBehavior="Forever">
+                                    <DoubleAnimation
+                                        AutoReverse="True"
+                                        Storyboard.TargetName="PulseRing"
+                                        Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                        From="1.0"
+                                        To="1.35"
+                                        Duration="0:0:1.4" />
+                                    <DoubleAnimation
+                                        AutoReverse="True"
+                                        Storyboard.TargetName="PulseRing"
+                                        Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                        From="1.0"
+                                        To="1.35"
+                                        Duration="0:0:1.4" />
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="PulseRing"
+                                        Storyboard.TargetProperty="Opacity"
+                                        From="0.5"
+                                        To="0.0"
+                                        Duration="0:0:1.4" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.88" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="PulseRing" Property="Visibility" Value="Collapsed" />
+                            <Setter Property="Opacity" Value="0.42" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.Tab — تبويبات التنقل الأفقية (RadioButton)
+        الاستخدام: شريط التبويبات في MainWindow
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Btn.Tab" TargetType="RadioButton">
+        <Setter Property="Height" Value="38" />
+        <Setter Property="Padding" Value="18,0" />
+        <Setter Property="Margin" Value="2,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border
+                        x:Name="Bd"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="8">
+                        <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource PrimaryMainBrush}" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.42" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.AddNew — زر "إضافة جديد" للرأس في Views
+        الاستخدام: زر الإضافة في ColorZone / Header
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Btn.AddNew"
+        BasedOn="{StaticResource MaterialDesignRaisedButton}"
+        TargetType="Button">
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Padding" Value="20,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Foreground" Value="{StaticResource PrimaryDarkBrush}" />
+        <Setter Property="BorderBrush" Value="White" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="10" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp2" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp4" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

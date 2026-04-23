@@ -1,74 +1,153 @@
-﻿<Application
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                            App.xaml                                     ║
+    ║         نقطة الدخول لنظام الستايل الموحّد — Radio Project              ║
+    ║                                                                          ║
+    ║  ترتيب التحميل (مهم جداً — لا تغيّر الترتيب):                          ║
+    ║   1. Material Design 2 Defaults                                          ║
+    ║   2. BundledTheme (Indigo + LightBlue + Light)                          ║
+    ║   3. AppColors.xaml       ← Design Tokens + Brushes                     ║
+    ║   4. Windows.xaml         ← ستايلات النوافذ والـ UserControl           ║
+    ║   5. TextBlock.xaml       ← Typography Scale                            ║
+    ║   6. Buttons.xaml         ← جميع أنواع الأزرار                         ║
+    ║   7. TextBox.xaml         ← حقول النصوص والبحث وكلمة المرور           ║
+    ║   8. ComboBox.xaml        ← قوائم الاختيار                             ║
+    ║   9. ListBox.xaml         ← قوائم العرض والـ Chips                     ║
+    ║   10. DateTimePicker.xaml ← منتقيات التاريخ والوقت                    ║
+    ║   11. DataGrid.xaml       ← جداول البيانات                             ║
+    ║   12. Cards.xaml          ← بطاقات العرض والتغليف                      ║
+    ║   13. ColorZone.xaml      ← ترويسات النوافذ والـ Header               ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<Application
     x:Class="Radio.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:Radio"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
     <Application.Resources>
+
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
 
-
-                <!--  Material Design Default Resources  -->
+                <!--
+                    ══════════════════════════════════════════════
+                    1. Material Design 2 Defaults — يجب أن يكون أولاً
+                    ══════════════════════════════════════════════
+                -->
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
 
-
-                <!--  الثيم الأساسي (عادي جداً بدون أي x:Key)  -->
-                <!--  تم تغييرها من Lime إلى Amber ليتوافق مع ديكور شاشة الدخول ديناميكياً  -->
+                <!--
+                    ══════════════════════════════════════════════
+                    2. BundledTheme — الثيم الأساسي
+                    Primary: Indigo | Secondary: LightBlue | Base: Light
+                    ══════════════════════════════════════════════
+                -->
                 <materialDesign:BundledTheme
                     BaseTheme="Light"
                     PrimaryColor="Indigo"
                     SecondaryColor="LightBlue" />
 
-
-
-
-
-                <!--  Custom App Styles  -->
-                <ResourceDictionary Source="Resources/BasicWindowStyle.xaml" />
-
-
-
-                <!--  3. الموارد المخصصة النظيفة (بدون أي تضارب)  -->
+                <!--
+                    ══════════════════════════════════════════════
+                    3. Design Tokens — الأساس الذي تعتمد عليه كل الملفات
+                    ══════════════════════════════════════════════
+                -->
                 <ResourceDictionary Source="Resources/AppColors.xaml" />
 
-                <ResourceDictionary Source="Resources/AppStyles.xaml" />
+                <!--
+                    ══════════════════════════════════════════════
+                    4. Windows & UserControl Styles
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/Windows.xaml" />
 
-                <ResourceDictionary Source="Resources/MasterDataGridStyles.xaml" />
+                <!--
+                    ══════════════════════════════════════════════
+                    5. Typography
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/TextBlock.xaml" />
 
+                <!--
+                    ══════════════════════════════════════════════
+                    6. Buttons
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/Buttons.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
+                    7. Text Inputs
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/TextBox.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
+                    8. ComboBox
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/ComboBox.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
+                    9. ListBox + Chips
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/ListBox.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
+                    10. Date & Time Pickers
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/DateTimePicker.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
+                    11. DataGrid — يعتمد على AppColors لذا يأتي بعده
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/DataGrid.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
+                    12. Cards
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/Cards.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
+                    13. ColorZone & Header Zones
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/ColorZone.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
 
-            <!--  Override MahApps brushes  -->
             <!--
-            <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource Primary700}" />
-            <SolidColorBrush x:Key="AccentBaseColorBrush" Color="{DynamicResource Primary600}" />
-            <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource Primary500}" />
-            <SolidColorBrush x:Key="AccentColorBrush2" Color="{DynamicResource Primary400}" />
-            <SolidColorBrush x:Key="AccentColorBrush3" Color="{DynamicResource Primary300}" />
-            <SolidColorBrush x:Key="AccentColorBrush4" Color="{DynamicResource Primary200}" />
-            <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{DynamicResource Primary700}" />
-            <SolidColorBrush x:Key="AccentSelectedColorBrush" Color="{DynamicResource Primary500Foreground}" />
-            <SolidColorBrush x:Key="IdealForegroundColorBrush" Color="{DynamicResource Primary500Foreground}" />
-            <SolidColorBrush
-                x:Key="IdealForegroundDisabledBrush"
-                Opacity="0.4"
-                Color="{DynamicResource Primary500}" />-->
+                ══════════════════════════════════════════════════
+                Global Converters
+                ══════════════════════════════════════════════════
+            -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-            <!--  يوضع داخل ResourceDictionary  -->
+            <!--
+                ══════════════════════════════════════════════════
+                ON AIR Pulse Storyboard (global — يُستخدم في MainWindow)
+                ══════════════════════════════════════════════════
+            -->
             <Storyboard x:Key="OnAirPulseStoryboard" RepeatBehavior="Forever">
                 <DoubleAnimation
                     AutoReverse="True"
-                    Storyboard.TargetName="OnAirGlow"
-                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                    Storyboard.TargetProperty="Opacity"
                     From="0.2"
-                    To="0.8"
+                    To="0.9"
                     Duration="0:0:1" />
             </Storyboard>
-
-            <!--  region Converter  -->
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-            <!--  Endregion Converter  -->
 
         </ResourceDictionary>
     </Application.Resources>

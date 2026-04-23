@@ -1,0 +1,212 @@
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                          ListBox.xaml                                   ║
+    ║             قوائم العرض — WPF + MaterialDesignInXAML                    ║
+    ║  الأنواع:                                                                ║
+    ║   • List.Default     — قائمة عرض بيانات عادية                          ║
+    ║   • List.Navigation  — قائمة تنقل جانبية                               ║
+    ║   • List.Selectable  — قائمة بتحديد مفرد                               ║
+    ║   • List.MultiSelect — قائمة بتحديد متعدد                              ║
+    ║   • ListBoxItem.Default — عنصر القائمة الأساسي                         ║
+    ║   • ListBoxItem.Nav     — عنصر التنقل                                   ║
+    ║                                                                          ║
+    ║  التبعيات: AppColors.xaml                                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        ListBoxItem.Default — عنصر القائمة الأساسي
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="ListBoxItem.Default" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="16,10" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border
+                        x:Name="ItemBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="8"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.42" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        ListBoxItem.Nav — عنصر التنقل الجانبي
+        الاستخدام: القوائم الجانبية، الأقسام
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="ListBoxItem.Nav" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="Margin" Value="8,2" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border
+                        x:Name="NavBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="10"
+                        SnapsToDevicePixels="True">
+                        <Grid>
+                            <!--  خط التنشيط على اليمين (RTL)  -->
+                            <Border
+                                x:Name="ActiveIndicator"
+                                Width="3"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch"
+                                Background="{StaticResource PrimaryMainBrush}"
+                                CornerRadius="0,2,2,0"
+                                Visibility="Collapsed" />
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="NavBorder" Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="NavBorder" Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                            <Setter TargetName="ActiveIndicator" Property="Visibility" Value="Visible" />
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        List.Default — قائمة عرض بيانات عادية
+        الاستخدام: قوائم عامة داخل البطاقات
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="List.Default" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ListBoxItem.Default}" />
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        List.Navigation — قائمة التنقل الجانبية
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="List.Navigation"
+        BasedOn="{StaticResource List.Default}"
+        TargetType="ListBox">
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ListBoxItem.Nav}" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        List.Selectable — قائمة بتحديد مفرد (مع إطار)
+        الاستخدام: قوائم الفلترة، لوحات الاختيار
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="List.Selectable"
+        BasedOn="{StaticResource List.Default}"
+        TargetType="ListBox">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        List.MultiSelect — قائمة تحديد متعدد
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="List.MultiSelect"
+        BasedOn="{StaticResource List.Selectable}"
+        TargetType="ListBox">
+        <Setter Property="SelectionMode" Value="Multiple" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Chip.Status — شرائح الحالة (Active / Inactive / Pending)
+        الاستخدام: داخل خلايا الـ DataGrid وبطاقات الإحصاء
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Chip.Active" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+    <Style x:Key="Chip.Inactive" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+    <Style x:Key="Chip.Warning" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+    <Style x:Key="Chip.Error" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+    <Style x:Key="Chip.Primary" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+</ResourceDictionary>

@@ -9,7 +9,7 @@
     Title="ConcurrencyDialog"
     Width="800"
     Height="450"
-    Style="{StaticResource BasicWindowStyle}"
+    Style="{StaticResource Window.Main}"
     mc:Ignorable="d">
 
     <Grid Margin="20">

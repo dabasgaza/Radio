@@ -13,7 +13,7 @@
     ShowMaxRestoreButton="False"
     ShowMinButton="False"
     ShowTitleBar="False"
-    Style="{StaticResource BasicWindowStyle}"
+    Style="{StaticResource Window.Main}"
     WindowStartupLocation="CenterScreen"
     WindowState="Maximized"
     WindowStyle="None">
@@ -128,7 +128,7 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Content="ON AIR"
-                        Style="{StaticResource BtnOnAir}" />
+                        Style="{StaticResource Btn.OnAir}" />
 
                     <!--  3. زر إغلاق الجلسة (يساراً في RTL)  -->
                     <Button
@@ -137,8 +137,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Click="BtnLogout_Click"
-                        Foreground="#CF6679"
-                        Style="{StaticResource MaterialDesignFlatButton}">
+                        Style="{StaticResource Btn.Icon.Close}">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon
                                 Width="18"

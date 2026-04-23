@@ -11,7 +11,7 @@
     Background="Transparent"
     FlowDirection="RightToLeft"
     ShowTitleBar="False"
-    Style="{StaticResource BasicWindowStyle}"
+    Style="{StaticResource Window.Dialog}"
     UseNoneWindowStyle="True"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None">

@@ -6,20 +6,18 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="إدارة البرامج"
     Width="600"
-    Height="620"
-    AllowsTransparency="True"
-    Background="Transparent"
-    ShowTitleBar="False"
-    Style="{StaticResource BasicWindowStyle}"
-    UseNoneWindowStyle="True"
-    WindowStartupLocation="CenterScreen"
-    WindowStyle="None">
+    MaxHeight="700"
+    SizeToContent="Height"
+    Style="{StaticResource Window.Dialog}"
+    WindowStartupLocation="CenterScreen">
+    <!--  تمت إزالة AllowsTransparency و Background لأنها موجودة داخل Window.Dialog  -->
 
     <materialDesign:Card
         Margin="30"
-        materialDesign:ElevationAssist.Elevation="Dp2"
-        Background="{DynamicResource MaterialDesignPaper}"
+        Effect="{StaticResource Shadow.Dialog}"
+        Style="{StaticResource Card.Form}"
         UniformCornerRadius="16">
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -27,17 +25,13 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <!--  ═══════ 1. الهيدر ═══════  -->
+            <!--  إضافة CornerRadius ليتطابق مع حواف الكارت الخارجية  -->
             <materialDesign:ColorZone
-                Padding="24,20"
-                materialDesign:ElevationAssist.Elevation="Dp0"
-                Foreground="White"
-                Mode="Custom">
-                <materialDesign:ColorZone.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Offset="0" Color="#006064" />
-                        <GradientStop Offset="1" Color="#004D40" />
-                    </LinearGradientBrush>
-                </materialDesign:ColorZone.Background>
+                Grid.Row="0"
+                Mode="Custom"
+                Style="{StaticResource Zone.Header.Primary}">
+
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -46,22 +40,23 @@
                     </Grid.ColumnDefinitions>
 
                     <materialDesign:PackIcon
-                        Width="35"
-                        Height="35"
+                        Width="32"
+                        Height="32"
                         VerticalAlignment="Center"
+                        Foreground="{StaticResource TextOnPrimaryBrush}"
                         Kind="RadioTower" />
 
-                    <StackPanel Grid.Column="1" Margin="18,0">
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="16,0,0,0"
+                        VerticalAlignment="Center">
                         <TextBlock
                             x:Name="TxtTitle"
-                            FontWeight="Bold"
-                            Foreground="White"
-                            Style="{StaticResource TitleLarge}"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
                             Text="إعداد البرنامج الإذاعي" />
                         <TextBlock
-                            FontSize="11"
-                            Foreground="White"
-                            Opacity="0.8"
+                            Margin="0,4,0,0"
+                            Style="{StaticResource Type.BodyMedium.OnColor}"
                             Text="أدخل البيانات التعريفية للبرنامج وتصنيفه" />
                     </StackPanel>
 
@@ -69,88 +64,84 @@
                         Grid.Column="2"
                         Click="CloseButton_Click"
                         Foreground="White"
-                        Opacity="0.7"
                         Style="{StaticResource MaterialDesignIconButton}">
                         <materialDesign:PackIcon Kind="Close" />
                     </Button>
                 </Grid>
             </materialDesign:ColorZone>
 
-            <ScrollViewer
-                Grid.Row="1"
-                Padding="28,20"
-                VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="10,15">
+            <!--  ═══════ 2. المحتوى ═══════  -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <!--  مسافة موحدة 28 من الجوانب، و 24 من الأعلى والأسفل  -->
+                <StackPanel Margin="28,24">
 
                     <TextBox
                         x:Name="TxtName"
-                        Margin="0,0,0,24"
+                        Margin="0,0,0,16"
                         materialDesign:HintAssist.Hint="اسم البرنامج الإذاعي *"
                         materialDesign:TextFieldAssist.HasLeadingIcon="True"
                         materialDesign:TextFieldAssist.LeadingIcon="MicrophoneVariant"
-                        Style="{StaticResource BroadcastTextBox}" />
+                        Style="{StaticResource Input.Text}" />
 
                     <TextBox
                         x:Name="TxtCategory"
-                        Margin="0,0,0,24"
+                        Margin="0,0,0,16"
                         materialDesign:HintAssist.Hint="تصنيف المحتوى (سياسي، أدبي...)"
                         materialDesign:TextFieldAssist.HasLeadingIcon="True"
                         materialDesign:TextFieldAssist.LeadingIcon="TagOutline"
-                        Style="{StaticResource BroadcastTextBox}" />
+                        Style="{StaticResource Input.Text}" />
 
                     <TextBox
                         x:Name="TxtDesc"
-                        Height="130"
+                        Height="120"
                         VerticalContentAlignment="Top"
                         materialDesign:HintAssist.Hint="نبذة تعريفية عن البرنامج"
                         materialDesign:TextFieldAssist.HasLeadingIcon="True"
                         materialDesign:TextFieldAssist.LeadingIcon="TextSubject"
                         AcceptsReturn="True"
-                        Style="{StaticResource BroadcastTextBox}"
+                        Style="{StaticResource Input.Text.Multiline}"
                         TextWrapping="Wrap" />
 
                 </StackPanel>
             </ScrollViewer>
 
+            <!--  ═══════ 3. الذيل (تم إصلاحه بالكامل) ═══════  -->
             <Border
                 Grid.Row="2"
-                Padding="28,24"
-                Background="{DynamicResource MaterialDesignDivider}"
-                CornerRadius="0,0,16,16">
+                Padding="28,20"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource DividerBrush}"
+                BorderThickness="0,1,0,0"
+                CornerRadius="0,0,16,0">
+
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="1.5*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Button
                         Grid.Column="0"
                         Content="إلغاء"
                         IsCancel="True"
-                        Style="{StaticResource CancelFlatButton}" />
+                        Style="{StaticResource Btn.Cancel}" />
 
+                    <!--  تم استخدام الطريقة الاحترافية لإضافة الأيقونة في MDIX  -->
                     <Button
                         x:Name="BtnSave"
                         Grid.Column="2"
-                        materialDesign:ButtonAssist.CornerRadius="8"
-                        materialDesign:ElevationAssist.Elevation="Dp2"
-                        Background="#006064"
-                        BorderBrush="#006064"
                         Click="BtnSave_Click"
-                        Content="اعتماد البرنامج"
-                        Style="{StaticResource PrimaryActionButton}">
-                        <Button.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon VerticalAlignment="Center" Kind="ContentSaveCheckOutline" />
-                                    <TextBlock
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center"
-                                        Text="{Binding}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </Button.ContentTemplate>
+                        Style="{StaticResource Btn.Primary}">
+
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center"
+                                Kind="ContentSaveCheckOutline" />
+                            <TextBlock VerticalAlignment="Center" Text="اعتماد البرنامج" />
+                        </StackPanel>
+
                     </Button>
                 </Grid>
             </Border>

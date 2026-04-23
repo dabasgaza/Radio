@@ -1,0 +1,261 @@
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                         TextBlock.xaml                                  ║
+    ║           نظام Typography الموحّد — Material Design Type Scale           ║
+    ║  المقياس:                                                                ║
+    ║   Display  → 45sp   عناوين ضخمة (صفحات رئيسية، شاشة البداية)          ║
+    ║   Headline → 32sp   عناوين القسم                                        ║
+    ║   Title    → 22sp   عنوان النافذة / الـ Card                            ║
+    ║   Label    → 14sp   نص الأزرار والعلامات                               ║
+    ║   Body     → 16sp / 14sp  النصوص الاعتيادية                            ║
+    ║   Caption  → 12sp   نصوص توضيحية، تواريخ، ملاحظات                     ║
+    ║   Overline → 11sp   تصنيفات ورؤوس جداول                                ║
+    ║                                                                          ║
+    ║  التبعيات: AppColors.xaml                                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        DISPLAY — 45sp | للشاشات الفارغة والترحيب
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.Display" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="45" />
+        <Setter Property="FontWeight" Value="Light" />
+        <Setter Property="LineHeight" Value="52" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        HEADLINE — 32sp | عنوان القسم الرئيسي
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.Headline" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="LineHeight" Value="40" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  Bold variant للـ Headline على الخلفية الملونة (ColorZone)  -->
+    <Style
+        x:Key="Type.Headline.OnColor"
+        BasedOn="{StaticResource Type.Headline}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        TITLE LARGE — 22sp | عنوان النافذة / Dialog header
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.TitleLarge" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="LineHeight" Value="28" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style
+        x:Key="Type.TitleLarge.OnColor"
+        BasedOn="{StaticResource Type.TitleLarge}"
+        TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        TITLE MEDIUM — 18sp | عناوين البطاقات والإحصائيات
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.TitleMedium" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="LineHeight" Value="24" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        TITLE SMALL — 16sp | عناوين الأقسام الفرعية
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.TitleSmall" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="LineHeight" Value="20" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        BODY LARGE — 16sp | نص القراءة الرئيسي
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.BodyLarge" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="LineHeight" Value="24" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        BODY MEDIUM — 14sp | النص الاعتيادي في الواجهة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.BodyMedium" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="LineHeight" Value="20" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  نص ثانوي / مساعد  -->
+    <Style
+        x:Key="Type.BodyMedium.Secondary"
+        BasedOn="{StaticResource Type.BodyMedium}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+    </Style>
+
+    <!--  نص على خلفية ملونة  -->
+    <Style
+        x:Key="Type.BodyMedium.OnColor"
+        BasedOn="{StaticResource Type.BodyMedium}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Opacity" Value="0.7" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        LABEL — 14sp Medium | نص الأزرار والشرائح
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.Label" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="LineHeight" Value="20" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  Label للشريط والأقسام الجانبية  -->
+    <Style
+        x:Key="Type.Label.Section"
+        BasedOn="{StaticResource Type.Label}"
+        TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Opacity" Value="0.55" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        CAPTION — 12sp | نصوص توضيحية، تواريخ، وصف الحالة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.Caption" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="LineHeight" Value="16" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  Caption على خلفية ملونة  -->
+    <Style
+        x:Key="Type.Caption.OnColor"
+        BasedOn="{StaticResource Type.Caption}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Opacity" Value="0.75" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        OVERLINE — 11sp | رؤوس الجداول، التصنيفات
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.Overline" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="LineHeight" Value="16" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        NUMERIC — أرقام الإحصاء في البطاقات
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.Numeric.Large" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style x:Key="Type.Numeric.Medium" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        CLOCK — ساعة الوقت الحقيقي في الـ Header
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.Clock" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        DATA GRID CELL TEXT — نص خلايا الجداول
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Type.DataGrid.Cell" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  نص الخلية الأولى (اسم السجل)  -->
+    <Style
+        x:Key="Type.DataGrid.CellPrimary"
+        BasedOn="{StaticResource Type.DataGrid.Cell}"
+        TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+</ResourceDictionary>

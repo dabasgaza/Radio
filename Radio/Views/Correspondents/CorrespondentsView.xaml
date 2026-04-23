@@ -8,7 +8,7 @@
     d:DesignHeight="700"
     d:DesignWidth="1100"
     FlowDirection="RightToLeft"
-    Style="{StaticResource UserControlStyle}"
+    Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
     <UserControl.Resources>

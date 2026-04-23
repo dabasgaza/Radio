@@ -1,0 +1,134 @@
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                          ComboBox.xaml                                  ║
+    ║           قوائم الاختيار — WPF + MaterialDesignInXAML                   ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        ⚠️ مهم: تم وضع ComboBoxItem في الأعلى لأن الستايلات الأخرى
+        تستخدمه كـ StaticResource ولا يمكنها قراءته لو كان أسفلهم
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Input.ComboBoxItem" TargetType="ComboBoxItem">
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                <Setter Property="FontWeight" Value="Medium" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.ComboBox — القائمة الأساسية في النماذج
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.ComboBox"
+        BasedOn="{StaticResource MaterialDesignOutlinedComboBox}"
+        TargetType="ComboBox">
+
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+
+
+
+        <!--  الآن هذا السطر سيعمل بشكل مثالي لأن الـ ItemContainer أصبح أعلاه  -->
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Input.ComboBoxItem}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+            <Trigger Property="IsDropDownOpen" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+            </Trigger>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+                <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ErrorBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+                <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.ComboBox.Filter — قائمة مع دعم البحث/الفلترة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.ComboBox.Filter"
+        BasedOn="{StaticResource Input.ComboBox}"
+        TargetType="ComboBox">
+        <Setter Property="IsEditable" Value="True" />
+        <Setter Property="IsTextSearchEnabled" Value="True" />
+        <Setter Property="StaysOpenOnEdit" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.ComboBox.Compact — قائمة مدمجة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.ComboBox.Compact"
+        BasedOn="{StaticResource MaterialDesignOutlinedComboBox}"
+        TargetType="ComboBox">
+
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
+
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Input.ComboBoxItem}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+            <Trigger Property="IsDropDownOpen" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

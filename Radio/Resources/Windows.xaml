@@ -1,0 +1,222 @@
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                          Windows.xaml                                   ║
+    ║        ستايلات النوافذ والـ UserControl — MahApps + MDIX                ║
+    ║                                                                          ║
+    ║  الأنواع:                                                                ║
+    ║   • Window.Main      — نافذة التطبيق الرئيسية (MetroWindow RTL)         ║
+    ║   • Window.Dialog    — نافذة الحوار (شفافة، بطاقة داخلية)              ║
+    ║   • Window.Login     — نافذة تسجيل الدخول (خاصة)                       ║
+    ║   • View.Base        — UserControl الأساسي لجميع Views                 ║
+    ║   • ScrollView.Base  — ScrollViewer موحّد                               ║
+    ║   • Separator.H      — فاصل أفقي                                       ║
+    ║   • Separator.Section— فاصل قسم مع عنوان                               ║
+    ║                                                                          ║
+    ║  التبعيات: AppColors.xaml                                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Window.Main — نافذة التطبيق الرئيسية
+        الاستخدام: MainWindow.xaml
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Window.Main" TargetType="{x:Type mah:MetroWindow}">
+        <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="GlowBrush" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="WindowTitleBrush" Value="{StaticResource PrimaryDarkBrush}" />
+        <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource MaterialDesignPaper}" />
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="ShowTitleBar" Value="False" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Window.Dialog — نافذة الحوار الشفافة
+        الاستخدام: ProgramFormDialog, UserFormDialog, GuestFormDialog...
+        القاعدة: خلفية شفافة + Card داخلية بظل
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Window.Dialog" TargetType="{x:Type mah:MetroWindow}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="AllowsTransparency" Value="True" />
+        <Setter Property="WindowStyle" Value="None" />
+        <Setter Property="ShowTitleBar" Value="False" />
+        <Setter Property="UseNoneWindowStyle" Value="True" />
+        <Setter Property="ShowCloseButton" Value="False" />
+        <Setter Property="ShowMaxRestoreButton" Value="False" />
+        <Setter Property="ShowMinButton" Value="False" />
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+
+        <!--  ✨ السطر السحري لتحديد الحواف بأناقة  -->
+        <Setter Property="BorderThickness" Value="0" />
+        <!--<Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />-->
+    </Style>
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Window.Login — نافذة تسجيل الدخول
+        الاستخدام: LoginWindow.xaml
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Window.Login" TargetType="{x:Type mah:MetroWindow}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="AllowsTransparency" Value="True" />
+        <Setter Property="WindowStyle" Value="None" />
+        <Setter Property="ShowTitleBar" Value="False" />
+        <Setter Property="ResizeMode" Value="NoResize" />
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        View.Base — UserControl الأساسي
+        الاستخدام: جميع Views (ProgramsView, GuestsView...)
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="View.Base" TargetType="{x:Type UserControl}">
+        <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        DataGrid.ColumnHeader — الخلية الأولى في DataGrid
+        ستايلات Cell توافقية مع BasicWindowStyle القديم
+        ═══════════════════════════════════════════════════════════
+    -->
+
+    <!--  خلية توسيط للـ DataGrid (متوافق مع الكود القديم)  -->
+    <Style
+        x:Key="CenterCellAligned"
+        BasedOn="{StaticResource MaterialDesignDataGridCell}"
+        TargetType="{x:Type DataGridCell}">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <!--  خلية توسيط مع لون مختلف  -->
+    <Style
+        x:Key="CenterCellAlignedAndBackColor2"
+        BasedOn="{StaticResource CenterCellAligned}"
+        TargetType="{x:Type DataGridCell}">
+        <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+    </Style>
+
+    <!--  خلية محاذاة يسار  -->
+    <Style
+        x:Key="LeftCellAligned"
+        BasedOn="{StaticResource MaterialDesignDataGridCell}"
+        TargetType="{x:Type DataGridCell}">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextBlock.TextAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Padding" Value="10,0,0,0" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        ScrollView.Base — ScrollViewer مخصص
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="ScrollView.Base" TargetType="ScrollViewer">
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="materialDesign:ScrollViewerAssist.IsAutoHideEnabled" Value="True" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Separator.H — فاصل أفقي بسيط
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Separator.H" TargetType="Separator">
+        <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Margin" Value="0,16" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        DialogHost.Content — إعداد DialogHost الموحّد
+        الاستخدام: يُلفّ DockPanel في MainWindow
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="DialogHost.Main" TargetType="materialDesign:DialogHost">
+        <Setter Property="materialDesign:DialogHost.DialogMargin" Value="0" />
+        <Setter Property="materialDesign:DialogHost.OverlayBackground">
+            <Setter.Value>
+                <SolidColorBrush Opacity="0.45" Color="Black" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         DropShadow.Card — ظل قياسي للبطاقات الطافية
+         الاستخدام: أي Grid/Border يحتاج ظل ناعم
+         مثال: <Grid.Effect><DropShadowEffect ... /></Grid.Effect>
+         (يُستخدم كـ resource مرجعية وليس style مباشر)
+         ═══════════════════════════════════════════════════════════-->
+    <DropShadowEffect
+        x:Key="Shadow.Card"
+        BlurRadius="24"
+        Direction="270"
+        Opacity="0.12"
+        ShadowDepth="4"
+        Color="Black" />
+
+    <DropShadowEffect
+        x:Key="Shadow.Dialog"
+        BlurRadius="40"
+        Direction="270"
+        Opacity="0.18"
+        ShadowDepth="6"
+        Color="Black" />
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Dialog.ContentCard — الهيكل الموحّد لمحتوى الحوارات
+        الاستخدام: يوضع كـ Root Element داخل DialogHost.DialogContent
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Dialog.ContentCard" TargetType="Border">
+        <!--  الخلفية والظل  -->
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="Effect" Value="{StaticResource Shadow.Dialog}" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusLarge}" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Width" Value="450" />
+        <!--  التوجيه والخط  -->
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="TextElement.FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="TextElement.FontSize" Value="15" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+    </Style>
+
+</ResourceDictionary>

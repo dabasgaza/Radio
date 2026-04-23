@@ -12,7 +12,7 @@
     ResizeMode="NoResize"
     ShowCloseButton="False"
     ShowTitleBar="False"
-    Style="{StaticResource BasicWindowStyle}"
+    Style="{StaticResource Window.Login}"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None">
 

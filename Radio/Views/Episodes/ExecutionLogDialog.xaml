@@ -6,143 +6,150 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="توثيق تنفيذ الحلقة"
     Width="540"
-    Height="660"
-    Background="{DynamicResource MaterialDesignPaper}"
-    BorderBrush="{DynamicResource MaterialDesignDivider}"
-    BorderThickness="1"
-    FlowDirection="RightToLeft"
-    GlowBrush="{DynamicResource SuccessBrush}"
-    ShowTitleBar="False"
-    Style="{StaticResource BasicWindowStyle}"
-    UseNoneWindowStyle="True"
+    MaxHeight="660"
+    SizeToContent="Height"
+    Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterScreen">
+    <!--  تمت إزالة جميع الخصائص المكررة (Background, BorderBrush, GlowBrush, UseNoneWindowStyle)  -->
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <!--  إضافة بطاقة خارجية لتناسب شكل باقي الـ Dialogs  -->
+    <materialDesign:Card
+        Margin="30"
+        Background="{StaticResource SurfaceBrush}"
+        UniformCornerRadius="16">
 
-        <materialDesign:ColorZone
-            Padding="20"
-            materialDesign:ElevationAssist.Elevation="Dp2"
-            Background="{DynamicResource SuccessBrush}"
-            Foreground="White"
-            Mode="Custom">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-                <materialDesign:PackIcon
-                    Width="32"
-                    Height="32"
-                    VerticalAlignment="Center"
-                    Kind="CheckDecagram" />
+            <!--  ═══════ 1. الهيدر (هيدر نجاح مخصص) ═══════  -->
+            <!--  استخدام لون ثابت SuccessBrush لأن سياق النافذة هو "إتمام مهمة"  -->
+            <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Green}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="1" Margin="16,0">
-                    <TextBlock
+                    <materialDesign:PackIcon
+                        Width="32"
+                        Height="32"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextOnPrimaryBrush}"
+                        Kind="CheckDecagram" />
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="16,0,0,0"
+                        VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Type.TitleLarge.OnColor}" Text="إتمام تنفيذ الحلقة" />
+                        <TextBlock
+                            Margin="0,4,0,0"
+                            Style="{StaticResource Type.BodyMedium.OnColor}"
+                            Text="سجّل تفاصيل البث، المدة الفعلية، وأي ملاحظات تقنية" />
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="2"
+                        Click="BtnClose_Click"
                         Foreground="White"
-                        Style="{StaticResource TitleLarge}"
-                        Text="إتمام تنفيذ الحلقة" />
-                    <TextBlock
-                        FontSize="11"
-                        Foreground="White"
-                        Opacity="0.9"
-                        Text="سجّل تفاصيل البث، المدة الفعلية، وأي ملاحظات تقنية" />
-                </StackPanel>
+                        Style="{StaticResource MaterialDesignIconButton}">
+                        <materialDesign:PackIcon Kind="Close" />
+                    </Button>
+                </Grid>
+            </materialDesign:ColorZone>
 
-                <Button
-                    Grid.Column="2"
-                    Click="BtnClose_Click"
-                    Foreground="White"
-                    Style="{StaticResource MaterialDesignIconButton}">
-                    <materialDesign:PackIcon Kind="Close" />
-                </Button>
-            </Grid>
-        </materialDesign:ColorZone>
+            <!--  ═══════ 2. المحتوى ═══════  -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="24,24">
 
-        <ScrollViewer
-            Grid.Row="1"
-            Padding="24,20"
-            VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="10,15">
+                    <!--  حقل المدة  -->
+                    <TextBox
+                        x:Name="TxtDuration"
+                        Margin="0,0,0,16"
+                        materialDesign:HintAssist.Hint="مدة الحلقة الفعلية (بالدقائق) *"
+                        materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                        materialDesign:TextFieldAssist.LeadingIcon="Timer"
+                        Style="{StaticResource Input.Text}" />
 
-                <TextBox
-                    x:Name="TxtDuration"
-                    Margin="0,0,0,24"
-                    materialDesign:HintAssist.Hint="مدة الحلقة الفعلية (بالدقائق) *"
-                    materialDesign:TextFieldAssist.LeadingIcon="Timer"
-                    Style="{StaticResource BroadcastTextBox}" />
+                    <!--  حقل الملاحظات العامة  -->
+                    <TextBox
+                        x:Name="TxtNotes"
+                        Margin="0,0,0,16"
+                        materialDesign:HintAssist.Hint="تفاصيل سير البث والملاحظات العامة"
+                        materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                        materialDesign:TextFieldAssist.LeadingIcon="FileDocumentEditOutline"
+                        Style="{StaticResource Input.Text.Multiline}" />
 
-                <TextBox
-                    x:Name="TxtNotes"
-                    Height="120"
-                    Margin="0,0,0,24"
-                    VerticalContentAlignment="Top"
-                    materialDesign:HintAssist.Hint="تفاصيل سير البث والملاحظات العامة"
-                    materialDesign:TextFieldAssist.LeadingIcon="FileDocumentEditOutline"
-                    AcceptsReturn="True"
-                    Style="{StaticResource BroadcastTextBox}"
-                    TextWrapping="Wrap" />
-
-                <materialDesign:Card
-                    Padding="2"
-                    Background="{DynamicResource MaterialDesignDivider}"
-                    UniformCornerRadius="8">
+                    <!--  حقل المشاكل التقنية  -->
+                    <!--  تمت إزالة الـ Card المزيف حوله، الـ Design System الحديث يعتمد على وضوح الـ Hint  -->
                     <TextBox
                         x:Name="TxtIssues"
-                        Height="100"
-                        VerticalContentAlignment="Top"
                         materialDesign:HintAssist.Hint="المشاكل التقنية أو الأعطال (إن وجدت)"
+                        materialDesign:TextFieldAssist.HasLeadingIcon="True"
                         materialDesign:TextFieldAssist.LeadingIcon="AlertCircleOutline"
-                        AcceptsReturn="True"
-                        BorderThickness="0"
-                        Style="{StaticResource BroadcastTextBox}"
-                        TextWrapping="Wrap" />
-                </materialDesign:Card>
+                        Style="{StaticResource Input.Text.Multiline}" />
 
-                <TextBlock
-                    Margin="4,12,0,0"
-                    FontSize="11"
-                    FontWeight="Medium"
-                    Foreground="{DynamicResource SuccessBrush}"
-                    Text="* سيتم تحويل حالة الحلقة تلقائياً إلى 'منفذة' عند الحفظ." />
-            </StackPanel>
-        </ScrollViewer>
+                    <!--  رسالة توضيحية  -->
+                    <Border
+                        Margin="0,10"
+                        Padding="16,12"
+                        Background="{DynamicResource MaterialDesignDivider}"
+                        CornerRadius="10">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Foreground="#1565C0"
+                                Kind="Information"
+                                Opacity="0.7" />
+                            <TextBlock
+                                Margin="12,0"
+                                VerticalAlignment="Center"
+                                FontSize="11"
+                                Opacity="0.8"
+                                Text="* سيتم تحويل حالة الحلقة تلقائياً إلى 'منفذة' عند الحفظ." />
+                        </StackPanel>
+                    </Border>
 
-        <Border
-            Grid.Row="2"
-            Padding="24"
-            Background="{DynamicResource MaterialDesignCardBackground}"
-            BorderBrush="{DynamicResource MaterialDesignDivider}"
-            BorderThickness="0,1,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                </StackPanel>
+            </ScrollViewer>
 
-                <Button
-                    Grid.Column="0"
-                    Content="إلغاء"
-                    IsCancel="True"
-                    Style="{StaticResource CancelFlatButton}" />
+            <!--  ═══════ 3. الذيل ═══════  -->
+            <Border
+                Grid.Row="2"
+                Padding="24,20"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource DividerBrush}"
+                BorderThickness="0,1,0,0"
+                CornerRadius="0,0,16,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <Button
-                    x:Name="BtnSave"
-                    Grid.Column="2"
-                    materialDesign:ButtonAssist.CornerRadius="8"
-                    Background="{DynamicResource SuccessBrush}"
-                    BorderBrush="{DynamicResource SuccessBrush}"
-                    Click="BtnSave_Click"
-                    Content="تأكيد التنفيذ والحفظ"
-                    Style="{StaticResource PrimaryActionButton}" />
-            </Grid>
-        </Border>
-    </Grid>
+                    <Button
+                        Grid.Column="0"
+                        Content="إلغاء"
+                        IsCancel="True"
+                        Style="{StaticResource Btn.Cancel}" />
+
+                    <!--  زر تأكيد التنفيذ (تجاوز لونBtn.Primary ليكون أخضر بنفس هيكلية الزر الأساسي)  -->
+                    <Button
+                        x:Name="BtnSave"
+                        Grid.Column="2"
+                        Background="{StaticResource SuccessBrush}"
+                        BorderBrush="{StaticResource SuccessBrush}"
+                        Click="BtnSave_Click"
+                        Content="تأكيد التنفيذ والحفظ"
+                        Style="{StaticResource Btn.Primary}" />
+
+                </Grid>
+            </Border>
+        </Grid>
+    </materialDesign:Card>
 </mah:MetroWindow>

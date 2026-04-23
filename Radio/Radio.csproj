@@ -23,9 +23,9 @@
     <PackageReference Include="MaterialDesignColors" Version="5.3.1" />
     <PackageReference Include="MaterialDesignThemes" Version="5.3.1" />
     <PackageReference Include="MaterialDesignThemes.MahApps" Version="5.3.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.6" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.6" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
   </ItemGroup>
 

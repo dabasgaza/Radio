@@ -1,0 +1,197 @@
+<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                       DateTimePicker.xaml                               ║
+    ║         منتقيات التاريخ والوقت — WPF + MaterialDesignInXAML             ║
+    ║  الأنواع:                                                                ║
+    ║   • Input.DatePicker         — منتقي التاريخ الأساسي                   ║
+    ║   • Input.DatePicker.Compact — منتقي تاريخ مدمج                       ║
+    ║   • Input.TimePicker         — منتقي الوقت                             ║
+    ║   • Input.TimePicker.Compact — منتقي وقت مدمج                         ║
+    ║                                                                          ║
+    ║  التبعيات: AppColors.xaml                                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.DatePicker — منتقي التاريخ الأساسي
+        الاستخدام: تاريخ البث في EpisodeFormDialog وغيره
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.DatePicker"
+        BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}"
+        TargetType="DatePicker">
+
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+
+        <!--  إضافة لون الإطار الافتراضي  -->
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+
+        <!--  Floating Hint  -->
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+
+        <!--  أيقونة التقويم  -->
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="CalendarMonthOutline" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="20" />
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
+
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <!--  تمت إزالة BorderThickness لتجنب ارتجاج النص، MDIX يديرها داخلياً  -->
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+            <!--  دعم التحقق من الأخطاء  -->
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+                <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ErrorBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+                <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.DatePicker.Compact — منتقي تاريخ مدمج
+        الاستخدام: أشرطة الفلترة، نطاق تاريخ في التقارير
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.DatePicker.Compact"
+        BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}"
+        TargetType="DatePicker">
+
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="CalendarRange" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="18" />
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+                <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ErrorBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.TimePicker — منتقي الوقت
+        الاستخدام: وقت البث في EpisodeFormDialog
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.TimePicker"
+        BasedOn="{StaticResource MaterialDesignOutlinedTimePicker}"
+        TargetType="materialDesign:TimePicker">
+
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+
+        <!--  أيقونة الساعة  -->
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="ClockOutline" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="20" />
+
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <!--  تمت إزالة BorderThickness لتجنب ارتجاج النص  -->
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+                <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ErrorBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+                <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Input.TimePicker.Compact — منتقي وقت مدمج
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="Input.TimePicker.Compact"
+        BasedOn="{StaticResource MaterialDesignOutlinedTimePicker}"
+        TargetType="materialDesign:TimePicker">
+
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="Clock" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="18" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
+            </Trigger>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+                <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ErrorBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.55" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

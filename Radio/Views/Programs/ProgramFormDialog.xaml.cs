@@ -95,5 +95,6 @@ namespace Radio.Views.Programs
         {
             Close();
         }
+
     }
 }
