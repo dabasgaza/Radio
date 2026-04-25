@@ -7,27 +7,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="700"
     d:DesignWidth="1000"
-    FlowDirection="RightToLeft"
     Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
-    <Grid Background="{DynamicResource MaterialDesignPaper}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <materialDesign:ColorZone
-            Padding="30,25"
-            materialDesign:ElevationAssist.Elevation="Dp3"
-            Mode="Custom">
-            <materialDesign:ColorZone.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0" Color="#4527A0" />
-                    <GradientStop Offset="1" Color="#0097A7" />
-                </LinearGradientBrush>
-            </materialDesign:ColorZone.Background>
+        <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -44,37 +34,25 @@
                             Kind="ShieldAccountVariantOutline" />
                         <TextBlock
                             Margin="15,0"
-                            FontSize="30"
-                            FontWeight="Bold"
-                            Foreground="White"
+                            Style="{StaticResource Type.Headline.OnColor}"
                             Text="منظومة إدارة المستخدمين" />
                     </StackPanel>
                     <TextBlock
                         Margin="50,5,0,0"
-                        FontSize="13"
-                        Foreground="White"
-                        Opacity="0.7"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
                         Text="التحكم في الحسابات، مراجعة النشاط، وتخصيص صلاحيات الوصول" />
                 </StackPanel>
 
                 <Button
                     x:Name="BtnAddUser"
                     Grid.Column="1"
-                    Height="45"
-                    Padding="20,0"
-                    VerticalAlignment="Center"
-                    materialDesign:ButtonAssist.CornerRadius="10"
-                    materialDesign:ElevationAssist.Elevation="Dp2"
-                    Background="White"
-                    BorderThickness="0"
                     Click="BtnAddUser_Click"
-                    Foreground="#4527A0">
+                    Style="{StaticResource Btn.AddNew}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon VerticalAlignment="Center" Kind="AccountPlus" />
                         <TextBlock
                             Margin="10,0,0,0"
                             VerticalAlignment="Center"
-                            FontWeight="Bold"
                             Text="إضافة مستخدم جديد" />
                     </StackPanel>
                 </Button>
@@ -90,12 +68,7 @@
             <TextBox
                 x:Name="TxtSearch"
                 Grid.Column="0"
-                Margin="0,0,20,0"
-                VerticalAlignment="Center"
-                materialDesign:HintAssist.Hint="بحث بالاسم أو اسم المستخدم..."
-                materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                materialDesign:TextFieldAssist.LeadingIcon="AccountSearchOutline"
-                Style="{StaticResource BroadcastTextBox}" />
+                Style="{StaticResource Input.Search}" />
 
             <UniformGrid Grid.Column="1" Columns="3">
                 <materialDesign:Card
@@ -202,10 +175,10 @@
             UniformCornerRadius="15">
             <DataGrid
                 x:Name="DgUsers"
-                CellStyle="{StaticResource BroadcastPro.DataGridCell}"
-                ColumnHeaderStyle="{StaticResource BroadcastPro.DataGridColumnHeader}"
-                RowStyle="{StaticResource BroadcastPro.DataGridRow}"
-                Style="{StaticResource BroadcastProDataGrid}">
+                CellStyle="{StaticResource DataGrid.Cell}"
+                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                RowStyle="{StaticResource DataGrid.Row}"
+                Style="{StaticResource DataGrid.Main}">
 
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Width="200" Header="المستخدم">
@@ -228,10 +201,7 @@
                                         </Border>
                                     </Border>
                                     <StackPanel Margin="15,0" VerticalAlignment="Center">
-                                        <TextBlock
-                                            FontSize="14"
-                                            FontWeight="Bold"
-                                            Text="{Binding FullName}" />
+                                        <TextBlock FontSize="15" Text="{Binding FullName}" />
                                         <TextBlock
                                             FontSize="11"
                                             Opacity="0.5"
@@ -244,17 +214,18 @@
 
                     <DataGridTemplateColumn
                         Width="180"
-                        CellStyle="{StaticResource CenterCellAligned}"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
                         Header="الصلاحية">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <materialDesign:Chip
                                     x:Name="RoleChip"
-                                    MinWidth="50"
+                                    Width="120"
+                                    Height="32"
                                     HorizontalAlignment="Center"
                                     HorizontalContentAlignment="Center"
                                     Content="{Binding RoleName}"
-                                    FontSize="15"
+                                    FontSize="13"
                                     Icon="{materialDesign:PackIcon Kind=BadgeAccountOutline}">
                                     <materialDesign:Chip.Style>
                                         <Style BasedOn="{StaticResource {x:Type materialDesign:Chip}}" TargetType="materialDesign:Chip">
@@ -291,7 +262,10 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Width="120" Header="الحالة">
+                    <DataGridTemplateColumn
+                        Width="120"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
+                        Header="الحالة">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ToggleButton
@@ -304,7 +278,10 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="200" Header="إدارة">
+                    <DataGridTemplateColumn
+                        Width="200"
+                        CellStyle="{StaticResource DataGrid.Cell.Actions}"
+                        Header="إدارة">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

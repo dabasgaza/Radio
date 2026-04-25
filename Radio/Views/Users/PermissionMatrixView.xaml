@@ -7,14 +7,8 @@
     Title="إدارة صلاحيات الوصول المتقدمة"
     Width="1000"
     Height="650"
-    AllowsTransparency="True"
-    Background="Transparent"
-    FlowDirection="RightToLeft"
-    ShowTitleBar="False"
-    Style="{StaticResource BasicWindowStyle}"
-    UseNoneWindowStyle="True"
-    WindowStartupLocation="CenterScreen"
-    WindowStyle="None">
+    Style="{StaticResource Window.Dialog}"
+    WindowStartupLocation="CenterScreen">
 
     <materialDesign:Card
         Margin="30"
@@ -27,17 +21,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <materialDesign:ColorZone
-                Padding="30,25"
-                Foreground="White"
-                Mode="Custom"
-                MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-                <materialDesign:ColorZone.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Offset="0" Color="#1B5E20" />
-                        <GradientStop Offset="1" Color="#0D2511" />
-                    </LinearGradientBrush>
-                </materialDesign:ColorZone.Background>
+            <materialDesign:ColorZone MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Style="{StaticResource Zone.Header.Primary}">
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -53,16 +37,8 @@
                         Kind="ShieldLockOutline" />
 
                     <StackPanel Grid.Column="1" Margin="20,0">
-                        <TextBlock
-                            FontSize="24"
-                            FontWeight="ExtraBold"
-                            Foreground="White"
-                            Text="مصفوفة الصلاحيات السيادية" />
-                        <TextBlock
-                            FontSize="12"
-                            Foreground="White"
-                            Opacity="0.7"
-                            Text="التحكم الكامل في أدوار المستخدمين وصلاحيات الوصول للوحدات البرمجية" />
+                        <TextBlock Style="{StaticResource Type.TitleLarge.OnColor}" Text="مصفوفة الصلاحيات السيادية" />
+                        <TextBlock Style="{StaticResource Type.BodyMedium.OnColor}" Text="التحكم الكامل في أدوار المستخدمين وصلاحيات الوصول للوحدات البرمجية" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -80,7 +56,6 @@
                                 <TextBlock
                                     Margin="10,0,0,0"
                                     VerticalAlignment="Center"
-                                    FontWeight="Bold"
                                     Text="اعتماد وحفظ التغييرات" />
                             </StackPanel>
                         </Button>
@@ -117,16 +92,12 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Border
-                            Padding="15"
-                            Background="#F1F8E9"
-                            CornerRadius="15,15,0,0">
+                        <Border Margin="5" Style="{StaticResource Card.Info}">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Foreground="#2E7D32" Kind="AccountKey" />
+                                <materialDesign:PackIcon Kind="AccountKey" />
                                 <TextBlock
                                     Margin="12,0"
-                                    FontWeight="Bold"
-                                    Foreground="#2E7D32"
+                                    Foreground="{StaticResource PrimaryLightBrush}"
                                     Text="الأدوار والوظائف" />
                             </StackPanel>
                         </Border>
@@ -135,9 +106,8 @@
                             x:Name="LstRoles"
                             Grid.Row="1"
                             Margin="5"
-                            ItemContainerStyle="{StaticResource MaterialDesignNavigationPrimaryListBoxItem}"
                             SelectionChanged="LstRoles_SelectionChanged"
-                            Style="{StaticResource MaterialDesignNavigationListBox}">
+                            Style="{StaticResource List.Navigation}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Margin="10,6" Orientation="Horizontal">
@@ -169,14 +139,8 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Border
-                            Padding="15"
-                            Background="#F1F8E9"
-                            CornerRadius="15,15,0,0">
-                            <TextBlock
-                                FontWeight="Bold"
-                                Foreground="#2E7D32"
-                                Text="توزيع صلاحيات الدور المختار" />
+                        <Border Margin="5" Style="{StaticResource Card.Info}">
+                            <TextBlock Foreground="{StaticResource PrimaryLightBrush}" Text="توزيع صلاحيات الدور المختار" />
                         </Border>
 
                         <ScrollViewer
@@ -208,7 +172,6 @@
                                                 <StackPanel VerticalAlignment="Center">
                                                     <TextBlock
                                                         FontSize="15"
-                                                        FontWeight="Bold"
                                                         Foreground="{DynamicResource MaterialDesignBody}"
                                                         Text="{Binding DisplayName}" />
                                                     <StackPanel Margin="0,5,0,0" Orientation="Horizontal">

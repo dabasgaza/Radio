@@ -12,11 +12,7 @@
     WindowStartupLocation="CenterScreen">
     <!--  تمت إزالة AllowsTransparency و Background لأنها موجودة داخل Window.Dialog  -->
 
-    <materialDesign:Card
-        Margin="30"
-        Effect="{StaticResource Shadow.Dialog}"
-        Style="{StaticResource Card.Form}"
-        UniformCornerRadius="16">
+    <materialDesign:Card Margin="30" Style="{StaticResource Card.Form}">
 
         <Grid>
             <Grid.RowDefinitions>
@@ -109,10 +105,7 @@
             <Border
                 Grid.Row="2"
                 Padding="28,20"
-                Background="{StaticResource SurfaceBrush}"
-                BorderBrush="{StaticResource DividerBrush}"
-                BorderThickness="0,1,0,0"
-                CornerRadius="0,0,16,0">
+                Style="{StaticResource Window.Footer}">
 
                 <Grid>
                     <Grid.ColumnDefinitions>

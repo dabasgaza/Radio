@@ -1,6 +1,7 @@
 ﻿using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Input;
 
@@ -19,6 +20,8 @@ namespace Radio.Forms
             InitializeComponent();
             _authService = authService;
             _serviceProvider = serviceProvider;
+
+            Loaded += (_, _) => NotificationManager.RegisterHost(NotificationHost);
 
             // ✅ الضغط على Enter في حقل كلمة المرور = تسجيل دخول
             TxtPassword.KeyDown += (s, e) =>
@@ -63,10 +66,10 @@ namespace Radio.Forms
                     return;
                 }
 
-                MessageService.Current.ShowSuccess($"مرحباً بك، {session.FullName}");
+                //MessageService.Current.ShowSuccess($"مرحباً بك، {session.FullName}");
 
                 var reportsService = _serviceProvider.GetRequiredService<IReportsService>();
-                var mainWindow = new MainWindow(session, _serviceProvider, reportsService);
+                var mainWindow = new MainWindow(session, _serviceProvider);
                 mainWindow.Show();
                 Close();
             }

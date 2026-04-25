@@ -140,10 +140,13 @@ namespace Radio.Views.Correspondents
         /// <summary>
         /// البحث في قائمة المراسلين حسب الاسم.
         /// </summary>
-        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        private async void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is not TextBox textBox)
+            {
+                await LoadDataAsync(); // إعادة تحميل البيانات إذا حدث خطأ في الوصول إلى TextBox
                 return;
+            }
 
             string keyword = textBox.Text.Trim();
 

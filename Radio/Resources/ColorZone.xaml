@@ -43,6 +43,27 @@
     </Style>
 
     <!--
+        ===========================================================
+        Zone.Header.Primary — ترويسة أساسية موحّدة لجميع Views
+        ===========================================================
+    -->
+
+    <Style x:Key="Zone.Header.Secondary" TargetType="materialDesign:ColorZone">
+        <Setter Property="Padding" Value="30,22" />
+        <Setter Property="Mode" Value="Custom" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp2" />
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Offset="0.0" Color="{StaticResource Secondary700Color}" />
+                    <GradientStop Offset="1.0" Color="{StaticResource Secondary500Color}" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
         ═══════════════════════════════════════════════════════════
         Zone.Header.Dark — ترويسة داكنة للنوافذ الحوارية
         اللون: Indigo 900 → Indigo 700

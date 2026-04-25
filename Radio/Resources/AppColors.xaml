@@ -154,6 +154,12 @@
         <GradientStop Offset="0.0" Color="{StaticResource SuccessColor}" />
         <GradientStop Offset="1.0" Color="{StaticResource SuccessColor}" />
     </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SeconderyGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource Secondary700Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Secondary500Color}" />
+    </LinearGradientBrush>
+
     <!--  ═════════════════════ DIALOG HEADER GRADIENTS ═════════════════════  -->
 
     <!--

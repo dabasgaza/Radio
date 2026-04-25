@@ -143,6 +143,7 @@
         <Setter Property="FontSize" Value="15" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
 
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />

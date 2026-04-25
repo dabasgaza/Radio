@@ -24,11 +24,10 @@ namespace Radio
         private readonly IServiceProvider _serviceProvider;
         private readonly IReportsService _reportsService;
 
-        public MainWindow(UserSession session, IServiceProvider serviceProvider, IReportsService reportsService)
+        public MainWindow(UserSession session, IServiceProvider serviceProvider)
         {
             _session = session;
             _serviceProvider = serviceProvider;
-            _reportsService = reportsService;
 
             InitializeComponent();
 
@@ -43,14 +42,14 @@ namespace Radio
         private void InitializeUI()
         {
             // Set User Info in Header
-            //TxtUserFullName.Text = _session.FullName;
-            //ChipRole.Content = TranslateRole(_session.RoleName);
+            TxtUserFullName.Text = _session.FullName;
+            ChipRole.Text = TranslateRole(_session.RoleName);
 
             // استدعاء نظام الأمان الجديد
             ApplyPermissionSecurity();
 
             // Default Navigation
-            NavigateTo(new ReportsView(_reportsService));
+            NavigateTo(new HomeView());
         }
 
         // 1. تحديث دالة تصفية القوائم بناءً على الصلاحيات الديناميكية
@@ -73,8 +72,10 @@ namespace Radio
                            ? Visibility.Visible : Visibility.Collapsed;
 
             // الحلقات والضيوف تظهر للجميع عادةً (والتحكم بالأزرار يكون داخلياً)
-            MenuEpisodes.Visibility = Visibility.Visible;
-            MenuGuests.Visibility = Visibility.Visible;
+            MenuEpisodes.Visibility = Visibility.Visible; // تظهر للجميع
+
+            MenuGuests.Visibility = _session.HasPermission(AppPermissions.GuestManage)
+                           ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private string TranslateRole(string roleName) => roleName switch

@@ -7,28 +7,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="600"
     d:DesignWidth="1000"
-    FlowDirection="RightToLeft"
     Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
-    <Grid Background="{DynamicResource MaterialDesignPaper}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <materialDesign:ColorZone
-            Grid.Row="0"
-            Padding="24,20"
-            materialDesign:ElevationAssist.Elevation="Dp2"
-            Mode="PrimaryMid">
-            <materialDesign:ColorZone.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0" Color="#1976D2" />
-                    <GradientStop Offset="1" Color="#1565C0" />
-                </LinearGradientBrush>
-            </materialDesign:ColorZone.Background>
+        <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -36,15 +25,21 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="32"
+                            Height="32"
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextOnPrimaryBrush}"
+                            Kind="People" />
+                        <TextBlock
+                            Margin="12,0,0,0"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="قاعدة بيانات الضيوف" />
+                    </StackPanel>
                     <TextBlock
-                        FontSize="28"
-                        Foreground="White"
-                        Style="{StaticResource HeadlineLarge}"
-                        Text="قاعدة بيانات الضيوف" />
-                    <TextBlock
-                        Foreground="White"
-                        Opacity="0.8"
-                        Style="{StaticResource BodyMedium}"
+                        Margin="44,4,0,0"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
                         Text="إدارة سجلات الشخصيات والمؤسسات المتعاونة مع الإذاعة" />
                 </StackPanel>
 
@@ -52,11 +47,8 @@
                     x:Name="BtnAddGuest"
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    materialDesign:ElevationAssist.Elevation="Dp2"
-                    Background="White"
                     Click="BtnAddGuest_Click"
-                    Foreground="#1565C0"
-                    Style="{StaticResource PrimaryActionButton}">
+                    Style="{StaticResource Btn.AddNew}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="AccountPlusOutline" />
                         <TextBlock
@@ -81,21 +73,20 @@
                 Margin="0,0,16,0"
                 materialDesign:HintAssist.Hint="بحث بالاسم، المؤسسة، أو رقم الهاتف..."
                 materialDesign:TextFieldAssist.LeadingIcon="Magnify"
-                Style="{StaticResource BroadcastTextBox}"
+                Style="{StaticResource Input.Search}"
                 TextChanged="TxtSearch_TextChanged" />
 
             <materialDesign:Card
                 Grid.Column="1"
                 Margin="4,0"
-                Padding="12"
-                materialDesign:ElevationAssist.Elevation="Dp1"
-                UniformCornerRadius="10">
+                Background="{StaticResource SuccessLightBrush}"
+                Style="{StaticResource Card.Stat}">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon
                         Width="24"
                         Height="24"
                         VerticalAlignment="Center"
-                        Foreground="{DynamicResource PrimaryHueMidBrush}"
+                        Foreground="{DynamicResource SuccessBrush}"
                         Kind="AccountGroup" />
                     <StackPanel Margin="12,0">
                         <TextBlock
@@ -114,15 +105,14 @@
             <materialDesign:Card
                 Grid.Column="2"
                 Margin="4,0"
-                Padding="12"
-                materialDesign:ElevationAssist.Elevation="Dp1"
-                UniformCornerRadius="10">
+                Background="{StaticResource WarningLightBrush}"
+                Style="{StaticResource Card.Stat}">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon
                         Width="24"
                         Height="24"
                         VerticalAlignment="Center"
-                        Foreground="{DynamicResource SecondaryHueMidBrush}"
+                        Foreground="{DynamicResource WarningBrush}"
                         Kind="Domain" />
                     <StackPanel Margin="12,0">
                         <TextBlock
@@ -146,15 +136,15 @@
             UniformCornerRadius="12">
             <DataGrid
                 x:Name="DgGuests"
-                CellStyle="{StaticResource BroadcastPro.DataGridCell}"
-                ColumnHeaderStyle="{StaticResource BroadcastPro.DataGridColumnHeader}"
-                RowStyle="{StaticResource BroadcastPro.DataGridRow}"
-                Style="{StaticResource BroadcastProDataGrid}">
+                CellStyle="{StaticResource DataGrid.Cell}"
+                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                RowStyle="{StaticResource DataGrid.Row}"
+                Style="{StaticResource DataGrid.Main}">
 
                 <DataGrid.Columns>
                     <DataGridTemplateColumn
                         Width="350"
-                        CellStyle="{StaticResource BroadcastPro.DataGridCell.FirstColumn}"
+                        CellStyle="{StaticResource DataGrid.Cell.First}"
                         Header="الاسم الكامل">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -177,24 +167,32 @@
 
                     <DataGridTemplateColumn
                         Width="180"
-                        CellStyle="{StaticResource CenterCellAligned}"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
                         Header="جهة العمل">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <materialDesign:Chip
-                                    MinWidth="80"
+                                <Border
+                                    Width="120"
+                                    Height="28"
                                     HorizontalAlignment="Center"
-                                    HorizontalContentAlignment="Center"
+                                    VerticalAlignment="Center"
                                     Background="{DynamicResource MaterialDesignDivider}"
-                                    Content="{Binding Organization}"
-                                    FontSize="11" />
+                                    CornerRadius="14">
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="11"
+                                        FontWeight="Medium"
+                                        Foreground="{DynamicResource MaterialDesignBody}"
+                                        Text="{Binding Organization}" />
+                                </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-
                     <DataGridTextColumn
                         Width="150"
                         Binding="{Binding PhoneNumber}"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
                         Header="رقم التواصل" />
 
                     <DataGridTextColumn
@@ -202,7 +200,10 @@
                         Binding="{Binding EmailAddress}"
                         Header="البريد الإلكتروني" />
 
-                    <DataGridTemplateColumn Width="180" Header="إجراءات">
+                    <DataGridTemplateColumn
+                        Width="180"
+                        CellStyle="{StaticResource DataGrid.Cell.Actions}"
+                        Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

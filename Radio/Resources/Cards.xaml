@@ -87,8 +87,8 @@
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="UniformCornerRadius" Value="20" />
         <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp4" />
+        <Setter Property="Effect" Value="{StaticResource Shadow.Dialog}" />
     </Style>
-
     <!--
         ═══════════════════════════════════════════════════════════
         Card.Info — بطاقة المعلومات / التنبيه / الإرشاد
@@ -100,7 +100,7 @@
         <Setter Property="CornerRadius" Value="10" />
         <Setter Property="Padding" Value="16,12" />
         <Setter Property="BorderBrush" Value="{StaticResource InfoBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderThickness" Value="0.8" />
     </Style>
 
     <Style x:Key="Card.Warning" TargetType="Border">
@@ -158,6 +158,15 @@
         <Setter Property="Height" Value="48" />
         <Setter Property="CornerRadius" Value="12" />
         <Setter Property="Background" Value="{StaticResource InfoLightBrush}" />
+    </Style>
+
+
+    <Style x:Key="Window.Footer" TargetType="Border">
+        <Setter Property="Padding" Value="24,20" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+        <Setter Property="CornerRadius" Value="0,0,16,0" />
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
     </Style>
 
     <!--

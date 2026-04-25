@@ -7,7 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="600"
     d:DesignWidth="1000"
-    FlowDirection="RightToLeft"
     Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
@@ -18,17 +17,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <materialDesign:ColorZone
-            Grid.Row="0"
-            Padding="24,20"
-            materialDesign:ElevationAssist.Elevation="Dp2"
-            Mode="PrimaryMid">
-            <materialDesign:ColorZone.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0" Color="#3F51B5" />
-                    <GradientStop Offset="1" Color="#303F9F" />
-                </LinearGradientBrush>
-            </materialDesign:ColorZone.Background>
+        <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -36,27 +25,30 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="32"
+                            Height="32"
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextOnPrimaryBrush}"
+                            Kind="Radar" />
+                        <TextBlock
+                            Margin="12,0,0,0"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="سجل التغطيات الميدانية" />
+                    </StackPanel>
                     <TextBlock
-                        FontSize="28"
-                        Foreground="White"
-                        Style="{StaticResource HeadlineLarge}"
-                        Text="سجل التغطيات الميدانية" />
-                    <TextBlock
-                        Foreground="White"
-                        Opacity="0.8"
-                        Style="{StaticResource BodyMedium}"
-                        Text="متابعة وإدارة المهام الخارجية وتنسيق عمل المراسلين" />
+                        Margin="44,4,0,0"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
+                        Text="المهام الخارجية وتنسيق عمل المراسلين" />
                 </StackPanel>
+
 
                 <Button
                     x:Name="BtnAdd"
                     Grid.Column="1"
-                    VerticalAlignment="Center"
-                    materialDesign:ElevationAssist.Elevation="Dp2"
-                    Background="White"
                     Click="BtnAddCoverage_Click"
-                    Foreground="#3F51B5"
-                    Style="{StaticResource PrimaryActionButton}">
+                    Style="{StaticResource Btn.AddNew}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="SatelliteUplink" />
                         <TextBlock
@@ -82,9 +74,8 @@
                 Grid.Column="0"
                 Margin="0,0,12,0"
                 materialDesign:HintAssist.Hint="بحث سريع..."
-                materialDesign:TextFieldAssist.HasLeadingIcon="True"
                 materialDesign:TextFieldAssist.LeadingIcon="Magnify"
-                Style="{StaticResource BroadcastTextBox}"
+                Style="{StaticResource Input.Search}"
                 TextChanged="TxtSearch_TextChanged" />
 
             <ComboBox
@@ -94,7 +85,7 @@
                 materialDesign:HintAssist.Hint="تصفية الموقع"
                 materialDesign:TextFieldAssist.LeadingIcon="MapMarkerOutline"
                 SelectionChanged="CboLocation_SelectionChanged"
-                Style="{StaticResource BroadcastComboBox}" />
+                Style="{StaticResource Input.ComboBox}" />
 
             <materialDesign:Card
                 Grid.Column="2"
@@ -116,7 +107,7 @@
                         materialDesign:HintAssist.Hint="من تاريخ"
                         materialDesign:TextFieldAssist.LeadingIcon="CalendarImportOutline"
                         BorderThickness="0"
-                        Style="{StaticResource BroadcastDatePicker}" />
+                        Style="{StaticResource Input.DatePicker}" />
 
                     <materialDesign:PackIcon
                         Grid.Column="1"
@@ -131,7 +122,7 @@
                         materialDesign:HintAssist.Hint="إلى تاريخ"
                         materialDesign:TextFieldAssist.LeadingIcon="CalendarExportOutline"
                         BorderThickness="0"
-                        Style="{StaticResource BroadcastDatePicker}" />
+                        Style="{StaticResource Input.DatePicker}" />
                 </Grid>
             </materialDesign:Card>
 
@@ -166,8 +157,7 @@
                         x:Name="TxtTotal"
                         Margin="8,0"
                         VerticalAlignment="Center"
-                        FontSize="18"
-                        FontWeight="Bold"
+                        Style="{StaticResource Type.Numeric.Medium}"
                         Text="0" />
                 </StackPanel>
             </materialDesign:Card>
@@ -179,16 +169,14 @@
             UniformCornerRadius="12">
             <DataGrid
                 x:Name="DgCoverages"
-                CellStyle="{StaticResource BroadcastPro.DataGridCell}"
-                ColumnHeaderStyle="{StaticResource BroadcastPro.DataGridColumnHeader}"
-                RowStyle="{StaticResource BroadcastPro.DataGridRow}"
-                Style="{StaticResource BroadcastProDataGrid}">
+                CellStyle="{StaticResource DataGrid.Cell}"
+                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                RowStyle="{StaticResource DataGrid.Row}"
+                Style="{StaticResource DataGrid.Main}">
 
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn
-                        Width="180"
-                        CellStyle="{StaticResource BroadcastPro.DataGridCell.FirstColumn}"
-                        Header="المراسل الميداني">
+
+                    <DataGridTemplateColumn Width="180" Header="المراسل الميداني">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -199,7 +187,6 @@
                                     <TextBlock
                                         Margin="12,0"
                                         VerticalAlignment="Center"
-                                        FontWeight="SemiBold"
                                         Text="{Binding CorrespondentName}" />
                                 </StackPanel>
                             </DataTemplate>
@@ -214,12 +201,12 @@
                     <DataGridTextColumn
                         Width="150"
                         Binding="{Binding Location}"
-                        CellStyle="{StaticResource CenterCellAligned}"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
                         Header="موقع التغطية" />
 
                     <DataGridTemplateColumn
                         Width="140"
-                        CellStyle="{StaticResource CenterCellAligned}"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
                         Header="موعد المهمة">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -240,7 +227,10 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="200" Header="إجراءات">
+                    <DataGridTemplateColumn
+                        Width="200"
+                        CellStyle="{StaticResource DataGrid.Cell.Actions}"
+                        Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

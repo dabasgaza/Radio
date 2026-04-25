@@ -2,7 +2,6 @@
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace DataAccess.Services;
 
@@ -51,7 +50,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             }).ToListAsync();
     }
 
-    public async Task UpdateEpisodeAsync(EpisodeDto dto , UserSession session)
+    public async Task UpdateEpisodeAsync(EpisodeDto dto, UserSession session)
     {
         session.EnsurePermission(AppPermissions.EpisodeManage);
         using var context = await contextFactory.CreateDbContextAsync();
@@ -72,7 +71,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         // ❌ تم إزالة MessageService.Current.ShowSuccess من هنا! الـ UI هي من تعرض الرسالة.
     }
 
-    public async Task CreateEpisodeAsync(EpisodeDto dto , UserSession session)
+    public async Task CreateEpisodeAsync(EpisodeDto dto, UserSession session)
     {
         session.EnsurePermission(AppPermissions.CoordinationManage);
         using var context = await contextFactory.CreateDbContextAsync();

@@ -39,7 +39,7 @@ namespace Radio.Messaging
                 _ => ("Information", "#1565C0", "#42A5F5")
             };
 
-            Icon.Kind = MaterialDesignThemes.Wpf.PackIconKind.CheckCircle;
+            //Icon.Kind = MaterialDesignThemes.Wpf.PackIconKind.CheckCircle;
             Icon.Kind = Enum.Parse<MaterialDesignThemes.Wpf.PackIconKind>(icon);
 
             var brush = (SolidColorBrush)new BrushConverter().ConvertFrom(accentColor)!;
@@ -107,7 +107,9 @@ namespace Radio.Messaging
                 parent?.Children.Remove(this);
             };
 
-            ((TranslateTransform)RenderTransform).BeginAnimation(TranslateTransform.XProperty, slideOut);
+            if (RenderTransform is TranslateTransform transform)
+                transform.BeginAnimation(TranslateTransform.XProperty, slideOut);
+
             BeginAnimation(OpacityProperty, fadeOut);
         }
 
@@ -121,7 +123,7 @@ namespace Radio.Messaging
             };
             animation.Completed += (_, _) => AnimateExit();
 
-            ProgressBar.Width = 380;
+            ProgressBar.Width = ActualWidth;
             ProgressBar.BeginAnimation(WidthProperty, animation);
         }
 

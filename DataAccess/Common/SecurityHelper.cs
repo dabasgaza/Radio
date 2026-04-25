@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-
 namespace DataAccess.Common;
 
 public static class SecurityHelper

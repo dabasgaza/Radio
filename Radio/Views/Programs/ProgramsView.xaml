@@ -18,11 +18,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <materialDesign:ColorZone
-            Padding="30,24"
-            materialDesign:ElevationAssist.Elevation="Dp3"
-            Background="{StaticResource HeaderGradientBrush}"
-            Mode="Custom">
+        <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -39,13 +35,12 @@
                             Kind="RadioTower" />
                         <TextBlock
                             Margin="15,0"
-                            Style="{StaticResource Type.Headline.OnColor}"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
                             Text="منظومة إدارة البرامج" />
                     </StackPanel>
                     <TextBlock
                         Margin="47,4,0,0"
-                        Foreground="White"
-                        Opacity="0.7"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
                         Text="تنسيق الخارطة البرامجية، تصنيف المحتوى، وإحصائيات الإنتاج" />
                 </StackPanel>
 
@@ -77,10 +72,8 @@
             <materialDesign:Card
                 Grid.Column="1"
                 Margin="5"
-                Padding="15,12"
-                materialDesign:ElevationAssist.Elevation="Dp1"
-                Background="{StaticResource InfoLightBrush}"
-                UniformCornerRadius="12">
+                Background="{StaticResource SuccessLightBrush}"
+                Style="{StaticResource Card.Stat}">
                 <StackPanel Orientation="Horizontal">
                     <Border
                         Width="40"
@@ -111,10 +104,8 @@
             <materialDesign:Card
                 Grid.Column="2"
                 Margin="5"
-                Padding="15,12"
-                materialDesign:ElevationAssist.Elevation="Dp1"
-                Background="{StaticResource SuccessLightBrush}"
-                UniformCornerRadius="12">
+                Background="{StaticResource WarningLightBrush}"
+                Style="{StaticResource Card.Stat}">
                 <StackPanel Orientation="Horizontal">
                     <Border
                         Width="40"
@@ -151,12 +142,13 @@
             <DataGrid
                 x:Name="DgPrograms"
                 CellStyle="{StaticResource DataGrid.Cell}"
-                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader}"
+                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
                 RowStyle="{StaticResource DataGrid.Row}"
                 Style="{StaticResource DataGrid.Main}">
 
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="*" Header="البرنامج">
+
+                    <DataGridTemplateColumn Width="200" Header="البرنامج">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="5,0" Orientation="Horizontal">
@@ -166,30 +158,36 @@
                                         Opacity="0.3" />
                                     <TextBlock
                                         Margin="12,0"
+                                        HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
-                                        FontSize="14"
-                                        FontWeight="Bold"
+                                        FontSize="15"
                                         Text="{Binding ProgramName}" />
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="200" Header="التصنيف">
+                    <DataGridTemplateColumn
+                        Width="200"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
+                        Header="التصنيف">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <materialDesign:Chip
+                                    Width="100"
                                     HorizontalAlignment="Center"
                                     Background="{DynamicResource MaterialDesignDivider}"
                                     Content="{Binding Category}"
-                                    FontSize="11"
-                                    FontWeight="Medium"
+                                    FontSize="14"
                                     Icon="{materialDesign:PackIcon Kind=ShapeOutline}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="150" Header="إجراءات">
+                    <DataGridTemplateColumn
+                        Width="150"
+                        CellStyle="{StaticResource DataGrid.Cell.Actions}"
+                        Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

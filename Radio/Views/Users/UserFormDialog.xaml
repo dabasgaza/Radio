@@ -7,20 +7,10 @@
     Title="إدارة بيانات المستخدم"
     Width="650"
     Height="750"
-    AllowsTransparency="True"
-    Background="Transparent"
-    FlowDirection="RightToLeft"
-    ShowTitleBar="False"
     Style="{StaticResource Window.Dialog}"
-    UseNoneWindowStyle="True"
-    WindowStartupLocation="CenterScreen"
-    WindowStyle="None">
+    WindowStartupLocation="CenterScreen">
 
-    <materialDesign:Card
-        Margin="30"
-        materialDesign:ElevationAssist.Elevation="Dp2"
-        Background="{DynamicResource MaterialDesignPaper}"
-        UniformCornerRadius="20">
+    <materialDesign:Card Margin="30" Style="{StaticResource Card.Form}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -28,16 +18,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <materialDesign:ColorZone
-                Padding="30,25"
-                Foreground="White"
-                Mode="Custom">
-                <materialDesign:ColorZone.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Offset="0" Color="#4527A0" />
-                        <GradientStop Offset="1" Color="#0097A7" />
-                    </LinearGradientBrush>
-                </materialDesign:ColorZone.Background>
+            <materialDesign:ColorZone Style="{StaticResource Zone.Header.Green}">
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -65,29 +46,22 @@
                         VerticalAlignment="Center">
                         <TextBlock
                             x:Name="TxtTitle"
-                            FontSize="24"
-                            FontWeight="Bold"
-                            Foreground="White"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
                             Text="إدارة بيانات المستخدم" />
                         <TextBlock
                             x:Name="TxtSubtitle"
-                            FontSize="12"
-                            Foreground="White"
                             Opacity="0.8"
+                            Style="{StaticResource Type.BodyMedium.OnColor}"
                             Text="يرجى ملء كافة الحقول لضمان أمن الحساب" />
                     </StackPanel>
 
                     <Button
                         Grid.Column="2"
-                        VerticalAlignment="Top"
-                        Click="BtnCancel_Click"
+                        Click="BtnClose_Click"
                         Foreground="White"
-                        Opacity="0.5"
+                        Opacity="0.6"
                         Style="{StaticResource MaterialDesignIconButton}">
-                        <materialDesign:PackIcon
-                            Width="24"
-                            Height="24"
-                            Kind="Close" />
+                        <materialDesign:PackIcon Kind="Close" />
                     </Button>
                 </Grid>
             </materialDesign:ColorZone>
@@ -128,18 +102,16 @@
                             Grid.Row="0"
                             Grid.Column="0"
                             materialDesign:HintAssist.Hint="الاسم الكامل *"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="AccountCard"
-                            Style="{StaticResource BroadcastTextBox}" />
+                            Style="{StaticResource Input.Text}" />
 
                         <TextBox
                             x:Name="TxtUsername"
                             Grid.Row="0"
                             Grid.Column="2"
                             materialDesign:HintAssist.Hint="اسم المستخدم *"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="At"
-                            Style="{StaticResource BroadcastTextBox}" />
+                            Style="{StaticResource Input.Text}" />
 
                         <PasswordBox
                             x:Name="TxtPassword"
@@ -147,20 +119,18 @@
                             Grid.Column="0"
                             Height="52"
                             materialDesign:HintAssist.Hint="كلمة المرور"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="LockOutline"
-                            Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
+                            Style="{StaticResource Input.Password}" />
 
                         <ComboBox
                             x:Name="CboRoles"
                             Grid.Row="2"
                             Grid.Column="2"
                             materialDesign:HintAssist.Hint="الدور / الصلاحية *"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="ShieldKeyOutline"
                             DisplayMemberPath="RoleName"
                             SelectedValuePath="RoleId"
-                            Style="{StaticResource BroadcastComboBox}" />
+                            Style="{StaticResource Input.ComboBox}" />
                     </Grid>
 
                     <Border
@@ -211,27 +181,21 @@
                             x:Name="TxtPhone"
                             Grid.Column="0"
                             materialDesign:HintAssist.Hint="رقم الهاتف"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="PhoneOutline"
-                            Style="{StaticResource BroadcastTextBox}" />
+                            Style="{StaticResource Input.Text}" />
 
                         <TextBox
                             x:Name="TxtEmail"
                             Grid.Column="2"
                             materialDesign:HintAssist.Hint="البريد الإلكتروني"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="EmailOutline"
-                            Style="{StaticResource BroadcastTextBox}" />
+                            Style="{StaticResource Input.Text}" />
                     </Grid>
 
                 </StackPanel>
             </ScrollViewer>
 
-            <Border
-                Grid.Row="2"
-                Padding="35,25"
-                Background="{DynamicResource MaterialDesignDivider}"
-                CornerRadius="0,0,20,20">
+            <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -244,18 +208,14 @@
                         Grid.Column="0"
                         Click="BtnCancel_Click"
                         Content="إلغاء التغييرات"
-                        Style="{StaticResource CancelFlatButton}" />
+                        Style="{StaticResource Btn.Cancel}" />
 
                     <Button
                         x:Name="BtnSave"
                         Grid.Column="2"
-                        materialDesign:ButtonAssist.CornerRadius="10"
-                        materialDesign:ElevationAssist.Elevation="Dp2"
-                        Background="#4527A0"
-                        BorderBrush="#4527A0"
                         Click="BtnSave_Click"
                         Content="حفظ بيانات الحساب"
-                        Style="{StaticResource PrimaryActionButton}">
+                        Style="{StaticResource Btn.Primary}">
                         <Button.ContentTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">

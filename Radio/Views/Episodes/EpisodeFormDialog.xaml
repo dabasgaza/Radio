@@ -145,13 +145,7 @@
             </ScrollViewer>
 
             <!--  ═══════ 3. الذيل (تم إصلاحه) ═══════  -->
-            <Border
-                Grid.Row="2"
-                Padding="24,20"
-                Background="{StaticResource SurfaceBrush}"
-                BorderBrush="{StaticResource DividerBrush}"
-                BorderThickness="0,1,0,0"
-                CornerRadius="0,0,16,0">
+            <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

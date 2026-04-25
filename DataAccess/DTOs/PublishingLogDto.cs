@@ -1,6 +1,4 @@
-﻿using System.Security.AccessControl;
-
-namespace DataAccess.DTOs
+﻿namespace DataAccess.DTOs
 {
     public record PublishingLogDto
     {

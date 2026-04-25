@@ -219,7 +219,7 @@
     <Style x:Key="Type.Numeric.Medium" TargetType="TextBlock">
         <Setter Property="FontSize" Value="20" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 

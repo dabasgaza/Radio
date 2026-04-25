@@ -209,5 +209,10 @@ namespace Radio.Views.Episodes
         }
 
         #endregion
+
+        private void BtnViewDetails_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

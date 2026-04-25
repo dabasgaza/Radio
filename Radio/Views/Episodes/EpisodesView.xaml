@@ -20,11 +20,7 @@
 
         <!--  ═══════ 1. الهيدر (Header) ═══════  -->
         <!--  استخدام التدرج الجاهز من AppColors بدلاً من كتابة ألوان يدوية  -->
-        <materialDesign:ColorZone
-            Padding="24,20"
-            materialDesign:ElevationAssist.Elevation="Dp3"
-            Background="{StaticResource HeaderGradientBrush}"
-            Mode="Custom">
+        <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -38,7 +34,7 @@
                             Height="32"
                             VerticalAlignment="Center"
                             Foreground="{StaticResource TextOnPrimaryBrush}"
-                            Kind="RadioTower" />
+                            Kind="RadioFm" />
                         <TextBlock
                             Margin="12,0,0,0"
                             Style="{StaticResource Type.TitleLarge.OnColor}"
@@ -183,7 +179,7 @@
             <DataGrid
                 x:Name="DgEpisodes"
                 CellStyle="{StaticResource DataGrid.Cell}"
-                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader}"
+                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
                 RowStyle="{StaticResource DataGrid.Row}"
                 Style="{StaticResource DataGrid.Main}">
 
@@ -196,17 +192,26 @@
                         Header="البرنامج">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <materialDesign:Chip
-                                    MinWidth="100"
+                                <Border
+                                    Width="100"
+                                    Height="28"
+                                    Padding="16,0"
                                     HorizontalAlignment="Center"
-                                    Background="{StaticResource DividerBrush}"
-                                    Content="{Binding ProgramName}"
-                                    FontSize="13"
-                                    Foreground="{StaticResource TextPrimaryBrush}" />
+                                    VerticalAlignment="Center"
+                                    Background="{StaticResource SecondaryLightBrush}"
+                                    CornerRadius="14"
+                                    Opacity="0.8">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                        Text="{Binding ProgramName}"
+                                        TextAlignment="Center" />
+                                </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-
                     <!--  عمود تفاصيل الحلقة  -->
                     <DataGridTemplateColumn Width="250" Header="تفاصيل الحلقة">
                         <DataGridTemplateColumn.CellTemplate>
@@ -256,6 +261,11 @@
                                     <materialDesign:Chip.Style>
                                         <Style BasedOn="{StaticResource {x:Type materialDesign:Chip}}" TargetType="materialDesign:Chip">
                                             <Style.Triggers>
+                                                <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
+                                                    <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
+                                                    <Setter Property="Foreground" Value="White" />
+                                                    <Setter Property="Icon" Value="{materialDesign:PackIcon Kind=CheckAll}" />
+                                                </DataTrigger>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
                                                     <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
                                                     <Setter Property="Foreground" Value="White" />
@@ -305,13 +315,134 @@
                                     <Button
                                         Click="BtnEdit_Click"
                                         Style="{StaticResource Btn.Icon.Edit}"
-                                        ToolTip="تعديل" />
+                                        ToolTip="تعديل">
+                                        <materialDesign:PackIcon Kind="Edit" />
+                                    </Button>
 
                                     <Button
                                         Click="BtnDelete_Click"
                                         Style="{StaticResource Btn.Icon.Delete}"
-                                        ToolTip="حذف" />
+                                        ToolTip="حذف">
+                                        <materialDesign:PackIcon Kind="Delete" />
+                                    </Button>
 
+                                    <!--  باقي الإجراءات في قائمة منسدلة  -->
+                                    <materialDesign:PopupBox
+                                        PlacementMode="BottomAndAlignCentres"
+                                        PopupHorizontalOffset="-60"
+                                        StaysOpen="False"
+                                        ToolTip="المزيد من الإجراءات">
+                                        <Border
+                                            MinWidth="200"
+                                            Padding="4"
+                                            Background="{DynamicResource MaterialDesignPaper}"
+                                            CornerRadius="12"
+                                            Effect="{DynamicResource MaterialDesignShadowDepth2}">
+                                            <StackPanel Orientation="Vertical">
+
+                                                <Button
+                                                    Height="40"
+                                                    Padding="12,0"
+                                                    HorizontalContentAlignment="Right"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Click="BtnMarkExecuted_Click"
+                                                    Cursor="Hand"
+                                                    IsEnabled="{Binding CanMarkExecuted}">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border
+                                                                            x:Name="ItemBorder"
+                                                                            Padding="12,8"
+                                                                            Background="Transparent"
+                                                                            CornerRadius="8"
+                                                                            SnapsToDevicePixels="True">
+                                                                            <StackPanel Orientation="Horizontal">
+                                                                                <TextBlock
+                                                                                    VerticalAlignment="Center"
+                                                                                    FontFamily="{DynamicResource MaterialDesignFont}"
+                                                                                    FontSize="13"
+                                                                                    Text="تأكيد التنفيذ" />
+                                                                                <materialDesign:PackIcon
+                                                                                    Width="20"
+                                                                                    Height="20"
+                                                                                    Margin="12,0,0,0"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Foreground="{DynamicResource MaterialDesignBody}"
+                                                                                    Kind="PlayCircleOutline" />
+                                                                            </StackPanel>
+                                                                        </Border>
+                                                                        <ControlTemplate.Triggers>
+                                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                                                                            </Trigger>
+                                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                                <Setter Property="Opacity" Value="0.38" />
+                                                                            </Trigger>
+                                                                        </ControlTemplate.Triggers>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
+
+                                                <Button
+                                                    Height="40"
+                                                    Padding="12,0"
+                                                    HorizontalContentAlignment="Right"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Click="BtnMarkPublished_Click"
+                                                    Cursor="Hand"
+                                                    IsEnabled="{Binding CanMarkPublished}">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border
+                                                                            x:Name="ItemBorder"
+                                                                            Padding="12,8"
+                                                                            Background="Transparent"
+                                                                            CornerRadius="8"
+                                                                            SnapsToDevicePixels="True">
+                                                                            <StackPanel Orientation="Horizontal">
+                                                                                <TextBlock
+                                                                                    VerticalAlignment="Center"
+                                                                                    FontFamily="{DynamicResource MaterialDesignFont}"
+                                                                                    FontSize="13"
+                                                                                    Text="تأكيد النشر الرقمي" />
+                                                                                <materialDesign:PackIcon
+                                                                                    Width="20"
+                                                                                    Height="20"
+                                                                                    Margin="12,0,0,0"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Foreground="{DynamicResource MaterialDesignBody}"
+                                                                                    Kind="CloudUploadOutline" />
+                                                                            </StackPanel>
+                                                                        </Border>
+                                                                        <ControlTemplate.Triggers>
+                                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                                                                            </Trigger>
+                                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                                <Setter Property="Opacity" Value="0.38" />
+                                                                            </Trigger>
+                                                                        </ControlTemplate.Triggers>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
+
+                                            </StackPanel>
+                                        </Border>
+                                    </materialDesign:PopupBox>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

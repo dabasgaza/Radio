@@ -31,8 +31,7 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
                  g.FullName,
                  g.Organization,
                  g.PhoneNumber,
-                 g.EmailAddress,"",""
-                 ))
+                 g.EmailAddress, string.Empty, string.Empty))
             .ToListAsync();
     }
 
@@ -119,8 +118,8 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
         if (guest == null) throw new KeyNotFoundException("الضيف غير موجود.");
 
         guest.IsActive = false;
-        
-        
+
+
         // ❌ تم إزالة UpdatedAt و UpdatedByUserId لأن الـ Interceptor يفعل ذلك تلقائياً عند ملاحظة التعديل!
 
         await context.SaveChangesAsync();

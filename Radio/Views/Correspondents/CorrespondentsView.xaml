@@ -11,47 +11,15 @@
     Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
-    <UserControl.Resources>
-        <Style
-            x:Key="LuxuryColumnHeader"
-            BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}"
-            TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#F8FAFC" />
-            <Setter Property="Foreground" Value="#475569" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Height" Value="50" />
-            <Setter Property="Padding" Value="15,0" />
-            <Setter Property="BorderThickness" Value="0,0,0,1" />
-            <Setter Property="BorderBrush" Value="#E2E8F0" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#F1F5F9" />
-                    <Setter Property="Foreground" Value="#1E293B" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Resources>
 
-    <Grid Background="#F1F5F9">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <materialDesign:ColorZone
-            Grid.Row="0"
-            Padding="30,24"
-            materialDesign:ElevationAssist.Elevation="Dp4"
-            Foreground="White"
-            Mode="Custom">
-
-            <materialDesign:ColorZone.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0" Color="#1A237E" />
-                    <GradientStop Offset="1" Color="#283593" />
-                </LinearGradientBrush>
-            </materialDesign:ColorZone.Background>
+        <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -65,35 +33,27 @@
                             Width="32"
                             Height="32"
                             VerticalAlignment="Center"
-                            Foreground="#82B1FF"
+                            Foreground="{StaticResource SurfaceBrush}"
                             Kind="AccountTieVoice" />
                         <TextBlock
                             Margin="15,0"
                             VerticalAlignment="Center"
-                            FontSize="28"
-                            FontWeight="ExtraBold"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
                             Text="إدارة المراسلين الميدانيين" />
                     </StackPanel>
                     <TextBlock
                         Margin="47,5,0,0"
-                        FontSize="13"
-                        Opacity="0.7"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
                         Text="تنسيق العمليات الميدانية، متابعة المواقع، وإدارة بيانات التواصل الرسمية" />
                 </StackPanel>
 
                 <Button
                     x:Name="BtnAdd"
                     Grid.Column="1"
-                    Height="50"
-                    Padding="25,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    materialDesign:ButtonAssist.CornerRadius="12"
-                    materialDesign:ElevationAssist.Elevation="Dp2"
-                    Background="#FFB300"
-                    BorderThickness="0"
                     Click="BtnAdd_Click"
-                    Foreground="#1A237E">
+                    Style="{StaticResource Btn.AddNew}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Width="20"
@@ -103,8 +63,6 @@
                         <TextBlock
                             Margin="12,0,0,0"
                             VerticalAlignment="Center"
-                            FontSize="15"
-                            FontWeight="Bold"
                             Text="إضافة مراسل جديد" />
                     </StackPanel>
                 </Button>
@@ -124,9 +82,8 @@
                 Width="400"
                 HorizontalAlignment="Right"
                 materialDesign:HintAssist.Hint="البحث عن اسم أو منطقة..."
-                materialDesign:TextFieldAssist.HasLeadingIcon="True"
                 materialDesign:TextFieldAssist.LeadingIcon="Search"
-                Style="{StaticResource BroadcastTextBox}"
+                Style="{StaticResource Input.Search}"
                 TextChanged="TxtSearch_TextChanged" />
 
             <StackPanel
@@ -143,9 +100,8 @@
                     <TextBlock
                         x:Name="TxtTotal"
                         HorizontalAlignment="Center"
-                        FontSize="18"
-                        FontWeight="Bold"
-                        Foreground="#1E293B"
+                        Foreground="{StaticResource SuccessBrush}"
+                        Style="{StaticResource Type.Numeric.Medium}"
                         Text="0" />
                 </StackPanel>
                 <Border
@@ -162,9 +118,7 @@
                     <TextBlock
                         x:Name="TxtActive"
                         HorizontalAlignment="Center"
-                        FontSize="18"
-                        FontWeight="Bold"
-                        Foreground="#3F51B5"
+                        Style="{StaticResource Type.Numeric.Medium}"
                         Text="0" />
                 </StackPanel>
             </StackPanel>
@@ -180,11 +134,10 @@
             <DataGrid
                 x:Name="DgCorrespondents"
                 Background="White"
-                CellStyle="{StaticResource BroadcastPro.DataGridCell}"
-                ColumnHeaderStyle="{StaticResource LuxuryColumnHeader}"
+                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
                 RowHeight="65"
-                RowStyle="{StaticResource BroadcastPro.DataGridRow}"
-                Style="{StaticResource BroadcastProDataGrid}">
+                RowStyle="{StaticResource DataGrid.Row}"
+                Style="{StaticResource DataGrid.Main}">
 
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Width="*" Header="المراسل الميداني">
@@ -194,18 +147,16 @@
                                     <Border
                                         Width="38"
                                         Height="38"
-                                        Background="#F1F5F9"
-                                        CornerRadius="10">
+                                        Style="{StaticResource Chip.Primary}">
                                         <materialDesign:PackIcon
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Foreground="#64748B"
+                                            Foreground="{StaticResource PrimaryMainBrush}"
                                             Kind="Account" />
                                     </Border>
                                     <StackPanel Margin="15,0" VerticalAlignment="Center">
                                         <TextBlock
-                                            FontSize="14"
-                                            FontWeight="Bold"
+                                            FontSize="15"
                                             Foreground="#1E293B"
                                             Text="{Binding FullName}" />
                                         <TextBlock
@@ -218,27 +169,35 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="220" Header="مناطق التغطية">
+                    <DataGridTemplateColumn
+                        Width="220"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
+                        Header="مناطق التغطية">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border
+                                    MinWidth="100"
                                     Padding="12,5"
                                     HorizontalAlignment="Center"
-                                    Background="#F8FAFC"
+                                    Background="{StaticResource HeaderGradientBrush}"
                                     BorderBrush="#E2E8F0"
                                     BorderThickness="1"
                                     CornerRadius="8">
                                     <TextBlock
+                                        HorizontalAlignment="Center"
                                         FontSize="12"
                                         FontWeight="Medium"
-                                        Foreground="#475569"
+                                        Foreground="{StaticResource TextOnPrimaryBrush}"
                                         Text="{Binding AssignedLocations}" />
                                 </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="150" Header="خيارات">
+                    <DataGridTemplateColumn
+                        Width="150"
+                        CellStyle="{StaticResource DataGrid.Cell.Actions}"
+                        Header="الإجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

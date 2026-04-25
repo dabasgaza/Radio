@@ -7,20 +7,10 @@
     Title="إدارة التغطية الميدانية"
     Width="600"
     Height="600"
-    AllowsTransparency="True"
-    Background="Transparent"
-    FlowDirection="RightToLeft"
-    ShowTitleBar="False"
     Style="{StaticResource Window.Dialog}"
-    UseNoneWindowStyle="True"
-    WindowStartupLocation="CenterScreen"
-    WindowStyle="None">
+    WindowStartupLocation="CenterScreen">
 
-    <materialDesign:Card
-        Margin="30"
-        materialDesign:ElevationAssist.Elevation="Dp2"
-        Background="{DynamicResource MaterialDesignPaper}"
-        UniformCornerRadius="16">
+    <materialDesign:Card Margin="30" Style="{StaticResource Card.Form}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -28,17 +18,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <materialDesign:ColorZone
-                Padding="24,20"
-                materialDesign:ElevationAssist.Elevation="Dp0"
-                Foreground="White"
-                Mode="Custom">
-                <materialDesign:ColorZone.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Offset="0" Color="#3949AB" />
-                        <GradientStop Offset="1" Color="#283593" />
-                    </LinearGradientBrush>
-                </materialDesign:ColorZone.Background>
+            <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -55,15 +35,9 @@
                     <StackPanel Grid.Column="1" Margin="18,0">
                         <TextBlock
                             x:Name="TxtTitle"
-                            FontWeight="Bold"
-                            Foreground="White"
-                            Style="{StaticResource TitleLarge}"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
                             Text="إضافة تغطية ميدانية" />
-                        <TextBlock
-                            FontSize="11"
-                            Foreground="White"
-                            Opacity="0.8"
-                            Text="تنسيق المهام الخارجية وتكليف المراسلين" />
+                        <TextBlock Style="{StaticResource Type.BodyMedium.OnColor}" Text="تنسيق المهام الخارجية وتكليف المراسلين" />
                     </StackPanel>
 
                     <Button
@@ -94,30 +68,27 @@
                             x:Name="CboCorrespondents"
                             Grid.Column="0"
                             materialDesign:HintAssist.Hint="المراسل المكلف *"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="AccountTieVoiceOutline"
                             DisplayMemberPath="FullName"
                             SelectedValuePath="CorrespondentId"
-                            Style="{StaticResource BroadcastComboBox}" />
+                            Style="{StaticResource Input.ComboBox}" />
 
                         <ComboBox
                             x:Name="CboGuests"
                             Grid.Column="2"
                             materialDesign:HintAssist.Hint="الضيف المستهدف"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="MicrophoneOutline"
                             DisplayMemberPath="FullName"
                             SelectedValuePath="GuestId"
-                            Style="{StaticResource BroadcastComboBox}" />
+                            Style="{StaticResource Input.ComboBox}" />
                     </Grid>
 
                     <TextBox
                         x:Name="TxtTopic"
                         Margin="0,0,0,24"
                         materialDesign:HintAssist.Hint="موضوع أو عنوان التغطية *"
-                        materialDesign:TextFieldAssist.HasLeadingIcon="True"
                         materialDesign:TextFieldAssist.LeadingIcon="FileDocumentEditOutline"
-                        Style="{StaticResource BroadcastTextBox}" />
+                        Style="{StaticResource Input.Text}" />
 
                     <Grid Margin="0,0,0,24">
                         <Grid.ColumnDefinitions>
@@ -130,27 +101,21 @@
                             x:Name="TxtLocation"
                             Grid.Column="0"
                             materialDesign:HintAssist.Hint="الموقع الجغرافي"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="MapMarkerPath"
-                            Style="{StaticResource BroadcastTextBox}" />
+                            Style="{StaticResource Input.Text}" />
 
                         <DatePicker
                             x:Name="DpDate"
                             Grid.Column="2"
                             materialDesign:HintAssist.Hint="تاريخ التغطية"
-                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
                             materialDesign:TextFieldAssist.LeadingIcon="CalendarClockOutline"
-                            Style="{StaticResource BroadcastDatePicker}" />
+                            Style="{StaticResource Input.DatePicker}" />
                     </Grid>
 
                 </StackPanel>
             </ScrollViewer>
 
-            <Border
-                Grid.Row="2"
-                Padding="28,24"
-                Background="{DynamicResource MaterialDesignDivider}"
-                CornerRadius="0,0,16,16">
+            <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -162,18 +127,14 @@
                         Grid.Column="0"
                         Content="الغاء"
                         IsCancel="True"
-                        Style="{StaticResource CancelFlatButton}" />
+                        Style="{StaticResource Btn.Cancel}" />
 
                     <Button
                         x:Name="BtnSave"
                         Grid.Column="2"
-                        materialDesign:ButtonAssist.CornerRadius="8"
-                        materialDesign:ElevationAssist.Elevation="Dp2"
-                        Background="#3F51B5"
-                        BorderBrush="#3F51B5"
                         Click="BtnSave_Click"
                         Content="حفظ بيانات التغطية"
-                        Style="{StaticResource PrimaryActionButton}">
+                        Style="{StaticResource Btn.Primary}">
                         <Button.ContentTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">

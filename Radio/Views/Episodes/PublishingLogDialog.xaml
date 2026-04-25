@@ -170,11 +170,7 @@
                         </materialDesign:Card>
                     </Grid>
 
-                    <Border
-                        Margin="0,10"
-                        Padding="16,12"
-                        Background="{DynamicResource MaterialDesignDivider}"
-                        CornerRadius="10">
+                    <Border Margin="0,10" Style="{StaticResource Card.Info}">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon
                                 Foreground="#1565C0"
@@ -191,12 +187,7 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <Border
-                Grid.Row="2"
-                Padding="24"
-                Background="{DynamicResource MaterialDesignCardBackground}"
-                BorderBrush="{DynamicResource MaterialDesignDivider}"
-                BorderThickness="0,1,0,0">
+            <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

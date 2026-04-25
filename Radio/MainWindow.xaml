@@ -155,6 +155,7 @@
             </Border>
 
             <!--  ═══════════ الترويسة العلوية (Header) ═══════════  -->
+            <!--  ── TOP HEADER (Adaptive) ──  -->
             <Border
                 Height="64"
                 Background="White"
@@ -163,6 +164,7 @@
                 DockPanel.Dock="Top">
                 <Grid Margin="24,0">
                     <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+
                         <Border
                             Width="40"
                             Height="40"
@@ -176,6 +178,7 @@
                                 Foreground="White"
                                 Kind="RadioTower" />
                         </Border>
+
                         <TextBlock
                             Margin="14,0,0,0"
                             VerticalAlignment="Center"
@@ -189,44 +192,78 @@
                             FontSize="14"
                             Foreground="#757575"
                             Text="|  إذاعة صوت القدس" />
+
                     </StackPanel>
 
+                    <!--  Center: User Info  -->
+                    <Border
+                        Padding="4,4,14,4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        CornerRadius="14"
+                        Style="{StaticResource Chip.Primary}">
+                        <StackPanel Orientation="Horizontal">
+
+                            <!--  Avatar  -->
+                            <Border
+                                Width="34"
+                                Height="34"
+                                BorderBrush="Black"
+                                BorderThickness="0"
+                                CornerRadius="0">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="#303F9F"
+                                    Kind="Account" />
+                            </Border>
+
+                            <!--  Divider  -->
+                            <Rectangle
+                                Width="1"
+                                Margin="10,8"
+                                Fill="{StaticResource PrimaryDarkBrush}"
+                                Opacity="0.4" />
+
+                            <!--  Info  -->
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock
+                                    x:Name="TxtUserFullName"
+                                    HorizontalAlignment="Center"
+                                    FontSize="13"
+                                    Foreground="{DynamicResource MaterialDesignBody}"
+                                    Text="اسم المستخدم"
+                                    TextTrimming="CharacterEllipsis" />
+                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                                    <TextBlock
+                                        x:Name="ChipRole"
+                                        VerticalAlignment="Center"
+                                        FontSize="10"
+                                        Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                        Text="مدير النظام" />
+                                    <Ellipse
+                                        Width="5"
+                                        Height="5"
+                                        Margin="7,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Fill="#22C55E" />
+                                    <TextBlock
+                                        Margin="4,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="9.5"
+                                        Foreground="#22C55E"
+                                        Text="متصل" />
+                                </StackPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
                     <StackPanel
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Orientation="Horizontal">
-                        <Border
-                            Margin="0,0,16,0"
-                            Padding="16,8"
-                            Background="#F5F5F5"
-                            CornerRadius="8">
-                            <TextBlock
-                                x:Name="TxtClock"
-                                FontSize="16"
-                                FontWeight="Bold"
-                                Foreground="#212121"
-                                Text="00:00:00" />
-                        </Border>
-                        <Grid
-                            Width="36"
-                            Height="36"
-                            Margin="0,0,8,0"
-                            Background="#E8EAF6">
-                            <materialDesign:PackIcon
-                                Width="18"
-                                Height="18"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Foreground="#303F9F"
-                                Kind="Account" />
-                        </Grid>
-                        <TextBlock
-                            x:Name="TxtUserFullName"
-                            Margin="0,0,16,0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            Foreground="#212121"
-                            Text="مدير النظام" />
 
                         <Button
                             Width="36"

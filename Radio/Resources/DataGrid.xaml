@@ -57,6 +57,24 @@
         </Style.Triggers>
     </Style>
 
+
+    <!--
+        ==================================================================
+        DataGrid.ColumnHeader.Center — رأس العمود مع توسيط النص
+        ==================================================================
+    -->
+    <Style
+        x:Key="DataGrid.ColumnHeader.Center"
+        BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}"
+        TargetType="DataGridColumnHeader">
+
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Height" Value="48" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="SeparatorVisibility" Value="Collapsed" />
+    </Style>
+
     <!--
         ═══════════════════════════════════════════════════════════
         DataGrid.Row — صف البيانات
@@ -110,7 +128,7 @@
         <Setter Property="Padding" Value="16,0" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="15" />
 
         <!--  Template مخصص يزيل focus rectangle المزعج  -->
         <Setter Property="Template">
@@ -184,6 +202,26 @@
                         BorderThickness="{TemplateBinding BorderThickness}"
                         SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style
+        x:Key="DataGrid.Cell.Left"
+        BasedOn="{StaticResource DataGrid.Cell}"
+        TargetType="DataGridCell">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
