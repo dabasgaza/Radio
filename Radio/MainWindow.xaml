@@ -157,10 +157,8 @@
             <!--  ═══════════ الترويسة العلوية (Header) ═══════════  -->
             <!--  ── TOP HEADER (Adaptive) ──  -->
             <Border
-                Height="64"
-                Background="White"
-                BorderBrush="#E0E0E0"
-                BorderThickness="0,0,0,1"
+                materialDesign:ElevationAssist.Elevation="Dp2"
+                Style="{StaticResource Header.App}"
                 DockPanel.Dock="Top">
                 <Grid Margin="24,0">
                     <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
@@ -304,10 +302,7 @@
 
             <!--  ═══════════ شريط التبويبات الأفقية (Tabs) ═══════════  -->
             <Border
-                Height="56"
-                Margin="0,1,0,0"
-                Padding="24,8"
-                Background="White"
+                Style="{StaticResource Header.TabBar}"
                 DockPanel.Dock="Top">
                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                     <RadioButton

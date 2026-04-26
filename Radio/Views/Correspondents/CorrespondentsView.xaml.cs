@@ -2,6 +2,7 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using Domain.Models;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -37,7 +38,14 @@ namespace Radio.Views.Correspondents
         {
             try
             {
-                DgCorrespondents.ItemsSource = await _service.GetAllActiveAsync();
+                var correspondents = await _service.GetAllActiveAsync();
+
+                DgCorrespondents.ItemsSource = correspondents;
+
+                _allCorrespondents = correspondents.ToList();
+
+                TxtTotal.Text = $"{_allCorrespondents.Count}";
+
             }
             catch (UnauthorizedAccessException)
             {
@@ -140,28 +148,26 @@ namespace Radio.Views.Correspondents
         /// <summary>
         /// البحث في قائمة المراسلين حسب الاسم.
         /// </summary>
-        private async void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        private List<CorrespondentDto>? _allCorrespondents;
+
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is not TextBox textBox)
-            {
-                await LoadDataAsync(); // إعادة تحميل البيانات إذا حدث خطأ في الوصول إلى TextBox
                 return;
-            }
 
             string keyword = textBox.Text.Trim();
 
-            // ✅ DTO بدلاً من Entity
-            if (DgCorrespondents.ItemsSource is IEnumerable<CorrespondentDto> correspondents)
-            {
-                var filtered = string.IsNullOrWhiteSpace(keyword)
-                    ? correspondents
-                    : correspondents.Where(c =>
-                        c.FullName.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+            // لا نبحث إذا لم تُحمّل البيانات بعد
+            if (_allCorrespondents == null)
+                return;
 
-                DgCorrespondents.ItemsSource = filtered.ToList();
-            }
+            var filtered = string.IsNullOrWhiteSpace(keyword)
+                ? _allCorrespondents
+                : _allCorrespondents.Where(c =>
+                    c.FullName.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+            DgCorrespondents.ItemsSource = filtered.ToList();
         }
-
         #endregion
     }
 }
