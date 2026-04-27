@@ -158,8 +158,8 @@
             <!--  ── TOP HEADER (Adaptive) ──  -->
             <Border
                 materialDesign:ElevationAssist.Elevation="Dp2"
-                Style="{StaticResource Header.App}"
-                DockPanel.Dock="Top">
+                DockPanel.Dock="Top"
+                Style="{StaticResource Header.App}">
                 <Grid Margin="24,0">
                     <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
 
@@ -301,9 +301,7 @@
             </Border>
 
             <!--  ═══════════ شريط التبويبات الأفقية (Tabs) ═══════════  -->
-            <Border
-                Style="{StaticResource Header.TabBar}"
-                DockPanel.Dock="Top">
+            <Border DockPanel.Dock="Top" Style="{StaticResource Header.TabBar}">
                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                     <RadioButton
                         x:Name="MenuHome"
@@ -366,20 +364,19 @@
 
             <!--  ═══════════ منطقة العمل الخالية ═══════════  -->
 
-            <ContentControl
-                x:Name="MainContentArea"
-                VerticalAlignment="Top"
-                DockPanel.Dock="Top" />
+            <Grid>
+                <ContentControl x:Name="MainContentArea" />
 
 
 
-            <!--  نظام الإشعارات (مثبت في الأسفل فوق الشريط السفلي)  -->
-            <StackPanel
-                x:Name="NotificationHost"
-                Margin="0,10,0,0"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Top"
-                DockPanel.Dock="Top" />
+                <!--  نظام الإشعارات (مثبت في الأسفل فوق الشريط السفلي)  -->
+                <StackPanel
+                    x:Name="NotificationHost"
+                    Margin="0,10,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Panel.ZIndex="999" />
+            </Grid>
 
 
 

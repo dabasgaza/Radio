@@ -24,7 +24,6 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         // ✨ استخدام AsNoTracking وإرجاع DTOs
         return await context.Programs
             .AsNoTracking()
-            .Where(p => p.IsActive) // حماية إضافية
             .Select(p => new ProgramDto
             (
                 p.ProgramId,

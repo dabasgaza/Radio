@@ -82,7 +82,8 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             GuestId = dto.GuestId,
             EpisodeName = dto.EpisodeName,
             ScheduledExecutionTime = dto.ScheduledTime,
-            StatusId = EpisodeStatus.Planned // ✨ استخدام الثوابت
+            StatusId = EpisodeStatus.Planned, // ✨ استخدام الثوابت
+            SpecialNotes = dto.SpecialNotes,
             // ❌ لا حاجة لـ CreatedByUserId، الـ Interceptor سيضعه تلقائياً!
         };
 

@@ -9,7 +9,6 @@
     FlowDirection="RightToLeft">
 
     <UserControl.Resources>
-        <!--  تأثير الظل الموحّد  -->
         <DropShadowEffect
             x:Key="CardShadow"
             BlurRadius="16"
@@ -21,8 +20,6 @@
     <Border
         x:Name="RootBorder"
         Padding="16,14"
-        Background="{DynamicResource MaterialDesignCardBackground}"
-        BorderBrush="{DynamicResource MaterialDesignDivider}"
         BorderThickness="1"
         CornerRadius="14"
         Effect="{StaticResource CardShadow}">
@@ -41,12 +38,13 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!--  أيقونة النوع  -->
+                <!--  أيقونة النوع (دائرة بيضاء على خلفية ملونة)  -->
                 <Border
                     x:Name="IconCircle"
                     Width="36"
                     Height="36"
                     VerticalAlignment="Center"
+                    Background="White"
                     CornerRadius="18">
                     <materialDesign:PackIcon
                         x:Name="Icon"
@@ -66,15 +64,14 @@
                         x:Name="TxtTitle"
                         FontSize="13.5"
                         FontWeight="SemiBold"
-                        Foreground="{DynamicResource MaterialDesignBody}"
                         TextTrimming="CharacterEllipsis" />
                     <TextBlock
                         x:Name="TxtMessage"
                         MaxWidth="310"
                         Margin="0,3,0,0"
                         FontSize="12.5"
-                        Foreground="{DynamicResource MaterialDesignBodyLight}"
                         LineHeight="18"
+                        Opacity="0.85"
                         TextWrapping="Wrap" />
                 </StackPanel>
 
@@ -88,23 +85,24 @@
                     VerticalAlignment="Top"
                     Click="BtnClose_Click"
                     Cursor="Hand"
-                    Opacity="0.4"
+                    Opacity="0.5"
                     Style="{StaticResource MaterialDesignIconButton}">
                     <materialDesign:PackIcon
+                        Name="CloseIcon"
                         Width="14"
                         Height="14"
                         Kind="Close" />
                 </Button>
             </Grid>
 
-            <!--  ═══ شريط التقدم (M3 Style — داخل البطاقة) ═══  -->
+            <!--  ═══ شريط التقدم ═══  -->
             <Border
                 x:Name="ProgressBar"
                 Grid.Row="1"
                 Height="3"
                 HorizontalAlignment="Stretch"
                 CornerRadius="1.5"
-                Opacity="0.7" />
+                Opacity="0.5" />
         </Grid>
     </Border>
 </UserControl>

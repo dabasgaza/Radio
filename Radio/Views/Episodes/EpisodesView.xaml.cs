@@ -5,6 +5,7 @@ using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
+using static Domain.Models.BroadcastWorkflowDBContext;
 
 namespace Radio.Views.Episodes
 {
@@ -209,6 +210,43 @@ namespace Radio.Views.Episodes
         }
 
         #endregion
+
+
+        private void UpdateStatistics(List<ActiveEpisodeView> data)
+        {
+            if (data == null || !data.Any())
+            {
+                TxtTotal.Text = "0";
+                TxtExecuted.Text = "0";
+                TxtPublished.Text = "0";
+                return;
+            }
+
+            // عدد الحلقات الكلي
+            TxtTotal.Text = data.Count.ToString();
+
+            // عدد المنشورة
+            var publishedCount = data.Count(e => e.StatusText == "تم النشر");
+            TxtPublished.Text = $"تم النشر: {publishedCount} حلقة";
+
+            // البث القادم: أقرب حلقة مخططة بعد الآن
+            var now = DateTime.Now;
+            var nextEpisode = data
+                .Where(e => e.ScheduledExecutionTime > now)
+                .OrderBy(e => e.ScheduledExecutionTime)
+                .FirstOrDefault();
+
+            if (nextEpisode != null)
+            {
+                var dayName = nextEpisode.ScheduledExecutionTime.ToString("dddd", new System.Globalization.CultureInfo("ar-SA"));
+                var time = nextEpisode.ScheduledExecutionTime.ToString("hh:mm tt", new System.Globalization.CultureInfo("ar-SA"));
+                TxtExecuted.Text = $"البث القادم: {nextEpisode.ProgramName} — {dayName} {time}";
+            }
+            else
+            {
+                TxtExecuted.Text = "البث القادم: لا يوجد";
+            }
+        }
 
         private void BtnViewDetails_Click(object sender, RoutedEventArgs e)
         {

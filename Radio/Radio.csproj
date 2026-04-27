@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Img\Logo.jpeg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -36,6 +40,10 @@
 
   <ItemGroup>
     <Folder Include="Resources\Converter\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Img\Logo.jpeg" />
   </ItemGroup>
 
 </Project>

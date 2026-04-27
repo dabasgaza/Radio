@@ -10,23 +10,9 @@
     d:DesignWidth="800"
     Style="{StaticResource View.Base}"
     mc:Ignorable="d">
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-        <StackPanel>
-            <materialDesign:PackIcon
-                Width="120"
-                Height="120"
-                HorizontalAlignment="Center"
-                Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
-                Kind="ViewDashboard" />
-            <TextBlock
-                Margin="0,20,0,0"
-                Style="{StaticResource MaterialDesignHeadline4TextBlock}"
-                Text="أهلاً بك في نظام إدارة سير العمل" />
-            <TextBlock
-                HorizontalAlignment="Center"
-                Opacity="0.6"
-                Style="{StaticResource MaterialDesignBody1TextBlock}"
-                Text="يرجى اختيار قسم من القائمة الجانبية العلوية" />
-        </StackPanel>
-    </Grid>
+    <Image
+        Margin="0,0,0,20"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Source="/Resources/Img/Logo.jpeg" />
 </UserControl>
