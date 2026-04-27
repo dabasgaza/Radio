@@ -89,7 +89,7 @@ namespace Radio.Views.Episodes
                 ? _allEpisodes
                 : _allEpisodes.Where(ep =>
                     (ep.EpisodeName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    (ep.GuestName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false));
+                    (ep.GuestsDisplay?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false));
 
             DgEpisodes.ItemsSource = filtered.ToList();
         }
@@ -227,7 +227,7 @@ namespace Radio.Views.Episodes
 
             // عدد المنشورة
             var publishedCount = data.Count(e => e.StatusText == "تم النشر");
-            TxtPublished.Text = $"تم النشر: {publishedCount} حلقة";
+            TxtPublished.Text = $"{publishedCount}";
 
             // البث القادم: أقرب حلقة مخططة بعد الآن
             var now = DateTime.Now;
@@ -236,16 +236,16 @@ namespace Radio.Views.Episodes
                 .OrderBy(e => e.ScheduledExecutionTime)
                 .FirstOrDefault();
 
-            if (nextEpisode != null)
-            {
-                var dayName = nextEpisode.ScheduledExecutionTime.ToString("dddd", new System.Globalization.CultureInfo("ar-SA"));
-                var time = nextEpisode.ScheduledExecutionTime.ToString("hh:mm tt", new System.Globalization.CultureInfo("ar-SA"));
-                TxtExecuted.Text = $"البث القادم: {nextEpisode.ProgramName} — {dayName} {time}";
-            }
-            else
-            {
-                TxtExecuted.Text = "البث القادم: لا يوجد";
-            }
+            //if (nextEpisode != null)
+            //{
+            //    var dayName = nextEpisode.ScheduledExecutionTime.ToString("dddd", new System.Globalization.CultureInfo("ar-SA"));
+            //    var time = nextEpisode.ScheduledExecutionTime.ToString("hh:mm tt", new System.Globalization.CultureInfo("ar-SA"));
+            //    TxtExecuted.Text = $"البث القادم: {nextEpisode.ProgramName} — {dayName} {time}";
+            //}
+            //else
+            //{
+            //    TxtExecuted.Text = "البث القادم: لا يوجد";
+            //}
         }
 
         private void BtnViewDetails_Click(object sender, RoutedEventArgs e)

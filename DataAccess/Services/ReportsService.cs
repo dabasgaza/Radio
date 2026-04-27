@@ -43,7 +43,7 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 e.EpisodeId,
                 e.EpisodeName,
                 e.Program.ProgramName,
-                e.Guest != null ? e.Guest.FullName : "بدون ضيف",
+                FormatGuestsDisplay(e.EpisodeGuests),
                 e.ScheduledExecutionTime,
                 e.EpisodeStatus.DisplayName
             ))
@@ -67,5 +67,23 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             .OrderByDescending(x => x.TotalEpisodes)
             .Take(5)
             .ToListAsync();
+    }
+
+    private static string FormatGuestsDisplay(IEnumerable<EpisodeGuest> guests)
+    {
+        var list = guests.OrderBy(g => g.HostingTime).ToList();
+
+        if (list.Count == 0)
+            return "لا يوجد ضيف";
+
+        return string.Join(" ، ", list.Select(g =>
+        {
+            var name = g.Guest?.FullName ?? "غير معروف";
+            if (g.HostingTime.HasValue)
+                name += $" ({g.HostingTime.Value:hh\\:mm})";
+            if (!string.IsNullOrWhiteSpace(g.Topic))
+                name += $" — {g.Topic}";
+            return name;
+        }));
     }
 }

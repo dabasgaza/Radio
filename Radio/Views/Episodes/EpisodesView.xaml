@@ -93,15 +93,14 @@
                     <StackPanel Margin="12,0,0,0">
                         <TextBlock
                             FontSize="14"
-                            FontWeight="Bold"
                             Foreground="{StaticResource TextHintBrush}"
                             Text="إجمالي الحلقات" />
                         <TextBlock
                             x:Name="TxtTotal"
                             FontSize="20"
-                            TextAlignment="Center"
                             Foreground="{StaticResource TextPrimaryBrush}"
-                            Text="0" />
+                            Text="0"
+                            TextAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
             </materialDesign:Card>
@@ -124,15 +123,15 @@
                     <StackPanel Margin="12,0,0,0">
                         <TextBlock
                             FontSize="14"
-                            TextAlignment="Center"
                             Foreground="{StaticResource SuccessBrush}"
-                            Text="تم النشر" />
+                            Text="تم النشر"
+                            TextAlignment="Center" />
                         <TextBlock
                             x:Name="TxtPublished"
                             FontSize="20"
-                            TextAlignment="Center"
                             Foreground="{StaticResource SuccessBrush}"
-                            Text="0" />
+                            Text="0"
+                            TextAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
             </materialDesign:Card>
@@ -159,9 +158,9 @@
                         <TextBlock
                             x:Name="TxtExecuted"
                             FontSize="20"
-                            TextAlignment="Center"
                             Foreground="{StaticResource WarningBrush}"
-                            Text="0" />
+                            Text="0"
+                            TextAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
             </materialDesign:Card>
@@ -202,8 +201,6 @@
                                     Opacity="0.8">
                                     <TextBlock
                                         VerticalAlignment="Center"
-                                        FontSize="13"
-                                        FontWeight="Medium"
                                         Foreground="{StaticResource TextPrimaryBrush}"
                                         Text="{Binding ProgramName}"
                                         TextAlignment="Center" />
@@ -211,16 +208,16 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+
                     <!--  عمود تفاصيل الحلقة  -->
-                    <DataGridTemplateColumn Width="250" Header="تفاصيل الحلقة">
+                    <DataGridTemplateColumn
+                        Width="250"
+                        CellStyle="{StaticResource DataGrid.Cell.Center}"
+                        Header="تفاصيل الحلقة">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="8,0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="Bold"
-                                        Foreground="{StaticResource TextPrimaryBrush}"
-                                        Text="{Binding EpisodeName}" />
+                                    <TextBlock Foreground="{StaticResource TextPrimaryBrush}" Text="{Binding EpisodeName}" />
                                     <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
                                         <materialDesign:PackIcon
                                             Width="14"
@@ -254,9 +251,10 @@
                     <!--  الوقت  -->
                     <DataGridTextColumn
                         Width="90"
-                        Binding="{Binding ScheduledExecutionTime, StringFormat='hh:mm tt' , ConverterCulture='ar-SA'}"
+                        Binding="{Binding ScheduledExecutionTime, StringFormat='hh:mm tt', ConverterCulture='ar-SA'}"
                         CellStyle="{StaticResource DataGrid.Cell.Center}"
                         Header="الوقت" />
+
                     <!--  عمود حالة المهمة  -->
                     <DataGridTemplateColumn
                         Width="130"
@@ -267,9 +265,7 @@
                                 <materialDesign:Chip
                                     x:Name="StatusChip"
                                     HorizontalAlignment="Center"
-                                    Content="{Binding StatusText}"
-                                    FontSize="11"
-                                    FontWeight="Bold">
+                                    Content="{Binding StatusText}">
                                     <materialDesign:Chip.Style>
                                         <Style BasedOn="{StaticResource {x:Type materialDesign:Chip}}" TargetType="materialDesign:Chip">
                                             <Style.Triggers>
@@ -311,7 +307,9 @@
                                         Foreground="{StaticResource SecondaryMainBrush}"
                                         IsEnabled="{Binding CanMarkExecuted}"
                                         Style="{StaticResource Btn.Icon}"
-                                        ToolTip="تأكيد تنفيذ البث">
+                                        ToolTip="تأكيد تنفيذ البث"
+                                        Visibility="{Binding Session, Converter={StaticResource PermissionVisibilityConverter}, ConverterParameter=Episode.Execute}">
+
                                         <materialDesign:PackIcon Kind="PlayCircleOutline" />
                                     </Button>
 

@@ -5,13 +5,11 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="إدارة بيانات الحلقة"
-    Width="600"
-    MaxHeight="750"
+    Width="720"
+    MaxHeight="800"
     SizeToContent="Height"
     Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterScreen">
-    <!--  تمت إزالة AllowsTransparency و Background لأن Window.Dialog يوفرها  -->
-    <!--  تمت إزالة GlowBrush و ShowTitleBar لأن Window.Dialog يلغيها أصلاً  -->
 
     <materialDesign:Card
         Margin="30"
@@ -27,7 +25,6 @@
             </Grid.RowDefinitions>
 
             <!--  ═══════ 1. الهيدر ═══════  -->
-            <!--  استخدام التدرج الأساسي الموحد بدلاً من الألوان العشوائية  -->
             <materialDesign:ColorZone
                 Grid.Row="0"
                 MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
@@ -72,37 +69,19 @@
 
             <!--  ═══════ 2. المحتوى ═══════  -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                <!--  مسافات موحدة 24 من الجوانب، و 24 من الأعلى  -->
                 <StackPanel Margin="24,24">
 
-                    <!--  صف الـ ComboBoxes  -->
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <!--  البرنامج  -->
+                    <ComboBox
+                        x:Name="CboPrograms"
+                        Margin="0,0,0,16"
+                        materialDesign:HintAssist.Hint="البرنامج *"
+                        materialDesign:TextFieldAssist.LeadingIcon="Book"
+                        DisplayMemberPath="ProgramName"
+                        SelectedValuePath="ProgramId"
+                        Style="{StaticResource Input.ComboBox}" />
 
-                        <!--  توحيد شكل الـ ComboBox ليتطابق مع Input.Text  -->
-                        <ComboBox
-                            x:Name="CboPrograms"
-                            materialDesign:HintAssist.Hint="البرنامج *"
-                            materialDesign:TextFieldAssist.LeadingIcon="Book"
-                            DisplayMemberPath="ProgramName"
-                            SelectedValuePath="ProgramId"
-                            Style="{StaticResource Input.ComboBox}" />
-
-                        <ComboBox
-                            x:Name="CboGuests"
-                            Grid.Column="2"
-                            materialDesign:HintAssist.Hint="الضيف المشارك"
-                            materialDesign:TextFieldAssist.LeadingIcon="AccountVoice"
-                            DisplayMemberPath="FullName"
-                            SelectedValuePath="GuestId"
-                            Style="{StaticResource Input.ComboBox}" />
-                    </Grid>
-
-                    <!--  حقل عنوان الحلقة  -->
+                    <!--  عنوان الحلقة  -->
                     <TextBox
                         x:Name="TxtEpisodeName"
                         Margin="0,0,0,16"
@@ -118,7 +97,6 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <!--  توحيد شكل الـ DatePicker  -->
                         <DatePicker
                             x:Name="DpDate"
                             materialDesign:HintAssist.Hint="تاريخ البث"
@@ -133,7 +111,94 @@
                             Style="{StaticResource Input.TimePicker}" />
                     </Grid>
 
-                    <!--  حقل الملاحظات  -->
+                    <!--  ═══════ قسم الضيوف ═══════  -->
+                    <Grid Margin="0,8,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource Type.BodyLarge}"
+                            Text="الضيوف المشاركون" />
+
+                        <Button
+                            Grid.Column="1"
+                            Padding="12,6"
+                            Click="BtnAddGuest_Click"
+                            Style="{StaticResource MaterialDesignFlatButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Margin="0,0,6,0"
+                                    VerticalAlignment="Center"
+                                    Kind="Plus" />
+                                <TextBlock VerticalAlignment="Center" Text="إضافة ضيف" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!--  قائمة الضيوف الديناميكية  -->
+                    <ItemsControl ItemsSource="{Binding GuestEntries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Margin="0,0,0,8"
+                                    Padding="12"
+                                    Background="{StaticResource SurfaceBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--  اختيار الضيف  -->
+                                        <ComboBox
+                                            materialDesign:HintAssist.Hint="الضيف"
+                                            DisplayMemberPath="FullName"
+                                            ItemsSource="{Binding DataContext.AllGuests, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"
+                                            SelectedValue="{Binding GuestId, Mode=TwoWay}"
+                                            SelectedValuePath="GuestId"
+                                            Style="{StaticResource Input.ComboBox}" />
+
+                                        <!--  الموضوع  -->
+                                        <TextBox
+                                            Grid.Column="2"
+                                            materialDesign:HintAssist.Hint="الموضوع"
+                                            Style="{StaticResource Input.Text}"
+                                            Text="{Binding Topic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <!--  وقت الاستضافة  -->
+                                        <materialDesign:TimePicker
+                                            Grid.Column="4"
+                                            materialDesign:HintAssist.Hint="الساعة"
+                                            SelectedTime="{Binding HostingTime, Mode=TwoWay}"
+                                            Style="{StaticResource Input.TimePicker}" />
+
+                                        <!--  زر إزالة  -->
+                                        <Button
+                                            Grid.Column="6"
+                                            VerticalAlignment="Center"
+                                            Click="BtnRemoveGuest_Click"
+                                            Style="{StaticResource MaterialDesignIconButton}"
+                                            ToolTip="إزالة الضيف">
+                                            <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!--  ملاحظات  -->
                     <TextBox
                         x:Name="TxtNotes"
                         materialDesign:HintAssist.Hint="ملاحظات الإنتاج"
@@ -144,7 +209,7 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <!--  ═══════ 3. الذيل (تم إصلاحه) ═══════  -->
+            <!--  ═══════ 3. الذيل ═══════  -->
             <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -153,14 +218,12 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  استخدام ستايل الإلغاء الموحد  -->
                     <Button
                         Grid.Column="0"
                         Content="تراجع"
                         IsCancel="True"
                         Style="{StaticResource Btn.Cancel}" />
 
-                    <!--  استخدام ستايل الزر الأساسي + إضافة الأيقونة بالطريقة الحديثة  -->
                     <Button
                         x:Name="BtnSave"
                         Grid.Column="2"

@@ -2,8 +2,8 @@
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Versioning;
 using System.Windows;
 
 namespace Radio.Views.Episodes
@@ -11,7 +11,6 @@ namespace Radio.Views.Episodes
     /// <summary>
     /// نافذة إضافة/تعديل حلقة — تتولى جمع البيانات والتحقق منها ثم إرسالها لـ EpisodeService.
     /// </summary>
-    [SupportedOSPlatform("windows")]
     public partial class EpisodeFormDialog
     {
         private readonly ActiveEpisodeDto? _existingEpisode;
@@ -19,6 +18,12 @@ namespace Radio.Views.Episodes
         private readonly IProgramService _programService;
         private readonly IGuestService _guestService;
         private readonly UserSession _session;
+
+        // ✅ قائمة الضيوف المتاحة (للـ ComboBox داخل DataTemplate)
+        public List<GuestDto> AllGuests { get; private set; } = [];
+
+        // ✅ عناصر الضيوف المضافة ديناميكياً
+        public ObservableCollection<GuestEntryViewModel> GuestEntries { get; } = new();
 
         public EpisodeFormDialog(
             IEpisodeService episodeService,
@@ -34,6 +39,9 @@ namespace Radio.Views.Episodes
             _existingEpisode = existingEpisode;
             _session = session;
 
+            // ✅ تمكين Data Binding — ضروري للـ RelativeSource في DataTemplate
+            DataContext = this;
+
             IsWindowDraggable = true;
             Title = _existingEpisode is not null ? "تعديل بيانات الحلقة" : "إضافة حلقة جديدة";
 
@@ -45,14 +53,10 @@ namespace Radio.Views.Episodes
 
         #region Data Loading
 
-        /// <summary>
-        /// تحميل قوائم البرامج والضيوف وتعبئة الحقول في حالة التعديل.
-        /// </summary>
         private async Task LoadInitialDataAsync()
         {
             try
             {
-                // ✅ تشغيل متوازي + await منفصل بدلاً من .Result
                 var programsTask = _programService.GetAllActiveAsync();
                 var guestsTask = _guestService.GetAllActiveAsync();
 
@@ -60,12 +64,11 @@ namespace Radio.Views.Episodes
                 var guests = await guestsTask;
 
                 CboPrograms.ItemsSource = programs;
-                CboGuests.ItemsSource = guests;
+                AllGuests = guests.ToList();
 
                 if (_existingEpisode is not null)
                 {
                     CboPrograms.SelectedValue = _existingEpisode.ProgramId;
-                    CboGuests.SelectedValue = _existingEpisode.GuestId;
                     TxtEpisodeName.Text = _existingEpisode.EpisodeName;
                     TxtNotes.Text = _existingEpisode.SpecialNotes;
 
@@ -74,6 +77,9 @@ namespace Radio.Views.Episodes
                         DpDate.SelectedDate = _existingEpisode.ScheduledExecutionTime.Value.Date;
                         TpTime.SelectedTime = _existingEpisode.ScheduledExecutionTime.Value;
                     }
+
+                    // ✅ تحميل ضيوف الحلقة الحالية — يتطلب تحديث خارجي (انظر الملاحظات)
+                    LoadExistingGuests();
                 }
             }
             catch (UnauthorizedAccessException)
@@ -90,13 +96,57 @@ namespace Radio.Views.Episodes
             }
         }
 
+        /// <summary>
+        /// تحميل ضيوف الحلقة في حالة التعديل.
+        /// يتطلب إضافة خاصية GuestEntries إلى ActiveEpisodeDto
+        /// أو إضافة ميثود GetEpisodeGuestsAsync لـ IEpisodeService.
+        /// </summary>
+        private void LoadExistingGuests()
+        {
+            // عند توفر بيانات الضيوف:
+            // foreach (var g in _existingEpisode.GuestEntries)
+            //     GuestEntries.Add(new GuestEntryViewModel
+            //     {
+            //         GuestId = g.GuestId,
+            //         Topic = g.Topic,
+            //         HostingTime = g.HostingTime
+            //     });
+        }
+
+        #endregion
+
+        #region Guest Management
+
+        private void BtnAddGuest_Click(object sender, RoutedEventArgs e)
+        {
+            GuestEntries.Add(new GuestEntryViewModel());
+        }
+
+        private void BtnRemoveGuest_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element
+                && element.DataContext is GuestEntryViewModel entry)
+                GuestEntries.Remove(entry);
+        }
+
+        /// <summary>
+        /// جمع بيانات الضيوف من القائمة الديناميكية — يتجاهل العناصر الفارغة.
+        /// </summary>
+        private List<EpisodeGuestDto> CollectGuests()
+        {
+            return GuestEntries
+                .Where(g => g.GuestId > 0)
+                .Select(g => new EpisodeGuestDto(
+                    g.GuestId,
+                    g.Topic?.Trim(),
+                    g.HostingTime))
+                .ToList();
+        }
+
         #endregion
 
         #region Save
 
-        /// <summary>
-        /// حفظ الحلقة (إضافة أو تعديل) بعد التحقق من صحة المدخلات.
-        /// </summary>
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             DateTime? scheduledTime = null;
@@ -111,7 +161,7 @@ namespace Radio.Views.Episodes
             var dto = new EpisodeDto(
                 _existingEpisode?.EpisodeId ?? 0,
                 (int)CboPrograms.SelectedValue!,
-                (int?)CboGuests.SelectedValue,
+                CollectGuests(),                    // ✅ ضيوف متعددين
                 TxtEpisodeName.Text.Trim(),
                 scheduledTime,
                 TxtNotes.Text.Trim());

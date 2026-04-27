@@ -31,7 +31,6 @@ namespace Radio
             // ✅ النهج الحديث في .NET 10 (بدلاً من CreateDefaultBuilder)
             var builder = Host.CreateApplicationBuilder();
 
-
             // 1. Database Context Factory (EF Core 10)
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
             builder.Services.AddDbContextFactory<BroadcastWorkflowDBContext>((sp, options) =>
@@ -61,7 +60,7 @@ namespace Radio
 
             // 4. UI
             builder.Services.AddTransient<LoginWindow>();
-            builder.Services.AddTransient<MainWindow>();
+
 
 
             AppHost = builder.Build();

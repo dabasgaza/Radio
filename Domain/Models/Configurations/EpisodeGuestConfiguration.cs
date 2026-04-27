@@ -16,8 +16,13 @@ public class EpisodeGuestConfiguration : IEntityTypeConfiguration<EpisodeGuest>
               .IsUnique();
 
         // 3. إعدادات الخصائص (Properties)
-        builder.Property(e => e.BookingNotes)
+        builder.Property(e => e.Topic)
                .HasMaxLength(500);
+
+        builder.Property(eg => eg.HostingTime)
+       .HasColumnType("TIME")              // PostgreSQL: TIME / SQL Server: TIME
+       .IsRequired(false);                // اختياري — بعض الضيوف قد لا يوجد وقت محدد
+
 
         builder.Property(e => e.CreatedAt)
                .HasDefaultValueSql("GETUTCDATE()");

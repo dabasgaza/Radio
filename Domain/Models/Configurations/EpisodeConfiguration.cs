@@ -27,6 +27,10 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
         builder.Property(e => e.UpdatedAt)
                .HasDefaultValueSql("GETUTCDATE()");
 
+        // ✅ نشر الموقع — افتراضي false
+        builder.Property(e => e.IsWebsitePublished)
+               .HasDefaultValue(false);
+
         builder.Property(e => e.IsActive)
                .HasDefaultValue(true);
 
@@ -50,12 +54,6 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
               .HasForeignKey(e => e.ProgramId)
               .OnDelete(DeleteBehavior.Cascade);
 
-        // علاقة الضيف الأساسي (Guest)
-        // ✨ الضيف يمكن أن يكون Null (حلقة بدون ضيف)، وإذا حُذف الضيف نضبط المفتاح إلى Null
-        builder.HasOne(e => e.Guest)
-              .WithMany(g => g.Episodes)
-              .HasForeignKey(e => e.GuestId)
-              .OnDelete(DeleteBehavior.SetNull);
 
         // علاقة "أنشأ بواسطة"
         builder.HasOne(e => e.CreatedByUser)

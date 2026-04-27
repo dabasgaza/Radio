@@ -25,12 +25,14 @@ public partial class Episode : BaseEntity
 
     public string SpecialNotes { get; set; }
 
+    // ✅ نشر الموقع
+    public bool IsWebsitePublished { get; set; }
+
     // ✅ أضف هذين السطرين مكانه:
     public byte StatusId { get; set; }
 
     [ForeignKey("StatusId")]
     public virtual EpisodeStatus EpisodeStatus { get; set; } = null!;
-    public virtual Guest Guest { get; set; } = null!;
 
     public virtual ICollection<EpisodeGuest> EpisodeGuests { get; set; } = new List<EpisodeGuest>();
 

@@ -12,9 +12,10 @@ public partial class EpisodeGuest : BaseEntity
 
     public int GuestId { get; set; }
 
-    public string BookingNotes { get; set; }
+    public string? Topic { get; set; }
+    public TimeSpan? HostingTime { get; set; }   // ✅ ساعة الاستضافة (مثلاً: 08:30)
 
-    public virtual Episode Episode { get; set; }
+    public virtual Episode Episode { get; set; } = null!;
 
-    public virtual Guest Guest { get; set; }
+    public virtual Guest Guest { get; set; } = null!;
 }
