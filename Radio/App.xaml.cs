@@ -26,6 +26,7 @@ namespace Radio
         public IConfiguration Configuration { get; private set; } = null!;
         public static IHost AppHost { get; private set; } = null!;
 
+        /// ✅ النهج الحديث في .NET 10: استخدام HostBuilder لتهيئة التطبيق وخدماته
         public App()
         {
             // ✅ النهج الحديث في .NET 10 (بدلاً من CreateDefaultBuilder)
