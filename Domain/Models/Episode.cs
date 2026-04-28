@@ -11,8 +11,6 @@ public partial class Episode : BaseEntity
 
     public int ProgramId { get; set; }
 
-    public int? GuestId { get; set; }
-
     public string EpisodeName { get; set; }
 
     public string EpisodeDescription { get; set; }

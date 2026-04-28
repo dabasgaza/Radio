@@ -1,7 +1,8 @@
-﻿using DataAccess.DTOs;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
+using MaterialDesignThemes.Wpf;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows;
@@ -9,7 +10,24 @@ using System.Windows;
 namespace Radio.Views.Episodes
 {
     /// <summary>
-    /// نافذة إضافة/تعديل حلقة — تتولى جمع البيانات والتحقق منها ثم إرسالها لـ EpisodeService.
+    /// نموذج عرض لصف واحد في DataGrid الضيوف
+    /// </summary>
+    public class GuestRow
+    {
+        public int Id { get; set; }
+        public int GuestId { get; set; }
+        public string GuestName { get; set; } = string.Empty;
+        public string? Topic { get; set; }
+        public TimeSpan? HostingTime { get; set; }
+
+        public string HostingTimeDisplay =>
+            HostingTime.HasValue
+                ? HostingTime.Value.ToString(@"hh\:mm")
+                : string.Empty;
+    }
+
+    /// <summary>
+    /// نافذة إضافة/تعديل حلقة — Code-Behind نقي
     /// </summary>
     public partial class EpisodeFormDialog
     {
@@ -19,11 +37,10 @@ namespace Radio.Views.Episodes
         private readonly IGuestService _guestService;
         private readonly UserSession _session;
 
-        // ✅ قائمة الضيوف المتاحة (للـ ComboBox داخل DataTemplate)
-        public List<GuestDto> AllGuests { get; private set; } = [];
-
-        // ✅ عناصر الضيوف المضافة ديناميكياً
-        public ObservableCollection<GuestEntryViewModel> GuestEntries { get; } = new();
+        /// <summary>
+        /// قائمة الضيوف المُضافين مؤقتاً — تُعرض في DataGrid
+        /// </summary>
+        public ObservableCollection<GuestRow> GuestList { get; } = new();
 
         public EpisodeFormDialog(
             IEpisodeService episodeService,
@@ -39,7 +56,6 @@ namespace Radio.Views.Episodes
             _existingEpisode = existingEpisode;
             _session = session;
 
-            // ✅ تمكين Data Binding — ضروري للـ RelativeSource في DataTemplate
             DataContext = this;
 
             IsWindowDraggable = true;
@@ -64,7 +80,7 @@ namespace Radio.Views.Episodes
                 var guests = await guestsTask;
 
                 CboPrograms.ItemsSource = programs;
-                AllGuests = guests.ToList();
+                CboGuest.ItemsSource = guests.ToList();
 
                 if (_existingEpisode is not null)
                 {
@@ -78,8 +94,7 @@ namespace Radio.Views.Episodes
                         TpTime.SelectedTime = _existingEpisode.ScheduledExecutionTime.Value;
                     }
 
-                    // ✅ تحميل ضيوف الحلقة الحالية — يتطلب تحديث خارجي (انظر الملاحظات)
-                    LoadExistingGuests();
+                    await LoadExistingGuests();
                 }
             }
             catch (UnauthorizedAccessException)
@@ -96,49 +111,157 @@ namespace Radio.Views.Episodes
             }
         }
 
-        /// <summary>
-        /// تحميل ضيوف الحلقة في حالة التعديل.
-        /// يتطلب إضافة خاصية GuestEntries إلى ActiveEpisodeDto
-        /// أو إضافة ميثود GetEpisodeGuestsAsync لـ IEpisodeService.
-        /// </summary>
-        private void LoadExistingGuests()
+        private async Task LoadExistingGuests()
         {
-            // عند توفر بيانات الضيوف:
-            // foreach (var g in _existingEpisode.GuestEntries)
-            //     GuestEntries.Add(new GuestEntryViewModel
-            //     {
-            //         GuestId = g.GuestId,
-            //         Topic = g.Topic,
-            //         HostingTime = g.HostingTime
-            //     });
+            var guests = await _episodeService.GetEpisodeGuestsAsync(_existingEpisode!.EpisodeId);
+
+            var allGuests = CboGuest.ItemsSource as System.Collections.IEnumerable;
+            if (allGuests == null) return;
+
+            foreach (var g in guests)
+            {
+                var guestName = "غير معروف";
+                foreach (var item in allGuests)
+                {
+                    if ((int)((dynamic)item).GuestId == g.GuestId)
+                    {
+                        guestName = ((dynamic)item).FullName;
+                        break;
+                    }
+                }
+
+                GuestList.Add(new GuestRow
+                {
+                    GuestId = g.GuestId,
+                    GuestName = guestName,
+                    Topic = g.Topic,
+                    HostingTime = g.HostingTime
+                });
+            }
         }
 
         #endregion
 
         #region Guest Management
 
+        /// <summary>
+        /// الصف الذي يتم تعديله حالياً — null يعني وضع الإضافة
+        /// </summary>
+        private GuestRow? _editingRow;
+
+        /// <summary>
+        /// إضافة ضيف جديد أو تحديث الضيف المحدد
+        /// </summary>
         private void BtnAddGuest_Click(object sender, RoutedEventArgs e)
         {
-            GuestEntries.Add(new GuestEntryViewModel());
+            if (CboGuest.SelectedValue is not int guestId || guestId <= 0)
+            {
+                MessageService.Current.ShowWarning("يرجى اختيار ضيف أولاً.");
+                return;
+            }
+
+            var guestName = ((dynamic)CboGuest.SelectedItem).FullName;
+            var topic = TxtTopic.Text.Trim();
+            var hostingTime = TpHostingTime.SelectedTime?.TimeOfDay;
+
+            if (_editingRow is not null)
+            {
+                // ✏️ وضع التعديل — تحديث الصف الموجود
+                _editingRow.GuestId = guestId;
+                _editingRow.GuestName = guestName;
+                _editingRow.Topic = topic;
+                _editingRow.HostingTime = hostingTime;
+
+                ExitEditMode();
+            }
+            else
+            {
+                // ➕ وضع الإضافة — التحقق من التكرار
+                if (GuestList.Any(g => g.GuestId == guestId))
+                {
+                    MessageService.Current.ShowWarning("هذا الضيف مُضاف مسبقاً.");
+                    return;
+                }
+
+                GuestList.Add(new GuestRow
+                {
+                    GuestId = guestId,
+                    GuestName = guestName,
+                    Topic = topic,
+                    HostingTime = hostingTime
+                });
+            }
+
+            // تفريغ صف الإدخال
+            CboGuest.SelectedIndex = -1;
+            TxtTopic.Text = string.Empty;
+            TpHostingTime.SelectedTime = null;
+        }
+
+        /// <summary>
+        /// النقر المزدوج على صف → نقل البيانات لصف الإدخال لتعديلها
+        /// </summary>
+        private void DgGuests_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // تجاهل النقر على رأس الأعمدة
+            if (e.OriginalSource is not FrameworkElement element) return;
+            if (element.DataContext is not GuestRow row) return;
+
+            // تعبئة صف الإدخال ببيانات الصف المحدد
+            CboGuest.SelectedValue = row.GuestId;
+            TxtTopic.Text = row.Topic ?? string.Empty;
+
+            if (row.HostingTime.HasValue)
+            {
+                var today = DateTime.Today;
+                TpHostingTime.SelectedTime = today.Add(row.HostingTime.Value);
+            }
+            else
+            {
+                TpHostingTime.SelectedTime = null;
+            }
+
+            // الدخول في وضع التعديل
+            _editingRow = row;
+
+            // تغيير شكل الزر
+            IcoAddGuest.Kind = PackIconKind.Check;
+            BtnAddGuest.ToolTip = "حفظ التعديل";
+        }
+
+        /// <summary>
+        /// الخروج من وضع التعديل وإعادة الزر لحالته الأصلية
+        /// </summary>
+        private void ExitEditMode()
+        {
+            _editingRow = null;
+            IcoAddGuest.Kind = PackIconKind.Plus;
+            BtnAddGuest.ToolTip = "إضافة الضيف للقائمة";
         }
 
         private void BtnRemoveGuest_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element
-                && element.DataContext is GuestEntryViewModel entry)
-                GuestEntries.Remove(entry);
+                && element.DataContext is GuestRow row)
+            {
+                // إذا كان الصف المحذوف هو المعروف حالياً — الخروج من وضع التعديل
+                if (_editingRow == row)
+                    ExitEditMode();
+
+                GuestList.Remove(row);
+            }
         }
 
         /// <summary>
-        /// جمع بيانات الضيوف من القائمة الديناميكية — يتجاهل العناصر الفارغة.
+        /// جمع بيانات الضيوف من DataGrid للإرسال لقاعدة البيانات
         /// </summary>
         private List<EpisodeGuestDto> CollectGuests()
         {
-            return GuestEntries
-                .Where(g => g.GuestId > 0)
+            return GuestList
                 .Select(g => new EpisodeGuestDto(
+                    g.Id,
                     g.GuestId,
-                    g.Topic?.Trim(),
+                    g.Topic,
                     g.HostingTime))
                 .ToList();
         }
@@ -161,7 +284,7 @@ namespace Radio.Views.Episodes
             var dto = new EpisodeDto(
                 _existingEpisode?.EpisodeId ?? 0,
                 (int)CboPrograms.SelectedValue!,
-                CollectGuests(),                    // ✅ ضيوف متعددين
+                CollectGuests(),
                 TxtEpisodeName.Text.Trim(),
                 scheduledTime,
                 TxtNotes.Text.Trim());

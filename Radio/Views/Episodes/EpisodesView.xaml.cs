@@ -5,14 +5,9 @@ using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
-using static Domain.Models.BroadcastWorkflowDBContext;
 
 namespace Radio.Views.Episodes
 {
-    /// <summary>
-    /// شاشة إدارة الحلقات — تعرض قائمة الحلقات النشطة مع إمكانية
-    /// الإضافة والتعديل والحذف والبحث والتنفيذ والنشر.
-    /// </summary>
     public partial class EpisodesView : UserControl
     {
         private readonly IEpisodeService _episodeService;
@@ -37,7 +32,6 @@ namespace Radio.Views.Episodes
             _serviceProvider = serviceProvider;
             _guestService = guestService;
 
-            // ✅ AppPermissions بدلاً من نصوص ثابتة
             BtnAddEpisode.Visibility = _session.HasPermission(AppPermissions.EpisodeManage)
                 ? Visibility.Visible
                 : Visibility.Collapsed;
@@ -47,15 +41,15 @@ namespace Radio.Views.Episodes
 
         #region Data Loading
 
-        /// <summary>
-        /// تحميل جميع الحلقات النشطة وربطها بالـ DataGrid مع تحديث الإحصائيات.
-        /// </summary>
         private async Task LoadDataAsync()
         {
             try
             {
                 _allEpisodes = (await _episodeService.GetActiveEpisodesAsync()).ToList();
                 DgEpisodes.ItemsSource = _allEpisodes;
+
+                // ✅ تحديث الإحصائيات بعد كل تحميل
+                UpdateStatistics(_allEpisodes);
             }
             catch (UnauthorizedAccessException)
             {
@@ -75,9 +69,6 @@ namespace Radio.Views.Episodes
 
         #region Search
 
-        /// <summary>
-        /// البحث الفوري في قائمة الحلقات حسب عنوان الحلقة أو اسم الضيف.
-        /// </summary>
         private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is not TextBox textBox || _allEpisodes.Count == 0)
@@ -89,7 +80,11 @@ namespace Radio.Views.Episodes
                 ? _allEpisodes
                 : _allEpisodes.Where(ep =>
                     (ep.EpisodeName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    (ep.GuestsDisplay?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false));
+                    (ep.ProgramName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (ep.GuestsDisplay?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    ep.GuestItems.Any(g =>
+                        (g.Name?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                        (g.Topic?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false)));
 
             DgEpisodes.ItemsSource = filtered.ToList();
         }
@@ -98,21 +93,15 @@ namespace Radio.Views.Episodes
 
         #region CRUD Operations
 
-        /// <summary>
-        /// فتح نافذة إضافة حلقة جديدة.
-        /// </summary>
         private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new EpisodeFormDialog(
                 _episodeService, _programService, _guestService, _session);
 
             if (dialog.ShowDialog() == true)
-                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
+                await LoadDataAsync();
         }
 
-        /// <summary>
-        /// فتح نافذة تعديل حلقة موجودة.
-        /// </summary>
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto selectedEpisode)
@@ -123,18 +112,14 @@ namespace Radio.Views.Episodes
                 _session, selectedEpisode);
 
             if (dialog.ShowDialog() == true)
-                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
+                await LoadDataAsync();
         }
 
-        /// <summary>
-        /// حذف حلقة بعد التحقق من حالتها وتأكيد المستخدم.
-        /// </summary>
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto selectedEpisode)
                 return;
 
-            // ✅ منع حذف الحلقات المنفذة أو المنشورة
             if (selectedEpisode.StatusText is "منفّذة" or "منشورة")
             {
                 MessageService.Current.ShowWarning(
@@ -173,9 +158,6 @@ namespace Radio.Views.Episodes
 
         #region Execution & Publishing
 
-        /// <summary>
-        /// فتح نافذة تسجيل تنفيذ حلقة (للحلقات المجدولة فقط).
-        /// </summary>
         private async void BtnMarkExecuted_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
@@ -188,12 +170,9 @@ namespace Radio.Views.Episodes
             var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
 
             if (dialog.ShowDialog() == true)
-                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
+                await LoadDataAsync();
         }
 
-        /// <summary>
-        /// فتح نافذة تسجيل نشر حلقة (للحلقات المنفّذة فقط).
-        /// </summary>
         private async void BtnMarkPublished_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
@@ -206,15 +185,51 @@ namespace Radio.Views.Episodes
             var dialog = new PublishingLogDialog(ep.EpisodeId, pubService, _session);
 
             if (dialog.ShowDialog() == true)
-                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
+                await LoadDataAsync();
+        }
+
+        /// <summary>
+        /// تبديل حالة النشر على الموقع الإلكتروني
+        /// </summary>
+        private async void BtnToggleWebsitePublish_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
+                return;
+
+            try
+            {
+                var newStatus = !ep.IsWebsitePublished;
+                await _episodeService.ToggleWebsitePublishAsync(ep.EpisodeId, newStatus, _session);
+
+
+                await LoadDataAsync();
+
+                MessageService.Current.ShowSuccess(
+                    newStatus
+                        ? "تم نشر الحلقة على الموقع بنجاح."
+                        : "تم إلغاء نشر الحلقة من الموقع.");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageService.Current.ShowError("ليس لديك صلاحية لنشر الحلقات على الموقع.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageService.Current.ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تغيير حالة النشر.");
+            }
         }
 
         #endregion
 
+        #region Statistics
 
-        private void UpdateStatistics(List<ActiveEpisodeView> data)
+        private void UpdateStatistics(List<ActiveEpisodeDto> data)
         {
-            if (data == null || !data.Any())
+            if (data == null || data.Count == 0)
             {
                 TxtTotal.Text = "0";
                 TxtExecuted.Text = "0";
@@ -222,35 +237,11 @@ namespace Radio.Views.Episodes
                 return;
             }
 
-            // عدد الحلقات الكلي
             TxtTotal.Text = data.Count.ToString();
-
-            // عدد المنشورة
-            var publishedCount = data.Count(e => e.StatusText == "تم النشر");
-            TxtPublished.Text = $"{publishedCount}";
-
-            // البث القادم: أقرب حلقة مخططة بعد الآن
-            var now = DateTime.Now;
-            var nextEpisode = data
-                .Where(e => e.ScheduledExecutionTime > now)
-                .OrderBy(e => e.ScheduledExecutionTime)
-                .FirstOrDefault();
-
-            //if (nextEpisode != null)
-            //{
-            //    var dayName = nextEpisode.ScheduledExecutionTime.ToString("dddd", new System.Globalization.CultureInfo("ar-SA"));
-            //    var time = nextEpisode.ScheduledExecutionTime.ToString("hh:mm tt", new System.Globalization.CultureInfo("ar-SA"));
-            //    TxtExecuted.Text = $"البث القادم: {nextEpisode.ProgramName} — {dayName} {time}";
-            //}
-            //else
-            //{
-            //    TxtExecuted.Text = "البث القادم: لا يوجد";
-            //}
+            TxtPublished.Text = data.Count(e => e.StatusText == "منشورة").ToString();
+            TxtExecuted.Text = data.Count(e => e.StatusText == "مجدولة").ToString();
         }
 
-        private void BtnViewDetails_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+        #endregion
     }
 }

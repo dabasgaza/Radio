@@ -10,4 +10,7 @@
         string GuestsDisplay,                                   // ✅ بدل string GuestName
         DateTime? ScheduledExecutionTime, string StatusText);
     public record ActiveGuestDto(int GuestId, string FullName, string? Organization, int EpisodeCount);
+
+    public record GuestDisplayItem(string Name, string? Topic, TimeSpan? HostingTime);
+
 }

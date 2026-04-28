@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,8 @@ public static class EpisodeStatus
     public const byte Planned = 0;
     public const byte Executed = 1;
     public const byte Published = 2;
-    public const byte Cancelled = 3;
+    public const byte WebsitePublished = 3;   // منشورة عبر الموقع
+    public const byte Cancelled = 4;
 }
 
 public interface IEpisodeService
@@ -43,7 +44,13 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 StatusId = e.StatusId,
                 ProgramId = e.ProgramId,
                 EpisodeName = e.EpisodeName,
-                GuestsDisplay = FormatGuestsDisplay(e.EpisodeGuests),
+                GuestItems = e.EpisodeGuests
+                    .OrderBy(g => g.HostingTime)
+                    .Select(g => new GuestDisplayItem(
+                        g.Guest.FullName,
+                        g.Topic,
+                        g.HostingTime))
+                    .ToList(),
                 ProgramName = e.Program.ProgramName,
                 ScheduledExecutionTime = e.ScheduledExecutionTime,
                 StatusText = e.EpisodeStatus.DisplayName,
@@ -88,19 +95,59 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         // تحديث الحقول
         episode.ProgramId = dto.ProgramId;
-        //episode.GuestId = dto.GuestId;
         episode.EpisodeName = dto.EpisodeName;
         episode.ScheduledExecutionTime = dto.ScheduledTime;
         episode.SpecialNotes = dto.SpecialNotes;
 
-
-        // ✅ مزامنة الضيوف — حذف القديم ثم إضافة الجديد
-        context.EpisodeGuests.RemoveRange(episode.EpisodeGuests.ToList());
-
-        AddGuestsToEpisode(episode, dto.Guests);
+        // ✅ مزامنة ذكية — فقط إذا تغيرت قائمة الضيوف فعلاً
+        if (dto.Guests is { Count: > 0 } || episode.EpisodeGuests.Count > 0)
+            SyncGuests(episode.EpisodeGuests.ToList(), dto.Guests ?? [], episode);
 
         // الـ Interceptor سيتولى تحديث UpdatedAt و UpdatedByUserId تلقائياً
         await context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// مزامنة ذكية للضيوف — المقارنة بالمفتاح الأساسي Id وليس GuestId
+    /// حتى عند تغيير الضيف يتم تحديث الصف نفسه (UPDATE) بدلاً من حذفه وإعادة إدراجه
+    /// </summary>
+    private static void SyncGuests(
+        List<EpisodeGuest> existingGuests,
+        List<EpisodeGuestDto> newGuests,
+        Episode episode)
+    {
+        // 1. بناء قاموس بالضيوف الحاليين حسب المفتاح الأساسي
+        var existingById = existingGuests.ToDictionary(g => g.EpisodeGuestId);
+        var newIds = newGuests
+            .Where(g => g.Id != 0)
+            .Select(g => g.Id)
+            .ToHashSet();
+
+        // 2. حذف الصفوف المُزالة فقط (لم تعد موجودة في القائمة الجديدة)
+        foreach (var guest in existingGuests.Where(g => !newIds.Contains(g.EpisodeGuestId)).ToList())
+            episode.EpisodeGuests.Remove(guest);
+
+        // 3. تحديث أو إضافة
+        foreach (var dto in newGuests)
+        {
+            if (dto.Id != 0 && existingById.TryGetValue(dto.Id, out var existing))
+            {
+                // ✅ تحديث الصف الموجود — بما في ذلك تغيير GuestId
+                existing.GuestId = dto.GuestId;
+                existing.Topic = dto.Topic;
+                existing.HostingTime = dto.HostingTime;
+            }
+            else
+            {
+                // ✅ ضيف جديد تماماً (Id == 0) — إضافة فقط
+                episode.EpisodeGuests.Add(new EpisodeGuest
+                {
+                    GuestId = dto.GuestId,
+                    Topic = dto.Topic,
+                    HostingTime = dto.HostingTime
+                });
+            }
+        }
     }
 
     public async Task<List<EpisodeGuestDto>> GetEpisodeGuestsAsync(int episodeId)
@@ -111,13 +158,14 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             .AsNoTracking()
             .Where(eg => eg.EpisodeId == episodeId)
             .Select(eg => new EpisodeGuestDto(
+                eg.EpisodeGuestId,
                 eg.GuestId,
                 eg.Topic,
                 eg.HostingTime))
             .ToListAsync();
     }
 
-    // تحديث الحالة مع قواعد الـ Workflow والصلاحيات    
+    // تحديث الحالة مع قواعد الـ Workflow والصلاحيات
     public async Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session)
     {
         // التحقق من الصلاحيات بناءً على الحالة الجديدة
@@ -181,9 +229,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         foreach (var guest in episode.EpisodeGuests)
             guest.IsActive = false;
 
-
         await context.SaveChangesAsync();
-
     }
 
     public async Task ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session)
@@ -194,58 +240,27 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var episode = await context.Episodes.FindAsync(episodeId)
             ?? throw new KeyNotFoundException("الحلقة غير موجودة.");
 
-        // ✅ يمكن نشر الحلقات المنفذة أو المنشورة رقمياً فقط
-        if (episode.StatusId < EpisodeStatus.Executed)
-            throw new InvalidOperationException("لا يمكن نشر حلقة على الموقع قبل تنفيذها.");
+        if (isPublished)
+        {
+            // يمكن النشر بالموقع فقط من حالة المنشورة رقمياً
+            if (episode.StatusId != EpisodeStatus.Published)
+                throw new InvalidOperationException("لا يمكن نشر حلقة على الموقع قبل نشرها رقمياً.");
 
-        episode.IsWebsitePublished = isPublished;
+            episode.StatusId = EpisodeStatus.WebsitePublished;
+        }
+        else
+        {
+            // يمكن إلغاء النشر فقط إذا كانت منشورة بالفعل على الموقع
+            if (episode.StatusId != EpisodeStatus.WebsitePublished)
+                throw new InvalidOperationException("الحلقة غير منشورة على الموقع.");
+
+            episode.StatusId = EpisodeStatus.Published;
+        }
+
         await context.SaveChangesAsync();
     }
 
-
     #region Private Helpers
-
-    /// <summary>
-    /// تحويل كيان Episode إلى ActiveEpisodeDto مع تنسيق أسماء الضيوف.
-    /// </summary>
-    private static ActiveEpisodeDto MapToActiveDto(Episode e)
-    {
-        return new ActiveEpisodeDto
-        {
-            EpisodeId = e.EpisodeId,
-            StatusId = e.StatusId,
-            ProgramId = e.ProgramId,
-            EpisodeName = e.EpisodeName,
-            ProgramName = e.Program.ProgramName,
-            GuestsDisplay = FormatGuestsDisplay(e.EpisodeGuests),
-            ScheduledExecutionTime = e.ScheduledExecutionTime,
-            StatusText = e.EpisodeStatus.DisplayName,
-            SpecialNotes = e.SpecialNotes,
-            IsWebsitePublished = e.IsWebsitePublished
-        };
-    }
-
-    /// <summary>
-    /// تنسيق قائمة الضيوف كنص للعرض.
-    /// مثال: "أحمد (08:30) — السياسة ، سعيد (09:45) — الاقتصاد"
-    /// </summary>
-    private static string FormatGuestsDisplay(IEnumerable<EpisodeGuest> guests)
-    {
-        var list = guests.OrderBy(g => g.HostingTime).ToList();
-
-        if (list.Count == 0)
-            return "لا يوجد ضيف";
-
-        return string.Join(" ، ", list.Select(g =>
-        {
-            var name = g.Guest?.FullName ?? "غير معروف";
-            if (g.HostingTime.HasValue)
-                name += $" ({g.HostingTime.Value:hh\\:mm})";
-            if (!string.IsNullOrWhiteSpace(g.Topic))
-                name += $" — {g.Topic}";
-            return name;
-        }));
-    }
 
     /// <summary>
     /// إضافة ضيوف إلى كيان الحلقة.
@@ -264,5 +279,4 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     }
 
     #endregion
-
 }

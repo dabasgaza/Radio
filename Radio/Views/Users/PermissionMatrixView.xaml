@@ -121,7 +121,7 @@
                                             Margin="15,0"
                                             VerticalAlignment="Center"
                                             FontSize="16"
-                                            Text="{Binding RoleName}" />
+                                            Text="{Binding RoleDescription}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

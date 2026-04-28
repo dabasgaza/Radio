@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow
+<mah:MetroWindow
     x:Class="Radio.Views.Episodes.EpisodeFormDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -112,95 +112,129 @@
                     </Grid>
 
                     <!--  ═══════ قسم الضيوف ═══════  -->
-                    <Grid Margin="0,8,0,12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Margin="0,8,0,10"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource PrimaryMainBrush}"
+                        Text="الضيوف المشاركون" />
 
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Style="{StaticResource Type.BodyLarge}"
-                            Text="الضيوف المشاركون" />
+                    <Border
+                        Background="{StaticResource SurfaceBrush}"
+                        BorderBrush="{StaticResource BorderDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
 
-                        <Button
-                            Grid.Column="1"
-                            Padding="12,6"
-                            Click="BtnAddGuest_Click"
-                            Style="{StaticResource MaterialDesignFlatButton}">
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon
-                                    Margin="0,0,6,0"
-                                    VerticalAlignment="Center"
-                                    Kind="Plus" />
-                                <TextBlock VerticalAlignment="Center" Text="إضافة ضيف" />
-                            </StackPanel>
-                        </Button>
-                    </Grid>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                    <!--  قائمة الضيوف الديناميكية  -->
-                    <ItemsControl ItemsSource="{Binding GuestEntries}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border
-                                    Margin="0,0,0,8"
-                                    Padding="12"
-                                    Background="{StaticResource SurfaceBrush}"
-                                    BorderBrush="{StaticResource BorderBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="8">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="120" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
+                            <!--  ═══ صف الإدخال الثابت — يُفرّغ بعد كل إضافة ═══  -->
+                            <Border
+                                Padding="12"
+                                Background="{StaticResource PrimaryXLightBrush}"
+                                CornerRadius="8,8,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="130" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                        <!--  اختيار الضيف  -->
-                                        <ComboBox
-                                            materialDesign:HintAssist.Hint="الضيف"
-                                            DisplayMemberPath="FullName"
-                                            ItemsSource="{Binding DataContext.AllGuests, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"
-                                            SelectedValue="{Binding GuestId, Mode=TwoWay}"
-                                            SelectedValuePath="GuestId"
-                                            Style="{StaticResource Input.ComboBox}" />
+                                    <!--  اختيار الضيف  -->
+                                    <ComboBox
+                                        x:Name="CboGuest"
+                                        materialDesign:HintAssist.Hint="الضيف"
+                                        DisplayMemberPath="FullName"
+                                        SelectedValuePath="GuestId"
+                                        Style="{StaticResource Input.ComboBox}" />
 
-                                        <!--  الموضوع  -->
-                                        <TextBox
-                                            Grid.Column="2"
-                                            materialDesign:HintAssist.Hint="الموضوع"
-                                            Style="{StaticResource Input.Text}"
-                                            Text="{Binding Topic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <!--  الموضوع  -->
+                                    <TextBox
+                                        x:Name="TxtTopic"
+                                        Grid.Column="2"
+                                        materialDesign:HintAssist.Hint="الموضوع"
+                                        Style="{StaticResource Input.Text}" />
 
-                                        <!--  وقت الاستضافة  -->
-                                        <materialDesign:TimePicker
-                                            Grid.Column="4"
-                                            materialDesign:HintAssist.Hint="الساعة"
-                                            SelectedTime="{Binding HostingTime, Mode=TwoWay}"
-                                            Style="{StaticResource Input.TimePicker}" />
+                                    <!--  وقت الاستضافة  -->
+                                    <materialDesign:TimePicker
+                                        x:Name="TpHostingTime"
+                                        Grid.Column="4"
+                                        materialDesign:HintAssist.Hint="الساعة"
+                                        Style="{StaticResource Input.TimePicker}" />
 
-                                        <!--  زر إزالة  -->
-                                        <Button
-                                            Grid.Column="6"
-                                            VerticalAlignment="Center"
-                                            Click="BtnRemoveGuest_Click"
-                                            Style="{StaticResource MaterialDesignIconButton}"
-                                            ToolTip="إزالة الضيف">
-                                            <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
-                                        </Button>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                    <!--  زر إضافة / تحديث  -->
+                                    <Button
+                                        x:Name="BtnAddGuest"
+                                        Grid.Column="6"
+                                        Width="40"
+                                        Height="40"
+                                        Click="BtnAddGuest_Click"
+                                        Style="{StaticResource Btn.Primary}"
+                                        ToolTip="إضافة الضيف للقائمة">
+                                        <materialDesign:PackIcon
+                                            x:Name="IcoAddGuest"
+                                            Foreground="{StaticResource SurfaceBrush}"
+                                            Kind="Plus" />
+                                    </Button>
+                                </Grid>
+                            </Border>
+
+                            <!--  ═══ DataGrid — عرض الضيوف المُضافين ═══  -->
+                            <DataGrid
+                                x:Name="DgGuests"
+                                Grid.Row="1"
+                                CellStyle="{StaticResource DataGrid.Cell}"
+                                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                                ItemsSource="{Binding GuestList}"
+                                MouseDoubleClick="DgGuests_MouseDoubleClick"
+                                RowStyle="{StaticResource DataGrid.Row}"
+                                Style="{StaticResource DataGrid.Main}">
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding GuestName}"
+                                        Header="الضيف" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Topic}"
+                                        Header="الموضوع" />
+                                    <DataGridTextColumn
+                                        Width="130"
+                                        Binding="{Binding HostingTimeDisplay}"
+                                        Header="الساعة" />
+                                    <DataGridTemplateColumn
+                                        Width="70"
+                                        CanUserResize="False"
+                                        CellStyle="{StaticResource DataGrid.Cell.Actions}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Padding="4"
+                                                    Click="BtnRemoveGuest_Click"
+                                                    Style="{StaticResource MaterialDesignIconButton}"
+                                                    ToolTip="إزالة الضيف">
+                                                    <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                        </Grid>
+                    </Border>
 
                     <!--  ملاحظات  -->
                     <TextBox
                         x:Name="TxtNotes"
+                        Margin="0,16,0,0"
                         materialDesign:HintAssist.Hint="ملاحظات الإنتاج"
                         materialDesign:TextFieldAssist.HasLeadingIcon="True"
                         materialDesign:TextFieldAssist.LeadingIcon="MessageTextOutline"

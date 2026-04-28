@@ -24,6 +24,39 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
         builder.HasOne(rp => rp.Permission)
               .WithMany(p => p.RolePermissions)
               .HasForeignKey(rp => rp.PermissionId)
-              .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Cascade);
+
+        // 3. Seed Data
+        builder.HasData(
+            // Admin - جميع الصلاحيات (1-11)
+            new RolePermission { RoleId = 1, PermissionId = 1 },
+            new RolePermission { RoleId = 1, PermissionId = 2 },
+            new RolePermission { RoleId = 1, PermissionId = 3 },
+            new RolePermission { RoleId = 1, PermissionId = 4 },
+            new RolePermission { RoleId = 1, PermissionId = 5 },
+            new RolePermission { RoleId = 1, PermissionId = 6 },
+            new RolePermission { RoleId = 1, PermissionId = 7 },
+            new RolePermission { RoleId = 1, PermissionId = 8 },
+            new RolePermission { RoleId = 1, PermissionId = 9 },
+            new RolePermission { RoleId = 1, PermissionId = 10 },
+            new RolePermission { RoleId = 1, PermissionId = 11 },
+
+            // ProgramMgr - برامج + حلقات + ضيوف + تقارير
+            new RolePermission { RoleId = 2, PermissionId = 2 },
+            new RolePermission { RoleId = 2, PermissionId = 3 },
+            new RolePermission { RoleId = 2, PermissionId = 4 },
+            new RolePermission { RoleId = 2, PermissionId = 5 },
+            new RolePermission { RoleId = 2, PermissionId = 7 },
+            new RolePermission { RoleId = 2, PermissionId = 9 },
+            new RolePermission { RoleId = 2, PermissionId = 11 },
+
+            // Director - تنفيذ الحلقات + تقارير
+            new RolePermission { RoleId = 3, PermissionId = 4 },
+            new RolePermission { RoleId = 3, PermissionId = 11 },
+
+            // WebPublisher - نشر الموقع + تقارير
+            new RolePermission { RoleId = 4, PermissionId = 6 },
+            new RolePermission { RoleId = 4, PermissionId = 11 }
+        );
     }
 }

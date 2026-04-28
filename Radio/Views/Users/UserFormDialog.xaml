@@ -128,7 +128,7 @@
                             Grid.Column="2"
                             materialDesign:HintAssist.Hint="الدور / الصلاحية *"
                             materialDesign:TextFieldAssist.LeadingIcon="ShieldKeyOutline"
-                            DisplayMemberPath="RoleName"
+                            DisplayMemberPath="RoleDescription"
                             SelectedValuePath="RoleId"
                             Style="{StaticResource Input.ComboBox}" />
                     </Grid>

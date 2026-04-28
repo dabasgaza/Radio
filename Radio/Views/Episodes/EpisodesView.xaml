@@ -167,299 +167,387 @@
         </Grid>
 
         <!--  ═══════ 3. جدول البيانات ═══════  -->
-        <materialDesign:Card
+        <!--  ═══════ 3. بطاقات الحلقات ═══════  -->
+        <ListBox
+            x:Name="DgEpisodes"
             Grid.Row="2"
             Margin="24,8,24,24"
-            materialDesign:ElevationAssist.Elevation="Dp1"
-            UniformCornerRadius="16">
+            Background="Transparent"
+            BorderThickness="0"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            Style="{StaticResource MaterialDesignListBox}">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,0,0,10" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <materialDesign:Card
+                        Padding="0"
+                        materialDesign:ElevationAssist.Elevation="Dp1"
+                        Background="{StaticResource SurfaceBrush}"
+                        UniformCornerRadius="12">
 
-            <!--  استخدام نظام الـ DataGrid الموحد  -->
-            <DataGrid
-                x:Name="DgEpisodes"
-                CellStyle="{StaticResource DataGrid.Cell}"
-                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
-                RowStyle="{StaticResource DataGrid.Row}"
-                Style="{StaticResource DataGrid.Main}">
+                        <Grid>
+                            <!--  الحدود اليسرى الملونة حسب الحالة  -->
+                            <Border
+                                Width="4"
+                                HorizontalAlignment="Left"
+                                CornerRadius="12,0,0,12">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{StaticResource WarningBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
+                                                <Setter Property="Background" Value="{StaticResource SecondaryMainBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
+                                                <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
+                                                <Setter Property="Background" Value="{StaticResource ErrorBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
 
-                <DataGrid.Columns>
+                            <Grid Margin="16,16,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                    <!--  عمود البرنامج  -->
-                    <DataGridTemplateColumn
-                        Width="160"
-                        CellStyle="{StaticResource DataGrid.Cell.Center}"
-                        Header="البرنامج">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Border
-                                    Width="100"
-                                    Height="28"
-                                    Padding="16,0"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Background="{StaticResource SecondaryLightBrush}"
-                                    CornerRadius="14"
-                                    Opacity="0.8">
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        Foreground="{StaticResource TextPrimaryBrush}"
-                                        Text="{Binding ProgramName}"
-                                        TextAlignment="Center" />
-                                </Border>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                                <!--  ═══ المحتوى الرئيسي ═══  -->
+                                <StackPanel>
 
-                    <!--  عمود تفاصيل الحلقة  -->
-                    <DataGridTemplateColumn
-                        Width="250"
-                        CellStyle="{StaticResource DataGrid.Cell.Center}"
-                        Header="تفاصيل الحلقة">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Margin="8,0" VerticalAlignment="Center">
-                                    <TextBlock Foreground="{StaticResource TextPrimaryBrush}" Text="{Binding EpisodeName}" />
-                                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="14"
-                                            Foreground="{StaticResource TextHintBrush}"
-                                            Kind="AccountVoice" />
-                                        <TextBlock
-                                            Margin="6,0,0,0"
-                                            FontSize="11"
-                                            Foreground="{StaticResource TextSecondaryBrush}"
-                                            Text="{Binding GuestName}" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                                    <!--  الصف العلوي: البرنامج + شارة الحالة  -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                    <!--  اليوم (اسم اليوم)  -->
-                    <DataGridTextColumn
-                        Width="100"
-                        Binding="{Binding ScheduledExecutionTime, StringFormat='dddd', ConverterCulture='ar-SA'}"
-                        CellStyle="{StaticResource DataGrid.Cell.Center}"
-                        Header="اليوم" />
-
-                    <!--  التاريخ  -->
-                    <DataGridTextColumn
-                        Width="130"
-                        Binding="{Binding ScheduledExecutionTime, StringFormat='yyyy/MM/dd'}"
-                        CellStyle="{StaticResource DataGrid.Cell.Center}"
-                        Header="التاريخ" />
-
-                    <!--  الوقت  -->
-                    <DataGridTextColumn
-                        Width="90"
-                        Binding="{Binding ScheduledExecutionTime, StringFormat='hh:mm tt', ConverterCulture='ar-SA'}"
-                        CellStyle="{StaticResource DataGrid.Cell.Center}"
-                        Header="الوقت" />
-
-                    <!--  عمود حالة المهمة  -->
-                    <DataGridTemplateColumn
-                        Width="130"
-                        CellStyle="{StaticResource DataGrid.Cell.Center}"
-                        Header="حالة المهمة">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <materialDesign:Chip
-                                    x:Name="StatusChip"
-                                    HorizontalAlignment="Center"
-                                    Content="{Binding StatusText}">
-                                    <materialDesign:Chip.Style>
-                                        <Style BasedOn="{StaticResource {x:Type materialDesign:Chip}}" TargetType="materialDesign:Chip">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                    <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="Icon" Value="{materialDesign:PackIcon Kind=CheckAll}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
-                                                    <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="Icon" Value="{materialDesign:PackIcon Kind=CheckDecagramOutline}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding StatusText}" Value="مجدولة">
-                                                    <Setter Property="Background" Value="{StaticResource WarningBrush}" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="Icon" Value="{materialDesign:PackIcon Kind=ClockOutline}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </materialDesign:Chip.Style>
-                                </materialDesign:Chip>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <!--  عمود مركز العمليات (الأزرار)  -->
-                    <DataGridTemplateColumn
-                        Width="Auto"
-                        CellStyle="{StaticResource DataGrid.Cell.Actions}"
-                        Header="الإجراءات">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-
-                                    <!--  استخدام ستايلات الأيقونات الموحدة  -->
-                                    <Button
-                                        Click="BtnMarkExecuted_Click"
-                                        Foreground="{StaticResource SecondaryMainBrush}"
-                                        IsEnabled="{Binding CanMarkExecuted}"
-                                        Style="{StaticResource Btn.Icon}"
-                                        ToolTip="تأكيد تنفيذ البث"
-                                        Visibility="{Binding Session, Converter={StaticResource PermissionVisibilityConverter}, ConverterParameter=Episode.Execute}">
-
-                                        <materialDesign:PackIcon Kind="PlayCircleOutline" />
-                                    </Button>
-
-                                    <Button
-                                        Click="BtnMarkPublished_Click"
-                                        Foreground="{StaticResource SuccessBrush}"
-                                        IsEnabled="{Binding CanMarkPublished}"
-                                        Style="{StaticResource Btn.Icon}"
-                                        ToolTip="تأكيد النشر الرقمي">
-                                        <materialDesign:PackIcon Kind="CloudUploadOutline" />
-                                    </Button>
-
-                                    <Button
-                                        Click="BtnEdit_Click"
-                                        Style="{StaticResource Btn.Icon.Edit}"
-                                        ToolTip="تعديل">
-                                        <materialDesign:PackIcon Kind="Edit" />
-                                    </Button>
-
-                                    <Button
-                                        Click="BtnDelete_Click"
-                                        Style="{StaticResource Btn.Icon.Delete}"
-                                        ToolTip="حذف">
-                                        <materialDesign:PackIcon Kind="Delete" />
-                                    </Button>
-
-                                    <!--  باقي الإجراءات في قائمة منسدلة  -->
-                                    <materialDesign:PopupBox
-                                        PlacementMode="BottomAndAlignCentres"
-                                        PopupHorizontalOffset="-60"
-                                        StaysOpen="False"
-                                        ToolTip="المزيد من الإجراءات">
+                                        <!--  شارة البرنامج  -->
                                         <Border
-                                            MinWidth="200"
-                                            Padding="4"
-                                            Background="{DynamicResource MaterialDesignPaper}"
-                                            CornerRadius="12"
-                                            Effect="{DynamicResource MaterialDesignShadowDepth2}">
-                                            <StackPanel Orientation="Vertical">
-
-                                                <Button
-                                                    Height="40"
-                                                    Padding="12,0"
-                                                    HorizontalContentAlignment="Right"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Click="BtnMarkExecuted_Click"
-                                                    Cursor="Hand"
-                                                    IsEnabled="{Binding CanMarkExecuted}">
-                                                    <Button.Style>
-                                                        <Style TargetType="Button">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate TargetType="Button">
-                                                                        <Border
-                                                                            x:Name="ItemBorder"
-                                                                            Padding="12,8"
-                                                                            Background="Transparent"
-                                                                            CornerRadius="8"
-                                                                            SnapsToDevicePixels="True">
-                                                                            <StackPanel Orientation="Horizontal">
-                                                                                <TextBlock
-                                                                                    VerticalAlignment="Center"
-                                                                                    FontFamily="{DynamicResource MaterialDesignFont}"
-                                                                                    FontSize="13"
-                                                                                    Text="تأكيد التنفيذ" />
-                                                                                <materialDesign:PackIcon
-                                                                                    Width="20"
-                                                                                    Height="20"
-                                                                                    Margin="12,0,0,0"
-                                                                                    VerticalAlignment="Center"
-                                                                                    Foreground="{DynamicResource MaterialDesignBody}"
-                                                                                    Kind="PlayCircleOutline" />
-                                                                            </StackPanel>
-                                                                        </Border>
-                                                                        <ControlTemplate.Triggers>
-                                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
-                                                                            </Trigger>
-                                                                            <Trigger Property="IsEnabled" Value="False">
-                                                                                <Setter Property="Opacity" Value="0.38" />
-                                                                            </Trigger>
-                                                                        </ControlTemplate.Triggers>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style>
-                                                    </Button.Style>
-                                                </Button>
-
-                                                <Button
-                                                    Height="40"
-                                                    Padding="12,0"
-                                                    HorizontalContentAlignment="Right"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Click="BtnMarkPublished_Click"
-                                                    Cursor="Hand"
-                                                    IsEnabled="{Binding CanMarkPublished}">
-                                                    <Button.Style>
-                                                        <Style TargetType="Button">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate TargetType="Button">
-                                                                        <Border
-                                                                            x:Name="ItemBorder"
-                                                                            Padding="12,8"
-                                                                            Background="Transparent"
-                                                                            CornerRadius="8"
-                                                                            SnapsToDevicePixels="True">
-                                                                            <StackPanel Orientation="Horizontal">
-                                                                                <TextBlock
-                                                                                    VerticalAlignment="Center"
-                                                                                    FontFamily="{DynamicResource MaterialDesignFont}"
-                                                                                    FontSize="13"
-                                                                                    Text="تأكيد النشر الرقمي" />
-                                                                                <materialDesign:PackIcon
-                                                                                    Width="20"
-                                                                                    Height="20"
-                                                                                    Margin="12,0,0,0"
-                                                                                    VerticalAlignment="Center"
-                                                                                    Foreground="{DynamicResource MaterialDesignBody}"
-                                                                                    Kind="CloudUploadOutline" />
-                                                                            </StackPanel>
-                                                                        </Border>
-                                                                        <ControlTemplate.Triggers>
-                                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
-                                                                            </Trigger>
-                                                                            <Trigger Property="IsEnabled" Value="False">
-                                                                                <Setter Property="Opacity" Value="0.38" />
-                                                                            </Trigger>
-                                                                        </ControlTemplate.Triggers>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style>
-                                                    </Button.Style>
-                                                </Button>
-
+                                            Padding="10,4"
+                                            HorizontalAlignment="Left"
+                                            Background="{StaticResource PrimaryXLightBrush}"
+                                            CornerRadius="6">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon
+                                                    Width="14"
+                                                    Height="14"
+                                                    Margin="0,0,5,0"
+                                                    VerticalAlignment="Center"
+                                                    Foreground="{StaticResource PrimaryMainBrush}"
+                                                    Kind="RadioFm" />
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    FontWeight="Medium"
+                                                    Foreground="{StaticResource PrimaryMainBrush}"
+                                                    Text="{Binding ProgramName}" />
                                             </StackPanel>
                                         </Border>
-                                    </materialDesign:PopupBox>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
 
-                </DataGrid.Columns>
-            </DataGrid>
-        </materialDesign:Card>
+                                        <!--  شارة الحالة + الوقت  -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+
+                                            <Border
+                                                Margin="0,0,10,0"
+                                                Padding="10,4"
+                                                Background="{StaticResource SurfaceVariantBrush}"
+                                                CornerRadius="6">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <materialDesign:PackIcon
+                                                        Width="13"
+                                                        Height="13"
+                                                        Margin="0,0,4,0"
+                                                        VerticalAlignment="Center"
+                                                        Foreground="{StaticResource TextHintBrush}"
+                                                        Kind="ClockOutline" />
+                                                    <TextBlock
+                                                        FontSize="12"
+                                                        Foreground="{StaticResource TextSecondaryBrush}"
+                                                        Text="{Binding ScheduledExecutionTime, StringFormat='dddd  dd/MM  hh:mm', ConverterCulture='ar-SA'}" />
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!--  Chip الحالة  -->
+                                            <materialDesign:Chip
+                                                Height="26"
+                                                Content="{Binding StatusText}"
+                                                FontSize="11">
+                                                <materialDesign:Chip.Style>
+                                                    <Style BasedOn="{StaticResource {x:Type materialDesign:Chip}}" TargetType="materialDesign:Chip">
+                                                        <Setter Property="FontSize" Value="11" />
+                                                        <Setter Property="Height" Value="26" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding StatusText}" Value="مجدولة">
+                                                                <Setter Property="Background" Value="{StaticResource WarningBrush}" />
+                                                                <Setter Property="Foreground" Value="White" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
+                                                                <Setter Property="Background" Value="{StaticResource SecondaryMainBrush}" />
+                                                                <Setter Property="Foreground" Value="White" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
+                                                                <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
+                                                                <Setter Property="Foreground" Value="White" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
+                                                                <Setter Property="Background" Value="{StaticResource ErrorBrush}" />
+                                                                <Setter Property="Foreground" Value="White" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </materialDesign:Chip.Style>
+                                            </materialDesign:Chip>
+
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!--  عنوان الحلقة  -->
+                                    <TextBlock
+                                        Margin="0,10,0,0"
+                                        FontSize="15"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                        Text="{Binding EpisodeName}" />
+
+                                    <!--  الضيوف  -->
+                                    <StackPanel Margin="0,8,0,0">
+                                        <!--  رأس الجدول: أيقونة + عنوان (يُخفى عند عدم وجود ضيوف)  -->
+                                        <StackPanel Orientation="Horizontal">
+                                            <StackPanel.Style>
+                                                <Style TargetType="StackPanel">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding GuestItems.Count}" Value="0">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </StackPanel.Style>
+                                            <materialDesign:PackIcon
+                                                Width="15"
+                                                Height="15"
+                                                Margin="0,0,5,0"
+                                                VerticalAlignment="Center"
+                                                Foreground="{StaticResource TextHintBrush}"
+                                                Kind="AccountVoice" />
+                                            <TextBlock
+                                                FontSize="13"
+                                                FontWeight="SemiBold"
+                                                Foreground="{StaticResource TextSecondaryBrush}"
+                                                Text="الضيوف" />
+                                        </StackPanel>
+
+                                        <!--  جدول الضيوف  -->
+                                        <ItemsControl Margin="20,4,0,0" ItemsSource="{Binding GuestItems}">
+                                            <ItemsControl.Style>
+                                                <Style TargetType="ItemsControl">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding GuestItems.Count}" Value="0">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ItemsControl.Style>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,1">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock
+                                                            Grid.Column="0"
+                                                            MinWidth="60"
+                                                            FontSize="12"
+                                                            FontWeight="Medium"
+                                                            Foreground="{StaticResource TextPrimaryBrush}"
+                                                            Text="{Binding Name}" />
+                                                        <TextBlock
+                                                            Grid.Column="1"
+                                                            MinWidth="50"
+                                                            Margin="8,0,0,0"
+                                                            FontSize="11"
+                                                            Foreground="{StaticResource TextHintBrush}"
+                                                            Text="{Binding HostingTime, StringFormat='hh\\:mm'}">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding HostingTime}" Value="{x:Null}">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                        <TextBlock
+                                                            Grid.Column="2"
+                                                            Margin="8,0,0,0"
+                                                            FontSize="12"
+                                                            Foreground="{StaticResource TextHintBrush}"
+                                                            Text="{Binding Topic}"
+                                                            TextTrimming="CharacterEllipsis">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Topic}" Value="{x:Null}">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Topic}" Value="">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <!--  نص احتياطي عند عدم وجود ضيوف  -->
+                                        <TextBlock
+                                            FontSize="13"
+                                            Foreground="{StaticResource TextSecondaryBrush}"
+                                            Text="{Binding GuestsDisplay}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding GuestItems.Count}" Value="0">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <!--  ملاحظات  -->
+                                    <TextBlock
+                                        Margin="0,6,0,0"
+                                        FontSize="12"
+                                        Foreground="{StaticResource TextHintBrush}"
+                                        Text="{Binding SpecialNotes}"
+                                        TextTrimming="CharacterEllipsis">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <Trigger Property="Text" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                    <Trigger Property="Text" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
+                                </StackPanel>
+
+                                <!--  ═══ شريط الإجراءات الجانبي ═══  -->
+                                <Border
+                                    Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    Padding="6,0"
+                                    Background="{StaticResource SurfaceVariantBrush}"
+                                    CornerRadius="8">
+                                    <StackPanel VerticalAlignment="Center">
+
+                                        <Button
+                                            Width="34"
+                                            Height="34"
+                                            Padding="0"
+                                            Click="BtnMarkExecuted_Click"
+                                            Foreground="{StaticResource SecondaryMainBrush}"
+                                            IsEnabled="{Binding CanMarkExecuted}"
+                                            Style="{StaticResource Btn.Icon}"
+                                            ToolTip="تنفيذ البث">
+                                            <materialDesign:PackIcon
+                                                Width="18"
+                                                Height="18"
+                                                Kind="PlayCircleOutline" />
+                                        </Button>
+
+                                        <Button
+                                            Width="34"
+                                            Height="34"
+                                            Padding="0"
+                                            Click="BtnMarkPublished_Click"
+                                            Foreground="{StaticResource SuccessBrush}"
+                                            IsEnabled="{Binding CanMarkPublished}"
+                                            Style="{StaticResource Btn.Icon}"
+                                            ToolTip="النشر الرقمي">
+                                            <materialDesign:PackIcon
+                                                Width="18"
+                                                Height="18"
+                                                Kind="CloudUploadOutline" />
+                                        </Button>
+
+                                        <Button
+                                            Click="BtnToggleWebsitePublish_Click"
+                                            Foreground="{StaticResource PrimaryMainBrush}"
+                                            IsEnabled="{Binding CanToggleWebsitePublish}"
+                                            Style="{StaticResource Btn.Icon}"
+                                            ToolTip="النشر عبر الموقع الإلكتروني">
+                                            <materialDesign:PackIcon Kind="Web" />
+                                        </Button>
+                                        <Separator Margin="6,4" Background="{StaticResource DividerBrush}" />
+
+                                        <Button
+                                            Width="34"
+                                            Height="34"
+                                            Padding="0"
+                                            Click="BtnEdit_Click"
+                                            Style="{StaticResource Btn.Icon.Edit}"
+                                            ToolTip="تعديل">
+                                            <materialDesign:PackIcon
+                                                Width="18"
+                                                Height="18"
+                                                Kind="PencilOutline" />
+                                        </Button>
+
+                                        <Button
+                                            Width="34"
+                                            Height="34"
+                                            Padding="0"
+                                            Click="BtnDelete_Click"
+                                            Style="{StaticResource Btn.Icon.Delete}"
+                                            ToolTip="حذف">
+                                            <materialDesign:PackIcon
+                                                Width="18"
+                                                Height="18"
+                                                Kind="DeleteOutline" />
+                                        </Button>
+
+                                    </StackPanel>
+                                </Border>
+
+                            </Grid>
+                        </Grid>
+                    </materialDesign:Card>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </UserControl>

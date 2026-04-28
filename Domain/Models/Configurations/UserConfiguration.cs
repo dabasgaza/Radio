@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Models.Configurations;
@@ -69,5 +69,20 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
               .WithMany(p => p.InverseUpdatedByUser) // تغيير الاسم من InverseUpdatedByUser ليكون معبراً
               .HasForeignKey(d => d.UpdatedByUserId)
               .OnDelete(DeleteBehavior.Restrict);
+
+        // 5. Seed Data
+        builder.HasData(
+            new User
+            {
+                UserId = 1,
+                Username = "admin",
+                PasswordHash = "$2a$11$24Mf/Vktd2tHGnC3f/iyTOmKMaQtcy4T0qOT07h22jC0Teor66hZa",
+                FullName = "مدير النظام",
+                RoleId = 1,
+                IsActive = true,
+                CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc)
+            }
+        );
     }
 }

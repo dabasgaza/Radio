@@ -1,4 +1,6 @@
-﻿namespace DataAccess.DTOs
+﻿using DataAccess.Services;
+
+namespace DataAccess.DTOs
 {
     public record ActiveEpisodeDto
     {
@@ -16,10 +18,14 @@
 
 
         // 👈 منطق تفعيل زر التنفيذ: فقط إذا كانت الحالة "مجدولة" (0)
-        public bool CanMarkExecuted => StatusId == 0;
+        public bool CanMarkExecuted => StatusId == EpisodeStatus.Planned;
 
         // 👈 منطق تفعيل زر النشر: فقط إذا كانت الحالة "منفذة" (1)
-        public bool CanMarkPublished => StatusId == 1;
+        public bool CanMarkPublished => StatusId == EpisodeStatus.Executed;
+        
+        public bool CanToggleWebsitePublish => StatusId >= EpisodeStatus.Executed && StatusId <= EpisodeStatus.Published;
+
+        public List<GuestDisplayItem> GuestItems { get; init; } = [];
     }
 
 }

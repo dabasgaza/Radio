@@ -1,5 +1,6 @@
 ﻿using DataAccess.Common;
 using DataAccess.Data;
+using DataAccess.Seeding;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
@@ -26,7 +27,6 @@ namespace Radio
         public IConfiguration Configuration { get; private set; } = null!;
         public static IHost AppHost { get; private set; } = null!;
 
-        /// ✅ النهج الحديث في .NET 10: استخدام HostBuilder لتهيئة التطبيق وخدماته
         public App()
         {
             // ✅ النهج الحديث في .NET 10 (بدلاً من CreateDefaultBuilder)
@@ -96,6 +96,20 @@ namespace Radio
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
+            //// 3. إنشاء البيانات الأساسية (Seed)
+            //try
+            //{
+            //    var dbFactory = ServiceProvider.GetRequiredService<IDbContextFactory<BroadcastWorkflowDBContext>>();
+            //    await DbSeeder.SeedAsync(dbFactory);
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(
+            //        $"فشل إنشاء البيانات الأساسية:\n{ex.Message}",
+            //        "خطأ في Seeding",
+            //        MessageBoxButton.OK,
+            //        MessageBoxImage.Error);
+            //}
 
             // ✅ تهيئة MessageService من DI
             MessageService.Initialize(AppHost.Services.GetRequiredService<IMessageService>());
