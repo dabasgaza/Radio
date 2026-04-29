@@ -90,26 +90,33 @@
                         materialDesign:TextFieldAssist.LeadingIcon="FileDocumentEditOutline"
                         Style="{StaticResource Input.Text}" />
 
-                    <Grid Margin="0,0,0,24">
+                    <TextBox
+                        x:Name="TxtLocation"
+                        materialDesign:HintAssist.Hint="الموقع الجغرافي"
+                        materialDesign:TextFieldAssist.LeadingIcon="MapMarkerPath"
+                        Style="{StaticResource Input.Text}" />
+
+
+                    <Grid Margin="0,24,0,24">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBox
-                            x:Name="TxtLocation"
-                            Grid.Column="0"
-                            materialDesign:HintAssist.Hint="الموقع الجغرافي"
-                            materialDesign:TextFieldAssist.LeadingIcon="MapMarkerPath"
-                            Style="{StaticResource Input.Text}" />
-
                         <DatePicker
                             x:Name="DpDate"
-                            Grid.Column="2"
+                            Grid.Column="0"
                             materialDesign:HintAssist.Hint="تاريخ التغطية"
                             materialDesign:TextFieldAssist.LeadingIcon="CalendarClockOutline"
                             Style="{StaticResource Input.DatePicker}" />
+
+                        <materialDesign:TimePicker
+                            x:Name="DpTime"
+                            Grid.Column="2"
+                            materialDesign:HintAssist.Hint="وقت التغطية"
+                            materialDesign:TextFieldAssist.LeadingIcon="ClockOutline"
+                            Style="{StaticResource Input.TimePicker}" />
                     </Grid>
 
                 </StackPanel>

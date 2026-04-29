@@ -204,6 +204,7 @@
                                     <Button
                                         Width="35"
                                         Height="35"
+                                        Click="BtnEdit_Click"
                                         Style="{StaticResource MaterialDesignIconButton}"
                                         ToolTip="تعديل">
                                         <materialDesign:PackIcon
@@ -215,6 +216,7 @@
                                         Width="35"
                                         Height="35"
                                         Margin="8,0"
+                                        Click="BtnDelete_Click"
                                         Style="{StaticResource MaterialDesignIconButton}"
                                         ToolTip="حذف">
                                         <materialDesign:PackIcon

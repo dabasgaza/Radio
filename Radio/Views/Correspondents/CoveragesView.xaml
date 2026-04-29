@@ -211,15 +211,11 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+
                                     <TextBlock
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
-                                        FontWeight="Medium"
-                                        Text="{Binding ScheduledDate, StringFormat=yyyy/MM/dd}" />
-                                    <TextBlock
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        FontSize="11"
+                                        FontSize="14"
                                         Opacity="0.6"
                                         Text="{Binding ScheduledTime, StringFormat=hh:mm tt}" />
                                 </StackPanel>

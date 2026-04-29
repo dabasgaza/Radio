@@ -23,8 +23,8 @@ namespace DataAccess.DTOs
         // 👈 منطق تفعيل زر النشر: فقط إذا كانت الحالة "منفذة" (1)
         public bool CanMarkPublished => StatusId == EpisodeStatus.Executed;
         
-        public bool CanToggleWebsitePublish => StatusId >= EpisodeStatus.Executed && StatusId <= EpisodeStatus.Published;
-
+        // 👈 منطق تفعيل زر نشر الموقع: فقط إذا كانت الحالة "منفذة" (1) أو "منشورة" (2) أو "منشورة على الموقع" (3)
+        public bool CanToggleWebsitePublish => StatusId >= EpisodeStatus.Executed && StatusId != EpisodeStatus.Cancelled;
         public List<GuestDisplayItem> GuestItems { get; init; } = [];
     }
 

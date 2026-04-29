@@ -4,6 +4,7 @@ using DataAccess.Services.Messaging;
 using DataAccess.Validation;
 using MaterialDesignThemes.Wpf;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
@@ -12,7 +13,7 @@ namespace Radio.Views.Episodes
     /// <summary>
     /// نموذج عرض لصف واحد في DataGrid الضيوف
     /// </summary>
-    public class GuestRow
+    public class GuestRow : INotifyPropertyChanged
     {
         public int Id { get; set; }
         public int GuestId { get; set; }
@@ -24,6 +25,8 @@ namespace Radio.Views.Episodes
             HostingTime.HasValue
                 ? HostingTime.Value.ToString(@"hh\:mm")
                 : string.Empty;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 
     /// <summary>

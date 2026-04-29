@@ -65,6 +65,7 @@ namespace Radio.Views.Correspondents
                     TxtTopic.Text = _existingCoverage.Topic;
                     TxtLocation.Text = _existingCoverage.Location;
                     DpDate.SelectedDate = _existingCoverage.ScheduledTime;
+                    DpTime.SelectedTime = _existingCoverage.ScheduledTime;
                 }
             }
             catch (UnauthorizedAccessException)
@@ -86,6 +87,16 @@ namespace Radio.Views.Correspondents
         /// </summary>
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
+            // ✅ دمج التاريخ والوقت في قيمة واحدة
+            DateTime? scheduledTime = null;
+
+            if (DpDate.SelectedDate.HasValue)
+            {
+                var date = DpDate.SelectedDate.Value.Date;
+                var time = DpTime.SelectedTime?.TimeOfDay ?? TimeSpan.Zero;
+                scheduledTime = date.Add(time);
+            }
+
             var dto = new CoverageDto
             {
                 CoverageId = _existingCoverage?.CoverageId ?? 0,
@@ -93,7 +104,7 @@ namespace Radio.Views.Correspondents
                 GuestId = (int?)CboGuests.SelectedValue,
                 Topic = TxtTopic.Text.Trim(),
                 Location = TxtLocation.Text.Trim(),
-                ScheduledTime = DpDate.SelectedDate,
+                ScheduledTime = scheduledTime,
                 ActualTime = _existingCoverage?.ActualTime
             };
 

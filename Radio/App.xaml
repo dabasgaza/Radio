@@ -138,6 +138,8 @@
 
             <converter:PermissionVisibilityConverter x:Key="PermissionVisibilityConverter" />
 
+            <converter:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
+
             <!--
                 ══════════════════════════════════════════════════
                 ON AIR Pulse Storyboard (global — يُستخدم في MainWindow)

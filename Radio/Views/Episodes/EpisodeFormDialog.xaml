@@ -5,7 +5,7 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="إدارة بيانات الحلقة"
-    Width="720"
+    Width="800"
     MaxHeight="800"
     SizeToContent="Height"
     Style="{StaticResource Window.Dialog}"
@@ -199,15 +199,15 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn
                                         Width="*"
-                                        Binding="{Binding GuestName}"
+                                        Binding="{Binding GuestName, NotifyOnSourceUpdated=True}"
                                         Header="الضيف" />
                                     <DataGridTextColumn
                                         Width="*"
-                                        Binding="{Binding Topic}"
+                                        Binding="{Binding Topic, NotifyOnSourceUpdated=True}"
                                         Header="الموضوع" />
                                     <DataGridTextColumn
                                         Width="130"
-                                        Binding="{Binding HostingTimeDisplay}"
+                                        Binding="{Binding HostingTimeDisplay, NotifyOnSourceUpdated=True}"
                                         Header="الساعة" />
                                     <DataGridTemplateColumn
                                         Width="70"

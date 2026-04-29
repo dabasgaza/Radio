@@ -42,7 +42,8 @@ public static class DbSeeder
             new() { StatusId = 0, StatusName = "Planned",   DisplayName = "مخطط لها",  SortOrder = 0 },
             new() { StatusId = 1, StatusName = "Executed",  DisplayName = "تم تنفيذها", SortOrder = 1 },
             new() { StatusId = 2, StatusName = "Published", DisplayName = "تم نشرها",  SortOrder = 2 },
-            new() { StatusId = 3, StatusName = "Cancelled", DisplayName = "ملغاة",     SortOrder = 3 },
+            new() { StatusId = 3, StatusName = "WebsitePublished", DisplayName = "منشورة على الموقع", SortOrder = 3 },
+            new() { StatusId = 4, StatusName = "Cancelled", DisplayName = "ملغاة", SortOrder = 4 },
         };
 
         context.Set<EpisodeStatus>().AddRange(statuses);

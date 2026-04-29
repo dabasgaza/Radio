@@ -120,7 +120,7 @@ namespace Radio.Views.Episodes
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto selectedEpisode)
                 return;
 
-            if (selectedEpisode.StatusText is "منفّذة" or "منشورة")
+            if (selectedEpisode.StatusText is "منفّذة" or "منشورة رقمياً" or "منشورة على الموقع")
             {
                 MessageService.Current.ShowWarning(
                     "لا يمكن حذف حلقة تم تنفيذها أو نشرها، يُرجى إلغائها أولاً.");
@@ -198,14 +198,14 @@ namespace Radio.Views.Episodes
 
             try
             {
-                var newStatus = !ep.IsWebsitePublished;
-                await _episodeService.ToggleWebsitePublishAsync(ep.EpisodeId, newStatus, _session);
-
+                // تحقق من الحالة الحالية للحلقة قبل التبديل    
+                var isCurrentlyPublished = ep.StatusId == EpisodeStatus.WebsitePublished;
+                await _episodeService.ToggleWebsitePublishAsync(ep.EpisodeId, !isCurrentlyPublished, _session);
 
                 await LoadDataAsync();
 
                 MessageService.Current.ShowSuccess(
-                    newStatus
+                    !isCurrentlyPublished
                         ? "تم نشر الحلقة على الموقع بنجاح."
                         : "تم إلغاء نشر الحلقة من الموقع.");
             }
@@ -238,8 +238,9 @@ namespace Radio.Views.Episodes
             }
 
             TxtTotal.Text = data.Count.ToString();
-            TxtPublished.Text = data.Count(e => e.StatusText == "منشورة").ToString();
-            TxtExecuted.Text = data.Count(e => e.StatusText == "مجدولة").ToString();
+            TxtExecuted.Text = data.Count(e => e.StatusId == DataAccess.Services.EpisodeStatus.Planned).ToString();
+            TxtPublished.Text = data.Count(e => e.StatusId == DataAccess.Services.EpisodeStatus.Published ||
+                                              e.StatusId == DataAccess.Services.EpisodeStatus.WebsitePublished).ToString();
         }
 
         #endregion

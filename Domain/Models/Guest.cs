@@ -17,8 +17,5 @@ public partial class Guest : BaseEntity
     public string EmailAddress { get; set; }
 
     public virtual ICollection<CorrespondentCoverage> CorrespondentCoverages { get; set; } = new List<CorrespondentCoverage>();
-
-    public virtual ICollection<Episode> Episodes { get; set; } = new List<Episode>();
-
     public virtual ICollection<EpisodeGuest> EpisodeGuests { get; set; } = new List<EpisodeGuest>();
 }
