@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -41,10 +41,6 @@ namespace Radio.Views.Programs
             {
                 _allPrograms = (await _programService.GetAllActiveAsync()).ToList();
                 DgPrograms.ItemsSource = _allPrograms;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض البرامج.");
             }
             catch (InvalidOperationException ex)
             {
@@ -137,17 +133,17 @@ namespace Radio.Views.Programs
 
             try
             {
-                await _programService.SoftDeleteAsync(prog.ProgramId, _session);
-                await LoadDataAsync();
-                MessageService.Current.ShowSuccess($"تم حذف البرنامج «{prog.ProgramName}» بنجاح.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لحذف البرامج.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                var result = await _programService.SoftDeleteAsync(prog.ProgramId, _session);
+
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess($"تم حذف البرنامج «{prog.ProgramName}» بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الحذف.");
+                }
             }
             catch (Exception)
             {

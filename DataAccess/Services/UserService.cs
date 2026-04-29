@@ -8,13 +8,13 @@ namespace DataAccess.Services
     public interface IUserService
     {
         Task<List<UserDto>> GetAllUsersAsync();
-        Task CreateUserAsync(UserDto dto, string plainPassword, UserSession session);
-        Task UpdateUserAsync(UserDto dto, string? newPassword, UserSession session);
-        Task ToggleUserStatusAsync(int userId, bool isActive, UserSession session);
+        Task<Result> CreateUserAsync(UserDto dto, string plainPassword, UserSession session);
+        Task<Result> UpdateUserAsync(UserDto dto, string? newPassword, UserSession session);
+        Task<Result> ToggleUserStatusAsync(int userId, bool isActive, UserSession session);
         Task<List<RoleDto>> GetRolesAsync();
         Task<List<PermissionViewModel>> GetPermissionsMatrixAsync(int roleId);
-        Task UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session);
-        Task DeleteUserAsync(int userId, UserSession session);
+        Task<Result> UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session);
+        Task<Result> DeleteUserAsync(int userId, UserSession session);
     }
 
     public class UserService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IUserService
@@ -42,14 +42,15 @@ namespace DataAccess.Services
                 .ToListAsync();
         }
 
-        public async Task CreateUserAsync(UserDto dto, string plainPassword, UserSession session)
+        public async Task<Result> CreateUserAsync(UserDto dto, string plainPassword, UserSession session)
         {
-            session.EnsurePermission(AppPermissions.UserManage);
+            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
             await using var context = await contextFactory.CreateDbContextAsync();
 
             if (await context.Users.AnyAsync(u => u.Username == dto.Username))
-                throw new InvalidOperationException("اسم المستخدم موجود بالفعل في النظام.");
+                return Result.Fail("اسم المستخدم موجود بالفعل في النظام.");
 
             var user = new User
             {
@@ -64,15 +65,18 @@ namespace DataAccess.Services
 
             context.Users.Add(user);
             await context.SaveChangesAsync();
+            return Result.Success();
         }
 
-        public async Task UpdateUserAsync(UserDto dto, string? newPassword, UserSession session)
+        public async Task<Result> UpdateUserAsync(UserDto dto, string? newPassword, UserSession session)
         {
-            session.EnsurePermission(AppPermissions.UserManage);
+            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
             await using var context = await contextFactory.CreateDbContextAsync();
-            var dbUser = await context.Users.FindAsync(dto.UserId)
-                ?? throw new KeyNotFoundException("المستخدم غير موجود.");
+            var dbUser = await context.Users.FindAsync(dto.UserId);
+
+            if (dbUser == null) return Result.Fail("المستخدم غير موجود.");
 
             dbUser.FullName = dto.FullName;
             dbUser.EmailAddress = dto.EmailAddress;
@@ -85,26 +89,30 @@ namespace DataAccess.Services
             try
             {
                 await context.SaveChangesAsync();
+                return Result.Success();
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw new InvalidOperationException("تم تعديل بيانات هذا المستخدم من قبل شخص آخر. يرجى التحديث والمحاولة ثانية.");
+                return Result.Fail("تم تعديل بيانات هذا المستخدم من قبل شخص آخر. يرجى التحديث والمحاولة ثانية.");
             }
         }
 
-        public async Task ToggleUserStatusAsync(int userId, bool isActive, UserSession session)
+        public async Task<Result> ToggleUserStatusAsync(int userId, bool isActive, UserSession session)
         {
-            session.EnsurePermission(AppPermissions.UserManage);
+            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
             if (userId == session.UserId)
-                throw new InvalidOperationException("لا يمكنك تعطيل حسابك الشخصي لأسباب أمنية.");
+                return Result.Fail("لا يمكنك تعطيل حسابك الشخصي لأسباب أمنية.");
 
             await using var context = await contextFactory.CreateDbContextAsync();
-            var user = await context.Users.FindAsync(userId)
-                ?? throw new KeyNotFoundException("المستخدم غير موجود.");
+            var user = await context.Users.FindAsync(userId);
+
+            if (user == null) return Result.Fail("المستخدم غير موجود.");
 
             user.IsActive = isActive;
             await context.SaveChangesAsync();
+            return Result.Success();
         }
 
         #endregion
@@ -151,13 +159,13 @@ namespace DataAccess.Services
             }).ToList();
         }
 
-        public async Task UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session)
+        public async Task<Result> UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session)
         {
-            session.EnsurePermission(AppPermissions.UserManage);
+            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
             await using var context = await contextFactory.CreateDbContextAsync();
 
-            // ✅ الخطوة 1: حذف الصلاحيات الحالية (SaveChanges منفصل)
             var existing = await context.RolePermissions
                 .Where(rp => rp.RoleId == roleId)
                 .ToListAsync();
@@ -168,7 +176,6 @@ namespace DataAccess.Services
                 await context.SaveChangesAsync();
             }
 
-            // ✅ الخطوة 2: إضافة الصلاحيات الجديدة (SaveChanges منفصل)
             if (selectedPermissionIds.Count > 0)
             {
                 context.RolePermissions.AddRange(
@@ -180,10 +187,12 @@ namespace DataAccess.Services
 
                 await context.SaveChangesAsync();
             }
+
+            return Result.Success();
         }
-        public Task DeleteUserAsync(int userId, UserSession session)
+        public Task<Result> DeleteUserAsync(int userId, UserSession session)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(Result.Fail("خاصية حذف المستخدمين غير متاحة حالياً."));
         }
 
 

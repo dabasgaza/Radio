@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,16 +8,17 @@ namespace DataAccess.Services;
 public interface IPublishingService
 {
     // ✨ استقبال DTO بدلاً من الكيان
-    Task LogPublishingAsync(PublishingLogDto dto, UserSession session);
+    Task<Result> LogPublishingAsync(PublishingLogDto dto, UserSession session);
 }
 
 // ✨ استخدام Primary Constructor
 public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IPublishingService
 {
-    public async Task LogPublishingAsync(PublishingLogDto dto, UserSession session)
+    public async Task<Result> LogPublishingAsync(PublishingLogDto dto, UserSession session)
     {
         // ✨ استخدام الـ Extension Method
-        session.EnsurePermission(AppPermissions.EpisodePublish);
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodePublish);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
         using var transaction = await context.Database.BeginTransactionAsync();
@@ -40,17 +41,18 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
             var episode = await context.Episodes.FindAsync(dto.EpisodeId);
 
             if (episode == null)
-                throw new KeyNotFoundException("عذراً، لم يتم العثور على الحلقة المطلوبة.");
+                return Result.Fail("عذراً، لم يتم العثور على الحلقة المطلوبة.");
 
             // ✨ استخدام الثوابت بدلاً من الأرقام السحرية
             if (episode.StatusId != EpisodeStatus.Executed)
-                throw new InvalidOperationException("لا يمكن نشر حلقة لم يتم توثيق تنفيذها (الإنتاج) أولاً.");
+                return Result.Fail("لا يمكن نشر حلقة لم يتم توثيق تنفيذها (الإنتاج) أولاً.");
 
             episode.StatusId = EpisodeStatus.Published;
             // ✨ الإشارة للـ Interceptor أنه سيتولى UpdatedAt و UpdatedByUserId
 
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
+            return Result.Success();
 
             // ❌ تم إزالة MessageService (الـ UI سيتولى عرض رسالة النجاح)
         }

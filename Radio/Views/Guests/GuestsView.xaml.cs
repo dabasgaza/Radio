@@ -43,10 +43,6 @@ namespace Radio.Views.Guests
                 _allGuests = (await _guestService.GetAllActiveAsync()).ToList();
                 DgGuests.ItemsSource = _allGuests;
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض بيانات الضيوف.");
-            }
             catch (InvalidOperationException ex)
             {
                 MessageService.Current.ShowWarning(ex.Message);
@@ -127,17 +123,16 @@ namespace Radio.Views.Guests
 
             try
             {
-                await _guestService.SoftDeleteGuestAsync(guest.GuestId, _session);
-                await LoadDataAsync();
-                MessageService.Current.ShowSuccess($"تم حذف الضيف «{guest.FullName}» بنجاح.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لحذف الضيوف.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                var result = await _guestService.SoftDeleteGuestAsync(guest.GuestId, _session);
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess($"تم حذف الضيف «{guest.FullName}» بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحذف.");
+                }
             }
             catch (Exception)
             {

@@ -39,10 +39,6 @@ namespace Radio.Views.Reports
 
                 DgProgramStats.ItemsSource = await _reportsService.GetMostActiveProgramsAsync();
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض التقارير.");
-            }
             catch (InvalidOperationException ex)
             {
                 MessageService.Current.ShowWarning(ex.Message);

@@ -4,7 +4,6 @@ using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
 using Radio.Views.Common;
-using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Guests
@@ -54,21 +53,34 @@ namespace Radio.Views.Guests
 
             try
             {
-                ValidationPipeline.ValidateGuest(dto);
+                var validation = ValidationPipeline.ValidateGuest(dto);
+                if (!validation.IsSuccess)
+                {
+                    MessageService.Current.ShowWarning(validation.ErrorMessage ?? "أخطاء في التحقق.");
+                    return;
+                }
 
                 BtnSave.IsEnabled = false;
 
+                DataAccess.Common.Result result;
                 if (_existingGuest is null)
-                    await _guestService.CreateGuestAsync(dto, _session);
+                    result = await _guestService.CreateGuestAsync(dto, _session);
                 else
-                    await _guestService.UpdateGuestAsync(dto, _session);
+                    result = await _guestService.UpdateGuestAsync(dto, _session);
 
-                MessageService.Current.ShowSuccess(
-                    _existingGuest is null
-                        ? "تمت إضافة الضيف بنجاح."
-                        : "تم تعديل بيانات الضيف بنجاح.");
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess(
+                        _existingGuest is null
+                            ? "تمت إضافة الضيف بنجاح."
+                            : "تم تعديل بيانات الضيف بنجاح.");
 
-                DialogResult = true;
+                    DialogResult = true;
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت العملية.");
+                }
             }
             catch (ConcurrencyException ex)
             {
@@ -78,14 +90,22 @@ namespace Radio.Views.Guests
                 {
                     try
                     {
-                        // ✅ لا حاجة لإعادة BtnSave.IsEnabled = false — finally الخارجي يكفي
+                        DataAccess.Common.Result retryResult;
                         if (_existingGuest is null)
-                            await _guestService.CreateGuestAsync(dto, _session);
+                            retryResult = await _guestService.CreateGuestAsync(dto, _session);
                         else
-                            await _guestService.UpdateGuestAsync(dto, _session);
+                            retryResult = await _guestService.UpdateGuestAsync(dto, _session);
 
-                        MessageService.Current.ShowSuccess("تم الحفظ بنجاح بعد حل تعارض البيانات.");
-                        DialogResult = true;
+                        if (retryResult.IsSuccess)
+                        {
+                            MessageService.Current.ShowSuccess("تم الحفظ بنجاح بعد حل تعارض البيانات.");
+                            DialogResult = true;
+                        }
+                        else
+                        {
+                            MessageService.Current.ShowWarning(
+                                retryResult.ErrorMessage ?? "فشل الحفظ بعد محاولة حل التعارض.");
+                        }
                     }
                     catch (ConcurrencyException)
                     {
@@ -96,29 +116,12 @@ namespace Radio.Views.Guests
                     {
                         MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء إعادة المحاولة.");
                     }
-                    // ✅ إزالة finally الداخلي — finally الخارجي يعيد تفعيل الزر
                 }
                 else
                 {
                     MessageService.Current.ShowInfo(
                         "تم إلغاء العملية. يرجى إغلاق النافذة وإعادة فتحها للحصول على أحدث نسخة.");
                 }
-            }
-            catch (ValidationException ex)
-            {
-                string allErrors = string.Join("\n", ex.Message);
-                MessageService.Current.ShowWarning(allErrors);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError(
-                    _existingGuest is null
-                        ? "ليس لديك صلاحية لإضافة ضيف جديد."
-                        : "ليس لديك صلاحية لتعديل بيانات الضيوف.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
             }
             catch (Exception)
             {

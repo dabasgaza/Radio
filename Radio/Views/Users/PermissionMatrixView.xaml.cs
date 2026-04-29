@@ -1,4 +1,5 @@
-﻿using DataAccess.DTOs;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using System.Windows;
@@ -37,10 +38,6 @@ namespace Radio.Views.Users
             {
                 LstRoles.ItemsSource = await _userService.GetRolesAsync();
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض الأدوار.");
-            }
             catch (InvalidOperationException ex)
             {
                 MessageService.Current.ShowWarning(ex.Message);
@@ -69,10 +66,6 @@ namespace Radio.Views.Users
             {
                 var allPermissions = await _userService.GetPermissionsMatrixAsync(role.RoleId);
                 ItemsPermissions.ItemsSource = allPermissions;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض صلاحيات هذا الدور.");
             }
             catch (InvalidOperationException ex)
             {
@@ -115,19 +108,18 @@ namespace Radio.Views.Users
             {
                 BtnSavePermissions.IsEnabled = false;
 
-                await _userService.UpdateRolePermissionsAsync(
+                var result = await _userService.UpdateRolePermissionsAsync(
                     _selectedRole.RoleId, selectedIds, _session);
 
-                MessageService.Current.ShowSuccess(
-                    "تم تحديث صلاحيات الدور بنجاح. سيحتاج المستخدمون لإعادة تسجيل الدخول لتفعيلها.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لتعديل صلاحيات الأدوار.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess(
+                        "تم تحديث صلاحيات الدور بنجاح. سيحتاج المستخدمون لإعادة تسجيل الدخول لتفعيلها.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل تحديث الصلاحيات.");
+                }
             }
             catch (Exception)
             {

@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -50,10 +50,6 @@ namespace Radio.Views.Episodes
 
                 // ✅ تحديث الإحصائيات بعد كل تحميل
                 UpdateStatistics(_allEpisodes);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض بيانات الحلقات.");
             }
             catch (InvalidOperationException ex)
             {
@@ -120,7 +116,7 @@ namespace Radio.Views.Episodes
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto selectedEpisode)
                 return;
 
-            if (selectedEpisode.StatusText is "منفّذة" or "منشورة رقمياً" or "منشورة على الموقع")
+            if (selectedEpisode.StatusId is EpisodeStatus.Executed or EpisodeStatus.Published or EpisodeStatus.WebsitePublished)
             {
                 MessageService.Current.ShowWarning(
                     "لا يمكن حذف حلقة تم تنفيذها أو نشرها، يُرجى إلغائها أولاً.");
@@ -136,17 +132,17 @@ namespace Radio.Views.Episodes
 
             try
             {
-                await _episodeService.DeleteEpisodeAsync(selectedEpisode.EpisodeId, _session);
-                await LoadDataAsync();
-                MessageService.Current.ShowSuccess($"تم حذف الحلقة «{selectedEpisode.EpisodeName}» بنجاح.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لحذف الحلقات.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                var result = await _episodeService.DeleteEpisodeAsync(selectedEpisode.EpisodeId, _session);
+                
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess($"تم حذف الحلقة «{selectedEpisode.EpisodeName}» بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الحذف.");
+                }
             }
             catch (Exception)
             {
@@ -163,7 +159,7 @@ namespace Radio.Views.Episodes
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
                 return;
 
-            if (ep.StatusText != "مجدولة")
+            if (ep.StatusId != EpisodeStatus.Planned)
                 return;
 
             var execService = _serviceProvider.GetRequiredService<IExecutionService>();
@@ -178,7 +174,7 @@ namespace Radio.Views.Episodes
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
                 return;
 
-            if (ep.StatusText != "منفّذة")
+            if (ep.StatusId != EpisodeStatus.Executed)
                 return;
 
             var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
@@ -200,22 +196,20 @@ namespace Radio.Views.Episodes
             {
                 // تحقق من الحالة الحالية للحلقة قبل التبديل    
                 var isCurrentlyPublished = ep.StatusId == EpisodeStatus.WebsitePublished;
-                await _episodeService.ToggleWebsitePublishAsync(ep.EpisodeId, !isCurrentlyPublished, _session);
+                var result = await _episodeService.ToggleWebsitePublishAsync(ep.EpisodeId, !isCurrentlyPublished, _session);
 
-                await LoadDataAsync();
-
-                MessageService.Current.ShowSuccess(
-                    !isCurrentlyPublished
-                        ? "تم نشر الحلقة على الموقع بنجاح."
-                        : "تم إلغاء نشر الحلقة من الموقع.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لنشر الحلقات على الموقع.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess(
+                        !isCurrentlyPublished
+                            ? "تم نشر الحلقة على الموقع بنجاح."
+                            : "تم إلغاء نشر الحلقة من الموقع.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت العملية");
+                }
             }
             catch (Exception)
             {
@@ -238,9 +232,9 @@ namespace Radio.Views.Episodes
             }
 
             TxtTotal.Text = data.Count.ToString();
-            TxtExecuted.Text = data.Count(e => e.StatusId == DataAccess.Services.EpisodeStatus.Planned).ToString();
-            TxtPublished.Text = data.Count(e => e.StatusId == DataAccess.Services.EpisodeStatus.Published ||
-                                              e.StatusId == DataAccess.Services.EpisodeStatus.WebsitePublished).ToString();
+            TxtExecuted.Text = data.Count(e => e.StatusId == EpisodeStatus.Executed).ToString();
+            TxtPublished.Text = data.Count(e => e.StatusId == EpisodeStatus.Published ||
+                                              e.StatusId == EpisodeStatus.WebsitePublished).ToString();
         }
 
         #endregion

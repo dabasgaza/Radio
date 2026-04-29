@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,16 +8,16 @@ namespace DataAccess.Services;
 public interface IExecutionService
 {
     // ✨ استقبال DTO بدلاً من الكيان
-    Task LogExecutionAsync(ExecutionLogDto dto, UserSession session);
+    Task<Result> LogExecutionAsync(ExecutionLogDto dto, UserSession session);
 }
 
 // ✨ استخدام Primary Constructor
 public class ExecutionService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IExecutionService
 {
-    public async Task LogExecutionAsync(ExecutionLogDto dto, UserSession session)
+    public async Task<Result> LogExecutionAsync(ExecutionLogDto dto, UserSession session)
     {
-        // ✨ تصحيح الأمان: استخدام EnsurePermission للصلاحيات
-        session.EnsurePermission(AppPermissions.EpisodeExecute);
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeExecute);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
         using var transaction = await context.Database.BeginTransactionAsync();
@@ -36,11 +36,11 @@ public class ExecutionService(IDbContextFactory<BroadcastWorkflowDBContext> cont
             context.ExecutionLogs.Add(log);
 
             var episode = await context.Episodes.FindAsync(dto.EpisodeId);
-            if (episode == null) throw new KeyNotFoundException("الحلقة غير موجودة.");
+            if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
             // ✨ استخدام الثوابت بدلاً من الأرقام السحرية
             if (episode.StatusId == EpisodeStatus.Published)
-                throw new InvalidOperationException("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
+                return Result.Fail("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
 
             episode.StatusId = EpisodeStatus.Executed;
             episode.ActualExecutionTime = DateTime.UtcNow;
@@ -49,6 +49,7 @@ public class ExecutionService(IDbContextFactory<BroadcastWorkflowDBContext> cont
 
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
+            return Result.Success();
         }
         catch
         {

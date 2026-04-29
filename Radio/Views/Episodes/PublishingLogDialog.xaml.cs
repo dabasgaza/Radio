@@ -1,5 +1,6 @@
-﻿using DataAccess.DTOs;
+using DataAccess.DTOs;
 using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using System.Text.RegularExpressions;
 using System.Windows;
 
@@ -51,14 +52,22 @@ namespace Radio.Views.Episodes
                 BtnSave.IsEnabled = false;
 
                 // استدعاء خدمة النشر
-                await _publishingService.LogPublishingAsync(log, _session);
+                var result = await _publishingService.LogPublishingAsync(log, _session);
 
-                this.DialogResult = true;
-                this.Close();
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess("تم النشر بنجاح.");
+                    this.DialogResult = true;
+                    this.Close();
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية النشر.");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("حدث خطأ أثناء تسجيل النشر: " + ex.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageService.Current.ShowError("حدث خطأ أثناء تسجيل النشر: " + ex.Message);
             }
             finally
             {

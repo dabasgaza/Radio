@@ -1,7 +1,6 @@
-﻿using DataAccess.DTOs;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Windows;
 
@@ -55,22 +54,17 @@ namespace Radio.Views.Episodes
             {
                 BtnSave.IsEnabled = false;
 
-                await _executionService.LogExecutionAsync(log, _session);
+                var result = await _executionService.LogExecutionAsync(log, _session);
 
-                MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
-                DialogResult = true;   // ✅ يُغلق النافذة تلقائياً — لا حاجة لـ Close()
-            }
-            catch (ValidationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لتسجيل تنفيذ الحلقات.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
+                    DialogResult = true;   // ✅ يُغلق النافذة تلقائياً — لا حاجة لـ Close()
+                }
+                else
+                {
+                    MessageService.Current.ShowError(result.ErrorMessage ?? "فشلت عملية التسجيل.");
+                }
             }
             catch (Exception)
             {

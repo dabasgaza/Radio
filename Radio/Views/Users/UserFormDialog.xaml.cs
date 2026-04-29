@@ -1,8 +1,8 @@
-﻿using DataAccess.DTOs;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
-using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Users
@@ -55,10 +55,6 @@ namespace Radio.Views.Users
             {
                 CboRoles.ItemsSource = await _userService.GetRolesAsync();
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض قائمة الأدوار.");
-            }
             catch (InvalidOperationException ex)
             {
                 MessageService.Current.ShowWarning(ex.Message);
@@ -87,38 +83,42 @@ namespace Radio.Views.Users
 
             try
             {
-                // ✅ التحقق عبر ValidationPipeline
-                ValidationPipeline.ValidateUser(dto, TxtPassword.Password);
+                var validation = ValidationPipeline.ValidateUser(dto, TxtPassword.Password);
+                if (!validation.IsSuccess)
+                {
+                    MessageService.Current.ShowWarning(validation.ErrorMessage ?? "أخطاء في التحقق.");
+                    return;
+                }
 
                 BtnSave.IsEnabled = false;
 
+                Result result;
                 if (_existing is null)
                 {
-                    await _userService.CreateUserAsync(dto, TxtPassword.Password, _session);
-                    MessageService.Current.ShowSuccess("تمت إضافة المستخدم بنجاح.");
+                    result = await _userService.CreateUserAsync(dto, TxtPassword.Password, _session);
+                    if (result.IsSuccess)
+                    {
+                        MessageService.Current.ShowSuccess("تمت إضافة المستخدم بنجاح.");
+                        DialogResult = true;
+                    }
+                    else
+                    {
+                        MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت العملية.");
+                    }
                 }
                 else
                 {
-                    await _userService.UpdateUserAsync(dto, TxtPassword.Password, _session);
-                    MessageService.Current.ShowSuccess("تم تعديل بيانات المستخدم بنجاح.");
+                    result = await _userService.UpdateUserAsync(dto, TxtPassword.Password, _session);
+                    if (result.IsSuccess)
+                    {
+                        MessageService.Current.ShowSuccess("تم تعديل بيانات المستخدم بنجاح.");
+                        DialogResult = true;
+                    }
+                    else
+                    {
+                        MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت العملية.");
+                    }
                 }
-
-                DialogResult = true;
-            }
-            catch (ValidationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError(
-                    _existing is null
-                        ? "ليس لديك صلاحية لإضافة مستخدم جديد."
-                        : "ليس لديك صلاحية لتعديل بيانات المستخدمين.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
             }
             catch (Exception)
             {

@@ -44,10 +44,6 @@ namespace Radio.Views.Users
                 DgUsers.ItemsSource = users;
                 UpdateStats();
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض بيانات المستخدمين.");
-            }
             catch (InvalidOperationException ex)
             {
                 MessageService.Current.ShowWarning(ex.Message);
@@ -102,21 +98,19 @@ namespace Radio.Views.Users
 
             try
             {
-                await _userService.ToggleUserStatusAsync(user.UserId, newStatus, _session);
-                MessageService.Current.ShowSuccess(
-                    newStatus
-                        ? $"تم تفعيل حساب المستخدم «{user.FullName}» بنجاح."
-                        : $"تم تعطيل حساب المستخدم «{user.FullName}» بنجاح.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لتغيير حالة المستخدمين.");
-                toggle.IsChecked = !newStatus;
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-                toggle.IsChecked = !newStatus;
+                var result = await _userService.ToggleUserStatusAsync(user.UserId, newStatus, _session);
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess(
+                        newStatus
+                            ? $"تم تفعيل حساب المستخدم «{user.FullName}» بنجاح."
+                            : $"تم تعطيل حساب المستخدم «{user.FullName}» بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت العملية.");
+                    toggle.IsChecked = !newStatus;
+                }
             }
             catch (Exception)
             {
@@ -161,8 +155,16 @@ namespace Radio.Views.Users
                     return;
                 try
                 {
-                    await _userService.DeleteUserAsync(user.UserId, _session);
-                    await LoadDataAsync();
+                    var result = await _userService.DeleteUserAsync(user.UserId, _session);
+                    if (result.IsSuccess)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess($"تم حذف المستخدم «{user.FullName}» بنجاح.");
+                    }
+                    else
+                    {
+                        MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحذف.");
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -1,8 +1,7 @@
-﻿using DataAccess.DTOs;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
-using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Programs
@@ -40,33 +39,34 @@ namespace Radio.Views.Programs
 
             try
             {
-                ValidationPipeline.ValidateProgram(dto);
+                var validation = ValidationPipeline.ValidateProgram(dto);
+                if (!validation.IsSuccess)
+                {
+                    MessageService.Current.ShowWarning(validation.ErrorMessage ?? "أخطاء في التحقق.");
+                    return;
+                }
 
                 SetLoading(true);
 
+                DataAccess.Common.Result result;
                 if (_originalDto is null)
-                    await _programService.CreateProgramAsync(dto, _session);
+                    result = await _programService.CreateProgramAsync(dto, _session);
                 else
-                    await _programService.UpdateProgramAsync(dto, _session);
+                    result = await _programService.UpdateProgramAsync(dto, _session);
 
-                MessageService.Current.ShowSuccess(
-                    _originalDto is null
-                        ? "تم إضافة البرنامج بنجاح."
-                        : "تم تعديل البرنامج بنجاح.");
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess(
+                        _originalDto is null
+                            ? "تم إضافة البرنامج بنجاح."
+                            : "تم تعديل البرنامج بنجاح.");
 
-                DialogResult = true;
-            }
-            catch (ValidationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لتنفيذ هذه العملية.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                    DialogResult = true;
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الحفظ.");
+                }
             }
             catch (Exception)
             {

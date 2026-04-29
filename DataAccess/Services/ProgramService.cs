@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -9,9 +9,9 @@ public interface IProgramService
 {
     // ✨ إرجاع DTO بدلاً من Entity
     Task<List<ProgramDto>> GetAllActiveAsync();
-    Task CreateProgramAsync(ProgramDto dto, UserSession session);
-    Task UpdateProgramAsync(ProgramDto dto, UserSession session);
-    Task SoftDeleteAsync(int programId, UserSession session);
+    Task<Result> CreateProgramAsync(ProgramDto dto, UserSession session);
+    Task<Result> UpdateProgramAsync(ProgramDto dto, UserSession session);
+    Task<Result> SoftDeleteAsync(int programId, UserSession session);
 }
 
 // ✨ استخدام Primary Constructor
@@ -34,10 +34,10 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             .ToListAsync();
     }
 
-    public async Task CreateProgramAsync(ProgramDto dto, UserSession session)
+    public async Task<Result> CreateProgramAsync(ProgramDto dto, UserSession session)
     {
-        // ✨ تصحيح الأمان: استخدام EnsurePermission بدلاً من EnsureRole
-        session.EnsurePermission(AppPermissions.CoordinationManage);
+        var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 
@@ -50,19 +50,20 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         });
 
         await context.SaveChangesAsync();
+        return Result.Success();
     }
 
-    public async Task UpdateProgramAsync(ProgramDto dto, UserSession session)
+    public async Task<Result> UpdateProgramAsync(ProgramDto dto, UserSession session)
     {
-        // ✨ تصحيح الأمان: استخدام EnsurePermission بدلاً من EnsureRole
-        session.EnsurePermission(AppPermissions.CoordinationManage);
+        var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 
         var prog = await context.Programs.FindAsync(dto.ProgramId);
 
         // ✨ إطلاق خطأ بدلاً من الصمت
-        if (prog == null) throw new KeyNotFoundException("البرنامج غير موجود.");
+        if (prog == null) return Result.Fail("البرنامج غير موجود.");
 
         prog.ProgramName = dto.ProgramName;
         prog.Category = dto.Category;
@@ -71,6 +72,7 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         // ❌ تم إزالة UpdatedAt و UpdatedByUserId (الـ Interceptor سيعبئهما)
 
         await context.SaveChangesAsync();
+        return Result.Success();
     }
 
 
@@ -81,22 +83,25 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     /// <param name="session">جلسة المستخدم الحالي للتدقيق.</param>
     /// <exception cref="UnauthorizedAccessException">إذا لم يكن لدى المستخدم صلاحية الحذف.</exception>
     /// <exception cref="InvalidOperationException">إذا كان البرنامج مرتبطاً بحلقات لا يمكن حذفه.</exception>
-    public async Task SoftDeleteAsync(int programId, UserSession session)
+    public async Task<Result> SoftDeleteAsync(int programId, UserSession session)
     {
-        session.EnsurePermission(AppPermissions.ProgramManage);
+        var permCheck = session.EnsurePermission(AppPermissions.ProgramManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         await using var context = await contextFactory.CreateDbContextAsync();
 
         var program = await context.Programs
-            .FindAsync(programId)
-            ?? throw new InvalidOperationException("البرنامج المحدد غير موجود أو تم حذفه مسبقاً.");
+            .FindAsync(programId);
+            
+        if (program == null) return Result.Fail("البرنامج المحدد غير موجود أو تم حذفه مسبقاً.");
 
         // ✅ قاعدة عمل: منع حذف برنامج مرتبط بحلقات نشطة
         if (program.Episodes.Any(e => !e.IsActive))
-            throw new InvalidOperationException("لا يمكن حذف برنامج مرتبط بحلقات نشطة. يرجى حذف الحلقات أولاً.");
+            return Result.Fail("لا يمكن حذف برنامج مرتبط بحلقات نشطة. يرجى حذف الحلقات أولاً.");
 
         program.IsActive = false;
 
         await context.SaveChangesAsync();
+        return Result.Success();
     }
 }

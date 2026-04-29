@@ -18,11 +18,11 @@ public static class EpisodeStatus
 public interface IEpisodeService
 {
     Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync();
-    Task CreateEpisodeAsync(EpisodeDto dto, UserSession session);
-    Task UpdateEpisodeAsync(EpisodeDto dto, UserSession session);
-    Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session);
-    Task ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session);
-    Task DeleteEpisodeAsync(int episodeId, UserSession session);
+    Task<Result> CreateEpisodeAsync(EpisodeDto dto, UserSession session);
+    Task<Result> UpdateEpisodeAsync(EpisodeDto dto, UserSession session);
+    Task<Result> UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session);
+    Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session);
+    Task<Result> ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session);
     Task<List<EpisodeGuestDto>> GetEpisodeGuestsAsync(int episodeId);
 }
 
@@ -59,9 +59,10 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             }).ToListAsync();
     }
 
-    public async Task CreateEpisodeAsync(EpisodeDto dto, UserSession session)
+    public async Task<Result> CreateEpisodeAsync(EpisodeDto dto, UserSession session)
     {
-        session.EnsurePermission(AppPermissions.EpisodeManage);
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
         using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = new Episode
@@ -80,18 +81,20 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         context.Episodes.Add(episode);
         await context.SaveChangesAsync();
+        return Result.Success();
     }
 
-    public async Task UpdateEpisodeAsync(EpisodeDto dto, UserSession session)
+    public async Task<Result> UpdateEpisodeAsync(EpisodeDto dto, UserSession session)
     {
-        session.EnsurePermission(AppPermissions.EpisodeManage);
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
         using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = await context.Episodes
             .Include(e => e.EpisodeGuests)     // ✅ ضروري
             .FirstOrDefaultAsync(e => e.EpisodeId == dto.EpisodeId);
 
-        if (episode == null) throw new KeyNotFoundException("الحلقة غير موجودة.");
+        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
         // تحديث الحقول
         episode.ProgramId = dto.ProgramId;
@@ -105,6 +108,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         // الـ Interceptor سيتولى تحديث UpdatedAt و UpdatedByUserId تلقائياً
         await context.SaveChangesAsync();
+        return Result.Success();
     }
 
     /// <summary>
@@ -166,28 +170,34 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     }
 
     // تحديث الحالة مع قواعد الـ Workflow والصلاحيات
-    public async Task UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session)
+    public async Task<Result> UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session)
     {
         // التحقق من الصلاحيات بناءً على الحالة الجديدة
         if (newStatusId == EpisodeStatus.Executed)
-            session.EnsurePermission(AppPermissions.EpisodeExecute);
+        {
+            var permCheck = session.EnsurePermission(AppPermissions.EpisodeExecute);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+        }
         if (newStatusId == EpisodeStatus.Published)
-            session.EnsurePermission(AppPermissions.EpisodePublish);
+        {
+            var permCheck = session.EnsurePermission(AppPermissions.EpisodePublish);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+        }
 
         using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = await context.Episodes.FindAsync(episodeId);
-        if (episode == null) throw new KeyNotFoundException("الحلقة غير موجودة.");
+        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
         // ✨ قواعد الـ Workflow باستخدام الثوابت (أوضح وأسهل للصيانة)
         if (episode.StatusId == EpisodeStatus.Published)
-            throw new InvalidOperationException("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
+            return Result.Fail("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
 
         if (episode.StatusId == EpisodeStatus.Executed && newStatusId == EpisodeStatus.Planned)
-            throw new InvalidOperationException("لا يمكن إعادة حلقة منفذة إلى حالة الجدولة.");
+            return Result.Fail("لا يمكن إعادة حلقة منفذة إلى حالة الجدولة.");
 
         if (episode.StatusId == EpisodeStatus.Planned && newStatusId == EpisodeStatus.Published)
-            throw new InvalidOperationException("يجب تنفيذ الحلقة وتوثيقها قبل عملية النشر الرقمي.");
+            return Result.Fail("يجب تنفيذ الحلقة وتوثيقها قبل عملية النشر الرقمي.");
 
         // تحديث الحالة
         episode.StatusId = newStatusId;
@@ -198,16 +208,18 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         try
         {
             await context.SaveChangesAsync();
+            return Result.Success();
         }
         catch (DbUpdateConcurrencyException)
         {
-            throw new InvalidOperationException("فشل التحديث: قام مستخدم آخر بتعديل حالة هذه الحلقة للتو.");
+            return Result.Fail("فشل التحديث: قام مستخدم آخر بتعديل حالة هذه الحلقة للتو.");
         }
     }
 
-    public async Task DeleteEpisodeAsync(int episodeId, UserSession session)
+    public async Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session)
     {
-        session.EnsurePermission(AppPermissions.EpisodeManage);
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         await using var context = await contextFactory.CreateDbContextAsync();
 
@@ -215,14 +227,14 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             .Include(e => e.EpisodeGuests)
             .FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
 
-        if (episode == null) throw new KeyNotFoundException("الحلقة غير موجودة.");
+        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
         // ✅ قاعدة عمل: منع حذف الحلقات المنفّذة أو المنشورة
         if (episode.ExecutionLogs.Any())
-            throw new InvalidOperationException("لا يمكن حذف حلقة تم تنفيذها، يُرجى إلغاء التنفيذ أولاً.");
+            return Result.Fail("لا يمكن حذف حلقة تم تنفيذها، يُرجى إلغاء التنفيذ أولاً.");
 
         if (episode.PublishingLogs.Any())
-            throw new InvalidOperationException("لا يمكن حذف حلقة تم نشرها، يُرجى إلغاء النشر أولاً.");
+            return Result.Fail("لا يمكن حذف حلقة تم نشرها، يُرجى إلغاء النشر أولاً.");
 
         episode.IsActive = false;
 
@@ -230,21 +242,24 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             guest.IsActive = false;
 
         await context.SaveChangesAsync();
+        return Result.Success();
     }
 
-    public async Task ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session)
+    public async Task<Result> ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session)
     {
-        session.EnsurePermission(AppPermissions.EpisodeWebPublish);
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeWebPublish);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
         await using var context = await contextFactory.CreateDbContextAsync();
 
-        var episode = await context.Episodes.FindAsync(episodeId)
-            ?? throw new KeyNotFoundException("الحلقة غير موجودة.");
+        var episode = await context.Episodes.FindAsync(episodeId);
+        if (episode == null)
+            return Result.Fail("الحلقة غير موجودة.");
 
         if (isPublished)
         {
             // يمكن النشر بالموقع فقط من حالة المنشورة رقمياً
             if (episode.StatusId != EpisodeStatus.Published)
-                throw new InvalidOperationException("لا يمكن نشر حلقة على الموقع قبل نشرها رقمياً.");
+                return Result.Fail("لا يمكن نشر حلقة على الموقع قبل نشرها رقمياً.");
 
             episode.StatusId = EpisodeStatus.WebsitePublished;
         }
@@ -252,12 +267,13 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         {
             // يمكن إلغاء النشر فقط إذا كانت منشورة بالفعل على الموقع
             if (episode.StatusId != EpisodeStatus.WebsitePublished)
-                throw new InvalidOperationException("الحلقة غير منشورة على الموقع.");
+                return Result.Fail("الحلقة غير منشورة على الموقع.");
 
             episode.StatusId = EpisodeStatus.Published;
         }
 
         await context.SaveChangesAsync();
+        return Result.Success();
     }
 
     #region Private Helpers

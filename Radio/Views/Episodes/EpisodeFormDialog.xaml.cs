@@ -5,7 +5,6 @@ using DataAccess.Validation;
 using MaterialDesignThemes.Wpf;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Episodes
@@ -99,10 +98,6 @@ namespace Radio.Views.Episodes
 
                     await LoadExistingGuests();
                 }
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض بيانات البرامج أو الضيوف.");
             }
             catch (InvalidOperationException ex)
             {
@@ -294,36 +289,35 @@ namespace Radio.Views.Episodes
 
             try
             {
-                ValidationPipeline.ValidateEpisode(dto);
+                var validation = ValidationPipeline.ValidateEpisode(dto);
+                if (!validation.IsSuccess)
+                {
+                    MessageService.Current.ShowWarning(validation.ErrorMessage ?? "أخطاء في التحقق.");
+                    return;
+                }
 
                 BtnSave.IsEnabled = false;
 
+                DataAccess.Common.Result result;
+
                 if (_existingEpisode is null)
-                    await _episodeService.CreateEpisodeAsync(dto, _session);
+                    result = await _episodeService.CreateEpisodeAsync(dto, _session);
                 else
-                    await _episodeService.UpdateEpisodeAsync(dto, _session);
+                    result = await _episodeService.UpdateEpisodeAsync(dto, _session);
 
-                MessageService.Current.ShowSuccess(
-                    _existingEpisode is null
-                        ? "تمت إضافة الحلقة بنجاح."
-                        : "تم تعديل بيانات الحلقة بنجاح.");
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess(
+                        _existingEpisode is null
+                            ? "تمت إضافة الحلقة بنجاح."
+                            : "تم تعديل بيانات الحلقة بنجاح.");
 
-                DialogResult = true;
-            }
-            catch (ValidationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError(
-                    _existingEpisode is null
-                        ? "ليس لديك صلاحية لإضافة حلقة جديدة."
-                        : "ليس لديك صلاحية لتعديل بيانات الحلقات.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                    DialogResult = true;
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الحفظ.");
+                }
             }
             catch (Exception)
             {

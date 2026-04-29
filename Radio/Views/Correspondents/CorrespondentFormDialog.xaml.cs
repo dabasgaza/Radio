@@ -1,8 +1,8 @@
-﻿using DataAccess.DTOs;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
-using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Correspondents
@@ -51,36 +51,34 @@ namespace Radio.Views.Correspondents
 
             try
             {
-                ValidationPipeline.ValidateCorrespondent(dto);
+                var validation = ValidationPipeline.ValidateCorrespondent(dto);
+                if (!validation.IsSuccess)
+                {
+                    MessageService.Current.ShowWarning(validation.ErrorMessage ?? "أخطاء في التحقق.");
+                    return;
+                }
 
-                BtnSave.IsEnabled = false;   // ✅ منع النقرات المتكررة
+                BtnSave.IsEnabled = false;
 
+                Result result;
                 if (_existing is null)
-                    await _service.CreateAsync(dto, _session);
+                    result = await _service.CreateAsync(dto, _session);
                 else
-                    await _service.UpdateAsync(dto, _session);
+                    result = await _service.UpdateAsync(dto, _session);
 
-                MessageService.Current.ShowSuccess(
-                    _existing is null
-                        ? "تمت إضافة المراسل بنجاح."
-                        : "تم تعديل بيانات المراسل بنجاح.");
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess(
+                        _existing is null
+                            ? "تمت إضافة المراسل بنجاح."
+                            : "تم تعديل بيانات المراسل بنجاح.");
 
-                DialogResult = true;
-            }
-            catch (ValidationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError(
-                    _existing is null
-                        ? "ليس لديك صلاحية لإضافة مراسل جديد."
-                        : "ليس لديك صلاحية لتعديل بيانات المراسلين.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                    DialogResult = true;
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت العملية.");
+                }
             }
             catch (Exception)
             {
@@ -88,7 +86,7 @@ namespace Radio.Views.Correspondents
             }
             finally
             {
-                BtnSave.IsEnabled = true;    // ✅ إعادة تفعيل الزر دائماً
+                BtnSave.IsEnabled = true;
             }
         }
 

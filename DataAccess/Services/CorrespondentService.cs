@@ -9,9 +9,9 @@ namespace DataAccess.Services
     {
         // ✨ إرجاع DTOs بدلاً من الكيانات
         Task<List<CorrespondentDto>> GetAllActiveAsync();
-        Task CreateAsync(CorrespondentDto dto, UserSession session);
-        Task UpdateAsync(CorrespondentDto dto, UserSession session);
-        Task SoftDeleteAsync(int id, UserSession session);
+        Task<Result> CreateAsync(CorrespondentDto dto, UserSession session);
+        Task<Result> UpdateAsync(CorrespondentDto dto, UserSession session);
+        Task<Result> SoftDeleteAsync(int id, UserSession session);
         Task<List<CorrespondentCoverageDto>> GetCoverageAsync(int correspondentId);
     }
 
@@ -35,10 +35,10 @@ namespace DataAccess.Services
                 .ToListAsync();
         }
 
-        public async Task CreateAsync(CorrespondentDto dto, UserSession session)
+        public async Task<Result> CreateAsync(CorrespondentDto dto, UserSession session)
         {
-            // ✨ تصحيح الأمان: استخدام EnsurePermission
-            session.EnsurePermission(AppPermissions.CoordinationManage);
+            var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
             using var context = await contextFactory.CreateDbContextAsync();
 
@@ -47,44 +47,44 @@ namespace DataAccess.Services
                 FullName = dto.FullName,
                 PhoneNumber = dto.PhoneNumber,
                 AssignedLocations = dto.AssignedLocations
-                // ❌ تم إزالة CreatedByUserId (الـ Interceptor يعمل)
             });
 
             await context.SaveChangesAsync();
+            return Result.Success();
         }
 
-        public async Task UpdateAsync(CorrespondentDto dto, UserSession session)
+        public async Task<Result> UpdateAsync(CorrespondentDto dto, UserSession session)
         {
-            session.EnsurePermission(AppPermissions.CoordinationManage);
+            var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
             using var context = await contextFactory.CreateDbContextAsync();
             var cor = await context.Correspondents.FindAsync(dto.CorrespondentId);
 
-            // ✨ إطلاق خطأ بدلاً من الصمت
-            if (cor == null) throw new KeyNotFoundException("المراسل غير موجود.");
+            if (cor == null) return Result.Fail("المراسل غير موجود.");
 
             cor.FullName = dto.FullName;
             cor.PhoneNumber = dto.PhoneNumber;
             cor.AssignedLocations = dto.AssignedLocations;
-            // ❌ تم إزالة UpdatedAt و UpdatedByUserId (الـ Interceptor يعمل)
 
             await context.SaveChangesAsync();
+            return Result.Success();
         }
 
-        public async Task SoftDeleteAsync(int id, UserSession session)
+        public async Task<Result> SoftDeleteAsync(int id, UserSession session)
         {
-            session.EnsurePermission(AppPermissions.CoordinationManage);
+            var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
             using var context = await contextFactory.CreateDbContextAsync();
             var cor = await context.Correspondents.FindAsync(id);
 
-            // ✨ إطلاق خطأ بدلاً من الصمت
-            if (cor == null) throw new KeyNotFoundException("المراسل غير موجود.");
+            if (cor == null) return Result.Fail("المراسل غير موجود.");
 
             cor.IsActive = false;
-            // ❌ تم إزالة UpdatedByUserId (الـ Interceptor يلتقط التغيير ويحدثها تلقائياً)
 
             await context.SaveChangesAsync();
+            return Result.Success();
         }
 
         public async Task<List<CorrespondentCoverageDto>> GetCoverageAsync(int correspondentId)

@@ -1,19 +1,16 @@
-﻿using DataAccess.DTOs;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using Domain.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Validation
 {
     /// <summary>
-    /// أنبوب تحقق مركزي — يجمع أخطاء المدخلات ويطرح ValidationException
-    /// عند وجود أي خطأ. يُستدعى من طبقة العرض (Code-Behind) قبل إرسال الـ DTO للـ Service.
+    /// أنبوب تحقق مركزي — يجمع أخطاء المدخلات ويعيد Result.Success/Fail
+    /// بدلاً من رمي استثناءات، لتجنب الضغط على الموارد.
     /// </summary>
     public static class ValidationPipeline
     {
-        /// <summary>
-        /// التحقق من بيانات الضيف.
-        /// </summary>
-        public static void ValidateGuest(GuestDto dto)
+        public static Result ValidateGuest(GuestDto dto)
         {
             var errors = new List<string>();
 
@@ -23,13 +20,10 @@ namespace DataAccess.Validation
             if (string.IsNullOrWhiteSpace(dto.PhoneNumber) && string.IsNullOrWhiteSpace(dto.EmailAddress))
                 errors.Add("يجب إدخال رقم الهاتف أو البريد الإلكتروني على الأقل للتواصل.");
 
-            ThrowIfHasErrors(errors);
+            return BuildResult(errors);
         }
 
-        /// <summary>
-        /// التحقق من بيانات المستخدم.
-        /// </summary>
-        public static void ValidateUser(User dto, bool isNew)
+        public static Result ValidateUser(User dto, bool isNew)
         {
             var errors = new List<string>();
 
@@ -45,13 +39,10 @@ namespace DataAccess.Validation
             if (dto.RoleId <= 0)
                 errors.Add("يجب تحديد دور وظيفي للمستخدم.");
 
-            ThrowIfHasErrors(errors);
+            return BuildResult(errors);
         }
 
-        /// <summary>
-        /// التحقق من بيانات المراسل.
-        /// </summary>
-        public static void ValidateCorrespondent(CorrespondentDto dto)
+        public static Result ValidateCorrespondent(CorrespondentDto dto)
         {
             var errors = new List<string>();
 
@@ -61,13 +52,10 @@ namespace DataAccess.Validation
             if (string.IsNullOrWhiteSpace(dto.PhoneNumber))
                 errors.Add("رقم هاتف المراسل مطلوب.");
 
-            ThrowIfHasErrors(errors);
+            return BuildResult(errors);
         }
 
-        /// <summary>
-        /// التحقق من بيانات التغطية الميدانية.
-        /// </summary>
-        public static void ValidateCoverage(CoverageDto dto)
+        public static Result ValidateCoverage(CoverageDto dto)
         {
             var errors = new List<string>();
 
@@ -77,21 +65,10 @@ namespace DataAccess.Validation
             if (string.IsNullOrWhiteSpace(dto.Topic))
                 errors.Add("يرجى إدخال موضوع التغطية.");
 
-            ThrowIfHasErrors(errors);
+            return BuildResult(errors);
         }
 
-        #region Shared Infrastructure
-
-        /// <summary>
-        /// يطرح ValidationException إذا كانت هناك أخطاء.
-        /// </summary>
-        private static void ThrowIfHasErrors(List<string> errors)
-        {
-            if (errors.Count > 0)
-                throw new ValidationException(string.Join(Environment.NewLine, errors));
-        }
-
-        public static void ValidateEpisode(EpisodeDto dto)
+        public static Result ValidateEpisode(EpisodeDto dto)
         {
             var errors = new List<string>();
 
@@ -104,22 +81,20 @@ namespace DataAccess.Validation
             if (dto.ScheduledTime is null)
                 errors.Add("يرجى تحديد تاريخ ووقت تنفيذ الحلقة.");
 
-            ThrowIfHasErrors(errors);
+            return BuildResult(errors);
         }
-        public static void ValidateProgram(ProgramDto dto)
+
+        public static Result ValidateProgram(ProgramDto dto)
         {
             var errors = new List<string>();
 
             if (string.IsNullOrWhiteSpace(dto.ProgramName))
                 errors.Add("اسم البرنامج مطلوب.");
 
-            ThrowIfHasErrors(errors);
-
+            return BuildResult(errors);
         }
-        /// <summary>
-        /// التحقق من بيانات المستخدم قبل الحفظ.
-        /// </summary>
-        public static void ValidateUser(UserDto dto, string? password)
+
+        public static Result ValidateUser(UserDto dto, string? password)
         {
             var errors = new List<string>();
 
@@ -132,15 +107,23 @@ namespace DataAccess.Validation
             if (dto.RoleId <= 0)
                 errors.Add("يرجى اختيار دور للمستخدم.");
 
-            // كلمة المرور مطلوبة فقط عند الإضافة
             if (dto.UserId == 0 && string.IsNullOrWhiteSpace(password))
                 errors.Add("كلمة المرور مطلوبة للمستخدم الجديد.");
 
-            // إذا أُدخلت كلمة مرور، تحقق من قوتها
             if (!string.IsNullOrWhiteSpace(password) && password.Length < 6)
                 errors.Add("كلمة المرور يجب أن تكون 6 أحرف على الأقل.");
 
-            ThrowIfHasErrors(errors);
+            return BuildResult(errors);
+        }
+
+        #region Infrastructure
+
+        private static Result BuildResult(List<string> errors)
+        {
+            if (errors.Count > 0)
+                return Result.Fail(string.Join(Environment.NewLine, errors));
+
+            return Result.Success();
         }
 
         #endregion

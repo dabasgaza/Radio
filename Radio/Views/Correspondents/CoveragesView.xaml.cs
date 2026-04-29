@@ -46,10 +46,6 @@ namespace Radio.Views.Correspondents
                 _allCoverages = (await _coverageService.GetAllAsync()).ToList();
                 ApplyFilters();
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض بيانات التغطيات.");
-            }
             catch (InvalidOperationException ex)
             {
                 MessageService.Current.ShowWarning(ex.Message);
@@ -114,17 +110,16 @@ namespace Radio.Views.Correspondents
 
             try
             {
-                await _coverageService.DeleteAsync(dto.CoverageId, _session);
-                await LoadDataAsync();
-                MessageService.Current.ShowSuccess($"تم حذف تغطية «{dto.CorrespondentName}» بنجاح.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لحذف التغطيات.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                var result = await _coverageService.DeleteAsync(dto.CoverageId, _session);
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess($"تم حذف تغطية «{dto.CorrespondentName}» بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحذف.");
+                }
             }
             catch (Exception)
             {

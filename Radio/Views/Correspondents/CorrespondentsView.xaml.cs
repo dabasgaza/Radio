@@ -47,10 +47,6 @@ namespace Radio.Views.Correspondents
                 TxtTotal.Text = $"{_allCorrespondents.Count}";
 
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض المراسلين.");
-            }
             catch (InvalidOperationException ex)
             {
                 MessageService.Current.ShowWarning(ex.Message);
@@ -106,17 +102,16 @@ namespace Radio.Views.Correspondents
 
             try
             {
-                await _service.SoftDeleteAsync(cor.CorrespondentId, _session);
-                await LoadDataAsync();
-                MessageService.Current.ShowSuccess($"تم حذف المراسل «{cor.FullName}» بنجاح.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لحذف المراسلين.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                var result = await _service.SoftDeleteAsync(cor.CorrespondentId, _session);
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess($"تم حذف المراسل «{cor.FullName}» بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحذف.");
+                }
             }
             catch (Exception)
             {

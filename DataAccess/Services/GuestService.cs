@@ -9,9 +9,9 @@ namespace DataAccess.Services;
 public interface IGuestService
 {
     Task<List<GuestDto>> GetAllActiveAsync(); // ✨ إرجاع DTO بدلاً من Entity
-    Task CreateGuestAsync(GuestDto dto, UserSession session);
-    Task UpdateGuestAsync(GuestDto dto, UserSession session);
-    Task SoftDeleteGuestAsync(int guestId, UserSession session);
+    Task<Result> CreateGuestAsync(GuestDto dto, UserSession session);
+    Task<Result> UpdateGuestAsync(GuestDto dto, UserSession session);
+    Task<Result> SoftDeleteGuestAsync(int guestId, UserSession session);
 }
 
 // ✨ استخدام Primary Constructor وإزالة IAuditService
@@ -35,10 +35,14 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
             .ToListAsync();
     }
 
-    public async Task CreateGuestAsync(GuestDto dto, UserSession session)
+    public async Task<Result> CreateGuestAsync(GuestDto dto, UserSession session)
     {
-        session.EnsurePermission(AppPermissions.GuestManage);
-        ValidationPipeline.ValidateGuest(dto); // بافتراض أن هذا Static Helper
+        var permCheck = session.EnsurePermission(AppPermissions.GuestManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+        var validation = ValidationPipeline.ValidateGuest(dto);
+        if (!validation.IsSuccess)
+            return validation;
 
         using var context = await contextFactory.CreateDbContextAsync();
 
@@ -48,43 +52,41 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
             Organization = dto.Organization,
             PhoneNumber = dto.PhoneNumber,
             EmailAddress = dto.EmailAddress
-            // ❌ تم إزالة CreatedByUserId لأن الـ AuditInterceptor سيعبئه تلقائياً!
         };
 
         context.Guests.Add(guest);
         await context.SaveChangesAsync();
 
-        // ❌ تم إزالة MessageService و _audit.LogActionAsync
+        return Result.Success();
     }
 
-    public async Task UpdateGuestAsync(GuestDto dto, UserSession session)
+    public async Task<Result> UpdateGuestAsync(GuestDto dto, UserSession session)
     {
-        session.EnsurePermission(AppPermissions.GuestManage);
+        var permCheck = session.EnsurePermission(AppPermissions.GuestManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
         var guest = await context.Guests.FindAsync(dto.GuestId);
 
-        if (guest == null) throw new KeyNotFoundException("الضيف غير موجود.");
+        if (guest == null) return Result.Fail("الضيف غير موجود.");
 
         guest.FullName = dto.FullName;
         guest.Organization = dto.Organization;
         guest.PhoneNumber = dto.PhoneNumber;
         guest.EmailAddress = dto.EmailAddress;
 
-        // ❌ تم إزالة UpdatedAt و UpdatedByUserId لأن الـ Interceptor يفعل ذلك!
-
         try
         {
             await context.SaveChangesAsync();
+            return Result.Success();
         }
         catch (DbUpdateConcurrencyException ex)
         {
-            // ✨ معالجة التزامن الممتازة التي كتبتها، لكن بطريقة أنظف قليلاً
             var entry = ex.Entries.Single();
             var dbValues = await entry.GetDatabaseValuesAsync();
 
             if (dbValues == null)
-                throw new InvalidOperationException("تم حذف هذا السجل من قبل مستخدم آخر.");
+                return Result.Fail("تم حذف هذا السجل من قبل مستخدم آخر.");
 
             var diff = new Dictionary<string, object?>();
             foreach (var property in dbValues.Properties)
@@ -92,17 +94,17 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
                 diff[property.Name] = dbValues[property.Name];
             }
 
-            throw new ConcurrencyException(diff); // تمرير القيم الحالية لواجهة المستخدم
+            throw new ConcurrencyException(diff);
         }
     }
 
-    public async Task SoftDeleteGuestAsync(int guestId, UserSession session)
+    public async Task<Result> SoftDeleteGuestAsync(int guestId, UserSession session)
     {
-        session.EnsurePermission(AppPermissions.GuestManage);
+        var permCheck = session.EnsurePermission(AppPermissions.GuestManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // ✨ استخدام الثوابت بدلاً من الأرقام السحرية
         var hasExecutedEpisodes = await context.EpisodeGuests
             .AnyAsync(eg => eg.GuestId == guestId &&
                             eg.IsActive &&
@@ -110,18 +112,14 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
                              eg.Episode.StatusId == EpisodeStatus.Published));
 
         if (hasExecutedEpisodes)
-        {
-            throw new InvalidOperationException("لا يمكن حذف ضيف مرتبط بحلقات تم تنفيذها أو نشرها بالفعل.");
-        }
+            return Result.Fail("لا يمكن حذف ضيف مرتبط بحلقات تم تنفيذها أو نشرها بالفعل.");
 
         var guest = await context.Guests.FindAsync(guestId);
-        if (guest == null) throw new KeyNotFoundException("الضيف غير موجود.");
+        if (guest == null) return Result.Fail("الضيف غير موجود.");
 
         guest.IsActive = false;
 
-
-        // ❌ تم إزالة UpdatedAt و UpdatedByUserId لأن الـ Interceptor يفعل ذلك تلقائياً عند ملاحظة التعديل!
-
         await context.SaveChangesAsync();
+        return Result.Success();
     }
 }

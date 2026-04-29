@@ -1,8 +1,8 @@
-﻿using DataAccess.DTOs;
+﻿using DataAccess.Common;
+using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
-using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace Radio.Views.Correspondents
@@ -68,10 +68,6 @@ namespace Radio.Views.Correspondents
                     DpTime.SelectedTime = _existingCoverage.ScheduledTime;
                 }
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("ليس لديك صلاحية لعرض بيانات المراسلين أو الضيوف.");
-            }
             catch (InvalidOperationException ex)
             {
                 MessageService.Current.ShowWarning(ex.Message);
@@ -110,36 +106,34 @@ namespace Radio.Views.Correspondents
 
             try
             {
-                ValidationPipeline.ValidateCoverage(dto);
+                var validation = ValidationPipeline.ValidateCoverage(dto);
+                if (!validation.IsSuccess)
+                {
+                    MessageService.Current.ShowWarning(validation.ErrorMessage ?? "أخطاء في التحقق.");
+                    return;
+                }
 
                 BtnSave.IsEnabled = false;
 
+                Result result;
                 if (_existingCoverage is null)
-                    await _coverageService.CreateAsync(dto, _session);
+                    result = await _coverageService.CreateAsync(dto, _session);
                 else
-                    await _coverageService.UpdateAsync(dto, _session);
+                    result = await _coverageService.UpdateAsync(dto, _session);
 
-                MessageService.Current.ShowSuccess(
-                    _existingCoverage is null
-                        ? "تمت إضافة التغطية الميدانية بنجاح."
-                        : "تم تعديل بيانات التغطية الميدانية بنجاح.");
+                if (result.IsSuccess)
+                {
+                    MessageService.Current.ShowSuccess(
+                        _existingCoverage is null
+                            ? "تمت إضافة التغطية الميدانية بنجاح."
+                            : "تم تعديل بيانات التغطية الميدانية بنجاح.");
 
-                DialogResult = true;
-            }
-            catch (ValidationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError(
-                    _existingCoverage is null
-                        ? "ليس لديك صلاحية لإضافة تغطية ميدانية."
-                        : "ليس لديك صلاحية لتعديل بيانات التغطيات.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
+                    DialogResult = true;
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت العملية.");
+                }
             }
             catch (Exception)
             {

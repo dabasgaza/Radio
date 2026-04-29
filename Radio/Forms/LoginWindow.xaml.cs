@@ -55,33 +55,22 @@ namespace Radio.Forms
 
             try
             {
-                var session = await _authService.LoginAsync(username, password);
+                var result = await _authService.LoginAsync(username, password);
 
-                // ✅ فحص أمان — إذا الـ Service يُرجع null بدلاً من رمي استثناء
-                if (session is null)
+                if (!result.IsSuccess)
                 {
-                    MessageService.Current.ShowError("اسم المستخدم أو كلمة المرور غير صحيحة.");
+                    MessageService.Current.ShowError(result.ErrorMessage ?? "فشل تسجيل الدخول.");
                     TxtPassword.Focus();
                     TxtPassword.SelectAll();
                     return;
                 }
 
-                //MessageService.Current.ShowSuccess($"مرحباً بك، {session.FullName}");
+                var session = result.Value!;
 
                 var reportsService = _serviceProvider.GetRequiredService<IReportsService>();
                 var mainWindow = new MainWindow(session, _serviceProvider);
                 mainWindow.Show();
                 Close();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageService.Current.ShowError("اسم المستخدم أو كلمة المرور غير صحيحة.");
-                TxtPassword.Focus();
-                TxtPassword.SelectAll();
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageService.Current.ShowWarning(ex.Message);
             }
             catch (Exception)
             {
