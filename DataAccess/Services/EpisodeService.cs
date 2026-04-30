@@ -24,6 +24,9 @@ public interface IEpisodeService
     Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session);
     Task<Result> ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session);
     Task<List<EpisodeGuestDto>> GetEpisodeGuestsAsync(int episodeId);
+    Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session);
+    Task<Result> CancelEpisodeAsync(int episodeId, string reason, UserSession session);
+    Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session);
 }
 
 // ✨ استخدام C# 13 Primary Constructor
@@ -35,7 +38,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        return await context.Episodes
+        var episodes = await context.Episodes
             .AsNoTracking()
             .OrderBy(e => e.ScheduledExecutionTime)
             .Select(e => new ActiveEpisodeDto
@@ -57,6 +60,49 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 SpecialNotes = e.SpecialNotes,
                 IsWebsitePublished = e.IsWebsitePublished
             }).ToListAsync();
+
+        var cancelledEpisodes = episodes
+            .Where(e => e.StatusId == EpisodeStatus.Cancelled)
+            .ToList();
+
+        if (cancelledEpisodes.Count > 0)
+        {
+            var cancelledIds = cancelledEpisodes.Select(e => e.EpisodeId).ToList();
+
+            using var auditContext = await contextFactory.CreateDbContextAsync();
+            var auditLogs = await auditContext.AuditLogs
+                .AsNoTracking()
+                .Where(a => a.TableName == "Episodes"
+                         && a.Action == "CANCEL"
+                         && a.RecordId != null
+                         && cancelledIds.Contains(a.RecordId.Value))
+                .OrderByDescending(a => a.ChangedAt)
+                .Select(a => new { a.RecordId, a.Reason, a.NewValues })
+                .ToListAsync();
+
+            var reasonDict = auditLogs
+                .GroupBy(a => a.RecordId!.Value)
+                .ToDictionary(g => g.Key, g =>
+                {
+                    var latest = g.First();
+                    var reason = latest.Reason ?? TryParseReasonFromJson(latest.NewValues);
+                    return reason;
+                });
+
+            foreach (var ep in cancelledEpisodes)
+            {
+                ep.CancellationReason = reasonDict.TryGetValue(ep.EpisodeId, out var reason) && !string.IsNullOrWhiteSpace(reason)
+                    ? reason
+                    : "لم يتم تحديد سبب الإلغاء";
+            }
+        }
+        else
+        {
+            foreach (var ep in episodes.Where(e => e.StatusId == EpisodeStatus.Cancelled))
+                ep.CancellationReason = "لم يتم تحديد سبب الإلغاء";
+        }
+
+        return episodes;
     }
 
     public async Task<Result> CreateEpisodeAsync(EpisodeDto dto, UserSession session)
@@ -276,7 +322,193 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         return Result.Success();
     }
 
+    public async Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session)
+    {
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeRevert);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+        if (string.IsNullOrWhiteSpace(reason))
+            return Result.Fail("يجب إدخال سبب التراجع.");
+
+        using var context = await contextFactory.CreateDbContextAsync();
+        using var transaction = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            var episode = await context.Episodes.FindAsync(episodeId);
+            if (episode == null) return Result.Fail("الحلقة غير موجودة.");
+
+            switch (episode.StatusId)
+            {
+                case EpisodeStatus.Executed:
+                {
+                    var execLog = await context.ExecutionLogs
+                        .Where(l => l.EpisodeId == episodeId && l.IsActive)
+                        .OrderByDescending(l => l.CreatedAt)
+                        .FirstOrDefaultAsync();
+
+                    if (execLog != null)
+                        execLog.IsActive = false;
+
+                    episode.StatusId = EpisodeStatus.Planned;
+                    episode.ActualExecutionTime = null;
+                    break;
+                }
+
+                case EpisodeStatus.Published:
+                {
+                    var pubLog = await context.PublishingLogs
+                        .Where(l => l.EpisodeId == episodeId && l.IsActive)
+                        .OrderByDescending(l => l.CreatedAt)
+                        .FirstOrDefaultAsync();
+
+                    if (pubLog != null)
+                        pubLog.IsActive = false;
+
+                    episode.StatusId = EpisodeStatus.Executed;
+                    break;
+                }
+
+                case EpisodeStatus.WebsitePublished:
+                    episode.StatusId = EpisodeStatus.Published;
+                    episode.IsWebsitePublished = false;
+                    break;
+
+                case EpisodeStatus.Planned:
+                    return Result.Fail("الحلقة في حالة جدولة مسبقاً، لا يوجد شيء للتراجع عنه.");
+
+                case EpisodeStatus.Cancelled:
+                    return Result.Fail("لا يمكن التراجع عن حالة حلقة ملغاة.");
+
+                default:
+                    return Result.Fail("لا يمكن التراجع عن هذه الحالة.");
+            }
+
+            context.AuditLogs.Add(new AuditLog
+            {
+                TableName = "Episodes",
+                RecordId = episode.EpisodeId,
+                Action = "REVERT",
+                Reason = reason,
+                UserId = session.UserId,
+                ChangedAt = DateTime.UtcNow
+            });
+
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return Result.Success();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<Result> CancelEpisodeAsync(int episodeId, string reason, UserSession session)
+    {
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeRevert);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+        if (string.IsNullOrWhiteSpace(reason))
+            return Result.Fail("يجب إدخال سبب الإلغاء.");
+
+        using var context = await contextFactory.CreateDbContextAsync();
+
+        var episode = await context.Episodes.FindAsync(episodeId);
+        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
+
+        if (episode.StatusId == EpisodeStatus.Cancelled)
+            return Result.Fail("الحلقة ملغاة مسبقاً.");
+
+        if (episode.StatusId == EpisodeStatus.Published || episode.StatusId == EpisodeStatus.WebsitePublished)
+            return Result.Fail("لا يمكن إلغاء حلقة منشورة.");
+
+        episode.StatusId = EpisodeStatus.Cancelled;
+
+        context.AuditLogs.Add(new AuditLog
+        {
+            TableName = "Episodes",
+            RecordId = episodeId,
+            Action = "CANCEL",
+            Reason = reason,
+            UserId = session.UserId,
+            ChangedAt = DateTime.UtcNow
+        });
+
+        try
+        {
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Result.Fail("فشل الإلغاء: قام مستخدم آخر بتعديل هذه الحلقة للتو.");
+        }
+    }
+
+    public async Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session)
+    {
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeRevert);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+        if (string.IsNullOrWhiteSpace(newReason))
+            return Result.Fail("يجب إدخال سبب الإلغاء.");
+
+        using var context = await contextFactory.CreateDbContextAsync();
+
+        var log = await context.AuditLogs
+            .Where(a => a.TableName == "Episodes"
+                     && a.Action == "CANCEL"
+                     && a.RecordId == episodeId)
+            .OrderByDescending(a => a.ChangedAt)
+            .FirstOrDefaultAsync();
+
+        if (log == null)
+            return Result.Fail("لم يتم العثور على سجل إلغاء لهذه الحلقة.");
+
+        log.Reason = newReason;
+
+        if (!string.IsNullOrWhiteSpace(log.NewValues) && log.NewValues.Contains("\"Reason\":"))
+        {
+            var start = log.NewValues.IndexOf("\"Reason\":") + 9;
+            var valueStart = log.NewValues.IndexOf('"', start) + 1;
+            var valueEnd = log.NewValues.IndexOf('"', valueStart);
+            if (valueStart > 0 && valueEnd > valueStart)
+            {
+                log.NewValues = log.NewValues[..valueStart] + newReason + log.NewValues[valueEnd..];
+            }
+        }
+
+        await context.SaveChangesAsync();
+        return Result.Success();
+    }
+
     #region Private Helpers
+
+    private static string? TryParseReasonFromJson(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            return null;
+
+        try
+        {
+            var start = json.IndexOf("\"Reason\":");
+            if (start < 0) return null;
+
+            start = json.IndexOf('"', start + 9);
+            if (start < 0) return null;
+
+            var end = json.IndexOf('"', start + 1);
+            if (end < 0) return null;
+
+            return json.Substring(start + 1, end - start - 1);
+        }
+        catch
+        {
+            return null;
+        }
+    }
 
     /// <summary>
     /// إضافة ضيوف إلى كيان الحلقة.

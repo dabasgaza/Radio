@@ -40,6 +40,7 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
             new RolePermission { RoleId = 1, PermissionId = 9 },
             new RolePermission { RoleId = 1, PermissionId = 10 },
             new RolePermission { RoleId = 1, PermissionId = 11 },
+            new RolePermission { RoleId = 1, PermissionId = 12 },
 
             // ProgramMgr - برامج + حلقات + ضيوف + تقارير
             new RolePermission { RoleId = 2, PermissionId = 2 },

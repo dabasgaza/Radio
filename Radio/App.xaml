@@ -138,6 +138,8 @@
 
             <converter:PermissionVisibilityConverter x:Key="PermissionVisibilityConverter" />
 
+            <converter:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+
             <converter:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
 
             <!--

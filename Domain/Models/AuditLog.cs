@@ -21,6 +21,9 @@ public partial class AuditLog
     public string? OldValues { get; set; } // JSON
     public string? NewValues { get; set; } // JSON
 
+    [MaxLength(500)]
+    public string? Reason { get; set; }
+
     public int? UserId { get; set; }
 
     // تأكد أن الاسم هنا ChangedAt ليطابق السكريبت الأخير

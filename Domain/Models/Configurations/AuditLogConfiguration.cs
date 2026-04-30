@@ -35,6 +35,10 @@ namespace Domain.Models.Configurations
             builder.Property(e => e.NewValues)
                 .HasColumnType("nvarchar(max)");
 
+            builder.Property(e => e.Reason)
+                .HasMaxLength(500)
+                .IsRequired(false);
+
             // 3. الفهارس (Indexes) - ✨ إضافة حاسمة للأداء!
             // جدول التدقيق بدون فهارس سيتسبب في بطء شديد بعد أسابيع قليلة من الاستخدام
             builder.HasIndex(e => e.TableName)

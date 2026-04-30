@@ -25,7 +25,15 @@ namespace DataAccess.DTOs
         
         // 👈 منطق تفعيل زر نشر الموقع: فقط إذا كانت الحالة "منفذة" (1) أو "منشورة" (2) أو "منشورة على الموقع" (3)
         public bool CanToggleWebsitePublish => StatusId >= EpisodeStatus.Executed && StatusId != EpisodeStatus.Cancelled;
+
+        // 👈 منطق تفعيل زر التراجع: منفّذة، منشورة، أو منشورة على الموقع
+        public bool CanRevert => StatusId is EpisodeStatus.Executed or EpisodeStatus.Published or EpisodeStatus.WebsitePublished;
+
+        // 👈 منطق تفعيل زر الإلغاء: مجدولة أو منفّذة فقط (لا يمكن إلغاء منشورة)
+        public bool CanCancel => StatusId is EpisodeStatus.Planned or EpisodeStatus.Executed;
+
         public List<GuestDisplayItem> GuestItems { get; init; } = [];
+        public string? CancellationReason { get; set; }
     }
 
 }

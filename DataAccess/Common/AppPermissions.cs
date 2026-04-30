@@ -18,6 +18,7 @@
         public const string EpisodeWebPublish = "EPISODE_WEB_PUBLISH"; // نشر الموقع
         public const string EpisodeEdit = "EPISODE_EDIT";           // تعديل
         public const string EpisodeDelete = "EPISODE_DELETE";       // حذف
+        public const string EpisodeRevert = "EPISODE_REVERT";       // تراجع عن تنفيذ أو نشر
 
         // الضيوف
         public const string GuestManage = "GUEST_MANAGE";

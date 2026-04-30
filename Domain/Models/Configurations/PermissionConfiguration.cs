@@ -32,7 +32,8 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new Permission { PermissionId = 8, SystemName = "EPISODE_DELETE", DisplayName = "حذف الحلقات", Module = "الحلقات" },
             new Permission { PermissionId = 9, SystemName = "GUEST_MANAGE", DisplayName = "إدارة الضيوف", Module = "الضيوف" },
             new Permission { PermissionId = 10, SystemName = "CORR_MANAGE", DisplayName = "إدارة التنسيق الميداني", Module = "التنسيق" },
-            new Permission { PermissionId = 11, SystemName = "VIEW_REPORTS", DisplayName = "عرض التقارير", Module = "التقارير" }
+            new Permission { PermissionId = 11, SystemName = "VIEW_REPORTS", DisplayName = "عرض التقارير", Module = "التقارير" },
+            new Permission { PermissionId = 12, SystemName = "EPISODE_REVERT", DisplayName = "تراجع عن تنفيذ/نشر", Module = "الحلقات" }
         );
     }
 }

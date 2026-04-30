@@ -84,6 +84,8 @@ namespace Radio
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            #region Globalization
+
             // تعيين الثقافة العربية للتطبيق كاملاً
             var customCulture = new System.Globalization.CultureInfo("en-US");
 
@@ -100,10 +102,8 @@ namespace Radio
                 new FrameworkPropertyMetadata(
                     System.Windows.Markup.XmlLanguage.GetLanguage("ar-SA")));
 
+            #endregion
 
-            // For now, we'll just show a placeholder or the first window when ready
-            //var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
-            //mainWindow.Show();
 
             // 1. اصطياد أخطاء واجهة المستخدم (UI Thread Exceptions)
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
@@ -113,25 +113,11 @@ namespace Radio
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            //// 3. إنشاء البيانات الأساسية (Seed)
-            //try
-            //{
-            //    var dbFactory = ServiceProvider.GetRequiredService<IDbContextFactory<BroadcastWorkflowDBContext>>();
-            //    await DbSeeder.SeedAsync(dbFactory);
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(
-            //        $"فشل إنشاء البيانات الأساسية:\n{ex.Message}",
-            //        "خطأ في Seeding",
-            //        MessageBoxButton.OK,
-            //        MessageBoxImage.Error);
-            //}
-
             // ✅ تهيئة MessageService من DI
             MessageService.Initialize(AppHost.Services.GetRequiredService<IMessageService>());
 
             var loginWindow = AppHost.Services.GetRequiredService<LoginWindow>();
+           
             loginWindow.Show();
 
             base.OnStartup(e);

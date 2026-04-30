@@ -1,9 +1,6 @@
-using DataAccess.Data;
 using DataAccess.Common;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace DataAccess.Seeding;
 
@@ -76,6 +73,7 @@ public static class DbSeeder
             new() { SystemName = AppPermissions.EpisodeWebPublish, DisplayName = "نشر على الموقع",    Module = "الحلقات" },
             new() { SystemName = AppPermissions.EpisodeEdit,       DisplayName = "تعديل الحلقات",     Module = "الحلقات" },
             new() { SystemName = AppPermissions.EpisodeDelete,     DisplayName = "حذف الحلقات",       Module = "الحلقات" },
+            new() { SystemName = AppPermissions.EpisodeRevert,     DisplayName = "تراجع عن تنفيذ/نشر", Module = "الحلقات" },
 
             // الضيوف
             new() { SystemName = AppPermissions.GuestManage,      DisplayName = "إدارة الضيوف",      Module = "الضيوف" },

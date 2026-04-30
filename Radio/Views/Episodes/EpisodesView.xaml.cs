@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Radio.Views.Common;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -214,6 +215,114 @@ namespace Radio.Views.Episodes
             catch (Exception)
             {
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تغيير حالة النشر.");
+            }
+        }
+
+        /// <summary>
+        /// التراجع عن تنفيذ أو نشر حلقة بالخطأ (يتطلب سبب)
+        /// </summary>
+        private async void BtnRevert_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
+                return;
+
+            if (ep.StatusId is not (EpisodeStatus.Executed or EpisodeStatus.Published or EpisodeStatus.WebsitePublished))
+                return;
+
+            var reasonDialog = new ReasonInputDialog("تأكيد التراجع", "يرجى إدخال سبب التراجع عن الحالة:");
+            reasonDialog.Owner = Window.GetWindow(this);
+            if (reasonDialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                var result = await _episodeService.RevertEpisodeStatusAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
+
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess($"تم التراجع عن حالة الحلقة «{ep.EpisodeName}» بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية التراجع.");
+                }
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء التراجع عن الحالة.");
+            }
+        }
+
+        /// <summary>
+        /// إلغاء حلقة مع إدخال سبب الإلغاء
+        /// </summary>
+        private async void BtnCancelEpisode_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
+                return;
+
+            if (ep.StatusId is not (EpisodeStatus.Planned or EpisodeStatus.Executed))
+                return;
+
+            var reasonDialog = new ReasonInputDialog("تأكيد الإلغاء", "يرجى إدخال سبب إلغاء الحلقة:");
+            reasonDialog.Owner = Window.GetWindow(this);
+            if (reasonDialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                var result = await _episodeService.CancelEpisodeAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
+
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess($"تم إلغاء الحلقة «{ep.EpisodeName}» بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الإلغاء.");
+                }
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء إلغاء الحلقة.");
+            }
+        }
+
+        /// <summary>
+        /// تعديل سبب إلغاء حلقة
+        /// </summary>
+        private async void BtnEditCancellationReason_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
+                return;
+
+            if (ep.StatusId != EpisodeStatus.Cancelled)
+                return;
+
+            var reasonDialog = new ReasonInputDialog("تعديل سبب الإلغاء", "عدّل سبب إلغاء الحلقة:");
+            reasonDialog.Owner = Window.GetWindow(this);
+            if (reasonDialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                var result = await _episodeService.UpdateCancellationReasonAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
+
+                if (result.IsSuccess)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess("تم تعديل سبب الإلغاء بنجاح.");
+                }
+                else
+                {
+                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل تعديل سبب الإلغاء.");
+                }
+            }
+            catch (Exception)
+            {
+                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تعديل سبب الإلغاء.");
             }
         }
 
