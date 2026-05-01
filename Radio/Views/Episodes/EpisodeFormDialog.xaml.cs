@@ -44,6 +44,21 @@ namespace Radio.Views.Episodes
         /// </summary>
         public ObservableCollection<GuestRow> GuestList { get; } = new();
 
+        /// <summary>
+        /// معرّف الحلقة التي تم إنشاؤها للتو (في حالة الإضافة فقط)
+        /// </summary>
+        public int CreatedEpisodeId { get; private set; }
+
+        /// <summary>
+        /// بيانات النموذج التي تم إرسالها للخدمة
+        /// </summary>
+        public EpisodeDto? SubmittedDto { get; private set; }
+
+        /// <summary>
+        /// اسم البرنامج المُختار في ComboBox
+        /// </summary>
+        public string SubmittedProgramName { get; private set; } = string.Empty;
+
         public EpisodeFormDialog(
             IEpisodeService episodeService,
             IProgramService programService,
@@ -298,25 +313,37 @@ namespace Radio.Views.Episodes
 
                 BtnSave.IsEnabled = false;
 
-                DataAccess.Common.Result result;
+                // الحصول على اسم البرنامج المختار
+                SubmittedProgramName = ((dynamic)CboPrograms.SelectedItem).ProgramName;
+                SubmittedDto = dto;
 
                 if (_existingEpisode is null)
-                    result = await _episodeService.CreateEpisodeAsync(dto, _session);
-                else
-                    result = await _episodeService.UpdateEpisodeAsync(dto, _session);
-
-                if (result.IsSuccess)
                 {
-                    MessageService.Current.ShowSuccess(
-                        _existingEpisode is null
-                            ? "تمت إضافة الحلقة بنجاح."
-                            : "تم تعديل بيانات الحلقة بنجاح.");
-
-                    DialogResult = true;
+                    var result = await _episodeService.CreateEpisodeAsync(dto, _session);
+                    if (result.IsSuccess)
+                    {
+                        CreatedEpisodeId = result.Value;
+                        MessageService.Current.ShowSuccess("تمت إضافة الحلقة بنجاح.");
+                        DialogResult = true;
+                    }
+                    else
+                    {
+                        MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الحفظ.");
+                    }
                 }
                 else
                 {
-                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الحفظ.");
+                    var result = await _episodeService.UpdateEpisodeAsync(dto, _session);
+                    if (result.IsSuccess)
+                    {
+                        CreatedEpisodeId = _existingEpisode.EpisodeId;
+                        MessageService.Current.ShowSuccess("تم تعديل بيانات الحلقة بنجاح.");
+                        DialogResult = true;
+                    }
+                    else
+                    {
+                        MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الحفظ.");
+                    }
                 }
             }
             catch (Exception)

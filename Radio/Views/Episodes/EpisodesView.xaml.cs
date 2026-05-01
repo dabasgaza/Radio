@@ -47,10 +47,7 @@ namespace Radio.Views.Episodes
             try
             {
                 _allEpisodes = (await _episodeService.GetActiveEpisodesAsync()).ToList();
-                DgEpisodes.ItemsSource = _allEpisodes;
-
-                // ✅ تحديث الإحصائيات بعد كل تحميل
-                UpdateStatistics(_allEpisodes);
+                RebindAndUpdateStats();
             }
             catch (InvalidOperationException ex)
             {
@@ -88,18 +85,113 @@ namespace Radio.Views.Episodes
 
         #endregion
 
+        #region Memory Cache Helpers
+
+        private void RebindAndUpdateStats()
+        {
+            DgEpisodes.ItemsSource = _allEpisodes;
+            UpdateStatistics(_allEpisodes);
+        }
+
+        private static List<GuestDisplayItem> BuildGuestItems(List<GuestRow> guestRows)
+        {
+            return guestRows
+                .Select(g => new GuestDisplayItem(g.GuestName, g.Topic, g.HostingTime))
+                .ToList();
+        }
+
+        private void InsertSorted(EpisodeDto dto, string programName, int newId, List<GuestRow> guestRows)
+        {
+            var newDto = new ActiveEpisodeDto
+            {
+                EpisodeId = newId,
+                ProgramId = dto.ProgramId,
+                EpisodeName = dto.EpisodeName,
+                ProgramName = programName,
+                ScheduledExecutionTime = dto.ScheduledTime,
+                StatusId = EpisodeStatus.Planned,
+                StatusText = "مجدولة",
+                SpecialNotes = dto.SpecialNotes,
+                GuestItems = BuildGuestItems(guestRows),
+                IsWebsitePublished = false
+            };
+
+            _allEpisodes.Add(newDto);
+            _allEpisodes = _allEpisodes.OrderBy(e => e.ScheduledExecutionTime).ToList();
+            RebindAndUpdateStats();
+        }
+
+        private void UpdateInCache(EpisodeDto dto, string programName, int episodeId, List<GuestRow> guestRows)
+        {
+            var idx = _allEpisodes.FindIndex(e => e.EpisodeId == episodeId);
+            if (idx < 0) return;
+
+            var existing = _allEpisodes[idx];
+
+            _allEpisodes[idx] = existing with
+            {
+                ProgramId = dto.ProgramId,
+                ProgramName = programName,
+                EpisodeName = dto.EpisodeName,
+                ScheduledExecutionTime = dto.ScheduledTime,
+                SpecialNotes = dto.SpecialNotes,
+                GuestItems = BuildGuestItems(guestRows)
+            };
+
+            _allEpisodes = _allEpisodes.OrderBy(e => e.ScheduledExecutionTime).ToList();
+            RebindAndUpdateStats();
+        }
+
+        private void RemoveFromCache(int episodeId)
+        {
+            var idx = _allEpisodes.FindIndex(e => e.EpisodeId == episodeId);
+            if (idx >= 0)
+                _allEpisodes.RemoveAt(idx);
+
+            RebindAndUpdateStats();
+        }
+
+        private void UpdateStatusInCache(int episodeId, byte newStatusId, string newStatusText,
+            bool? isWebsitePublished = null, string? cancellationReason = null)
+        {
+            var idx = _allEpisodes.FindIndex(e => e.EpisodeId == episodeId);
+            if (idx < 0) return;
+
+            var existing = _allEpisodes[idx];
+
+            var updated = existing with
+            {
+                StatusId = newStatusId,
+                StatusText = newStatusText
+            };
+
+            if (isWebsitePublished.HasValue)
+                updated = updated with { IsWebsitePublished = isWebsitePublished.Value };
+
+            if (cancellationReason is not null)
+                updated.CancellationReason = cancellationReason;
+
+            _allEpisodes[idx] = updated;
+            RebindAndUpdateStats();
+        }
+
+        #endregion
+
         #region CRUD Operations
 
-        private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
+        private void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new EpisodeFormDialog(
                 _episodeService, _programService, _guestService, _session);
 
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            if (dialog.ShowDialog() == true && dialog.SubmittedDto is not null)
+            {
+                InsertSorted(dialog.SubmittedDto, dialog.SubmittedProgramName,
+                    dialog.CreatedEpisodeId, dialog.GuestList.ToList());
+            }
         }
 
-        private async void BtnEdit_Click(object sender, RoutedEventArgs e)
+        private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto selectedEpisode)
                 return;
@@ -108,8 +200,11 @@ namespace Radio.Views.Episodes
                 _episodeService, _programService, _guestService,
                 _session, selectedEpisode);
 
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            if (dialog.ShowDialog() == true && dialog.SubmittedDto is not null)
+            {
+                UpdateInCache(dialog.SubmittedDto, dialog.SubmittedProgramName,
+                    selectedEpisode.EpisodeId, dialog.GuestList.ToList());
+            }
         }
 
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
@@ -137,7 +232,7 @@ namespace Radio.Views.Episodes
                 
                 if (result.IsSuccess)
                 {
-                    await LoadDataAsync();
+                    RemoveFromCache(selectedEpisode.EpisodeId);
                     MessageService.Current.ShowSuccess($"تم حذف الحلقة «{selectedEpisode.EpisodeName}» بنجاح.");
                 }
                 else
@@ -155,7 +250,7 @@ namespace Radio.Views.Episodes
 
         #region Execution & Publishing
 
-        private async void BtnMarkExecuted_Click(object sender, RoutedEventArgs e)
+        private void BtnMarkExecuted_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
                 return;
@@ -167,10 +262,10 @@ namespace Radio.Views.Episodes
             var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
 
             if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+                UpdateStatusInCache(ep.EpisodeId, EpisodeStatus.Executed, "منفّذة");
         }
 
-        private async void BtnMarkPublished_Click(object sender, RoutedEventArgs e)
+        private void BtnMarkPublished_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ActiveEpisodeDto ep)
                 return;
@@ -182,7 +277,7 @@ namespace Radio.Views.Episodes
             var dialog = new PublishingLogDialog(ep.EpisodeId, pubService, _session);
 
             if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+                UpdateStatusInCache(ep.EpisodeId, EpisodeStatus.Published, "منشورة رقمياً");
         }
 
         /// <summary>
@@ -195,13 +290,16 @@ namespace Radio.Views.Episodes
 
             try
             {
-                // تحقق من الحالة الحالية للحلقة قبل التبديل    
                 var isCurrentlyPublished = ep.StatusId == EpisodeStatus.WebsitePublished;
                 var result = await _episodeService.ToggleWebsitePublishAsync(ep.EpisodeId, !isCurrentlyPublished, _session);
 
                 if (result.IsSuccess)
                 {
-                    await LoadDataAsync();
+                    UpdateStatusInCache(ep.EpisodeId,
+                        !isCurrentlyPublished ? EpisodeStatus.WebsitePublished : EpisodeStatus.Published,
+                        !isCurrentlyPublished ? "منشورة على الموقع" : "منشورة رقمياً",
+                        isWebsitePublished: !isCurrentlyPublished);
+
                     MessageService.Current.ShowSuccess(
                         !isCurrentlyPublished
                             ? "تم نشر الحلقة على الموقع بنجاح."
@@ -240,7 +338,15 @@ namespace Radio.Views.Episodes
 
                 if (result.IsSuccess)
                 {
-                    await LoadDataAsync();
+                    var (newStatus, newText, isWebPub) = ep.StatusId switch
+                    {
+                        EpisodeStatus.Executed => (EpisodeStatus.Planned, "مجدولة", (bool?)null),
+                        EpisodeStatus.Published => (EpisodeStatus.Executed, "منفّذة", (bool?)null),
+                        EpisodeStatus.WebsitePublished => (EpisodeStatus.Published, "منشورة رقمياً", (bool?)false),
+                        _ => ((byte)0, "", (bool?)null)
+                    };
+
+                    UpdateStatusInCache(ep.EpisodeId, newStatus, newText, isWebsitePublished: isWebPub);
                     MessageService.Current.ShowSuccess($"تم التراجع عن حالة الحلقة «{ep.EpisodeName}» بنجاح.");
                 }
                 else
@@ -276,7 +382,8 @@ namespace Radio.Views.Episodes
 
                 if (result.IsSuccess)
                 {
-                    await LoadDataAsync();
+                    UpdateStatusInCache(ep.EpisodeId, EpisodeStatus.Cancelled, "ملغاة",
+                        cancellationReason: reasonDialog.Reason);
                     MessageService.Current.ShowSuccess($"تم إلغاء الحلقة «{ep.EpisodeName}» بنجاح.");
                 }
                 else
@@ -312,7 +419,8 @@ namespace Radio.Views.Episodes
 
                 if (result.IsSuccess)
                 {
-                    await LoadDataAsync();
+                    UpdateStatusInCache(ep.EpisodeId, ep.StatusId, ep.StatusText!,
+                        cancellationReason: reasonDialog.Reason);
                     MessageService.Current.ShowSuccess("تم تعديل سبب الإلغاء بنجاح.");
                 }
                 else

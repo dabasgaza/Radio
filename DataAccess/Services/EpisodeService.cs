@@ -18,12 +18,13 @@ public static class EpisodeStatus
 public interface IEpisodeService
 {
     Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync();
-    Task<Result> CreateEpisodeAsync(EpisodeDto dto, UserSession session);
+    Task<Result<int>> CreateEpisodeAsync(EpisodeDto dto, UserSession session);
     Task<Result> UpdateEpisodeAsync(EpisodeDto dto, UserSession session);
     Task<Result> UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session);
     Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session);
     Task<Result> ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session);
     Task<List<EpisodeGuestDto>> GetEpisodeGuestsAsync(int episodeId);
+    Task<ActiveEpisodeDto?> GetActiveEpisodeByIdAsync(int episodeId);
     Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session);
     Task<Result> CancelEpisodeAsync(int episodeId, string reason, UserSession session);
     Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session);
@@ -105,10 +106,10 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         return episodes;
     }
 
-    public async Task<Result> CreateEpisodeAsync(EpisodeDto dto, UserSession session)
+    public async Task<Result<int>> CreateEpisodeAsync(EpisodeDto dto, UserSession session)
     {
         var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
-        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+        if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
         using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = new Episode
@@ -127,7 +128,35 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         context.Episodes.Add(episode);
         await context.SaveChangesAsync();
-        return Result.Success();
+        return Result<int>.Success(episode.EpisodeId);
+    }
+
+    public async Task<ActiveEpisodeDto?> GetActiveEpisodeByIdAsync(int episodeId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+
+        return await context.Episodes
+            .AsNoTracking()
+            .Where(e => e.EpisodeId == episodeId)
+            .Select(e => new ActiveEpisodeDto
+            {
+                EpisodeId = e.EpisodeId,
+                StatusId = e.StatusId,
+                ProgramId = e.ProgramId,
+                EpisodeName = e.EpisodeName,
+                GuestItems = e.EpisodeGuests
+                    .OrderBy(g => g.HostingTime)
+                    .Select(g => new GuestDisplayItem(
+                        g.Guest.FullName,
+                        g.Topic,
+                        g.HostingTime))
+                    .ToList(),
+                ProgramName = e.Program.ProgramName,
+                ScheduledExecutionTime = e.ScheduledExecutionTime,
+                StatusText = e.EpisodeStatus.DisplayName,
+                SpecialNotes = e.SpecialNotes,
+                IsWebsitePublished = e.IsWebsitePublished
+            }).FirstOrDefaultAsync();
     }
 
     public async Task<Result> UpdateEpisodeAsync(EpisodeDto dto, UserSession session)
