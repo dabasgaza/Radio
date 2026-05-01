@@ -13,4 +13,39 @@
 
     public record GuestDisplayItem(string Name, string? Topic, TimeSpan? HostingTime);
 
+    /// <summary>
+    /// نتيجة تقرير الحلقات بفلتر التاريخ
+    /// </summary>
+    public record DateRangeEpisodeDto(
+        int EpisodeId,
+        string EpisodeName,
+        string ProgramName,
+        string GuestsDisplay,
+        DateTime? ScheduledExecutionTime,
+        string StatusText);
+
+    /// <summary>
+    /// تقرير الضيوف الأكثر ظهوراً
+    /// </summary>
+    public record TopGuestDto(
+        int Rank,
+        int GuestId,
+        string FullName,
+        string? Organization,
+        int AppearanceCount,
+        string? LastTopic,
+        DateTime? LastAppearance);
+
+    /// <summary>
+    /// تقرير الحلقات الملغاة مع الأسباب
+    /// </summary>
+    public record CancelledEpisodeDto(
+        int EpisodeId,
+        string EpisodeName,
+        string ProgramName,
+        DateTime? ScheduledExecutionTime,
+        string CancellationReason,
+        string? CancelledBy,
+        DateTime CancelledAt);
+
 }

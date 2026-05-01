@@ -86,21 +86,20 @@ namespace Radio
         {
             #region Globalization
 
-            // تعيين الثقافة العربية للتطبيق كاملاً
+            // ثقافة التنسيق (تواريخ، أرقام) — ميلادي بترتيب يوم-شهر-سنة
             var customCulture = new System.Globalization.CultureInfo("en-US");
-
-            // نأخذ ترتيب التاريخ من العربية (يوم-شهر-سنة)
             customCulture.DateTimeFormat.ShortDatePattern = "dd-MM-yyyy";
             customCulture.DateTimeFormat.DateSeparator = "-";
 
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("ar-SA");
+            System.Threading.Thread.CurrentThread.CurrentCulture   = customCulture;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = customCulture;
 
-            // لاتجاه النص من اليمين لليسار
+            // ✅ LanguageProperty يتحكم في StringFormat داخل WPF Bindings
+            // يجب أن يكون en-US حتى لا يستخدم WPF التقويم الهجري تلقائياً
             FrameworkElement.LanguageProperty.OverrideMetadata(
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(
-                    System.Windows.Markup.XmlLanguage.GetLanguage("ar-SA")));
+                    System.Windows.Markup.XmlLanguage.GetLanguage("en-US")));
 
             #endregion
 

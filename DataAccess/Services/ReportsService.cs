@@ -9,6 +9,9 @@ public interface IReportsService
     Task<List<TodayEpisodeDto>> GetTodayEpisodesAsync();
     Task<Dictionary<string, int>> GetEpisodeStatusStatsAsync();
     Task<List<ActiveProgramDto>> GetMostActiveProgramsAsync();
+    Task<List<DateRangeEpisodeDto>> GetEpisodesByDateRangeAsync(DateTime from, DateTime to);
+    Task<List<TopGuestDto>> GetTopGuestsAsync(int topCount = 10);
+    Task<List<CancelledEpisodeDto>> GetCancelledEpisodesAsync();
 }
 
 // ✨ استخدام Primary Constructor
@@ -30,24 +33,29 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // ✨ تحسين الأداء: استخدام نطاق التاريخ بدلاً من .Date (SARGable Query)
-        var today = DateTime.UtcNow.Date; // نستخدم UtcNow لأن قاعدة البيانات تخزن بالـ UTC
+        var today = DateTime.UtcNow.Date;
         var tomorrow = today.AddDays(1);
 
-        return await context.Episodes
+        // ✅ نجلب البيانات الخام من DB أولاً مع Include للضيوف
+        var raw = await context.Episodes
             .AsNoTracking()
+            .Include(e => e.Program)
+            .Include(e => e.EpisodeStatus)
+            .Include(e => e.EpisodeGuests)
+                .ThenInclude(eg => eg.Guest)
             .Where(e => e.ScheduledExecutionTime >= today && e.ScheduledExecutionTime < tomorrow)
             .OrderBy(e => e.ScheduledExecutionTime)
-            .Select(e => new TodayEpisodeDto
-            (
-                e.EpisodeId,
-                e.EpisodeName,
-                e.Program.ProgramName,
-                FormatGuestsDisplay(e.EpisodeGuests),
-                e.ScheduledExecutionTime,
-                e.EpisodeStatus.DisplayName
-            ))
             .ToListAsync();
+
+        // ✅ ثم نطبق التنسيق في الذاكرة (C#) لأن FormatGuestsDisplay لا تُترجم إلى SQL
+        return raw.Select(e => new TodayEpisodeDto(
+            e.EpisodeId,
+            e.EpisodeName,
+            e.Program.ProgramName,
+            FormatGuestsDisplay(e.EpisodeGuests),
+            e.ScheduledExecutionTime,
+            e.EpisodeStatus.DisplayName
+        )).ToList();
     }
 
     public async Task<List<ActiveProgramDto>> GetMostActiveProgramsAsync()
@@ -67,6 +75,136 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             .OrderByDescending(x => x.TotalEpisodes)
             .Take(5)
             .ToListAsync();
+    }
+
+    public async Task<List<DateRangeEpisodeDto>> GetEpisodesByDateRangeAsync(DateTime from, DateTime to)
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+
+        var toEndOfDay = to.Date.AddDays(1);
+
+        // ✅ نجلب البيانات الخام مع Include للضيوف
+        var raw = await context.Episodes
+            .AsNoTracking()
+            .Include(e => e.Program)
+            .Include(e => e.EpisodeStatus)
+            .Include(e => e.EpisodeGuests)
+                .ThenInclude(eg => eg.Guest)
+            .Where(e => e.ScheduledExecutionTime >= from.Date && e.ScheduledExecutionTime < toEndOfDay)
+            .OrderBy(e => e.ScheduledExecutionTime)
+            .ToListAsync();
+
+        // ✅ ثم نطبق التنسيق في الذاكرة
+        return raw.Select(e => new DateRangeEpisodeDto(
+            e.EpisodeId,
+            e.EpisodeName,
+            e.Program.ProgramName,
+            FormatGuestsDisplay(e.EpisodeGuests),
+            e.ScheduledExecutionTime,
+            e.EpisodeStatus.DisplayName
+        )).ToList();
+    }
+
+    public async Task<List<TopGuestDto>> GetTopGuestsAsync(int topCount = 10)
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+
+        // نجلب بيانات الضيوف مع حلقاتهم من DB
+        var raw = await context.EpisodeGuests
+            .AsNoTracking()
+            .Include(eg => eg.Guest)
+            .Include(eg => eg.Episode)
+            .ToListAsync();
+
+        // نجمّع في الذاكرة لأن التجميع يحتاج منطق C#
+        var grouped = raw
+            .GroupBy(eg => eg.GuestId)
+            .Select(g =>
+            {
+                var latest = g.OrderByDescending(eg => eg.Episode?.ScheduledExecutionTime).First();
+                return new
+                {
+                    GuestId = g.Key,
+                    FullName = latest.Guest?.FullName ?? "غير معروف",
+                    Organization = latest.Guest?.Organization,
+                    AppearanceCount = g.Count(),
+                    LastTopic = latest.Topic,
+                    LastAppearance = latest.Episode?.ScheduledExecutionTime
+                };
+            })
+            .OrderByDescending(x => x.AppearanceCount)
+            .Take(topCount)
+            .ToList();
+
+        return grouped.Select((x, i) => new TopGuestDto(
+            i + 1,
+            x.GuestId,
+            x.FullName,
+            x.Organization,
+            x.AppearanceCount,
+            x.LastTopic,
+            x.LastAppearance
+        )).ToList();
+    }
+
+    public async Task<List<CancelledEpisodeDto>> GetCancelledEpisodesAsync()
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+
+        // جلب الحلقات الملغاة — نتجاوز الـ soft-delete filter باستخدام IgnoreQueryFilters
+        var episodes = await context.Episodes
+            .AsNoTracking()
+            .IgnoreQueryFilters()
+            .Include(e => e.Program)
+            .Where(e => e.StatusId == EpisodeStatus.Cancelled)
+            .OrderByDescending(e => e.UpdatedAt)
+            .ToListAsync();
+
+        if (episodes.Count == 0)
+            return [];
+
+        var episodeIds = episodes.Select(e => e.EpisodeId).ToList();
+
+        // جلب سجلات الإلغاء من AuditLog
+        var auditLogs = await context.AuditLogs
+            .AsNoTracking()
+            .Where(a => a.TableName == "Episodes"
+                     && a.Action == "CANCEL"
+                     && a.RecordId != null
+                     && episodeIds.Contains(a.RecordId.Value))
+            .OrderByDescending(a => a.ChangedAt)
+            .ToListAsync();
+
+        // جلب أسماء المستخدمين الذين ألغوا
+        var userIds = auditLogs.Where(a => a.UserId.HasValue).Select(a => a.UserId!.Value).Distinct().ToList();
+        var users = await context.Users
+            .AsNoTracking()
+            .Where(u => userIds.Contains(u.UserId))
+            .Select(u => new { u.UserId, u.FullName })
+            .ToDictionaryAsync(u => u.UserId, u => u.FullName);
+
+        // بناء قاموس آخر سجل إلغاء لكل حلقة
+        var logDict = auditLogs
+            .GroupBy(a => a.RecordId!.Value)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        return episodes.Select(e =>
+        {
+            logDict.TryGetValue(e.EpisodeId, out var log);
+            var cancelledBy = log?.UserId.HasValue == true
+                ? users.GetValueOrDefault(log.UserId!.Value, "غير معروف")
+                : "غير معروف";
+
+            return new CancelledEpisodeDto(
+                e.EpisodeId,
+                e.EpisodeName,
+                e.Program?.ProgramName ?? "—",
+                e.ScheduledExecutionTime,
+                log?.Reason ?? "لم يتم تحديد سبب",
+                cancelledBy,
+                log?.ChangedAt ?? e.UpdatedAt
+            );
+        }).ToList();
     }
 
     private static string FormatGuestsDisplay(IEnumerable<EpisodeGuest> guests)
