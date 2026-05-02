@@ -4,6 +4,7 @@ using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(BroadcastWorkflowDBContext))]
-    partial class BroadcastWorkflowDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260502090121_UpdateBeforeSeedingFix")]
+    partial class UpdateBeforeSeedingFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,51 +241,6 @@ namespace Domain.Migrations
                     b.ToTable("CorrespondentCoverage", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Models.Employee", b =>
-                {
-                    b.Property<int>("EmployeeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EmployeeId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("UpdatedByUserId");
-
-                    b.ToTable("Employees");
-                });
-
             modelBuilder.Entity("Domain.Models.Episode", b =>
                 {
                     b.Property<int>("EpisodeId")
@@ -361,113 +319,6 @@ namespace Domain.Migrations
                     b.ToTable("Episodes");
                 });
 
-            modelBuilder.Entity("Domain.Models.EpisodeCorrespondent", b =>
-                {
-                    b.Property<int>("EpisodeCorrespondentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EpisodeCorrespondentId"));
-
-                    b.Property<int>("CorrespondentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EpisodeId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan?>("HostingTime")
-                        .HasColumnType("time");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<string>("Topic")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EpisodeCorrespondentId");
-
-                    b.HasIndex("CorrespondentId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("EpisodeId");
-
-                    b.HasIndex("UpdatedByUserId");
-
-                    b.ToTable("EpisodeCorrespondents");
-                });
-
-            modelBuilder.Entity("Domain.Models.EpisodeEmployee", b =>
-                {
-                    b.Property<int>("EpisodeEmployeeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EpisodeEmployeeId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EpisodeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<int>("StaffRoleId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EpisodeEmployeeId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("EpisodeId");
-
-                    b.HasIndex("StaffRoleId");
-
-                    b.HasIndex("UpdatedByUserId");
-
-                    b.ToTable("EpisodeEmployees");
-                });
-
             modelBuilder.Entity("Domain.Models.EpisodeGuest", b =>
                 {
                     b.Property<int>("EpisodeGuestId")
@@ -475,12 +326,6 @@ namespace Domain.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EpisodeGuestId"));
-
-                    b.Property<string>("ClipNotes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte>("ClipStatus")
-                        .HasColumnType("tinyint");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -961,6 +806,65 @@ namespace Domain.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Domain.Models.PublishingLog", b =>
+                {
+                    b.Property<int>("PublishingLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PublishingLogId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("EpisodeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FacebookUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("PublishedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("PublishedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("SoundCloudUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("TwitterUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("YouTubeUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("PublishingLogId");
+
+                    b.HasIndex("EpisodeId");
+
+                    b.HasIndex("PublishedByUserId");
+
+                    b.ToTable("PublishingLogs");
+                });
+
             modelBuilder.Entity("Domain.Models.Role", b =>
                 {
                     b.Property<int>("RoleId")
@@ -1173,212 +1077,6 @@ namespace Domain.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Models.SocialMediaPlatform", b =>
-                {
-                    b.Property<int>("SocialMediaPlatformId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SocialMediaPlatformId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SocialMediaPlatformId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("UpdatedByUserId");
-
-                    b.ToTable("SocialMediaPlatforms");
-                });
-
-            modelBuilder.Entity("Domain.Models.SocialMediaPublishingLog", b =>
-                {
-                    b.Property<int>("SocialMediaPublishingLogId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SocialMediaPublishingLogId"));
-
-                    b.Property<TimeSpan?>("ClipDuration")
-                        .HasColumnType("time");
-
-                    b.Property<string>("ClipTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EpisodeGuestId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EpisodeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<byte>("MediaType")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PublishedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PublishedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SocialMediaPublishingLogId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("EpisodeGuestId");
-
-                    b.HasIndex("EpisodeId");
-
-                    b.HasIndex("PublishedByUserId");
-
-                    b.HasIndex("UpdatedByUserId");
-
-                    b.ToTable("SocialMediaPublishingLogs");
-                });
-
-            modelBuilder.Entity("Domain.Models.SocialMediaPublishingLogPlatform", b =>
-                {
-                    b.Property<int>("SocialMediaPublishingLogPlatformId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SocialMediaPublishingLogPlatformId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<int>("SocialMediaPlatformId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SocialMediaPublishingLogId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SocialMediaPublishingLogPlatformId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("SocialMediaPlatformId");
-
-                    b.HasIndex("SocialMediaPublishingLogId");
-
-                    b.HasIndex("UpdatedByUserId");
-
-                    b.ToTable("SocialMediaPublishingLogPlatforms");
-                });
-
-            modelBuilder.Entity("Domain.Models.StaffRole", b =>
-                {
-                    b.Property<int>("StaffRoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffRoleId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("StaffRoleId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("UpdatedByUserId");
-
-                    b.ToTable("StaffRoles");
-                });
-
             modelBuilder.Entity("Domain.Models.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -1470,66 +1168,6 @@ namespace Domain.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Models.WebsitePublishingLog", b =>
-                {
-                    b.Property<int>("WebsitePublishingLogId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WebsitePublishingLogId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EpisodeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<byte>("MediaType")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PublishedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PublishedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("WebsitePublishingLogId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("EpisodeId");
-
-                    b.HasIndex("PublishedByUserId");
-
-                    b.HasIndex("UpdatedByUserId");
-
-                    b.ToTable("WebsitePublishingLogs");
-                });
-
             modelBuilder.Entity("Domain.Models.Correspondent", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
@@ -1579,23 +1217,6 @@ namespace Domain.Migrations
                     b.Navigation("UpdatedByUser");
                 });
 
-            modelBuilder.Entity("Domain.Models.Employee", b =>
-                {
-                    b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
             modelBuilder.Entity("Domain.Models.Episode", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
@@ -1625,80 +1246,6 @@ namespace Domain.Migrations
                     b.Navigation("EpisodeStatus");
 
                     b.Navigation("Program");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
-            modelBuilder.Entity("Domain.Models.EpisodeCorrespondent", b =>
-                {
-                    b.HasOne("Domain.Models.Correspondent", "Correspondent")
-                        .WithMany()
-                        .HasForeignKey("CorrespondentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Models.Episode", "Episode")
-                        .WithMany("EpisodeCorrespondents")
-                        .HasForeignKey("EpisodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Correspondent");
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("Episode");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
-            modelBuilder.Entity("Domain.Models.EpisodeEmployee", b =>
-                {
-                    b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Models.Employee", "Employee")
-                        .WithMany("EpisodeEmployees")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Episode", "Episode")
-                        .WithMany("EpisodeEmployees")
-                        .HasForeignKey("EpisodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.StaffRole", "StaffRole")
-                        .WithMany("EpisodeEmployees")
-                        .HasForeignKey("StaffRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Episode");
-
-                    b.Navigation("StaffRole");
 
                     b.Navigation("UpdatedByUser");
                 });
@@ -1788,6 +1335,25 @@ namespace Domain.Migrations
                     b.Navigation("UpdatedByUser");
                 });
 
+            modelBuilder.Entity("Domain.Models.PublishingLog", b =>
+                {
+                    b.HasOne("Domain.Models.Episode", "Episode")
+                        .WithMany("PublishingLogs")
+                        .HasForeignKey("EpisodeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.User", "PublishedByUser")
+                        .WithMany("PublishingLogs")
+                        .HasForeignKey("PublishedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Episode");
+
+                    b.Navigation("PublishedByUser");
+                });
+
             modelBuilder.Entity("Domain.Models.RolePermission", b =>
                 {
                     b.HasOne("Domain.Models.Permission", "Permission")
@@ -1805,110 +1371,6 @@ namespace Domain.Migrations
                     b.Navigation("Permission");
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("Domain.Models.SocialMediaPlatform", b =>
-                {
-                    b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
-            modelBuilder.Entity("Domain.Models.SocialMediaPublishingLog", b =>
-                {
-                    b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Models.EpisodeGuest", "EpisodeGuest")
-                        .WithMany()
-                        .HasForeignKey("EpisodeGuestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Episode", null)
-                        .WithMany("SocialMediaPublishingLogs")
-                        .HasForeignKey("EpisodeId");
-
-                    b.HasOne("Domain.Models.User", "PublishedByUser")
-                        .WithMany("SocialMediaPublishingLogs")
-                        .HasForeignKey("PublishedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("EpisodeGuest");
-
-                    b.Navigation("PublishedByUser");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
-            modelBuilder.Entity("Domain.Models.SocialMediaPublishingLogPlatform", b =>
-                {
-                    b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Models.SocialMediaPlatform", "SocialMediaPlatform")
-                        .WithMany("PublishingLogPlatforms")
-                        .HasForeignKey("SocialMediaPlatformId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.SocialMediaPublishingLog", "SocialMediaPublishingLog")
-                        .WithMany("Platforms")
-                        .HasForeignKey("SocialMediaPublishingLogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("SocialMediaPlatform");
-
-                    b.Navigation("SocialMediaPublishingLog");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
-            modelBuilder.Entity("Domain.Models.StaffRole", b =>
-                {
-                    b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>
@@ -1936,62 +1398,18 @@ namespace Domain.Migrations
                     b.Navigation("UpdatedByUser");
                 });
 
-            modelBuilder.Entity("Domain.Models.WebsitePublishingLog", b =>
-                {
-                    b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Models.Episode", "Episode")
-                        .WithMany("WebsitePublishingLogs")
-                        .HasForeignKey("EpisodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", "PublishedByUser")
-                        .WithMany("WebsitePublishingLogs")
-                        .HasForeignKey("PublishedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("Episode");
-
-                    b.Navigation("PublishedByUser");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
             modelBuilder.Entity("Domain.Models.Correspondent", b =>
                 {
                     b.Navigation("CorrespondentCoverages");
                 });
 
-            modelBuilder.Entity("Domain.Models.Employee", b =>
-                {
-                    b.Navigation("EpisodeEmployees");
-                });
-
             modelBuilder.Entity("Domain.Models.Episode", b =>
                 {
-                    b.Navigation("EpisodeCorrespondents");
-
-                    b.Navigation("EpisodeEmployees");
-
                     b.Navigation("EpisodeGuests");
 
                     b.Navigation("ExecutionLogs");
 
-                    b.Navigation("SocialMediaPublishingLogs");
-
-                    b.Navigation("WebsitePublishingLogs");
+                    b.Navigation("PublishingLogs");
                 });
 
             modelBuilder.Entity("Domain.Models.Guest", b =>
@@ -2016,21 +1434,6 @@ namespace Domain.Migrations
                     b.Navigation("RolePermissions");
 
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Domain.Models.SocialMediaPlatform", b =>
-                {
-                    b.Navigation("PublishingLogPlatforms");
-                });
-
-            modelBuilder.Entity("Domain.Models.SocialMediaPublishingLog", b =>
-                {
-                    b.Navigation("Platforms");
-                });
-
-            modelBuilder.Entity("Domain.Models.StaffRole", b =>
-                {
-                    b.Navigation("EpisodeEmployees");
                 });
 
             modelBuilder.Entity("Domain.Models.User", b =>
@@ -2063,9 +1466,7 @@ namespace Domain.Migrations
 
                     b.Navigation("ProgramUpdatedByUsers");
 
-                    b.Navigation("SocialMediaPublishingLogs");
-
-                    b.Navigation("WebsitePublishingLogs");
+                    b.Navigation("PublishingLogs");
                 });
 #pragma warning restore 612, 618
         }

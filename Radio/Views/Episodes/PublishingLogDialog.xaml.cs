@@ -35,24 +35,17 @@ namespace Radio.Views.Episodes
                 if (result == MessageBoxResult.No) return;
             }
 
-            // تجهيز كائن سجل النشر
-            var log = new PublishingLogDto
-            {
-                EpisodeId = _episodeId,
-                YouTubeUrl = TxtYouTube.Text.Trim(),
-                FacebookUrl = TxtFacebook.Text.Trim(),
-                TwitterUrl = TxtTwitter.Text.Trim(),
-                SoundCloudUrl = TxtSoundCloud.Text.Trim(),
-                PublishedAt = DateTime.UtcNow,
-                CreatedAt = DateTime.UtcNow
-            };
-
             try
             {
                 BtnSave.IsEnabled = false;
 
-                // استدعاء خدمة النشر
-                var result = await _publishingService.LogPublishingAsync(log, _session);
+                // استدعاء خدمة النشر (مؤقت لحين تحديث واجهة المستخدم بالكامل للتعامل مع المنصات الجديدة)
+                var result = await _publishingService.LogWebsitePublishingAsync(
+                    _episodeId, 
+                    "نشر مؤقت لحين تحديث الواجهة", 
+                    Domain.Models.MediaType.Both, 
+                    "روابط قديمة: " + TxtYouTube.Text + " " + TxtFacebook.Text, 
+                    _session);
 
                 if (result.IsSuccess)
                 {

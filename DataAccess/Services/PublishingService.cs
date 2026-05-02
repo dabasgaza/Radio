@@ -7,16 +7,14 @@ namespace DataAccess.Services;
 
 public interface IPublishingService
 {
-    // ✨ استقبال DTO بدلاً من الكيان
-    Task<Result> LogPublishingAsync(PublishingLogDto dto, UserSession session);
+    Task<Result> LogWebsitePublishingAsync(int episodeId, string title, MediaType mediaType, string notes, UserSession session);
 }
 
 // ✨ استخدام Primary Constructor
 public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IPublishingService
 {
-    public async Task<Result> LogPublishingAsync(PublishingLogDto dto, UserSession session)
+    public async Task<Result> LogWebsitePublishingAsync(int episodeId, string title, MediaType mediaType, string notes, UserSession session)
     {
-        // ✨ استخدام الـ Extension Method
         var permCheck = session.EnsurePermission(AppPermissions.EpisodePublish);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
@@ -25,41 +23,36 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
 
         try
         {
-            // ✨ إنشاء الكيان من الـ DTO داخل الـ Service فقط (حماية من Mass Assignment)
-            var log = new PublishingLog
+            var log = new WebsitePublishingLog
             {
-                EpisodeId = dto.EpisodeId,
-                PublishedByUserId = session.UserId, // حقل أعمال خاص بالنشر
-                YouTubeUrl = dto.YouTubeUrl,
-                SoundCloudUrl = dto.SoundCloudUrl,
-                FacebookUrl = dto.FacebookUrl,
-                TwitterUrl = dto.TwitterUrl
+                EpisodeId = episodeId,
+                PublishedByUserId = session.UserId,
+                Title = title,
+                MediaType = mediaType,
+                Notes = notes,
+                PublishedAt = DateTime.UtcNow
             };
 
-            context.PublishingLogs.Add(log);
+            context.WebsitePublishingLogs.Add(log);
 
-            var episode = await context.Episodes.FindAsync(dto.EpisodeId);
+            var episode = await context.Episodes.FindAsync(episodeId);
 
             if (episode == null)
                 return Result.Fail("عذراً، لم يتم العثور على الحلقة المطلوبة.");
 
-            // ✨ استخدام الثوابت بدلاً من الأرقام السحرية
             if (episode.StatusId != EpisodeStatus.Executed)
                 return Result.Fail("لا يمكن نشر حلقة لم يتم توثيق تنفيذها (الإنتاج) أولاً.");
 
             episode.StatusId = EpisodeStatus.Published;
-            // ✨ الإشارة للـ Interceptor أنه سيتولى UpdatedAt و UpdatedByUserId
 
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
             return Result.Success();
-
-            // ❌ تم إزالة MessageService (الـ UI سيتولى عرض رسالة النجاح)
         }
         catch
         {
             await transaction.RollbackAsync();
-            throw; // ✨ رمي الاستثناء الأصلي كما هو للحفاظ على الـ Stack Trace
+            throw;
         }
     }
 }

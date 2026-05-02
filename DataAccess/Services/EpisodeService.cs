@@ -333,7 +333,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         if (episode.ExecutionLogs.Any())
             return Result.Fail("لا يمكن حذف حلقة تم تنفيذها، يُرجى إلغاء التنفيذ أولاً.");
 
-        if (episode.PublishingLogs.Any())
+        if (episode.WebsitePublishingLogs.Any() || episode.SocialMediaPublishingLogs.Any())
             return Result.Fail("لا يمكن حذف حلقة تم نشرها، يُرجى إلغاء النشر أولاً.");
 
         episode.IsActive = false;
@@ -411,7 +411,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
                 case EpisodeStatus.Published:
                 {
-                    var pubLog = await context.PublishingLogs
+                    var pubLog = await context.WebsitePublishingLogs
                         .Where(l => l.EpisodeId == episodeId && l.IsActive)
                         .OrderByDescending(l => l.CreatedAt)
                         .FirstOrDefaultAsync();

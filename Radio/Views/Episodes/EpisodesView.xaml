@@ -302,10 +302,10 @@
                                     <!--  إجراءات سير العمل + التصحيحية  -->
                                     <StackPanel Orientation="Horizontal">
                                         <Button
-                                            Background="{StaticResource SecondaryMainBrush}"
+                                            Background="{StaticResource HeaderGradientBrush}"
                                             Click="BtnMarkExecuted_Click"
                                             IsEnabled="{Binding CanMarkExecuted}"
-                                            Style="{StaticResource ActionBtn}"
+                                            Style="{StaticResource Btn.Icon}"
                                             ToolTip="تنفيذ الحلقة">
                                             <materialDesign:PackIcon
                                                 Width="18"
@@ -318,7 +318,7 @@
                                             Background="{StaticResource SuccessBrush}"
                                             Click="BtnMarkPublished_Click"
                                             IsEnabled="{Binding CanMarkPublished}"
-                                            Style="{StaticResource ActionBtn}"
+                                            Style="{StaticResource Btn.Icon}"
                                             ToolTip="نشر رقمي">
                                             <materialDesign:PackIcon
                                                 Width="18"
@@ -331,7 +331,7 @@
                                             Background="#2196F3"
                                             Click="BtnToggleWebsitePublish_Click"
                                             IsEnabled="{Binding CanToggleWebsitePublish}"
-                                            Style="{StaticResource ActionBtn}"
+                                            Style="{StaticResource Btn.Icon}"
                                             ToolTip="نشر على الموقع">
                                             <materialDesign:PackIcon
                                                 Width="18"
@@ -351,7 +351,7 @@
                                             Background="{StaticResource WarningBrush}"
                                             Click="BtnRevert_Click"
                                             IsEnabled="{Binding CanRevert}"
-                                            Style="{StaticResource ActionBtn}"
+                                            Style="{StaticResource Btn.Icon}"
                                             ToolTip="تراجع عن الإجراء">
                                             <materialDesign:PackIcon
                                                 Width="18"
@@ -364,7 +364,7 @@
                                             Background="{StaticResource ErrorBrush}"
                                             Click="BtnCancelEpisode_Click"
                                             IsEnabled="{Binding CanCancel}"
-                                            Style="{StaticResource ActionBtn}"
+                                            Style="{StaticResource Btn.Icon}"
                                             ToolTip="إلغاء الحلقة">
                                             <materialDesign:PackIcon
                                                 Width="18"
@@ -451,7 +451,7 @@
 
                                         <!--  شارة البرنامج  -->
                                         <Border
-                                            Padding="12,6"
+                                            Padding="25,6"
                                             Background="{StaticResource PrimaryXLightBrush}"
                                             CornerRadius="8">
                                             <StackPanel Orientation="Horizontal">
@@ -464,8 +464,7 @@
                                                 <TextBlock
                                                     Margin="8,0,0,0"
                                                     VerticalAlignment="Center"
-                                                    FontSize="13"
-                                                    FontWeight="Medium"
+                                                    FontSize="15"
                                                     Foreground="{StaticResource PrimaryMainBrush}"
                                                     Text="{Binding ProgramName}" />
                                             </StackPanel>
@@ -524,7 +523,7 @@
                                             Height="26"
                                             Padding="10,0"
                                             Content="{Binding StatusText}"
-                                            FontSize="11"
+                                            FontSize="12"
                                             FontWeight="Medium">
                                             <materialDesign:Chip.Style>
                                                 <Style BasedOn="{StaticResource {x:Type materialDesign:Chip}}" TargetType="materialDesign:Chip">
@@ -564,7 +563,6 @@
                                     <!--  عنوان الحلقة  -->
                                     <TextBlock
                                         FontSize="17"
-                                        FontWeight="SemiBold"
                                         Foreground="{StaticResource TextPrimaryBrush}"
                                         Text="{Binding EpisodeName}"
                                         TextTrimming="CharacterEllipsis" />
@@ -655,11 +653,11 @@
                                                                     Foreground="{StaticResource SecondaryMainBrush}"
                                                                     Kind="AccountOutline" />
                                                             </Border>
+                                                            <!--إسم الضيف-->
                                                             <TextBlock
                                                                 Margin="10,0,0,0"
                                                                 VerticalAlignment="Center"
-                                                                FontSize="13"
-                                                                FontWeight="Medium"
+                                                                FontSize="14"
                                                                 Foreground="{StaticResource TextPrimaryBrush}"
                                                                 Text="{Binding Name}" />
                                                         </StackPanel>
@@ -684,7 +682,7 @@
                                                                 </Style>
                                                             </Border.Style>
                                                             <TextBlock
-                                                                FontSize="12"
+                                                                FontSize="13"
                                                                 Foreground="{StaticResource PrimaryMainBrush}"
                                                                 Text="{Binding Topic}"
                                                                 TextTrimming="CharacterEllipsis" />

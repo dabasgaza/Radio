@@ -23,6 +23,8 @@ public static class DbSeeder
         await SeedRolesAsync(context);
         await SeedRolePermissionsAsync(context);
         await SeedAdminUserAsync(context);
+        await SeedSocialMediaPlatformsAsync(context);
+        await SeedStaffRolesAsync(context);
 
         await context.SaveChangesAsync();
     }
@@ -31,8 +33,7 @@ public static class DbSeeder
 
     private static async Task SeedEpisodeStatusesAsync(BroadcastWorkflowDBContext context)
     {
-        if (await context.Set<EpisodeStatus>().AnyAsync())
-            return;
+        var existingStatuses = await context.Set<EpisodeStatus>().Select(s => s.StatusId).ToListAsync();
 
         var statuses = new List<EpisodeStatus>
         {
@@ -43,8 +44,13 @@ public static class DbSeeder
             new() { StatusId = 4, StatusName = "Cancelled", DisplayName = "ملغاة", SortOrder = 4 },
         };
 
-        context.Set<EpisodeStatus>().AddRange(statuses);
-        await context.SaveChangesAsync();
+        var missingStatuses = statuses.Where(s => !existingStatuses.Contains(s.StatusId)).ToList();
+
+        if (missingStatuses.Any())
+        {
+            context.Set<EpisodeStatus>().AddRange(missingStatuses);
+            await context.SaveChangesAsync();
+        }
     }
 
     #endregion
@@ -271,6 +277,48 @@ public static class DbSeeder
         using var sha = System.Security.Cryptography.SHA256.Create();
         var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(plainPassword));
         return Convert.ToBase64String(bytes);
+    }
+
+    #endregion
+
+    #region SocialMediaPlatforms
+
+    private static async Task SeedSocialMediaPlatformsAsync(BroadcastWorkflowDBContext context)
+    {
+        if (await context.Set<SocialMediaPlatform>().AnyAsync())
+            return;
+
+        var platforms = new List<SocialMediaPlatform>
+        {
+            new() { Name = "Facebook",  Icon = "Facebook" },
+            new() { Name = "Twitter",   Icon = "Twitter" },
+            new() { Name = "TikTok",    Icon = "MusicNote" }, 
+            new() { Name = "YouTube",   Icon = "Youtube" },
+            new() { Name = "Instagram", Icon = "Instagram" },
+        };
+
+        context.Set<SocialMediaPlatform>().AddRange(platforms);
+    }
+
+    #endregion
+
+    #region StaffRoles
+
+    private static async Task SeedStaffRolesAsync(BroadcastWorkflowDBContext context)
+    {
+        if (await context.Set<StaffRole>().AnyAsync())
+            return;
+
+        var roles = new List<StaffRole>
+        {
+            new() { RoleName = "مذيع" },
+            new() { RoleName = "منفذ" },
+            new() { RoleName = "مهندس صوت" },
+            new() { RoleName = "مخرج" },
+            new() { RoleName = "مصور" },
+        };
+
+        context.Set<StaffRole>().AddRange(roles);
     }
 
     #endregion

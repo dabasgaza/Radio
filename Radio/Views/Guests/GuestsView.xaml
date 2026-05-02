@@ -172,7 +172,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border
-                                    Width="120"
+                                    Width="170"
                                     Height="28"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
