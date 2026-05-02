@@ -1,105 +1,97 @@
 <div align="center">
 
-# 📻 Radio — نظام إدارة البث الإذاعي (بث برو)
+# 📻 Radio: Broadcast Workflow System (بث برو)
 
-[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![WPF](https://img.shields.io/badge/WPF-Desktop-0078D7?logo=windows)](https://github.com/dotnet/wpf)
-[![EF Core](https://img.shields.io/badge/EF_Core-10.0-68217A?logo=dotnet)](https://learn.microsoft.com/ef/core)
-[![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?logo=microsoftsqlserver)](https://www.microsoft.com/sql-server)
-[![Material Design](https://img.shields.io/badge/UI-Material_Design-757575?logo=materialdesign)](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+[![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![WPF](https://img.shields.io/badge/WPF-Desktop-0078D7?logo=windows&logoColor=white)](https://github.com/dotnet/wpf)
+[![EF Core](https://img.shields.io/badge/EF_Core-10.0-68217A?logo=dotnet&logoColor=white)](https://learn.microsoft.com/ef/core)
+[![Pattern](https://img.shields.io/badge/Pattern-Result_&_Service-orange)](#)
 
-**نظام مكتبي متكامل لإدارة دورة العمل الإذاعي — من الجدولة الذكية حتى الأرشفة والنشر الرقمي.**
+**المنصة الاحترافية لإدارة المؤسسات الإذاعية — هندسة برمجية متقدمة لإدارة المحتوى والأدوار وفق معايير Enterprise.**
 
 </div>
 
 ---
 
-## 📖 نظرة عامة
+## 🏗️ الهندسة البرمجية (Architecture Deep Dive)
 
-**Radio (بث برو)** هو تطبيق سطح مكتب متقدم مبني على تقنيات **.NET 10** و **WPF**، مصمم خصيصاً لتلبية احتياجات الإذاعات العصرية. يهدف النظام إلى أتمتة دورة حياة "الحلقة الإذاعية" بالكامل، مع التركيز على دقة البيانات، سهولة الاستخدام، والرقابة الكاملة عبر نظام صلاحيات صارم وسجل تدقيق شامل.
+يعتمد نظام **بث برو** على معمارية **Decoupled Layers Architecture** لضمان القابلية للتوسع، سهولة الصيانة، واختبار الوحدات البرمجية بشكل مستقل:
 
-تمت إعادة هيكلة النظام مؤخراً (مايو 2026) لتبني معايير برمجية أكثر حداثة واستقراراً.
+### 1. طبقة المجال (Domain Layer)
+*   **الكيانات (Entities):** تم تصميمها باستخدام **POCO Classes** مع وراثة موحدة من `BaseEntity` التي توفر خصائص الحذف المنطقي، التدقيق، وإدارة التزامن.
+*   **التكوين (Fluent API):** عزل تام لإعدادات قاعدة البيانات في مجلد `Configurations` لضمان نظافة الكيانات.
+*   **التدقيق الآلي (Auto-Auditing):** استخدام `AuditInterceptor` لاعتراض عمليات `SaveChanges` وتسجيل (من أنشأ، متى، من عدّل) آلياً.
 
----
+### 2. طبقة الوصول للبيانات (DataAccess Layer)
+*   **نمط الخدمات (Service Pattern):** عزل كامل لمنطق الأعمال عن واجهة المستخدم، مما يسهل استبدال الواجهة مستقبلاً (مثل Web API).
+*   **Result Pattern:** تبني أسلوب وظيفي (Functional Approach) لمعالجة الأخطاء، حيث ترجع الخدمات كائنات `Result` توضح حالة العملية (نجاح/فشل) مع تفاصيل الخطأ دون الحاجة لرمي الاستثناءات المكلفة.
+*   **Validation Pipeline:** خط دفاع مركزي يقوم بفحص البيانات وفق قواعد العمل قبل وصولها لطبقة البيانات.
 
-## ✨ المميزات الرئيسية
-
-- 🚀 **واجهة مستخدم عصرية**: تصميم يعتمد على Material Design مع انتقالات سلسة واستخدام لـ `DialogHost` لتوفير تجربة مستخدم خالية من تشتت النوافذ المتعددة.
-- 🏗️ **معمارية نظيفة (Clean Architecture)**: فصل تام بين طبقة المجال (Domain)، الخدمات (DataAccess)، وواجهة العرض (WPF).
-- 🔐 **نظام أمني متكامل**: إدارة دقيقة للمستخدمين والأدوار مع صلاحيات تصل لمستوى العمليات الفردية.
-- 📝 **سجل تدقيق ذكي (Audit System)**: تتبع آلي لكل تغيير (مَن، متى، ماذا تغير، والسبب) بفضل الـ Interceptors في EF Core.
-- 🔄 **إدارة دورة حياة الحلقة**: معالجة حالات الجدولة، التنفيذ، النشر الرقمي، والنشر على الموقع مع إمكانية التراجع الذكي.
-- 🛡️ **حذف منطقي (Soft Delete)**: حماية البيانات من الحذف النهائي مع إمكانية الاسترجاع، مدعومة بفلترة عالمية تلقائية.
-- ⚡ **نمط Result Pattern**: معالجة الأخطاء والتحقق من البيانات بدون استثناءات مكلفة، مما يضمن أداءً فائقاً واستقراراً في الواجهة.
-
----
-
-## 🏗️ المعمارية التقنية
-
-### تقسيم الطبقات
-1.  **Domain**: يحتوي على الكيانات (Entities)، التكوينات (Fluent API)، والـ `DbContext`. تم توحيد إدارة التدقيق عبر `BaseEntity`.
-2.  **DataAccess**: تضم منطق الأعمال (Services)، كائنات نقل البيانات (DTOs)، ونظام التحقق المركزي (Validation).
-3.  **Radio (Presentation)**: واجهة WPF تعتمد على `MahApps.Metro` و `MaterialDesignInXAML`.
-
-### قاعدة البيانات
-يعتمد النظام على **SQL Server** مع بنية جداول محسنة تمنع التكرار (Normalized Data). تم تنظيف العلاقات المعقدة مع جدول المستخدمين لضمان سرعة الاستعلامات ومنع تعارض المسارات.
+### 3. طبقة العرض (Presentation Layer - WPF)
+*   **Modern UI Pattern:** واجهة تفاعلية تعتمد على `DialogHost` لتقليل تشتت المستخدم بالبثق المتعدد للنوافذ.
+*   **Dependency Injection (DI):** استخدام `Microsoft.Extensions.DependencyInjection` لإدارة دورة حياة الخدمات (Singleton, Scoped, Transient).
+*   **Resources System:** فصل الأنماط البصرية (Styles) والألوان في ملفات XAML مستقلة لسهولة تغيير الهوية البصرية.
 
 ---
 
-## 🛠️ التقنيات المستخدمة
+## 📊 مخطط البيانات والتدفق (Data & Workflow)
 
-| التقنية | الغرض |
-|---------|-------|
-| **.NET 10.0** | منصة التطوير الأساسية |
-| **WPF** | إطار عمل واجهة المستخدم |
-| **EF Core 10.0** | التعامل مع قاعدة البيانات (ORM) |
-| **SQL Server** | محرك قاعدة البيانات |
-| **Material Design In XAML** | التصميم البصري والأيقونات |
-| **MahApps.Metro** | إطارات النوافذ والتحكم المتقدم |
-| **Fody / PropertyChanged** | أتمتة إشعارات تغيير الخصائص |
-| **Microsoft DI** | حقن التبعيات وإدارة دورة حياة الخدمات |
+### علاقات الكيانات (ER Diagram)
+```mermaid
+erDiagram
+    PROGRAM ||--o{ EPISODE : contains
+    EPISODE ||--o{ EPISODE_GUEST : involves
+    GUEST ||--o{ EPISODE_GUEST : participates
+    EPISODE ||--o{ EXECUTION_LOG : records
+    EPISODE_GUEST ||--o{ SOCIAL_LOG : published_as
+    USER ||--o{ AUDIT_LOG : performs
+    USER ||--|| ROLE : has
+```
 
----
-
-## 🚀 التشغيل والتثبيت
-
-### المتطلبات
-- نظام تشغيل Windows 10/11.
-- .NET 10.0 SDK أو أحدث.
-- SQL Server Express أو LocalDB.
-
-### الخطوات
-1.  **استنساخ المستودع**:
-    ```bash
-    git clone https://github.com/dabasgaza/Radio.git
-    ```
-2.  **إعداد قاعدة البيانات**:
-    تأكد من ضبط `ConnectionStrings` في ملف `Radio/appsettings.json`.
-3.  **تطبيق التهجيرات (Migrations)**:
-    ```bash
-    dotnet ef database update --project Domain --startup-project Radio
-    ```
-4.  **التشغيل**:
-    افتح ملف الحل `Radio.slnx` عبر Visual Studio أو استخدم الأمر:
-    ```bash
-    dotnet run --project Radio
-    ```
+### دورة حياة الحلقة (Episode State Machine)
+يتبع النظام مساراً صارماً لضمان جودة المحتوى من الفكرة حتى النشر:
+1.  **Planned (0):** حلقة مجدولة، بانتظار وقت البث.
+2.  **Executed (1):** تم البث الفعلي، وتسجيل ملاحظات المخرج والمشاكل الفنية.
+3.  **Published (2):** تم النشر الرقمي (وسائل التواصل الاجتماعي).
+4.  **WebsitePublished (3):** أعلى مراحل الأرشفة، النشر على الموقع الرسمي.
+5.  **Cancelled (4):** حلقة ملغاة مع تسجيل سبب الإلغاء للتحليل المستقبلي.
 
 ---
 
-## 📝 سجل التحديثات الأخيرة (مايو 2026)
+## 🔐 الأمن ومصفوفة الصلاحيات (Security Matrix)
 
-- ✅ **Refactoring الشامل**: حذف الحقول المكررة وتوحيد منطق النشر.
-- ✅ **إعادة ضبط الـ Migrations**: إنشاء بنية قاعدة بيانات نظيفة ومستقرة تماماً.
-- ✅ **تطوير الواجهة**: تحويل نوافذ الإدخال إلى `UserControls` عصرية تعمل داخل `DialogHost`.
-- ✅ **تحسين الأداء**: تبسيط علاقات الكيانات مع كلاس `User` لتقليل حجم الكائنات المسترجعة.
-- ✅ **التحقق المركزي**: دمج نظام `ValidationPipeline` مع `Result Pattern`.
+يعتمد النظام على نظام صلاحيات **Granular Permissions** المدمج مع الأدوار:
+
+| الكود | الصلاحية | التأثير البرمجي |
+|:--- |:--- |:--- |
+| `EPISODE_REVERT` | التراجع | يسمح بكسر سير العمل والعودة لحالة سابقة مع حذف السجلات المرتبطة. |
+| `PROGRAM_MANAGE` | إدارة البرامج | يسمح بتعديل هيكلية البرامج الإذاعية. |
+| `USER_MANAGE` | الإدارة | يمنح الوصول الكامل لإدارة الحسابات وتوزيع الصلاحيات. |
+
+*يتم التحقق من الصلاحيات في طبقة الخدمات (Services) لضمان الأمن حتى في حال تم تجاوز الواجهة.*
 
 ---
 
-## 📄 الترخيص
-خاص — للاستخدام الداخلي لمنظمة "إذاعة صوت القدس".
+## 🚀 دليل المطور (Developer Guide)
 
+### لإضافة ميزة أو كيان جديد:
+1.  **Domain:** أنشئ الكيان في `Domain/Models` وقم بوراثة `BaseEntity`.
+2.  **Configuration:** أضف إعدادات الجداول في `Domain/Configurations`.
+3.  **DTO:** أنشئ كائنات نقل البيانات المطلوبة في `DataAccess/DTOs`.
+4.  **Service:** أنشئ الخدمة وواجهتها (Interface) وقم بتنفيذ منطق العمل باستخدام `Result Pattern`.
+5.  **UI:** أنشئ `UserControl` جديد واستخدم `DialogHost` لعرضه، مع تسجيل الخدمة في `App.xaml.cs`.
+
+---
+
+## 🛡️ استقرار البيانات (Robustness Features)
+
+*   **Concurrency Handling:** حماية البيانات من التعديلات المتزامنة عبر `RowVersion`. عند حدوث تعارض، تظهر واجهة `ConcurrencyDialog` للمقارنة والدمج اليدوي.
+*   **Soft Delete:** لا يتم حذف أي بيانات حيوية نهائياً. يتم استخدام فلاتر عالمية (`Global Query Filters`) لإخفاء السجلات غير النشطة برمجياً.
+*   **Audit Trail:** سجل تاريخي كامل لكل حركة في النظام، يتيح للمسؤولين معرفة تفاصيل التغييرات في أي لحظة.
+
+---
 <div align="center">
-تم التطوير بواسطة <b>Antigravity AI</b> بالتعاون مع فريق التطوير.
+تم تطوير هذا النظام ليكون حجر الأساس الرقمي لأي مؤسسة إذاعية تطمح للاحترافية والتميز.
+
+**بواسطة Antigravity AI**
 </div>
