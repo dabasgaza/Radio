@@ -23,6 +23,12 @@ public partial class Episode : BaseEntity
 
     public string SpecialNotes { get; set; }
 
+    /// <summary>
+    /// سبب إلغاء الحلقة — يُملأ فقط عند الإلغاء (StatusId = 4).
+    /// مخزن مباشرة في الجدول لتفادي الاستعلام على AuditLogs.
+    /// </summary>
+    public string? CancellationReason { get; set; }
+
     // ✅ تم إزالة IsWebsitePublished لمنع تكرار البيانات وتضاربها مع جدول WebsitePublishingLogs وحالة الحلقة
 
     // ✅ أضف هذين السطرين مكانه:

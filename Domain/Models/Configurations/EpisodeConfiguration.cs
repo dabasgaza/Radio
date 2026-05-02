@@ -21,6 +21,9 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
         builder.Property(e => e.SpecialNotes)
                .HasMaxLength(1000);
 
+        builder.Property(e => e.CancellationReason)
+               .HasMaxLength(500);
+
         builder.Property(e => e.CreatedAt)
                .HasDefaultValueSql("GETUTCDATE()");
 

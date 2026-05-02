@@ -11,7 +11,7 @@ public static class EpisodeStatus
     public const byte Planned = 0;
     public const byte Executed = 1;
     public const byte Published = 2;
-    public const byte WebsitePublished = 3;   // منشورة عبر الموقع
+    public const byte WebsitePublished = 3;
     public const byte Cancelled = 4;
 }
 
@@ -30,15 +30,15 @@ public interface IEpisodeService
     Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session);
 }
 
-// ✨ استخدام C# 13 Primary Constructor
 public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IEpisodeService
 {
-    // تم إزالة IAuditService لأن الـ AuditInterceptor يتولى الأمر تلقائياً!
+    // ─── قراءة الحلقات ──────────────────────────────────────────────────────────
 
     public async Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync()
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
+        // ✅ CancellationReason الآن جزء من الحلقة مباشرة — لا استعلام ثاني على AuditLogs
         var episodes = await context.Episodes
             .AsNoTracking()
             .OrderBy(e => e.ScheduledExecutionTime)
@@ -58,82 +58,18 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 ProgramName = e.Program.ProgramName,
                 ScheduledExecutionTime = e.ScheduledExecutionTime,
                 StatusText = e.EpisodeStatus.DisplayName,
-                SpecialNotes = e.SpecialNotes
+                SpecialNotes = e.SpecialNotes,
+                CancellationReason = e.CancellationReason
             }).ToListAsync();
 
-        var cancelledEpisodes = episodes
-            .Where(e => e.StatusId == EpisodeStatus.Cancelled)
-            .ToList();
-
-        if (cancelledEpisodes.Count > 0)
-        {
-            var cancelledIds = cancelledEpisodes.Select(e => e.EpisodeId).ToList();
-
-            using var auditContext = await contextFactory.CreateDbContextAsync();
-            var auditLogs = await auditContext.AuditLogs
-                .AsNoTracking()
-                .Where(a => a.TableName == "Episodes"
-                         && a.Action == "CANCEL"
-                         && a.RecordId != null
-                         && cancelledIds.Contains(a.RecordId.Value))
-                .OrderByDescending(a => a.ChangedAt)
-                .Select(a => new { a.RecordId, a.Reason, a.NewValues })
-                .ToListAsync();
-
-            var reasonDict = auditLogs
-                .GroupBy(a => a.RecordId!.Value)
-                .ToDictionary(g => g.Key, g =>
-                {
-                    var latest = g.First();
-                    var reason = latest.Reason ?? TryParseReasonFromJson(latest.NewValues);
-                    return reason;
-                });
-
-            foreach (var ep in cancelledEpisodes)
-            {
-                ep.CancellationReason = reasonDict.TryGetValue(ep.EpisodeId, out var reason) && !string.IsNullOrWhiteSpace(reason)
-                    ? reason
-                    : "لم يتم تحديد سبب الإلغاء";
-            }
-        }
-        else
-        {
-            foreach (var ep in episodes.Where(e => e.StatusId == EpisodeStatus.Cancelled))
-                ep.CancellationReason = "لم يتم تحديد سبب الإلغاء";
-        }
-
         return episodes;
-    }
-
-    public async Task<Result<int>> CreateEpisodeAsync(EpisodeDto dto, UserSession session)
-    {
-        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
-        if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
-        using var context = await contextFactory.CreateDbContextAsync();
-
-        var episode = new Episode
-        {
-            ProgramId = dto.ProgramId,
-            EpisodeName = dto.EpisodeName,
-            ScheduledExecutionTime = dto.ScheduledTime,
-            StatusId = EpisodeStatus.Planned, // ✨ استخدام الثوابت
-            SpecialNotes = dto.SpecialNotes
-        };
-
-        // ✅ إضافة الضيوف مع حماية من null
-        if (dto.Guests is { Count: > 0 })
-            AddGuestsToEpisode(episode, dto.Guests);
-
-        context.Episodes.Add(episode);
-        await context.SaveChangesAsync();
-        return Result<int>.Success(episode.EpisodeId);
     }
 
     public async Task<ActiveEpisodeDto?> GetActiveEpisodeByIdAsync(int episodeId)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
 
-        var dto = await context.Episodes
+        return await context.Episodes
             .AsNoTracking()
             .Where(e => e.EpisodeId == episodeId)
             .Select(e => new ActiveEpisodeDto
@@ -152,103 +88,60 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 ProgramName = e.Program.ProgramName,
                 ScheduledExecutionTime = e.ScheduledExecutionTime,
                 StatusText = e.EpisodeStatus.DisplayName,
-                SpecialNotes = e.SpecialNotes
+                SpecialNotes = e.SpecialNotes,
+                CancellationReason = e.CancellationReason
             }).FirstOrDefaultAsync();
+    }
 
-        if (dto != null && dto.StatusId == EpisodeStatus.Cancelled)
+    // ─── إنشاء وتعديل ───────────────────────────────────────────────────────────
+
+    public async Task<Result<int>> CreateEpisodeAsync(EpisodeDto dto, UserSession session)
+    {
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
+        if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
+
+        using var context = await contextFactory.CreateDbContextAsync();
+
+        var episode = new Episode
         {
-            await using var auditContext = await contextFactory.CreateDbContextAsync();
-            var auditLog = await auditContext.AuditLogs
-                .AsNoTracking()
-                .Where(a => a.TableName == "Episodes"
-                         && a.Action == "CANCEL"
-                         && a.RecordId == episodeId)
-                .OrderByDescending(a => a.ChangedAt)
-                .Select(a => new { a.Reason, a.NewValues })
-                .FirstOrDefaultAsync();
+            ProgramId = dto.ProgramId,
+            EpisodeName = dto.EpisodeName,
+            ScheduledExecutionTime = dto.ScheduledTime,
+            StatusId = EpisodeStatus.Planned,
+            SpecialNotes = dto.SpecialNotes
+        };
 
-            if (auditLog != null)
-            {
-                var reason = auditLog.Reason ?? TryParseReasonFromJson(auditLog.NewValues);
-                dto.CancellationReason = !string.IsNullOrWhiteSpace(reason) ? reason : "لم يتم تحديد سبب الإلغاء";
-            }
-            else
-            {
-                dto.CancellationReason = "لم يتم تحديد سبب الإلغاء";
-            }
-        }
+        if (dto.Guests is { Count: > 0 })
+            AddGuestsToEpisode(episode, dto.Guests);
 
-        return dto;
+        context.Episodes.Add(episode);
+        await context.SaveChangesAsync();
+        return Result<int>.Success(episode.EpisodeId);
     }
 
     public async Task<Result> UpdateEpisodeAsync(EpisodeDto dto, UserSession session)
     {
         var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
         using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = await context.Episodes
-            .Include(e => e.EpisodeGuests)     // ✅ ضروري
+            .Include(e => e.EpisodeGuests)
             .FirstOrDefaultAsync(e => e.EpisodeId == dto.EpisodeId);
 
         if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
-        // تحديث الحقول
         episode.ProgramId = dto.ProgramId;
         episode.EpisodeName = dto.EpisodeName;
         episode.ScheduledExecutionTime = dto.ScheduledTime;
         episode.SpecialNotes = dto.SpecialNotes;
 
-        // ✅ مزامنة ذكية — فقط إذا تغيرت قائمة الضيوف فعلاً
         if (dto.Guests is { Count: > 0 } || episode.EpisodeGuests.Count > 0)
             SyncGuests(episode.EpisodeGuests.ToList(), dto.Guests ?? [], episode);
 
-        // الـ Interceptor سيتولى تحديث UpdatedAt و UpdatedByUserId تلقائياً
         await context.SaveChangesAsync();
         return Result.Success();
-    }
-
-    /// <summary>
-    /// مزامنة ذكية للضيوف — المقارنة بالمفتاح الأساسي Id وليس GuestId
-    /// حتى عند تغيير الضيف يتم تحديث الصف نفسه (UPDATE) بدلاً من حذفه وإعادة إدراجه
-    /// </summary>
-    private static void SyncGuests(
-        List<EpisodeGuest> existingGuests,
-        List<EpisodeGuestDto> newGuests,
-        Episode episode)
-    {
-        // 1. بناء قاموس بالضيوف الحاليين حسب المفتاح الأساسي
-        var existingById = existingGuests.ToDictionary(g => g.EpisodeGuestId);
-        var newIds = newGuests
-            .Where(g => g.Id != 0)
-            .Select(g => g.Id)
-            .ToHashSet();
-
-        // 2. حذف الصفوف المُزالة فقط (لم تعد موجودة في القائمة الجديدة)
-        foreach (var guest in existingGuests.Where(g => !newIds.Contains(g.EpisodeGuestId)).ToList())
-            episode.EpisodeGuests.Remove(guest);
-
-        // 3. تحديث أو إضافة
-        foreach (var dto in newGuests)
-        {
-            if (dto.Id != 0 && existingById.TryGetValue(dto.Id, out var existing))
-            {
-                // ✅ تحديث الصف الموجود — بما في ذلك تغيير GuestId
-                existing.GuestId = dto.GuestId;
-                existing.Topic = dto.Topic;
-                existing.HostingTime = dto.HostingTime;
-            }
-            else
-            {
-                // ✅ ضيف جديد تماماً (Id == 0) — إضافة فقط
-                episode.EpisodeGuests.Add(new EpisodeGuest
-                {
-                    GuestId = dto.GuestId,
-                    Topic = dto.Topic,
-                    HostingTime = dto.HostingTime
-                });
-            }
-        }
     }
 
     public async Task<List<EpisodeGuestDto>> GetEpisodeGuestsAsync(int episodeId)
@@ -266,10 +159,10 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             .ToListAsync();
     }
 
-    // تحديث الحالة مع قواعد الـ Workflow والصلاحيات
+    // ─── انتقالات الحالة ─────────────────────────────────────────────────────────
+
     public async Task<Result> UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session)
     {
-        // التحقق من الصلاحيات بناءً على الحالة الجديدة
         if (newStatusId == EpisodeStatus.Executed)
         {
             var permCheck = session.EnsurePermission(AppPermissions.EpisodeExecute);
@@ -286,7 +179,6 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var episode = await context.Episodes.FindAsync(episodeId);
         if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
-        // ✨ قواعد الـ Workflow باستخدام الثوابت (أوضح وأسهل للصيانة)
         if (episode.StatusId == EpisodeStatus.Published)
             return Result.Fail("لا يمكن تعديل حالة حلقة تم نشرها بالفعل.");
 
@@ -296,7 +188,6 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         if (episode.StatusId == EpisodeStatus.Planned && newStatusId == EpisodeStatus.Published)
             return Result.Fail("يجب تنفيذ الحلقة وتوثيقها قبل عملية النشر الرقمي.");
 
-        // تحديث الحالة
         episode.StatusId = newStatusId;
 
         if (newStatusId == EpisodeStatus.Executed)
@@ -313,40 +204,15 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         }
     }
 
-    public async Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session)
-    {
-        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
-        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
-
-        await using var context = await contextFactory.CreateDbContextAsync();
-
-        var episode = await context.Episodes
-            .Include(e => e.EpisodeGuests)
-            .FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
-
-        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
-
-        // ✅ قاعدة عمل: منع حذف الحلقات المنفّذة أو المنشورة
-        if (episode.ExecutionLogs.Any())
-            return Result.Fail("لا يمكن حذف حلقة تم تنفيذها، يُرجى إلغاء التنفيذ أولاً.");
-
-        bool hasSocialPublish = await context.SocialMediaPublishingLogs.AnyAsync(l => l.EpisodeGuest.EpisodeId == episodeId);
-        if (episode.WebsitePublishingLogs.Any() || hasSocialPublish)
-            return Result.Fail("لا يمكن حذف حلقة تم نشرها، يُرجى إلغاء النشر أولاً.");
-
-        episode.IsActive = false;
-
-        foreach (var guest in episode.EpisodeGuests)
-            guest.IsActive = false;
-
-        await context.SaveChangesAsync();
-        return Result.Success();
-    }
-
+    /// <summary>
+    /// تبديل حالة النشر على الموقع الإلكتروني.
+    /// الإصلاح: ينشئ الآن سجلاً فعلياً في WebsitePublishingLogs ليدعم التراجع لاحقاً.
+    /// </summary>
     public async Task<Result> ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session)
     {
         var permCheck = session.EnsurePermission(AppPermissions.EpisodeWebPublish);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
         await using var context = await contextFactory.CreateDbContextAsync();
 
         var episode = await context.Episodes.FindAsync(episodeId);
@@ -355,17 +221,33 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         if (isPublished)
         {
-            // يمكن النشر بالموقع فقط من حالة المنشورة رقمياً
             if (episode.StatusId != EpisodeStatus.Published)
                 return Result.Fail("لا يمكن نشر حلقة على الموقع قبل نشرها رقمياً.");
+
+            // ✅ إصلاح: إنشاء سجل فعلي في WebsitePublishingLogs
+            context.WebsitePublishingLogs.Add(new WebsitePublishingLog
+            {
+                EpisodeId = episodeId,
+                PublishedByUserId = session.UserId,
+                PublishedAt = DateTime.UtcNow,
+                MediaType = MediaType.Audio  // القيمة الافتراضية — يمكن توسيعها مستقبلاً
+            });
 
             episode.StatusId = EpisodeStatus.WebsitePublished;
         }
         else
         {
-            // يمكن إلغاء النشر فقط إذا كانت منشورة بالفعل على الموقع
             if (episode.StatusId != EpisodeStatus.WebsitePublished)
                 return Result.Fail("الحلقة غير منشورة على الموقع.");
+
+            // ✅ Soft Delete لأحدث سجل نشر على الموقع
+            var latestLog = await context.WebsitePublishingLogs
+                .Where(l => l.EpisodeId == episodeId && l.IsActive)
+                .OrderByDescending(l => l.PublishedAt)
+                .FirstOrDefaultAsync();
+
+            if (latestLog != null)
+                latestLog.IsActive = false;
 
             episode.StatusId = EpisodeStatus.Published;
         }
@@ -373,6 +255,8 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         await context.SaveChangesAsync();
         return Result.Success();
     }
+
+    // ─── التراجع والإلغاء ────────────────────────────────────────────────────────
 
     public async Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session)
     {
@@ -394,6 +278,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             {
                 case EpisodeStatus.Executed:
                 {
+                    // Soft Delete لسجل التنفيذ
                     var execLog = await context.ExecutionLogs
                         .Where(l => l.EpisodeId == episodeId && l.IsActive)
                         .OrderByDescending(l => l.CreatedAt)
@@ -409,21 +294,33 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
                 case EpisodeStatus.Published:
                 {
-                    var pubLog = await context.WebsitePublishingLogs
-                        .Where(l => l.EpisodeId == episodeId && l.IsActive)
-                        .OrderByDescending(l => l.CreatedAt)
-                        .FirstOrDefaultAsync();
+                    // ✅ إصلاح: التراجع من "منشورة رقمياً" يعني إلغاء سجلات وسائل التواصل
+                    // (لا يوجد WebsitePublishingLog في هذه المرحلة — ذلك في WebsitePublished)
+                    var socialLogs = await context.SocialMediaPublishingLogs
+                        .Where(l => l.EpisodeGuest.EpisodeId == episodeId && l.IsActive)
+                        .ToListAsync();
 
-                    if (pubLog != null)
-                        pubLog.IsActive = false;
+                    foreach (var log in socialLogs)
+                        log.IsActive = false;
 
                     episode.StatusId = EpisodeStatus.Executed;
                     break;
                 }
 
                 case EpisodeStatus.WebsitePublished:
+                {
+                    // ✅ Soft Delete لسجل النشر على الموقع
+                    var webLog = await context.WebsitePublishingLogs
+                        .Where(l => l.EpisodeId == episodeId && l.IsActive)
+                        .OrderByDescending(l => l.PublishedAt)
+                        .FirstOrDefaultAsync();
+
+                    if (webLog != null)
+                        webLog.IsActive = false;
+
                     episode.StatusId = EpisodeStatus.Published;
                     break;
+                }
 
                 case EpisodeStatus.Planned:
                     return Result.Fail("الحلقة في حالة جدولة مسبقاً، لا يوجد شيء للتراجع عنه.");
@@ -435,6 +332,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                     return Result.Fail("لا يمكن التراجع عن هذه الحالة.");
             }
 
+            // تسجيل يدوي في AuditLogs (لأن هذا الإجراء لا يُغطيه الـ Interceptor بالكامل)
             context.AuditLogs.Add(new AuditLog
             {
                 TableName = "Episodes",
@@ -475,8 +373,11 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         if (episode.StatusId == EpisodeStatus.Published || episode.StatusId == EpisodeStatus.WebsitePublished)
             return Result.Fail("لا يمكن إلغاء حلقة منشورة.");
 
+        // ✅ إصلاح: تخزين السبب مباشرة في العمود بدلاً من AuditLogs فقط
         episode.StatusId = EpisodeStatus.Cancelled;
+        episode.CancellationReason = reason;
 
+        // نحتفظ بالتسجيل في AuditLogs أيضاً للتتبع التاريخي
         context.AuditLogs.Add(new AuditLog
         {
             TableName = "Episodes",
@@ -508,6 +409,16 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         using var context = await contextFactory.CreateDbContextAsync();
 
+        var episode = await context.Episodes.FindAsync(episodeId);
+        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
+
+        if (episode.StatusId != EpisodeStatus.Cancelled)
+            return Result.Fail("لا يمكن تعديل سبب الإلغاء لحلقة غير ملغاة.");
+
+        // ✅ إصلاح: تحديث العمود مباشرة — بدون تعديل JSON يدوي
+        episode.CancellationReason = newReason;
+
+        // تحديث آخر سجل CANCEL في AuditLogs أيضاً للاتساق
         var log = await context.AuditLogs
             .Where(a => a.TableName == "Episodes"
                      && a.Action == "CANCEL"
@@ -515,55 +426,89 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             .OrderByDescending(a => a.ChangedAt)
             .FirstOrDefaultAsync();
 
-        if (log == null)
-            return Result.Fail("لم يتم العثور على سجل إلغاء لهذه الحلقة.");
-
-        log.Reason = newReason;
-
-        if (!string.IsNullOrWhiteSpace(log.NewValues) && log.NewValues.Contains("\"Reason\":"))
-        {
-            var start = log.NewValues.IndexOf("\"Reason\":") + 9;
-            var valueStart = log.NewValues.IndexOf('"', start) + 1;
-            var valueEnd = log.NewValues.IndexOf('"', valueStart);
-            if (valueStart > 0 && valueEnd > valueStart)
-            {
-                log.NewValues = log.NewValues[..valueStart] + newReason + log.NewValues[valueEnd..];
-            }
-        }
+        if (log != null)
+            log.Reason = newReason;
 
         await context.SaveChangesAsync();
         return Result.Success();
     }
 
-    #region Private Helpers
+    // ─── حذف ────────────────────────────────────────────────────────────────────
 
-    private static string? TryParseReasonFromJson(string? json)
+    public async Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session)
     {
-        if (string.IsNullOrWhiteSpace(json))
-            return null;
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        try
+        await using var context = await contextFactory.CreateDbContextAsync();
+
+        var episode = await context.Episodes
+            .Include(e => e.EpisodeGuests)
+            .Include(e => e.ExecutionLogs)
+            .Include(e => e.WebsitePublishingLogs)
+            .FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
+
+        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
+
+        if (episode.ExecutionLogs.Any(l => l.IsActive))
+            return Result.Fail("لا يمكن حذف حلقة تم تنفيذها، يُرجى إلغاء التنفيذ أولاً.");
+
+        bool hasSocialPublish = await context.SocialMediaPublishingLogs
+            .AnyAsync(l => l.EpisodeGuest.EpisodeId == episodeId && l.IsActive);
+
+        if (episode.WebsitePublishingLogs.Any(l => l.IsActive) || hasSocialPublish)
+            return Result.Fail("لا يمكن حذف حلقة تم نشرها، يُرجى إلغاء النشر أولاً.");
+
+        episode.IsActive = false;
+
+        foreach (var guest in episode.EpisodeGuests)
+            guest.IsActive = false;
+
+        await context.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// مزامنة ذكية للضيوف — المقارنة بالمفتاح الأساسي Id وليس GuestId
+    /// </summary>
+    private static void SyncGuests(
+        List<EpisodeGuest> existingGuests,
+        List<EpisodeGuestDto> newGuests,
+        Episode episode)
+    {
+        var existingById = existingGuests.ToDictionary(g => g.EpisodeGuestId);
+        var newIds = newGuests
+            .Where(g => g.Id != 0)
+            .Select(g => g.Id)
+            .ToHashSet();
+
+        // حذف الضيوف الذين لم يعودوا في القائمة
+        foreach (var guest in existingGuests.Where(g => !newIds.Contains(g.EpisodeGuestId)).ToList())
+            episode.EpisodeGuests.Remove(guest);
+
+        // تحديث أو إضافة
+        foreach (var dto in newGuests)
         {
-            var start = json.IndexOf("\"Reason\":");
-            if (start < 0) return null;
-
-            start = json.IndexOf('"', start + 9);
-            if (start < 0) return null;
-
-            var end = json.IndexOf('"', start + 1);
-            if (end < 0) return null;
-
-            return json.Substring(start + 1, end - start - 1);
-        }
-        catch
-        {
-            return null;
+            if (dto.Id != 0 && existingById.TryGetValue(dto.Id, out var existing))
+            {
+                existing.GuestId = dto.GuestId;
+                existing.Topic = dto.Topic;
+                existing.HostingTime = dto.HostingTime;
+            }
+            else
+            {
+                episode.EpisodeGuests.Add(new EpisodeGuest
+                {
+                    GuestId = dto.GuestId,
+                    Topic = dto.Topic,
+                    HostingTime = dto.HostingTime
+                });
+            }
         }
     }
 
-    /// <summary>
-    /// إضافة ضيوف إلى كيان الحلقة.
-    /// </summary>
     private static void AddGuestsToEpisode(Episode episode, List<EpisodeGuestDto> guestDtos)
     {
         foreach (var guestDto in guestDtos)
@@ -576,6 +521,4 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             });
         }
     }
-
-    #endregion
 }
