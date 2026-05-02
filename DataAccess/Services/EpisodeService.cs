@@ -135,7 +135,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     {
         await using var context = await contextFactory.CreateDbContextAsync();
 
-        return await context.Episodes
+        var dto = await context.Episodes
             .AsNoTracking()
             .Where(e => e.EpisodeId == episodeId)
             .Select(e => new ActiveEpisodeDto
@@ -157,6 +157,31 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 SpecialNotes = e.SpecialNotes,
                 IsWebsitePublished = e.IsWebsitePublished
             }).FirstOrDefaultAsync();
+
+        if (dto != null && dto.StatusId == EpisodeStatus.Cancelled)
+        {
+            await using var auditContext = await contextFactory.CreateDbContextAsync();
+            var auditLog = await auditContext.AuditLogs
+                .AsNoTracking()
+                .Where(a => a.TableName == "Episodes"
+                         && a.Action == "CANCEL"
+                         && a.RecordId == episodeId)
+                .OrderByDescending(a => a.ChangedAt)
+                .Select(a => new { a.Reason, a.NewValues })
+                .FirstOrDefaultAsync();
+
+            if (auditLog != null)
+            {
+                var reason = auditLog.Reason ?? TryParseReasonFromJson(auditLog.NewValues);
+                dto.CancellationReason = !string.IsNullOrWhiteSpace(reason) ? reason : "لم يتم تحديد سبب الإلغاء";
+            }
+            else
+            {
+                dto.CancellationReason = "لم يتم تحديد سبب الإلغاء";
+            }
+        }
+
+        return dto;
     }
 
     public async Task<Result> UpdateEpisodeAsync(EpisodeDto dto, UserSession session)

@@ -89,8 +89,20 @@ namespace Radio.Views.Episodes
 
         private void RebindAndUpdateStats()
         {
-            DgEpisodes.ItemsSource = _allEpisodes;
-            UpdateStatistics(_allEpisodes);
+            var keyword = TxtSearch.Text?.Trim();
+
+            var filtered = string.IsNullOrWhiteSpace(keyword)
+                ? _allEpisodes
+                : _allEpisodes.Where(ep =>
+                    (ep.EpisodeName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (ep.ProgramName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (ep.GuestsDisplay?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    ep.GuestItems.Any(g =>
+                        (g.Name?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                        (g.Topic?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false))).ToList();
+
+            DgEpisodes.ItemsSource = filtered.ToList();
+            UpdateStatistics(filtered);
         }
 
         private static List<GuestDisplayItem> BuildGuestItems(List<GuestRow> guestRows)
