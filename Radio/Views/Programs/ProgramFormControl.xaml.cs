@@ -2,24 +2,26 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
+using MaterialDesignThemes.Wpf;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Radio.Views.Programs
 {
-    public partial class ProgramFormDialog
+    public partial class ProgramFormControl : UserControl
     {
         private readonly IProgramService _programService;
         private readonly UserSession _session;
         private readonly ProgramDto? _originalDto;
 
-        public ProgramFormDialog(ProgramDto? dtoForEdit, IProgramService programService, UserSession session)
+        public ProgramFormControl(ProgramDto? dtoForEdit, IProgramService programService, UserSession session)
         {
             InitializeComponent();
             _programService = programService;
             _session = session;
             _originalDto = dtoForEdit;
 
-            Title = _originalDto is not null ? "تعديل البرنامج" : "إضافة برنامج جديد";
+            TxtTitle.Text = _originalDto is not null ? "تعديل البرنامج" : "إضافة برنامج جديد";
 
             if (_originalDto is not null)
             {
@@ -61,7 +63,8 @@ namespace Radio.Views.Programs
                             ? "تم إضافة البرنامج بنجاح."
                             : "تم تعديل البرنامج بنجاح.");
 
-                    DialogResult = true;
+                    // إغلاق الـ DialogHost مع إرجاع true للنافذة الأب
+                    DialogHost.Close(null, true);
                 }
                 else
                 {
@@ -85,16 +88,5 @@ namespace Radio.Views.Programs
             TxtCategory.IsEnabled = !isLoading;
             TxtDesc.IsEnabled = !isLoading;
         }
-
-        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
-
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
     }
 }

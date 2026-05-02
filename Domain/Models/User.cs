@@ -22,33 +22,15 @@ public partial class User : BaseEntity
 
     public DateTime? LastLoginAt { get; set; }
 
-    public virtual ICollection<CorrespondentCoverage> CorrespondentCoverageCreatedByUsers { get; set; } = new List<CorrespondentCoverage>();
-
-    public virtual ICollection<CorrespondentCoverage> CorrespondentCoverageUpdatedByUsers { get; set; } = new List<CorrespondentCoverage>();
-
-    public virtual ICollection<Correspondent> CorrespondentCreatedByUsers { get; set; } = new List<Correspondent>();
-
-    public virtual ICollection<Correspondent> CorrespondentUpdatedByUsers { get; set; } = new List<Correspondent>();
-
-    public virtual ICollection<Episode> EpisodeCreatedByUsers { get; set; } = new List<Episode>();
-
-    public virtual ICollection<EpisodeGuest> EpisodeGuests { get; set; } = new List<EpisodeGuest>();
-
-    public virtual ICollection<Episode> EpisodeUpdatedByUsers { get; set; } = new List<Episode>();
-
     public virtual ICollection<ExecutionLog> ExecutionLogs { get; set; } = new List<ExecutionLog>();
 
-    public virtual ICollection<Guest> GuestCreatedByUsers { get; set; } = new List<Guest>();
 
-    public virtual ICollection<Guest> GuestUpdatedByUsers { get; set; } = new List<Guest>();
 
     public virtual ICollection<User> InverseCreatedByUser { get; set; } = new List<User>();
 
     public virtual ICollection<User> InverseUpdatedByUser { get; set; } = new List<User>();
 
-    public virtual ICollection<Program> ProgramCreatedByUsers { get; set; } = new List<Program>();
 
-    public virtual ICollection<Program> ProgramUpdatedByUsers { get; set; } = new List<Program>();
 
     public virtual ICollection<SocialMediaPublishingLog> SocialMediaPublishingLogs { get; set; } = new List<SocialMediaPublishingLog>();
 

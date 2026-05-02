@@ -4,6 +4,7 @@ using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using System.Windows;
 using System.Windows.Controls;
+using MaterialDesignThemes.Wpf;
 
 namespace Radio.Views.Programs
 {
@@ -82,13 +83,14 @@ namespace Radio.Views.Programs
         /// <summary>
         /// فتح نافذة إضافة برنامج جديد.
         /// </summary>
-        private void BtnAddProgram_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddProgram_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var dialog = new ProgramFormDialog(null, _programService, _session);
-                if (dialog.ShowDialog() == true)
-                    _ = LoadDataAsync();
+                var view = new ProgramFormControl(null, _programService, _session);
+                var result = await DialogHost.Show(view);
+                if (result is true)
+                    await LoadDataAsync();
             }
             catch (Exception)
             {
@@ -99,16 +101,17 @@ namespace Radio.Views.Programs
         /// <summary>
         /// فتح نافذة تعديل برنامج موجود.
         /// </summary>
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ProgramDto prog)
                 return;
 
             try
             {
-                var dialog = new ProgramFormDialog(prog, _programService, _session);
-                if (dialog.ShowDialog() == true)
-                    _ = LoadDataAsync();
+                var view = new ProgramFormControl(prog, _programService, _session);
+                var result = await DialogHost.Show(view);
+                if (result is true)
+                    await LoadDataAsync();
             }
             catch (Exception)
             {

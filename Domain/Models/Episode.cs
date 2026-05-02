@@ -23,8 +23,7 @@ public partial class Episode : BaseEntity
 
     public string SpecialNotes { get; set; }
 
-    // ✅ نشر الموقع
-    public bool IsWebsitePublished { get; set; }
+    // ✅ تم إزالة IsWebsitePublished لمنع تكرار البيانات وتضاربها مع جدول WebsitePublishingLogs وحالة الحلقة
 
     // ✅ أضف هذين السطرين مكانه:
     public byte StatusId { get; set; }
@@ -38,7 +37,7 @@ public partial class Episode : BaseEntity
 
     public virtual Program Program { get; set; }
 
-    public virtual ICollection<SocialMediaPublishingLog> SocialMediaPublishingLogs { get; set; } = new List<SocialMediaPublishingLog>();
+
     public virtual ICollection<WebsitePublishingLog> WebsitePublishingLogs { get; set; } = new List<WebsitePublishingLog>();
     public virtual ICollection<EpisodeEmployee> EpisodeEmployees { get; set; } = new List<EpisodeEmployee>();
     public virtual ICollection<EpisodeCorrespondent> EpisodeCorrespondents { get; set; } = new List<EpisodeCorrespondent>();

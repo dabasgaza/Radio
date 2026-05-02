@@ -1,4 +1,4 @@
-﻿using DataAccess.Services;
+using DataAccess.Services;
 
 namespace DataAccess.DTOs
 {
@@ -14,7 +14,6 @@ namespace DataAccess.DTOs
         public string? StatusText { get; init; }
         public byte StatusId { get; init; } // نحتاج الـ ID هنا لاتخاذ القرار
         public string? SpecialNotes { get; init; }
-        public bool IsWebsitePublished { get; init; }         // ✅ نشر الموقع
 
 
         // 👈 منطق تفعيل زر التنفيذ: فقط إذا كانت الحالة "مجدولة" (0)

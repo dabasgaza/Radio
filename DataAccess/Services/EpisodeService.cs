@@ -58,8 +58,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 ProgramName = e.Program.ProgramName,
                 ScheduledExecutionTime = e.ScheduledExecutionTime,
                 StatusText = e.EpisodeStatus.DisplayName,
-                SpecialNotes = e.SpecialNotes,
-                IsWebsitePublished = e.IsWebsitePublished
+                SpecialNotes = e.SpecialNotes
             }).ToListAsync();
 
         var cancelledEpisodes = episodes
@@ -118,8 +117,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             EpisodeName = dto.EpisodeName,
             ScheduledExecutionTime = dto.ScheduledTime,
             StatusId = EpisodeStatus.Planned, // ✨ استخدام الثوابت
-            SpecialNotes = dto.SpecialNotes,
-            IsWebsitePublished = false
+            SpecialNotes = dto.SpecialNotes
         };
 
         // ✅ إضافة الضيوف مع حماية من null
@@ -154,8 +152,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 ProgramName = e.Program.ProgramName,
                 ScheduledExecutionTime = e.ScheduledExecutionTime,
                 StatusText = e.EpisodeStatus.DisplayName,
-                SpecialNotes = e.SpecialNotes,
-                IsWebsitePublished = e.IsWebsitePublished
+                SpecialNotes = e.SpecialNotes
             }).FirstOrDefaultAsync();
 
         if (dto != null && dto.StatusId == EpisodeStatus.Cancelled)
@@ -333,7 +330,8 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         if (episode.ExecutionLogs.Any())
             return Result.Fail("لا يمكن حذف حلقة تم تنفيذها، يُرجى إلغاء التنفيذ أولاً.");
 
-        if (episode.WebsitePublishingLogs.Any() || episode.SocialMediaPublishingLogs.Any())
+        bool hasSocialPublish = await context.SocialMediaPublishingLogs.AnyAsync(l => l.EpisodeGuest.EpisodeId == episodeId);
+        if (episode.WebsitePublishingLogs.Any() || hasSocialPublish)
             return Result.Fail("لا يمكن حذف حلقة تم نشرها، يُرجى إلغاء النشر أولاً.");
 
         episode.IsActive = false;
@@ -425,7 +423,6 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
                 case EpisodeStatus.WebsitePublished:
                     episode.StatusId = EpisodeStatus.Published;
-                    episode.IsWebsitePublished = false;
                     break;
 
                 case EpisodeStatus.Planned:

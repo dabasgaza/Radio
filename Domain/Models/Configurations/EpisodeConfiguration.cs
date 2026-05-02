@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Models.Configurations;
@@ -27,9 +27,7 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
         builder.Property(e => e.UpdatedAt)
                .HasDefaultValueSql("GETUTCDATE()");
 
-        // ✅ نشر الموقع — افتراضي false
-        builder.Property(e => e.IsWebsitePublished)
-               .HasDefaultValue(false);
+
 
         builder.Property(e => e.IsActive)
                .HasDefaultValue(true);
@@ -55,16 +53,6 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
               .OnDelete(DeleteBehavior.Cascade);
 
 
-        // علاقة "أنشأ بواسطة"
-        builder.HasOne(e => e.CreatedByUser)
-              .WithMany(p => p.EpisodeCreatedByUsers)
-              .HasForeignKey(e => e.CreatedByUserId)
-              .OnDelete(DeleteBehavior.Restrict); // ✨ حاسم لمنع Multiple Cascade Paths
 
-        // علاقة "عدّل بواسطة"
-        builder.HasOne(e => e.UpdatedByUser)
-              .WithMany(p => p.EpisodeUpdatedByUsers)
-              .HasForeignKey(e => e.UpdatedByUserId)
-              .OnDelete(DeleteBehavior.Restrict); // ✨ حاسم لمنع Multiple Cascade Paths
     }
 }

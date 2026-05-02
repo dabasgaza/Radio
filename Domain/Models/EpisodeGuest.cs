@@ -21,4 +21,6 @@ public partial class EpisodeGuest : BaseEntity
     public virtual Episode Episode { get; set; } = null!;
 
     public virtual Guest Guest { get; set; } = null!;
+
+    public virtual ICollection<SocialMediaPublishingLog> SocialMediaPublishingLogs { get; set; } = new List<SocialMediaPublishingLog>();
 }

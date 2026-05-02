@@ -74,6 +74,7 @@ public partial class BroadcastWorkflowDBContext : DbContext
         ConfigureAuditRelationships<SocialMediaPublishingLog>(modelBuilder);
         ConfigureAuditRelationships<SocialMediaPublishingLogPlatform>(modelBuilder);
         ConfigureAuditRelationships<WebsitePublishingLog>(modelBuilder);
+        ConfigureAuditRelationships<ExecutionLog>(modelBuilder);
 
         OnModelCreatingPartial(modelBuilder);
     }

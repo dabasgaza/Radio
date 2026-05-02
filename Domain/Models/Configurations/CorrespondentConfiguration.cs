@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Models.Configurations;
@@ -38,17 +38,7 @@ public class CorrespondentConfiguration : IEntityTypeConfiguration<Correspondent
 
         // 3. العلاقات (Relationships)
 
-        // علاقة "أنشأ بواسطة"
-        builder.HasOne(d => d.CreatedByUser)
-            .WithMany(p => p.CorrespondentCreatedByUsers)
-            .HasForeignKey(d => d.CreatedByUserId)
-            .OnDelete(DeleteBehavior.Restrict); // ✨ تغيير حاسم لمنع Multiple Cascade Paths
 
-        // علاقة "عدّل بواسطة"
-        builder.HasOne(d => d.UpdatedByUser)
-            .WithMany(p => p.CorrespondentUpdatedByUsers)
-            .HasForeignKey(d => d.UpdatedByUserId)
-            .OnDelete(DeleteBehavior.Restrict); // ✨ تغيير حاسم لمنع Multiple Cascade Paths
 
         // ملاحظة: لا نحتاج لكتابة HasQueryFilter هنا لأننا أضفناه ديناميكياً 
         // في DbContext لكل الكيانات التي ترث من BaseEntity!

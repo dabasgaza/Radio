@@ -124,8 +124,7 @@ namespace Radio.Views.Episodes
                 StatusId = EpisodeStatus.Planned,
                 StatusText = "مجدولة",
                 SpecialNotes = dto.SpecialNotes,
-                GuestItems = BuildGuestItems(guestRows),
-                IsWebsitePublished = false
+                GuestItems = BuildGuestItems(guestRows)
             };
 
             _allEpisodes.Add(newDto);
@@ -164,7 +163,7 @@ namespace Radio.Views.Episodes
         }
 
         private void UpdateStatusInCache(int episodeId, byte newStatusId, string newStatusText,
-            bool? isWebsitePublished = null, string? cancellationReason = null)
+            string? cancellationReason = null)
         {
             var idx = _allEpisodes.FindIndex(e => e.EpisodeId == episodeId);
             if (idx < 0) return;
@@ -177,8 +176,7 @@ namespace Radio.Views.Episodes
                 StatusText = newStatusText
             };
 
-            if (isWebsitePublished.HasValue)
-                updated = updated with { IsWebsitePublished = isWebsitePublished.Value };
+
 
             if (cancellationReason is not null)
                 updated.CancellationReason = cancellationReason;
@@ -309,8 +307,7 @@ namespace Radio.Views.Episodes
                 {
                     UpdateStatusInCache(ep.EpisodeId,
                         !isCurrentlyPublished ? EpisodeStatus.WebsitePublished : EpisodeStatus.Published,
-                        !isCurrentlyPublished ? "منشورة على الموقع" : "منشورة رقمياً",
-                        isWebsitePublished: !isCurrentlyPublished);
+                        !isCurrentlyPublished ? "منشورة على الموقع" : "منشورة رقمياً");
 
                     MessageService.Current.ShowSuccess(
                         !isCurrentlyPublished
@@ -350,15 +347,15 @@ namespace Radio.Views.Episodes
 
                 if (result.IsSuccess)
                 {
-                    var (newStatus, newText, isWebPub) = ep.StatusId switch
+                    var (newStatus, newText) = ep.StatusId switch
                     {
-                        EpisodeStatus.Executed => (EpisodeStatus.Planned, "مجدولة", (bool?)null),
-                        EpisodeStatus.Published => (EpisodeStatus.Executed, "منفّذة", (bool?)null),
-                        EpisodeStatus.WebsitePublished => (EpisodeStatus.Published, "منشورة رقمياً", (bool?)false),
-                        _ => ((byte)0, "", (bool?)null)
+                        EpisodeStatus.Executed => (EpisodeStatus.Planned, "مجدولة"),
+                        EpisodeStatus.Published => (EpisodeStatus.Executed, "منفّذة"),
+                        EpisodeStatus.WebsitePublished => (EpisodeStatus.Published, "منشورة رقمياً"),
+                        _ => ((byte)0, "")
                     };
 
-                    UpdateStatusInCache(ep.EpisodeId, newStatus, newText, isWebsitePublished: isWebPub);
+                    UpdateStatusInCache(ep.EpisodeId, newStatus, newText);
                     MessageService.Current.ShowSuccess($"تم التراجع عن حالة الحلقة «{ep.EpisodeName}» بنجاح.");
                 }
                 else

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(BroadcastWorkflowDBContext))]
-    [Migration("20260502125743_RemoveGuestIdFromEpisodes")]
-    partial class RemoveGuestIdFromEpisodes
+    [Migration("20260502161341_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -319,11 +319,6 @@ namespace Domain.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<bool>("IsWebsitePublished")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
                     b.Property<int>("ProgramId")
                         .HasColumnType("int");
 
@@ -609,6 +604,9 @@ namespace Domain.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DurationMinutes")
                         .HasColumnType("int");
 
@@ -633,14 +631,25 @@ namespace Domain.Migrations
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
                     b.HasKey("ExecutionLogId");
+
+                    b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("EpisodeId");
 
                     b.HasIndex("ExecutedByUserId");
+
+                    b.HasIndex("UpdatedByUserId");
 
                     b.ToTable("ExecutionLogs");
                 });
@@ -1244,9 +1253,6 @@ namespace Domain.Migrations
                     b.Property<int>("EpisodeGuestId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EpisodeId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -1279,8 +1285,6 @@ namespace Domain.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("EpisodeGuestId");
-
-                    b.HasIndex("EpisodeId");
 
                     b.HasIndex("PublishedByUserId");
 
@@ -1536,14 +1540,12 @@ namespace Domain.Migrations
             modelBuilder.Entity("Domain.Models.Correspondent", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany("CorrespondentCreatedByUsers")
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
 
                     b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany("CorrespondentUpdatedByUsers")
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId");
 
                     b.Navigation("CreatedByUser");
 
@@ -1559,9 +1561,8 @@ namespace Domain.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany("CorrespondentCoverageCreatedByUsers")
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
 
                     b.HasOne("Domain.Models.Guest", "Guest")
                         .WithMany("CorrespondentCoverages")
@@ -1569,9 +1570,8 @@ namespace Domain.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany("CorrespondentCoverageUpdatedByUsers")
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId");
 
                     b.Navigation("Correspondent");
 
@@ -1602,9 +1602,8 @@ namespace Domain.Migrations
             modelBuilder.Entity("Domain.Models.Episode", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany("EpisodeCreatedByUsers")
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
 
                     b.HasOne("Domain.Models.Program", "Program")
                         .WithMany("Episodes")
@@ -1619,9 +1618,8 @@ namespace Domain.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany("EpisodeUpdatedByUsers")
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId");
 
                     b.Navigation("CreatedByUser");
 
@@ -1709,9 +1707,8 @@ namespace Domain.Migrations
             modelBuilder.Entity("Domain.Models.EpisodeGuest", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany("EpisodeGuests")
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
 
                     b.HasOne("Domain.Models.Episode", "Episode")
                         .WithMany("EpisodeGuests")
@@ -1740,6 +1737,11 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.ExecutionLog", b =>
                 {
+                    b.HasOne("Domain.Models.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Domain.Models.Episode", "Episode")
                         .WithMany("ExecutionLogs")
                         .HasForeignKey("EpisodeId")
@@ -1752,22 +1754,29 @@ namespace Domain.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Domain.Models.User", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
                     b.Navigation("Episode");
 
                     b.Navigation("ExecutedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Domain.Models.Guest", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany("GuestCreatedByUsers")
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
 
                     b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany("GuestUpdatedByUsers")
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId");
 
                     b.Navigation("CreatedByUser");
 
@@ -1777,14 +1786,12 @@ namespace Domain.Migrations
             modelBuilder.Entity("Domain.Models.Program", b =>
                 {
                     b.HasOne("Domain.Models.User", "CreatedByUser")
-                        .WithMany("ProgramCreatedByUsers")
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
 
                     b.HasOne("Domain.Models.User", "UpdatedByUser")
-                        .WithMany("ProgramUpdatedByUsers")
-                        .HasForeignKey("UpdatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId");
 
                     b.Navigation("CreatedByUser");
 
@@ -1835,14 +1842,10 @@ namespace Domain.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Models.EpisodeGuest", "EpisodeGuest")
-                        .WithMany()
+                        .WithMany("SocialMediaPublishingLogs")
                         .HasForeignKey("EpisodeGuestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Domain.Models.Episode", null)
-                        .WithMany("SocialMediaPublishingLogs")
-                        .HasForeignKey("EpisodeId");
 
                     b.HasOne("Domain.Models.User", "PublishedByUser")
                         .WithMany("SocialMediaPublishingLogs")
@@ -1992,9 +1995,12 @@ namespace Domain.Migrations
 
                     b.Navigation("ExecutionLogs");
 
-                    b.Navigation("SocialMediaPublishingLogs");
-
                     b.Navigation("WebsitePublishingLogs");
+                });
+
+            modelBuilder.Entity("Domain.Models.EpisodeGuest", b =>
+                {
+                    b.Navigation("SocialMediaPublishingLogs");
                 });
 
             modelBuilder.Entity("Domain.Models.Guest", b =>
@@ -2038,33 +2044,11 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Models.User", b =>
                 {
-                    b.Navigation("CorrespondentCoverageCreatedByUsers");
-
-                    b.Navigation("CorrespondentCoverageUpdatedByUsers");
-
-                    b.Navigation("CorrespondentCreatedByUsers");
-
-                    b.Navigation("CorrespondentUpdatedByUsers");
-
-                    b.Navigation("EpisodeCreatedByUsers");
-
-                    b.Navigation("EpisodeGuests");
-
-                    b.Navigation("EpisodeUpdatedByUsers");
-
                     b.Navigation("ExecutionLogs");
-
-                    b.Navigation("GuestCreatedByUsers");
-
-                    b.Navigation("GuestUpdatedByUsers");
 
                     b.Navigation("InverseCreatedByUser");
 
                     b.Navigation("InverseUpdatedByUser");
-
-                    b.Navigation("ProgramCreatedByUsers");
-
-                    b.Navigation("ProgramUpdatedByUsers");
 
                     b.Navigation("SocialMediaPublishingLogs");
 

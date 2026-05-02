@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Models.Configurations;
@@ -36,11 +36,7 @@ public class EpisodeGuestConfiguration : IEntityTypeConfiguration<EpisodeGuest>
 
         // 4. العلاقات (Relationships)
 
-        // علاقة "أنشأ بواسطة" (تمنع الحذف المتسلسل لحماية البيانات)
-        builder.HasOne(d => d.CreatedByUser)
-              .WithMany(p => p.EpisodeGuests)
-              .HasForeignKey(d => d.CreatedByUserId)
-              .OnDelete(DeleteBehavior.Restrict);
+
 
         // علاقة الحلقة (Episode)
         // ✨ جدول الربط عادة يتبع دورة حياة الآباء، لذا Cascade هنا منطقي

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Models.Configurations;
@@ -40,17 +40,7 @@ public class GuestConfiguration : IEntityTypeConfiguration<Guest>
 
         // 3. العلاقات (Relationships)
 
-        // علاقة "أنشأ بواسطة"
-        builder.HasOne(d => d.CreatedByUser)
-              .WithMany(p => p.GuestCreatedByUsers)
-              .HasForeignKey(d => d.CreatedByUserId)
-              .OnDelete(DeleteBehavior.Restrict); // ✨ حاسم لمنع Multiple Cascade Paths
 
-        // علاقة "عدّل بواسطة"
-        builder.HasOne(d => d.UpdatedByUser)
-              .WithMany(p => p.GuestUpdatedByUsers)
-              .HasForeignKey(d => d.UpdatedByUserId)
-              .OnDelete(DeleteBehavior.Restrict); // ✨ حاسم لمنع Multiple Cascade Paths
 
         // ملاحظة: علاقة الضيف مع الحلقات (EpisodeGuests) و التغطيات (CorrespondentCoverages) 
         // يتم تعريفها من الجانب الآخر (في EpisodeGuestConfiguration و CorrespondentCoverageConfiguration)

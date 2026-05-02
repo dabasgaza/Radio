@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Models.Configurations;
@@ -49,16 +49,6 @@ public class CorrespondentCoverageConfiguration : IEntityTypeConfiguration<Corre
               .HasForeignKey(d => d.GuestId)
               .OnDelete(DeleteBehavior.Restrict);
 
-        // علاقة "أنشأ بواسطة"
-        builder.HasOne(d => d.CreatedByUser)
-              .WithMany(p => p.CorrespondentCoverageCreatedByUsers)
-              .HasForeignKey(d => d.CreatedByUserId)
-              .OnDelete(DeleteBehavior.Restrict);
 
-        // علاقة "عدّل بواسطة"
-        builder.HasOne(d => d.UpdatedByUser)
-              .WithMany(p => p.CorrespondentCoverageUpdatedByUsers)
-              .HasForeignKey(d => d.UpdatedByUserId)
-              .OnDelete(DeleteBehavior.Restrict);
     }
 }
