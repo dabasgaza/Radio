@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow
+<mah:MetroWindow
     x:Class="Radio.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -54,7 +54,7 @@
         </Style>
     </mah:MetroWindow.Resources>
 
-    <materialDesign:DialogHost>
+    <materialDesign:DialogHost Identifier="RootDialog">
         <DockPanel>
             <!--  ═══════════ الشريط السفلي (Bottom Dock) ═══════════  -->
             <Border
@@ -352,6 +352,18 @@
                         Content="المستخدمين"
                         Style="{StaticResource HubTabItem}"
                         Tag="Users" />
+                    <RadioButton
+                        x:Name="MenuEmployees"
+                        Click="Tab_Click"
+                        Content="طاقم العمل"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="Employees" />
+                    <RadioButton
+                        x:Name="MenuStaffRoles"
+                        Click="Tab_Click"
+                        Content="المسميات الوظيفية"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="StaffRoles" />
 
                     <RadioButton
                         x:Name="MenuPermissions"

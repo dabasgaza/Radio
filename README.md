@@ -33,7 +33,8 @@
 | لا Inverse Collections في `User.cs` | أزيلت لمنع التعارض في EF Core مع الكيانات التي ترتبط بـ `User` مرتين (CreatedBy + UpdatedBy). |
 | `IDbContextFactory` وليس `DbContext` مباشرة | كل خدمة تفتح `DbContext` خاصاً بها لتجنب مشاكل التزامن في البيئة المتعددة الخيوط. |
 | `EpisodeStatus` كثوابت `const byte` | الحالات ليست `enum` بل ثوابت رقمية في `EpisodeService.cs` لضمان التوافق مع SQL. |
-| `CancellationReason` مخزن في `AuditLogs.Reason` | لا يوجد عمود مستقل لسبب الإلغاء في جدول `Episodes`، بل يُقرأ من آخر سجل `CANCEL` في `AuditLogs`. |
+| `CancellationReason` مخزن في عمود مستقل | تم تحويله من AuditLogs إلى عمود مباشر في جدول `Episodes` لسرعة الاستعلام والوضوح. |
+| `StaffRole` مرتبط بـ `Employee` مباشرة | أزيل من جدول الربط `EpisodeEmployee` لتبسيط العلاقات؛ يتم الاستعلام عن دور الموظف من بياناته الشخصية. |
 
 ---
 
@@ -88,10 +89,16 @@ erDiagram
     USER ||--o{ EPISODE : "creates/updates"
     PROGRAM ||--o{ EPISODE : contains
     EPISODE ||--o{ EPISODE_GUEST : involves
+    EPISODE ||--o{ EPISODE_CORRESPONDENT : involves
+    EPISODE ||--o{ EPISODE_EMPLOYEE : involves
     GUEST ||--o{ EPISODE_GUEST : participates_in
+    CORRESPONDENT ||--o{ EPISODE_CORRESPONDENT : reports_in
+    EMPLOYEE ||--o{ EPISODE_EMPLOYEE : works_in
+    STAFF_ROLE ||--o{ EMPLOYEE : defines
     EPISODE ||--o| EXECUTION_LOG : recorded_by
     EPISODE ||--o| WEBSITE_PUBLISHING_LOG : archived_at
     EPISODE_GUEST ||--o{ SOCIAL_MEDIA_LOG : published_as
+    SOCIAL_MEDIA_LOG ||--o{ SOCIAL_MEDIA_PLATFORM : on_platform
     USER ||--o{ AUDIT_LOG : performed_by
     ROLE ||--o{ USER : assigned_to
     ROLE ||--o{ ROLE_PERMISSION : grants
@@ -319,11 +326,16 @@ dotnet run --project Radio
 
 ## 📝 سجل التغييرات الأخيرة (Changelog)
 
+### مايو 2026 — تطوير نظام إدارة الحلقات الشامل
+- ✅ **دعم تعدد الضيوف والمراسلين**: تم تحديث `EpisodeService` والواجهات لدعم إضافة قائمة من الضيوف والمراسلين لكل حلقة مع تتبع مواضيعهم.
+- ✅ **إدارة طاقم التنفيذ (Staff)**: إضافة كيان `Employee` و `StaffRole` لتوثيق الفريق العامل على الحلقة (مخرج، فني، مذيع) مع تبسيط العلاقة بجعل الدور جزءاً من بيانات الموظف.
+- ✅ **النشر الاجتماعي التفصيلي**: إضافة نظام سجلات النشر الاجتماعي (`SocialMediaPublishingLog`) الذي يسمح بربط كل ضيف بروابط منشورات متعددة على منصات (Facebook, X, Instagram) بشكل منفصل.
+- ✅ **واجهة إدارة حديثة**: استبدال النوافذ التقليدية بـ `DialogHost` واستخدام تبويبات (Tabs) داخل `EpisodeFormControl` لتنظيم البيانات المعقدة.
+
 ### مايو 2026 — إصلاحات جوهرية في سلامة البيانات
-- ✅ **`CancellationReason` كعمود مستقل**: أضيف `CancellationReason nvarchar(500)` مباشرة في جدول `Episodes` — حذف الاستعلامات المزدوجة على `AuditLogs` والتحليل اليدوي للـ JSON.
-- ✅ **إصلاح `WebsitePublishingLogs`**: `ToggleWebsitePublishAsync` ينشئ الآن سجلاً فعلياً في `WebsitePublishingLogs` عند النشر — دعم صحيح للتراجع لاحقاً.
-- ✅ **إصلاح منطق التراجع (`Revert`)**: التراجع من `Published` يُطبّق Soft Delete على `SocialMediaPublishingLogs` (وليس `WebsitePublishingLogs` كما كان خطأً).
-- ✅ **تبسيط `UpdateCancellationReasonAsync`**: تحديث العمود مباشرة بدلاً من التلاعب اليدوي بـ JSON string.
+- ✅ **`CancellationReason` كعمود مستقل**: أضيف `CancellationReason nvarchar(500)` مباشرة في جدول `Episodes` — حذف الاستعلامات المزدوجة على `AuditLogs`.
+- ✅ **إصلاح `WebsitePublishingLogs`**: `ToggleWebsitePublishAsync` ينشئ الآن سجلاً فعلياً في `WebsitePublishingLogs` عند النشر.
+- ✅ **إصلاح منطق التراجع (`Revert`)**: التراجع من `Published` يُطبّق Soft Delete على `SocialMediaPublishingLogs`.
 
 ### مايو 2026 — إعادة الهيكلة الشاملة (Major Refactoring)
 - ✅ **إزالة `IsWebsitePublished`**: الحالة محددة الآن من `StatusId` فقط.

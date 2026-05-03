@@ -1,4 +1,4 @@
-﻿namespace DataAccess.Common
+namespace DataAccess.Common
 {
     /// <summary>
     /// يحتوي على كافة ثوابت الصلاحيات لضمان عدم وجود أخطاء إملائية في الكود
@@ -26,9 +26,10 @@
         // التنسيق الميداني (المراسلين)
         public const string CoordinationManage = "CORR_MANAGE";
 
+        // طاقم العمل
+        public const string StaffManage = "STAFF_MANAGE";
+
         // التقارير
         public const string ViewReports = "VIEW_REPORTS";
-
     }
-
 }

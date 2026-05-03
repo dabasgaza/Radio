@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Forms;
@@ -59,6 +59,11 @@ namespace Radio
             bool canManageUsers = _session.HasPermission(AppPermissions.UserManage);
             MenuUsers.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
             MenuPermissions.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
+
+            // طاقم العمل
+            bool canManageStaff = _session.HasPermission(AppPermissions.StaffManage);
+            MenuEmployees.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
+            MenuStaffRoles.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
 
             // البرامج والمراسلين
             MenuPrograms.Visibility = _session.HasPermission(AppPermissions.ProgramManage) ? Visibility.Visible : Visibility.Collapsed;
@@ -144,6 +149,16 @@ namespace Radio
                         NavigateTo(new UsersView(userService, _session));
                         break;
 
+                    case "Employees":
+                        // NavigateTo(new EmployeesView(_serviceProvider.GetRequiredService<IUserService>(), _session));
+                        MainContentArea.Content = new TextBlock { Text = "شاشة إدارة الموظفين (قيد التنفيذ)", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                        break;
+
+                    case "StaffRoles":
+                        // NavigateTo(new StaffRolesView(_serviceProvider.GetRequiredService<IUserService>(), _session));
+                        MainContentArea.Content = new TextBlock { Text = "شاشة المسميات الوظيفية (قيد التنفيذ)", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                        break;
+
                     case "Permissions":
                         // Open permission matrix as a window (PermissionMatrixView is a MetroWindow)
                         var permWindow = new PermissionMatrixView(userService, _session)
@@ -162,7 +177,9 @@ namespace Radio
                         var epService = _serviceProvider.GetRequiredService<IEpisodeService>();
                         var pService = _serviceProvider.GetRequiredService<IProgramService>();
                         var gService = _serviceProvider.GetRequiredService<IGuestService>();
-                        NavigateTo(new EpisodesView(epService, pService, _session, _serviceProvider, gService));
+                        var cService = _serviceProvider.GetRequiredService<ICorrespondentService>();
+                        var uService = _serviceProvider.GetRequiredService<IUserService>();
+                        NavigateTo(new EpisodesView(epService, pService, _session, _serviceProvider, gService, cService, uService));
                         break;
 
                     case "Guests":
