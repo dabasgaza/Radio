@@ -127,6 +127,14 @@
                 -->
                 <ResourceDictionary Source="Resources/ColorZone.xaml" />
 
+
+                <!--
+                    ══════════════════════════════════════════════
+                    14. TabControl
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/TabControl.xaml" />
+
             </ResourceDictionary.MergedDictionaries>
 
             <!--

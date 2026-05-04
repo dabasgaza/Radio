@@ -14,14 +14,22 @@ namespace DataAccess.DTOs
         string? ClipNotes);
     public record ProgramDto(int ProgramId, string ProgramName, string? Category, string? ProgramDescription);
     public record EpisodeDto(
-        int EpisodeId, 
-        int ProgramId, 
+        int EpisodeId,
+        int ProgramId,
         List<EpisodeGuestDto> Guests,
         List<EpisodeCorrespondentDto> Correspondents,
         List<EpisodeEmployeeDto> Employees,
-        string EpisodeName, 
-        DateTime? ScheduledTime, 
-        string? SpecialNotes);
+        string EpisodeName,
+        DateTime? ScheduledDate,     // التاريخ فقط من DatePicker
+        TimeSpan? BroadcastTime,     // الوقت فقط من TimePicker
+        string? SpecialNotes)
+    {
+        /// <summary>يدمج التاريخ والوقت في قيمة DateTime واحدة لحفظها في قاعدة البيانات</summary>
+        public DateTime? ScheduledDateTime =>
+            ScheduledDate.HasValue
+                ? ScheduledDate.Value.Date + (BroadcastTime ?? TimeSpan.Zero)
+                : null;
+    };
     public record CorrespondentDto(int CorrespondentId, string FullName, string? PhoneNumber, string? AssignedLocations);
     public record TodayEpisodeDto(
         int EpisodeId, string EpisodeName, string ProgramName,

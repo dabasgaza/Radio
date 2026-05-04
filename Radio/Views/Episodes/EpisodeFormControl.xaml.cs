@@ -63,7 +63,9 @@ namespace Radio.Views.Episodes
                     if (ep == null) return;
 
                     TxtEpisodeName.Text = ep.EpisodeName;
-                    DpDate.SelectedDate = ep.ScheduledExecutionTime;
+                    DpDate.SelectedDate = ep.ScheduledExecutionTime?.Date;
+                    if (ep.ScheduledExecutionTime.HasValue)
+                        TpBroadcastTime.SelectedTime = DateTime.Today.Add(ep.ScheduledExecutionTime.Value.TimeOfDay);
                     TxtSpecialNotes.Text = ep.SpecialNotes;
                     CbPrograms.SelectedValue = ep.ProgramId;
 
@@ -193,6 +195,7 @@ namespace Radio.Views.Episodes
                 EmployeeList.Select(e => new EpisodeEmployeeDto(0, e.EmployeeId)).ToList(),
                 TxtEpisodeName.Text.Trim(),
                 DpDate.SelectedDate,
+                TpBroadcastTime.SelectedTime?.TimeOfDay,
                 TxtSpecialNotes.Text?.Trim()
             );
 

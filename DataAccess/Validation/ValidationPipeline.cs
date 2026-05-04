@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 
@@ -78,8 +78,8 @@ namespace DataAccess.Validation
             if (string.IsNullOrWhiteSpace(dto.EpisodeName))
                 errors.Add("عنوان الحلقة مطلوب ولا يمكن تركه فارغاً.");
 
-            if (dto.ScheduledTime is null)
-                errors.Add("يرجى تحديد تاريخ ووقت تنفيذ الحلقة.");
+            if (dto.ScheduledDate is null)
+                errors.Add("يرجى تحديد تاريخ تنفيذ الحلقة.");
 
             return BuildResult(errors);
         }

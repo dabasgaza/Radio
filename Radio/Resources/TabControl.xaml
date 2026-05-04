@@ -1,0 +1,366 @@
+﻿<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                         TabControl.xaml                                  ║
+    ║          نظام التبويبات المحترف — WPF + MaterialDesignInXAML             ║
+    ║                                                                          ║
+    ║  الأنواع:                                                                ║
+    ║   • Tab.Modern           — التبويب الحديث (مستطيل مدوّر + مؤشر سفلي)    ║
+    ║   • Tab.Modern.Underline — تبويب بخط سفلي متحرك (Material Design 3)    ║
+    ║   • Tab.Pill             — تبويب كبسولة (Pill / Segmented Control)      ║
+    ║   • TabItem.Modern       — عنصر التبويب الحديث                         ║
+    ║   • TabItem.Underline    — عنصر التبويب بخط سفلي                       ║
+    ║   • TabItem.Pill         — عنصر التبويب كبسولة                         ║
+    ║                                                                          ║
+    ║  التبعيات: AppColors.xaml                                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        TabItem.Modern — عنصر التبويب الحديث
+        التصميم: خلفية شفافة → ملونة عند التحديد + مؤشر سفلي
+        التأثيرات: Hover خفيف، Selected بلون Primary، نبض عند الضغط
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="TabItem.Modern" TargetType="TabItem">
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Padding" Value="24,0" />
+        <Setter Property="Margin" Value="0,0,2,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Grid>
+                        <!--  خلفية التبويب  -->
+                        <Border
+                            x:Name="TabBackground"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="8"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter
+                                x:Name="ContentSite"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                ContentSource="Header"
+                                RecognizesAccessKey="True" />
+                        </Border>
+
+                        <!--  مؤشر سفلي يظهر عند التحديد  -->
+                        <Border
+                            x:Name="BottomIndicator"
+                            Height="3"
+                            Margin="16,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            Background="{StaticResource PrimaryMainBrush}"
+                            CornerRadius="2"
+                            Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!--  Hover: خلفية شفافة بلون Primary  -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="TabBackground" Property="Background" Value="{StaticResource HoverOverlayBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                        </Trigger>
+
+                        <!--  Selected: خلفية Primary خفيفة + مؤشر سفلي  -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="TabBackground" Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter TargetName="BottomIndicator" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
+                        <!--  Pressed: خلفية أغمق قليلاً  -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="TabBackground" Property="Background" Value="{StaticResource PressedOverlayBrush}" />
+                        </MultiTrigger>
+
+                        <!--  Disabled  -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.42" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        TabItem.Underline — عنصر التبويب بخط سفلي متحرك
+        التصميم: Material Design 3 — خط سفلي أنيميشن
+        الاستخدام: داخل النماذج والحوارات (تفاصيل، إعدادات)
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="TabItem.Underline" TargetType="TabItem">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="20,0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Grid>
+                        <!--  خلفية شفافة  -->
+                        <Border
+                            x:Name="TabBackground"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter
+                                x:Name="ContentSite"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                ContentSource="Header"
+                                RecognizesAccessKey="True" />
+                        </Border>
+
+                        <!--  الخط السفلي — رفيع جداً بدون تحديد، سميك عند التحديد  -->
+                        <Border
+                            x:Name="UnderlineIndicator"
+                            Height="2"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Bottom"
+                            Background="{StaticResource PrimaryMainBrush}"
+                            CornerRadius="1"
+                            Opacity="0" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!--  Hover: لون نص أغمق + خط سفلي خفيف  -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                            <Setter TargetName="UnderlineIndicator" Property="Opacity" Value="0.35" />
+                        </Trigger>
+
+                        <!--  Selected: لون Primary + خط سفلي كامل  -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter TargetName="UnderlineIndicator" Property="Opacity" Value="1" />
+                            <Setter TargetName="UnderlineIndicator" Property="Height" Value="3" />
+                        </Trigger>
+
+                        <!--  Disabled  -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.42" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        TabItem.Pill — عنصر التبويب كبسولة
+        التصميم: خلفية كاملة عند التحديد (مثل SegmentedControl)
+        الاستخدام: فلترة، تبديل طرق العرض، تبويبات مدمجة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="TabItem.Pill" TargetType="TabItem">
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="18,0" />
+        <Setter Property="Margin" Value="2,0" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Border
+                        x:Name="PillBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{StaticResource BorderDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="18"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter
+                            x:Name="ContentSite"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            ContentSource="Header"
+                            RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--  Hover: خلفية خفيفة + إطار Primary  -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PillBorder" Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                            <Setter TargetName="PillBorder" Property="BorderBrush" Value="{StaticResource PrimaryLightBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+                        </Trigger>
+
+                        <!--  Selected: كبسولة Primary كاملة  -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="PillBorder" Property="Background" Value="{StaticResource PrimaryMainBrush}" />
+                            <Setter TargetName="PillBorder" Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter TargetName="PillBorder" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect
+                                        BlurRadius="8"
+                                        Direction="270"
+                                        Opacity="0.18"
+                                        ShadowDepth="2"
+                                        Color="{StaticResource Primary600Color}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+
+                        <!--  Disabled  -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.42" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Tab.Modern — التبويب الحديث
+        التصميم: شريط علوي شفاف + تبويبات مدوّرة + محتوى ببطاقة مرفوعة
+        الاستخدام: الصفحات الرئيسية (Views)، النوافذ الكبيرة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Tab.Modern" TargetType="TabControl">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource TabItem.Modern}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabControl">
+                    <DockPanel>
+                        <!-- خارجي زائد -->
+                        <DockPanel FlowDirection="RightToLeft">
+                            <!-- << خطأ إملائي! -->
+                            <Border DockPanel.Dock="Top">
+                                <ScrollViewer>
+                                    <TabPanel />
+                                </ScrollViewer>
+                            </Border>
+                        </DockPanel> >
+                        <!-- إغلاق خاطئ + > زائدة -->
+
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Tab.Modern.Underline — تبويب بخط سفلي متحرك (Material 3)
+        التصميم: بدون إطار حول المحتوى، خط سفلي يتحرك بين التبويبات
+        الاستخدام: نوافذ الحوار، لوحات الإعدادات، تفاصيل السجلات
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Tab.Modern.Underline" TargetType="TabControl">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource TabItem.Underline}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabControl">
+                    <DockPanel>
+                        <!--  شريط التبويبات  -->
+                        <Border
+                            Padding="4,0"
+                            Background="Transparent"
+                            BorderBrush="{StaticResource DividerBrush}"
+                            BorderThickness="0,0,0,1"
+                            DockPanel.Dock="Top"
+                            SnapsToDevicePixels="True">
+                            <TabPanel
+                                x:Name="HeaderPanel"
+                                Margin="0,4"
+                                Panel.ZIndex="1"
+                                IsItemsHost="True"
+                                KeyboardNavigation.TabIndex="1" />
+                        </Border>
+
+                        <!--  منطقة المحتوى — بدون إطار (مدمجة في السياق)  -->
+                        <ContentPresenter
+                            x:Name="PART_SelectedContentHost"
+                            Margin="0,12,0,0"
+                            ContentSource="SelectedContent" />
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Tab.Pill — تبويب الكبسولات (Segmented Control)
+        التصميم: مجموعة كبسولات متجاورة داخل حاوية مستطيلة مدوّرة
+        الاستخدام: تبديل طرق العرض (جدول/بطاقات)، فلترة سريعة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Tab.Pill" TargetType="TabControl">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource TabItem.Pill}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabControl">
+                    <DockPanel>
+                        <!--  حاوية الكبسولات — خلفية رمادية مدوّرة  -->
+                        <Border
+                            Padding="4"
+                            Background="{StaticResource SurfaceVariantBrush}"
+                            CornerRadius="22"
+                            DockPanel.Dock="Top"
+                            SnapsToDevicePixels="True">
+                            <TabPanel
+                                x:Name="HeaderPanel"
+                                Panel.ZIndex="1"
+                                IsItemsHost="True"
+                                KeyboardNavigation.TabIndex="1" />
+                        </Border>
+
+                        <!--  منطقة المحتوى  -->
+                        <ContentPresenter
+                            x:Name="PART_SelectedContentHost"
+                            Margin="0,12,0,0"
+                            ContentSource="SelectedContent" />
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
