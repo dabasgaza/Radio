@@ -653,7 +653,7 @@
                                                                     Foreground="{StaticResource SecondaryMainBrush}"
                                                                     Kind="AccountOutline" />
                                                             </Border>
-                                                            <!--إسم الضيف-->
+                                                            <!--  إسم الضيف  -->
                                                             <TextBlock
                                                                 Margin="10,0,0,0"
                                                                 VerticalAlignment="Center"

@@ -1,81 +1,184 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using System.Text.RegularExpressions;
+using MaterialDesignThemes.Wpf;
+using System.ComponentModel;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Radio.Views.Episodes
 {
-    /// <summary>
-    /// Interaction logic for PublishingLogDialog.xaml
-    /// </summary>
-    public partial class PublishingLogDialog
+    public partial class PublishingLogDialog : UserControl
     {
-        private readonly int _episodeId;
         private readonly IPublishingService _publishingService;
         private readonly UserSession _session;
+        private readonly int _episodeId;
+        private List<EpisodeGuestDto> _guests = new();
+        private List<PlatformSelectionVm> _platformVms = new();
 
-        // ✅ RegexOptions.Compiled — محسّن مرة واحدة، أفضل أداء
-        private static readonly Regex NumericOnlyRegex = new(@"^[0-9.]$", RegexOptions.Compiled);
-
-        public PublishingLogDialog(int episodeId, IPublishingService publishingService, UserSession session)
+        public PublishingLogDialog(IPublishingService publishingService,
+                                    UserSession session, 
+                                    int episodeId,
+                                    List<EpisodeGuestDto> guests)
         {
             InitializeComponent();
-            _episodeId = episodeId;
             _publishingService = publishingService;
             _session = session;
+            _episodeId = episodeId;
+            _guests = guests ?? new List<EpisodeGuestDto>();
+            Loaded += async (_, _) => await LoadAsync();
+        }
+
+        private async Task LoadAsync()
+        {
+            try
+            {
+                // تحميل الضيوف
+                LstGuests.ItemsSource = _guests;
+
+                // تحميل المنصات
+                var platforms = await _publishingService.GetAllPlatformsAsync();
+                _platformVms = platforms.Select(p => new PlatformSelectionVm
+                {
+                    SocialMediaPlatformId = p.SocialMediaPlatformId,
+                    PlatformName = p.Name,
+                    IsSelected = false,
+                    Url = string.Empty
+                }).ToList();
+                
+                IcPlatforms.ItemsSource = _platformVms;
+
+                // إذا لم يكن هناك ضيوف، أظهر رسالة تحذير
+                if (!_guests.Any())
+                {
+                    MessageService.Current.ShowWarning("لا توجد ضيوف في هذه الحلقة", "تنبيه");
+                    return;
+                }
+
+                // اختر أول ضيف
+                LstGuests.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageService.Current.ShowError($"خطأ في تحميل البيانات: {ex.Message}", "خطأ");
+            }
+        }
+
+        private void LstGuests_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // إعادة تعيين حقول النموذج عند تغيير الضيف
+            if (LstGuests.SelectedItem is EpisodeGuestDto)
+            {
+                TxtClipTitle.Text = string.Empty;
+                TxtDuration.Text = string.Empty;
+
+                // إعادة تعيين جميع المنصات
+                foreach (var vm in _platformVms)
+                {
+                    vm.IsSelected = false;
+                    vm.Url = string.Empty;
+                }
+                IcPlatforms.ItemsSource = null;
+                IcPlatforms.ItemsSource = _platformVms;
+            }
         }
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // التحقق من وجود رابط واحد على الأقل (اختياري حسب سياسة العمل)
-            if (string.IsNullOrWhiteSpace(TxtYouTube.Text) && string.IsNullOrWhiteSpace(TxtFacebook.Text))
-            {
-                var result = MessageBox.Show("لم تقم بإدخال روابط نشر رئيسية (يوتيوب أو فيسبوك). هل تود الاستمرار؟", "تأكيد", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.No) return;
-            }
-
             try
             {
-                BtnSave.IsEnabled = false;
+                // التحقق من اختيار ضيف
+                if (LstGuests.SelectedItem is not EpisodeGuestDto guest)
+                {
+                    MessageService.Current.ShowWarning("اختر ضيفاً أولاً", "تحقق من البيانات");
+                    return;
+                }
 
-                // استدعاء خدمة النشر (مؤقت لحين تحديث واجهة المستخدم بالكامل للتعامل مع المنصات الجديدة)
-                var result = await _publishingService.LogWebsitePublishingAsync(
-                    _episodeId, 
-                    "نشر مؤقت لحين تحديث الواجهة", 
-                    Domain.Models.MediaType.Both, 
-                    "روابط قديمة: " + TxtYouTube.Text + " " + TxtFacebook.Text, 
-                    _session);
+                // الحصول على المنصات المحددة
+                var selectedPlatforms = _platformVms
+                    .Where(p => p.IsSelected && !string.IsNullOrWhiteSpace(p.Url))
+                    .Select(p => new PlatformPublishDto(p.SocialMediaPlatformId, p.PlatformName, p.Url))
+                    .ToList();
+
+                // التحقق من وجود منصات محددة
+                if (!selectedPlatforms.Any())
+                {
+                    MessageService.Current.ShowWarning("اختر منصة واحدة على الأقل وأدخل رابطاً", "تحقق من البيانات");
+                    return;
+                }
+
+                // تحويل مدة المقطع
+                TimeSpan? duration = null;
+                if (!string.IsNullOrWhiteSpace(TxtDuration.Text))
+                {
+                    if (TimeSpan.TryParseExact(TxtDuration.Text, @"mm\:ss", CultureInfo.InvariantCulture, out var parsedDuration))
+                        duration = parsedDuration;
+                    else
+                    {
+                        MessageService.Current.ShowError("صيغة المدة غير صحيحة. استخدم MM:SS", "خطأ");
+                        return;
+                    }
+                }
+
+                // إنشاء DTO
+                var dto = new SocialMediaPublishingLogDto(
+                    0, 
+                    guest.EpisodeGuestId,
+                    TxtClipTitle.Text.Trim(),
+                    duration,
+                    selectedPlatforms);
+
+                // حفظ في قاعدة البيانات
+                var result = await _publishingService.SavePublishingLogAsync(dto, _session);
 
                 if (result.IsSuccess)
                 {
-                    MessageService.Current.ShowSuccess("تم النشر بنجاح.");
-                    this.DialogResult = true;
-                    this.Close();
+                    MessageService.Current.ShowSuccess("تم حفظ بيانات النشر بنجاح", "نجاح");
+                    DialogHost.Close("RootDialog", true);
                 }
                 else
                 {
-                    MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية النشر.");
+                    MessageService.Current.ShowError(result.ErrorMessage ?? "خطأ غير معروف", "خطأ في الحفظ");
                 }
             }
             catch (Exception ex)
             {
-                MessageService.Current.ShowError("حدث خطأ أثناء تسجيل النشر: " + ex.Message);
-            }
-            finally
-            {
-                BtnSave.IsEnabled = true;
+                MessageService.Current.ShowError($"خطأ غير متوقع: {ex.Message}", "خطأ");
             }
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
+            => DialogHost.Close("RootDialog", false);
     }
+
+    /// <summary>
+    /// ViewModel مساعد لاختيار المنصات
+    /// يدعم INotifyPropertyChanged للتحديث المباشر على الـ UI
+    /// </summary>
+        public class PlatformSelectionVm : INotifyPropertyChanged
+        {
+            public int SocialMediaPlatformId { get; set; }
+            public string PlatformName { get; set; } = string.Empty;
+
+            private bool _isSelected;
+            public bool IsSelected
+            {
+                get => _isSelected;
+                set { _isSelected = value; OnPropertyChanged(); }
+            }
+
+            private string? _url;
+            public string? Url
+            {
+                get => _url;
+                set { _url = value; OnPropertyChanged(); }
+            }
+
+            public event PropertyChangedEventHandler? PropertyChanged;
+
+            protected void OnPropertyChanged([CallerMemberName] string? name = null)
+                => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
 }

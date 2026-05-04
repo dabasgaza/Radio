@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -7,6 +7,7 @@ using Radio.Views.Common;
 using System.Windows;
 using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
+using Radio.Views.Publishing;
 
 namespace Radio.Views.Episodes
 {
@@ -16,7 +17,7 @@ namespace Radio.Views.Episodes
         private readonly IProgramService _programService;
         private readonly IGuestService _guestService;
         private readonly ICorrespondentService _correspondentService;
-        private readonly IUserService _userService;
+        private readonly IEmployeeService _employeeService;
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
         private List<ActiveEpisodeDto> _allEpisodes = [];
@@ -28,7 +29,7 @@ namespace Radio.Views.Episodes
             IServiceProvider serviceProvider,
             IGuestService guestService,
             ICorrespondentService correspondentService,
-            IUserService userService)
+            IEmployeeService employeeService)
         {
             InitializeComponent();
 
@@ -38,7 +39,7 @@ namespace Radio.Views.Episodes
             _serviceProvider = serviceProvider;
             _guestService = guestService;
             _correspondentService = correspondentService;
-            _userService = userService;
+            _employeeService = employeeService;
 
             BtnAddEpisode.Visibility = _session.HasPermission(AppPermissions.EpisodeManage)
                 ? Visibility.Visible
@@ -77,7 +78,7 @@ namespace Radio.Views.Episodes
 
         private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
-            var view = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _userService, _session);
+            var view = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session);
             var result = await DialogHost.Show(view, "RootDialog");
             if (result is true) await LoadDataAsync();
         }
@@ -86,7 +87,7 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var view = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _userService, _session, ep.EpisodeId);
+                var view = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session, ep.EpisodeId);
                 var result = await DialogHost.Show(view, "RootDialog");
                 if (result is true) await LoadDataAsync();
             }
@@ -119,8 +120,10 @@ namespace Radio.Views.Episodes
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
                 var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
-                var dialog = new PublishingLogDialog(ep.EpisodeId, pubService, _session);
-                if (dialog.ShowDialog() == true) await LoadDataAsync();
+                var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
+                var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests);
+                var result = await DialogHost.Show(dialog, "RootDialog");
+                if (result is true) await LoadDataAsync();
             }
         }
 
@@ -128,8 +131,10 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var res = await _episodeService.ToggleWebsitePublishAsync(ep.EpisodeId, ep.StatusId != EpisodeStatus.WebsitePublished, _session);
-                if (res.IsSuccess) await LoadDataAsync();
+                var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
+                var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId);
+                var result = await DialogHost.Show(dialog, "RootDialog");
+                if (result is true) await LoadDataAsync();
             }
         }
 

@@ -1,0 +1,15 @@
+Always read and follow the instructions in AI_DEVELOPMENT_PLAN.md before writing any code.
+
+Key rules to enforce from the plan:
+- WPF namespace must be: xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+- UI Style keys: Input.Text | Input.ComboBox | Input.DatePicker | Input.TimePicker | Input.Text.Multiline
+- Button styles: Btn.Primary | Btn.Cancel | Btn.AddNew
+- DataGrid styles: DataGrid.Main | DataGrid.Row | DataGrid.Cell | DataGrid.Cell.Center | DataGrid.Cell.Actions
+- Header style: Zone.Header.Primary
+- Footer style: Window.Footer
+- NEVER use hard delete — always set IsActive = false
+- NEVER throw exceptions in services — always return Result.Success() or Result.Fail()
+- NEVER use new ServiceClass() in Views — always use _serviceProvider.GetRequiredService<IService>()
+- StaffRoleId belongs to Employee, NOT to EpisodeEmployee
+- EpisodeDto uses ScheduledDate + BroadcastTime (not ScheduledTime)
+- Dialog close: DialogHost.Close("RootDialog", true/false)

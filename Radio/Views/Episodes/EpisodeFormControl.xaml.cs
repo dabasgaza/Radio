@@ -1,9 +1,10 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using MaterialDesignThemes.Wpf;
 
 namespace Radio.Views.Episodes
@@ -14,7 +15,7 @@ namespace Radio.Views.Episodes
         private readonly IProgramService _programService;
         private readonly IGuestService _guestService;
         private readonly ICorrespondentService _correspondentService;
-        private readonly IUserService _userService;
+        private readonly IEmployeeService _employeeService;
         private readonly UserSession _session;
         private readonly int? _episodeId;
 
@@ -28,7 +29,7 @@ namespace Radio.Views.Episodes
             IProgramService programService,
             IGuestService guestService,
             ICorrespondentService correspondentService,
-            IUserService userService,
+            IEmployeeService employeeService,
             UserSession session,
             int? episodeId = null)
         {
@@ -37,7 +38,7 @@ namespace Radio.Views.Episodes
             _programService = programService;
             _guestService = guestService;
             _correspondentService = correspondentService;
-            _userService = userService;
+            _employeeService = employeeService;
             _session = session;
             _episodeId = episodeId;
 
@@ -55,7 +56,7 @@ namespace Radio.Views.Episodes
                 CbPrograms.ItemsSource = await _programService.GetAllActiveAsync();
                 CbAllGuests.ItemsSource = await _guestService.GetAllActiveAsync();
                 CbAllCorrespondents.ItemsSource = await _correspondentService.GetAllActiveAsync();
-                CbAllEmployees.ItemsSource = await _userService.GetAllUsersAsync();
+                CbAllEmployees.ItemsSource = await _employeeService.GetAllActiveAsync();
 
                 if (_episodeId.HasValue)
                 {
@@ -79,17 +80,17 @@ namespace Radio.Views.Episodes
                         CorrespondentList.Add(new CorrespondentRow(c.Id, c.CorrespondentId, c.FullName, c.Topic, c.HostingTime));
 
                     // تحميل الموظفين
-                    var allUsers = (await _userService.GetAllUsersAsync()).ToList();
+                    var allEmployees = (await _employeeService.GetAllActiveAsync()).ToList();
                     foreach (var e in ep.EmployeeItems)
                     {
-                        var user = allUsers.FirstOrDefault(u => u.UserId == e.EmployeeId);
-                        EmployeeList.Add(new EmployeeRow(e.EmployeeId, user?.FullName ?? "غير معروف", user?.RoleName ?? "—"));
+                        var emp = allEmployees.FirstOrDefault(em => em.EmployeeId == e.EmployeeId);
+                        EmployeeList.Add(new EmployeeRow(e.EmployeeId, emp?.FullName ?? "غير معروف", emp?.StaffRoleName ?? "—"));
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"خطأ في تحميل البيانات:\n{ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageService.Current.ShowError($"خطأ في تحميل البيانات: {ex.Message}");
             }
         }
 
@@ -99,11 +100,11 @@ namespace Radio.Views.Episodes
         {
             if (CbAllGuests.SelectedItem is not GuestDto guest)
             {
-                MessageBox.Show("يرجى اختيار ضيف من القائمة أولاً."); return;
+                MessageService.Current.ShowWarning("يرجى اختيار ضيف من القائمة أولاً."); return;
             }
             if (GuestList.Any(x => x.GuestId == guest.GuestId))
             {
-                MessageBox.Show("هذا الضيف مضاف بالفعل."); return;
+                MessageService.Current.ShowWarning("هذا الضيف مضاف بالفعل."); return;
             }
 
             var topic = TxtGuestTopic.Text?.Trim();
@@ -131,11 +132,11 @@ namespace Radio.Views.Episodes
         {
             if (CbAllCorrespondents.SelectedItem is not CorrespondentDto corr)
             {
-                MessageBox.Show("يرجى اختيار مراسل من القائمة أولاً."); return;
+                MessageService.Current.ShowWarning("يرجى اختيار مراسل من القائمة أولاً."); return;
             }
             if (CorrespondentList.Any(x => x.CorrespondentId == corr.CorrespondentId))
             {
-                MessageBox.Show("هذا المراسل مضاف بالفعل."); return;
+                MessageService.Current.ShowWarning("هذا المراسل مضاف بالفعل."); return;
             }
 
             var topic = TxtCorrespondentTopic.Text?.Trim();
@@ -160,16 +161,16 @@ namespace Radio.Views.Episodes
 
         private void BtnAddEmployee_Click(object sender, RoutedEventArgs e)
         {
-            if (CbAllEmployees.SelectedItem is not UserDto user)
+            if (CbAllEmployees.SelectedItem is not EmployeeDto emp)
             {
-                MessageBox.Show("يرجى اختيار موظف من القائمة أولاً."); return;
+                MessageService.Current.ShowWarning("يرجى اختيار موظف من القائمة أولاً."); return;
             }
-            if (EmployeeList.Any(x => x.EmployeeId == user.UserId))
+            if (EmployeeList.Any(x => x.EmployeeId == emp.EmployeeId))
             {
-                MessageBox.Show("هذا الموظف مضاف بالفعل."); return;
+                MessageService.Current.ShowWarning("هذا الموظف مضاف بالفعل."); return;
             }
 
-            EmployeeList.Add(new EmployeeRow(user.UserId, user.FullName, user.RoleName ?? "—"));
+            EmployeeList.Add(new EmployeeRow(emp.EmployeeId, emp.FullName, emp.StaffRoleName ?? "—"));
             CbAllEmployees.SelectedItem = null;
         }
 
@@ -183,9 +184,9 @@ namespace Radio.Views.Episodes
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (CbPrograms.SelectedValue == null) { MessageBox.Show("يرجى اختيار البرنامج."); return; }
-            if (string.IsNullOrWhiteSpace(TxtEpisodeName.Text)) { MessageBox.Show("يرجى إدخال عنوان الحلقة."); return; }
-            if (DpDate.SelectedDate == null) { MessageBox.Show("يرجى تحديد تاريخ البث."); return; }
+            if (CbPrograms.SelectedValue == null) { MessageService.Current.ShowWarning("يرجى اختيار البرنامج."); return; }
+            if (string.IsNullOrWhiteSpace(TxtEpisodeName.Text)) { MessageService.Current.ShowWarning("يرجى إدخال عنوان الحلقة."); return; }
+            if (DpDate.SelectedDate == null) { MessageService.Current.ShowWarning("يرجى تحديد تاريخ البث."); return; }
 
             var dto = new EpisodeDto(
                 _episodeId ?? 0,
@@ -209,7 +210,7 @@ namespace Radio.Views.Episodes
             }
 
             if (result.IsSuccess) DialogHost.Close("RootDialog", true);
-            else MessageBox.Show(result.ErrorMessage ?? "فشل الحفظ.", "خطأ", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحفظ.");
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e) => DialogHost.Close("RootDialog", false);

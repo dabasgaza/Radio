@@ -1,0 +1,116 @@
+<UserControl
+    x:Class="Radio.Views.Publishing.WebsitePublishDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Width="500"
+    Height="450"
+    Style="{StaticResource View.Base}">
+    <materialDesign:Card
+        Background="{StaticResource SurfaceBrush}"
+        Effect="{StaticResource Shadow.Dialog}"
+        UniformCornerRadius="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Header  -->
+            <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
+                <TextBlock
+                    Margin="16,0"
+                    FontSize="18"
+                    FontWeight="Bold"
+                    Text="نشر الحلقة على الموقع الإلكتروني" />
+            </materialDesign:ColorZone>
+
+            <!--  Form Content  -->
+            <StackPanel Grid.Row="1" Margin="24">
+                <!--  نوع الوسيط  -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock
+                        Margin="0,0,0,8"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="#616161"
+                        Text="نوع الوسيط *" />
+                    <ComboBox
+                        x:Name="CmbMediaType"
+                        materialDesign:HintAssist.Hint="اختر نوع الوسيط"
+                        Style="{StaticResource Input.ComboBox}"
+                        SelectedValuePath="Tag"
+                        DisplayMemberPath="Content">
+                        <ComboBoxItem Content="فيديو" Tag="Video" />
+                        <ComboBoxItem Content="صوتي" Tag="Audio" />
+                        <ComboBoxItem Content="فيديو وصوت" Tag="Both" />
+                    </ComboBox>
+                </StackPanel>
+
+                <!--  العنوان  -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock
+                        Margin="0,0,0,8"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="#616161"
+                        Text="عنوان النشر *" />
+                    <TextBox
+                        x:Name="TxtTitle"
+                        Height="40"
+                        materialDesign:HintAssist.Hint="أدخل عنوان النشر على الموقع"
+                        Style="{StaticResource Input.Text}" />
+                </StackPanel>
+
+                <!--  الملاحظات  -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock
+                        Margin="0,0,0,8"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="#616161"
+                        Text="ملاحظات (اختياري)" />
+                    <TextBox
+                        x:Name="TxtNotes"
+                        Height="100"
+                        materialDesign:HintAssist.Hint="أدخل أي ملاحظات إضافية"
+                        AcceptsReturn="True"
+                        Style="{StaticResource Input.Text.Multiline}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!--  تاريخ النشر (تلقائي)  -->
+                <TextBlock
+                    Margin="0,12,0,0"
+                    FontSize="11"
+                    FontStyle="Italic"
+                    Foreground="#999"
+                    Text="سيتم النشر فوراً في:" />
+                <TextBlock
+                    x:Name="TxtPublishTime"
+                    Margin="0,4,0,0"
+                    FontSize="12"
+                    Foreground="#616161"
+                    Text="" />
+            </StackPanel>
+
+            <!--  Footer  -->
+            <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
+                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                    <Button
+                        Margin="0,0,8,0"
+                        Padding="16,8"
+                        Click="BtnCancel_Click"
+                        Content="إلغاء"
+                        Style="{StaticResource Btn.Cancel}" />
+                    <Button
+                        Padding="16,8"
+                        Click="BtnPublish_Click"
+                        Content="نشر على الموقع"
+                        Style="{StaticResource Btn.Primary}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </materialDesign:Card>
+</UserControl>

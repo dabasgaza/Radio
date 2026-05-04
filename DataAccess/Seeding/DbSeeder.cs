@@ -89,6 +89,9 @@ public static class DbSeeder
 
             // التقارير
             new() { SystemName = AppPermissions.ViewReports,      DisplayName = "عرض التقارير",      Module = "التقارير" },
+
+            // طاقم العمل
+            new() { SystemName = AppPermissions.StaffManage, DisplayName = "إدارة طاقم العمل", Module = "طاقم العمل" },
         };
 
         context.Set<Permission>().AddRange(permissions);
@@ -191,7 +194,8 @@ public static class DbSeeder
             AppPermissions.GuestManage,
             AppPermissions.CoordinationManage,
             AppPermissions.ViewReports,
-        };
+                        AppPermissions.StaffManage,
+                    };
         foreach (var permName in producerPerms)
         {
             if (permissions.TryGetValue(permName, out var perm))

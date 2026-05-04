@@ -1,20 +1,14 @@
-﻿<mah:MetroWindow
+<UserControl
     x:Class="Radio.Views.Episodes.PublishingLogDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Title="توثيق الروابط الرقمية"
-    Width="580"
-    Height="620"
-    BorderThickness="1"
-    Style="{StaticResource Window.Dialog}"
-    WindowStartupLocation="CenterScreen">
-
+    Width="860"
+    Height="700"
+    Style="{StaticResource View.Base}">
     <materialDesign:Card
-        Margin="30"
+        Background="{StaticResource SurfaceBrush}"
         Effect="{StaticResource Shadow.Dialog}"
-        Style="{StaticResource Card.Form}"
         UniformCornerRadius="16">
         <Grid>
             <Grid.RowDefinitions>
@@ -23,193 +17,140 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <materialDesign:ColorZone Style="{StaticResource Zone.Header.Neutral}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <materialDesign:PackIcon
-                        Width="35"
-                        Height="35"
-                        VerticalAlignment="Center"
-                        Kind="CloudSync" />
-
-                    <StackPanel Grid.Column="1" Margin="18,0">
-                        <TextBlock Style="{StaticResource Type.TitleLarge.OnColor}" Text="مركز النشر الرقمي" />
-
-                        <TextBlock Style="{StaticResource Type.BodyMedium.OnColor}" Text="أرشفة روابط الحلقة على منصات التواصل الاجتماعي" />
-                    </StackPanel>
-
-                    <Button
-                        Grid.Column="2"
-                        Click="BtnClose_Click"
-                        Foreground="White"
-                        Style="{StaticResource MaterialDesignIconButton}">
-                        <materialDesign:PackIcon Kind="Close" />
-                    </Button>
-                </Grid>
+            <!--  Header  -->
+            <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
+                <TextBlock
+                    Margin="16,0"
+                    FontSize="18"
+                    FontWeight="Bold"
+                    Text="نشر مقاطع الضيوف على السوشيال ميديا" />
             </materialDesign:ColorZone>
 
-            <ScrollViewer
-                Grid.Row="1"
-                Padding="20"
-                VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="10,15">
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+            <!--  Content Grid: Guests List + Platform Selection  -->
+            <Grid Grid.Row="1" Margin="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="240" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                        <materialDesign:Card
-                            Grid.Column="0"
-                            Padding="12"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="12">
-                            <StackPanel>
-                                <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
-                                    <materialDesign:PackIcon
-                                        VerticalAlignment="Center"
-                                        Foreground="#FF0000"
-                                        Kind="Youtube" />
-                                    <TextBlock
-                                        Margin="8,0"
-                                        FontSize="13"
-                                        FontWeight="Bold"
-                                        Text="يوتيوب" />
-                                </StackPanel>
-                                <TextBox
-                                    x:Name="TxtYouTube"
-                                    materialDesign:HintAssist.Hint="رابط الفيديو"
-                                    Style="{StaticResource Input.Text}" />
-                            </StackPanel>
-                        </materialDesign:Card>
+                <!--  قائمة الضيوف على اليسار  -->
+                <Border
+                    Grid.Column="0"
+                    Margin="0,0,16,0"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="0,0,1,0">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,12"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Text="الضيوف" />
+                        <ListBox
+                            x:Name="LstGuests"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            SelectionChanged="LstGuests_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="0,8" Text="{Binding FullName}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
 
-                        <materialDesign:Card
-                            Grid.Column="2"
-                            Padding="12"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="12">
-                            <StackPanel>
-                                <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
-                                    <materialDesign:PackIcon
-                                        VerticalAlignment="Center"
-                                        Foreground="#1877F2"
-                                        Kind="Facebook" />
-                                    <TextBlock
-                                        Margin="8,0"
-                                        FontSize="13"
-                                        FontWeight="Bold"
-                                        Text="فيسبوك" />
-                                </StackPanel>
-                                <TextBox
-                                    x:Name="TxtFacebook"
-                                    materialDesign:HintAssist.Hint="رابط المنشور"
-                                    Style="{StaticResource Input.Text}" />
-                            </StackPanel>
-                        </materialDesign:Card>
-                    </Grid>
+                <!--  منصات النشر على اليمين  -->
+                <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                    <!--  عنوان المقطع  -->
+                    <TextBlock
+                        Margin="0,0,0,8"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="#616161"
+                        Text="عنوان المقطع" />
+                    <TextBox
+                        x:Name="TxtClipTitle"
+                        Height="40"
+                        Margin="0,0,0,24"
+                        materialDesign:HintAssist.Hint="أدخل عنوان المقطع"
+                        Style="{StaticResource Input.Text}" />
 
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <!--  مدة المقطع  -->
+                    <TextBlock
+                        Margin="0,12,0,8"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="#616161"
+                        Text="مدة المقطع (دقيقة:ثانية)" />
+                    <TextBox
+                        x:Name="TxtDuration"
+                        Height="40"
+                        Margin="0,0,0,24"
+                        materialDesign:HintAssist.Hint="مثال: 05:30"
+                        Style="{StaticResource Input.Text}" />
 
-                        <materialDesign:Card
-                            Grid.Column="0"
-                            Padding="12"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="12">
-                            <StackPanel>
-                                <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
-                                    <materialDesign:PackIcon
-                                        VerticalAlignment="Center"
-                                        Foreground="{DynamicResource MaterialDesignBody}"
-                                        Kind="Twitter" />
-                                    <TextBlock
-                                        Margin="8,0"
-                                        FontSize="13"
-                                        FontWeight="Bold"
-                                        Text="تويتر (X)" />
-                                </StackPanel>
-                                <TextBox
-                                    x:Name="TxtTwitter"
-                                    materialDesign:HintAssist.Hint="رابط التغريدة"
-                                    Style="{StaticResource Input.Text}" />
-                            </StackPanel>
-                        </materialDesign:Card>
+                    <!--  المنصات  -->
+                    <TextBlock
+                        Margin="0,12,0,12"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Text="منصات النشر" />
+                    <ScrollViewer MaxHeight="350" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="IcPlatforms">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Padding="0,12"
+                                        BorderBrush="#F0F0F0"
+                                        BorderThickness="0,0,0,1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="160" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
 
-                        <materialDesign:Card
-                            Grid.Column="2"
-                            Padding="12"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="12">
-                            <StackPanel>
-                                <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
-                                    <materialDesign:PackIcon
-                                        VerticalAlignment="Center"
-                                        Foreground="#F57C00"
-                                        Kind="Soundcloud" />
-                                    <TextBlock
-                                        Margin="8,0"
-                                        FontSize="13"
-                                        FontWeight="Bold"
-                                        Text="ساوند كلاود" />
-                                </StackPanel>
-                                <TextBox
-                                    x:Name="TxtSoundCloud"
-                                    materialDesign:HintAssist.Hint="رابط الملف الصوتي"
-                                    Style="{StaticResource Input.Text}" />
-                            </StackPanel>
-                        </materialDesign:Card>
-                    </Grid>
+                                            <!--  CheckBox للمنصة  -->
+                                            <CheckBox
+                                                Grid.Column="0"
+                                                VerticalAlignment="Center"
+                                                Content="{Binding PlatformName}"
+                                                FontSize="12"
+                                                IsChecked="{Binding IsSelected, Mode=TwoWay}" />
 
-                    <Border Margin="0,10" Style="{StaticResource Card.Info}">
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon
-                                Foreground="#1565C0"
-                                Kind="Information"
-                                Opacity="0.7" />
-                            <TextBlock
-                                Margin="12,0"
-                                VerticalAlignment="Center"
-                                FontSize="11"
-                                Opacity="0.8"
-                                Text="تأكد من صحة الروابط لضمان ظهورها بشكل صحيح في تقارير النشر." />
-                        </StackPanel>
-                    </Border>
+                                            <!--  TextBox للرابط  -->
+                                            <TextBox
+                                                Grid.Column="1"
+                                                Height="36"
+                                                Margin="12,0,0,0"
+                                                materialDesign:HintAssist.Hint="رابط النشر"
+                                                IsEnabled="{Binding IsSelected}"
+                                                Style="{StaticResource Input.Text}"
+                                                Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </StackPanel>
-            </ScrollViewer>
+            </Grid>
 
+            <!--  Footer  -->
             <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="1.5*" />
-                    </Grid.ColumnDefinitions>
-
+                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                     <Button
-                        Grid.Column="0"
-                        Content="إلغاء"
-                        IsCancel="True"
+                        Margin="0,0,8,0"
+                        Padding="16,8"
+                        Click="BtnClose_Click"
+                        Content="إغلاق"
                         Style="{StaticResource Btn.Cancel}" />
-
                     <Button
-                        x:Name="BtnSave"
-                        Grid.Column="2"
+                        Padding="16,8"
                         Click="BtnSave_Click"
-                        Content="حفظ وتوثيق النشر"
+                        Content="حفظ النشر"
                         Style="{StaticResource Btn.Primary}" />
-                </Grid>
+                </StackPanel>
             </Border>
         </Grid>
-
     </materialDesign:Card>
-</mah:MetroWindow>
+</UserControl>

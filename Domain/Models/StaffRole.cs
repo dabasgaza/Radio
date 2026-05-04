@@ -6,5 +6,5 @@ public class StaffRole : BaseEntity
     
     public string RoleName { get; set; } = null!; // e.g. مذيع, منفذ, مهندس صوت
 
-    public virtual ICollection<EpisodeEmployee> EpisodeEmployees { get; set; } = new List<EpisodeEmployee>();
+    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 }

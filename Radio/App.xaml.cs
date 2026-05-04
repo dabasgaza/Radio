@@ -56,8 +56,10 @@ namespace Radio
             builder.Services.AddTransient<IReportsService, ReportsService>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<ICoverageService, CoverageService>();
-            builder.Services.AddSingleton<IMessageService, WpfMessageService>();
-            // ... باقي الخدمات ...
+                        // 🧑‍💼 خدمات طاقم العمل والأدوار الوظيفية
+                        builder.Services.AddTransient<IEmployeeService, EmployeeService>();
+                        builder.Services.AddSingleton<IMessageService, WpfMessageService>();
+                        // ... باقي الخدمات ...
 
             // 4. UI
             builder.Services.AddTransient<LoginWindow>();

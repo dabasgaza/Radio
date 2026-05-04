@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Forms;
@@ -8,7 +8,9 @@ using Radio.Views.Episodes;
 using Radio.Views.Guests;
 using Radio.Views.Home;
 using Radio.Views.Programs;
+using Radio.Views.Employees;
 using Radio.Views.Reports;
+using Radio.Views.StaffRoles;
 using Radio.Views.Users;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,7 +24,7 @@ namespace Radio
     {
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IReportsService _reportsService;
+        
 
         public MainWindow(UserSession session, IServiceProvider serviceProvider)
         {
@@ -130,7 +132,7 @@ namespace Radio
         }
 
         // ═══════════ مركز تحميل النوافذ ═══════════
-        private void LoadView(string viewName)
+        private void LoadView(string? viewName)
         {
             // مسح المحتوى الحالي أثناء التحميل
             MainContentArea.Content = null;
@@ -149,14 +151,14 @@ namespace Radio
                         NavigateTo(new UsersView(userService, _session));
                         break;
 
-                    case "Employees":
-                        // NavigateTo(new EmployeesView(_serviceProvider.GetRequiredService<IUserService>(), _session));
-                        MainContentArea.Content = new TextBlock { Text = "شاشة إدارة الموظفين (قيد التنفيذ)", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                                        case "Employees":
+                        var empService = _serviceProvider.GetRequiredService<IEmployeeService>();
+                        NavigateTo(new EmployeesView(empService, _session));
                         break;
 
                     case "StaffRoles":
-                        // NavigateTo(new StaffRolesView(_serviceProvider.GetRequiredService<IUserService>(), _session));
-                        MainContentArea.Content = new TextBlock { Text = "شاشة المسميات الوظيفية (قيد التنفيذ)", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                        var staffService = _serviceProvider.GetRequiredService<IEmployeeService>();
+                        NavigateTo(new StaffRolesView(staffService, _session));
                         break;
 
                     case "Permissions":
@@ -178,8 +180,8 @@ namespace Radio
                         var pService = _serviceProvider.GetRequiredService<IProgramService>();
                         var gService = _serviceProvider.GetRequiredService<IGuestService>();
                         var cService = _serviceProvider.GetRequiredService<ICorrespondentService>();
-                        var uService = _serviceProvider.GetRequiredService<IUserService>();
-                        NavigateTo(new EpisodesView(epService, pService, _session, _serviceProvider, gService, cService, uService));
+                                                var epEmpService = _serviceProvider.GetRequiredService<IEmployeeService>();
+                        NavigateTo(new EpisodesView(epService, pService, _session, _serviceProvider, gService, cService, epEmpService));
                         break;
 
                     case "Guests":

@@ -90,7 +90,7 @@ namespace Radio.Views.Guests
                 {
                     try
                     {
-                        DataAccess.Common.Result retryResult;
+                        Result retryResult;
                         if (_existingGuest is null)
                             retryResult = await _guestService.CreateGuestAsync(dto, _session);
                         else

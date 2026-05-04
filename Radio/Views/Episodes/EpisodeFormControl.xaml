@@ -59,9 +59,11 @@
                 materialDesign:ColorZoneAssist.Mode="PrimaryLight"
                 Style="{StaticResource Tab.Modern}">
 
-                <!-- ══════════════════════════════════════════
-                     Tab 1: المعلومات الأساسية
-                ══════════════════════════════════════════ -->
+                <!--
+                    ══════════════════════════════════════════
+                    Tab 1: المعلومات الأساسية
+                    ══════════════════════════════════════════
+                -->
                 <TabItem Header="المعلومات الأساسية">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="24">
@@ -119,9 +121,11 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- ══════════════════════════════════════════
-                     Tab 2: الضيوف
-                ══════════════════════════════════════════ -->
+                <!--
+                    ══════════════════════════════════════════
+                    Tab 2: الضيوف
+                    ══════════════════════════════════════════
+                -->
                 <TabItem Header="الضيوف المشاركون">
                     <Grid Margin="24,16,24,16">
                         <Grid.RowDefinitions>
@@ -191,9 +195,7 @@
                                             Click="BtnAddGuest_Click"
                                             Style="{StaticResource Btn.Primary}"
                                             ToolTip="إضافة الضيف للقائمة">
-                                            <materialDesign:PackIcon
-                                                Foreground="{StaticResource SurfaceBrush}"
-                                                Kind="Plus" />
+                                            <materialDesign:PackIcon Foreground="{StaticResource SurfaceBrush}" Kind="Plus" />
                                         </Button>
                                     </Grid>
                                 </Border>
@@ -232,9 +234,7 @@
                                                         Click="BtnRemoveGuest_Click"
                                                         Style="{StaticResource MaterialDesignIconButton}"
                                                         ToolTip="إزالة الضيف">
-                                                        <materialDesign:PackIcon
-                                                            Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
-                                                            Kind="CloseCircleOutline" />
+                                                        <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
                                                     </Button>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
@@ -246,9 +246,11 @@
                     </Grid>
                 </TabItem>
 
-                <!-- ══════════════════════════════════════════
-                     Tab 3: المراسلون
-                ══════════════════════════════════════════ -->
+                <!--
+                    ══════════════════════════════════════════
+                    Tab 3: المراسلون
+                    ══════════════════════════════════════════
+                -->
                 <TabItem Header="المراسلون الميدانيون">
                     <Grid Margin="24,16,24,16">
                         <Grid.RowDefinitions>
@@ -318,9 +320,7 @@
                                             Click="BtnAddCorrespondent_Click"
                                             Style="{StaticResource Btn.Primary}"
                                             ToolTip="إضافة المراسل للقائمة">
-                                            <materialDesign:PackIcon
-                                                Foreground="{StaticResource SurfaceBrush}"
-                                                Kind="Plus" />
+                                            <materialDesign:PackIcon Foreground="{StaticResource SurfaceBrush}" Kind="Plus" />
                                         </Button>
                                     </Grid>
                                 </Border>
@@ -359,9 +359,7 @@
                                                         Click="BtnRemoveCorrespondent_Click"
                                                         Style="{StaticResource MaterialDesignIconButton}"
                                                         ToolTip="إزالة المراسل">
-                                                        <materialDesign:PackIcon
-                                                            Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
-                                                            Kind="CloseCircleOutline" />
+                                                        <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
                                                     </Button>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
@@ -373,9 +371,11 @@
                     </Grid>
                 </TabItem>
 
-                <!-- ══════════════════════════════════════════
-                     Tab 4: طاقم التنفيذ
-                ══════════════════════════════════════════ -->
+                <!--
+                    ══════════════════════════════════════════
+                    Tab 4: طاقم التنفيذ
+                    ══════════════════════════════════════════
+                -->
                 <TabItem Header="طاقم التنفيذ">
                     <Grid Margin="24,16,24,16">
                         <Grid.RowDefinitions>
@@ -427,9 +427,7 @@
                                             Click="BtnAddEmployee_Click"
                                             Style="{StaticResource Btn.Primary}"
                                             ToolTip="إضافة للطاقم">
-                                            <materialDesign:PackIcon
-                                                Foreground="{StaticResource SurfaceBrush}"
-                                                Kind="Plus" />
+                                            <materialDesign:PackIcon Foreground="{StaticResource SurfaceBrush}" Kind="Plus" />
                                         </Button>
                                     </Grid>
                                 </Border>
@@ -464,9 +462,7 @@
                                                         Click="BtnRemoveEmployee_Click"
                                                         Style="{StaticResource MaterialDesignIconButton}"
                                                         ToolTip="إزالة من الطاقم">
-                                                        <materialDesign:PackIcon
-                                                            Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
-                                                            Kind="CloseCircleOutline" />
+                                                        <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
                                                     </Button>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
