@@ -1,6 +1,5 @@
 ﻿using DataAccess.Common;
 using DataAccess.Data;
-using DataAccess.Seeding;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
@@ -56,10 +55,11 @@ namespace Radio
             builder.Services.AddTransient<IReportsService, ReportsService>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<ICoverageService, CoverageService>();
-                        // 🧑‍💼 خدمات طاقم العمل والأدوار الوظيفية
-                        builder.Services.AddTransient<IEmployeeService, EmployeeService>();
-                        builder.Services.AddSingleton<IMessageService, WpfMessageService>();
-                        // ... باقي الخدمات ...
+            // 🧑‍💼 خدمات طاقم العمل والأدوار الوظيفية
+            builder.Services.AddTransient<IEmployeeService, EmployeeService>();
+            builder.Services.AddTransient<IPlatformService, PlatformService>();
+            builder.Services.AddSingleton<IMessageService, WpfMessageService>();
+            // ... باقي الخدمات ...
 
             // 4. UI
             builder.Services.AddTransient<LoginWindow>();

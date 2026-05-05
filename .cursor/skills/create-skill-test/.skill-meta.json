@@ -1,0 +1,13 @@
+{
+  "sourceType": "github",
+  "source": "github",
+  "url": "https://github.com/dotnet/skills",
+  "repo": "dotnet/skills",
+  "ref": null,
+  "subpath": ".agents/skills/create-skill-test",
+  "installSource": "dotnet/skills/.agents/skills/create-skill-test",
+  "skillName": "create-skill-test",
+  "scope": "legacy",
+  "installedAt": "2026-05-05T09:17:10.250Z",
+  "updatedAt": "2026-05-05T09:17:10.250Z"
+}

@@ -1,1 +1,687 @@
-"# 📡 دليل تطوير نظام إدارة البث الإذاعي — Radio Broadcast Management System\n**الإصدار:** 5.0 | **آخر تحديث:** مايو 2026 | **Build Status:** ✅ 0 Errors\n\n> هذا الملف هو **المصدر الوحيد للحقيقة** لأي مطور أو نموذج ذكاء اصطناعي يعمل على المشروع.\n> اقرأه كاملاً قبل أي تعديل. يمثل هذا الملف دمجاً لجميع الخطط والسجلات السابقة.\n\n---\n\n## الفهرس\n\n1. [نظرة عامة عن المشروع](#1-نظرة-عامة-عن-المشروع)\n2. [بنية المشروع](#2-بنية-المشروع)\n3. [قواعد معمارية أساسية](#3-قواعد-معمارية-أساسية)\n4. [الكيانات وقاعدة البيانات](#4-الكيانات-وقاعدة-البيانات)\n5. [سير عمل الحلقات (Episode Workflow)](#5-سير-عمل-الحلقات-episode-workflow)\n6. [طبقة البيانات (DTOs)](#6-طبقة-البيانات-dtos)\n7. [الخدمات (Services)](#7-الخدمات-services)\n8. [معايير واجهة المستخدم (UI Standards)](#8-معايير-واجهة-المستخدم-ui-standards)\n9. [نظام التنقل (MainWindow)](#9-نظام-التنقل-mainwindow)\n10. [نظام الصلاحيات](#10-نظام-الصلاحيات)\n11. [قائمة المهام المتبقية](#11-قائمة-المهام-المتبقية)\n12. [أوامر البناء](#12-أوامر-البناء)\n13. [الأخطاء الشائعة](#13-الأخطاء-الشائعة)\n\n---\n\n## 1. نظرة عامة عن المشروع\n\nتطبيق سطح مكتب **WPF** (.NET 10, C#) لإدارة سير عمل البث الإذاعي:\n- جدولة الحلقات مع الضيوف والمراسلين الميدانيين وطاقم الإنتاج\n- تتبع دورة حياة الحلقة: مجدولة → منفذة → منشورة → منشورة على الموقع\n- نشر المقاطع على منصات التواصل الاجتماعي والموقع الإلكتروني\n- نظام صلاحيات قائم على الأدوار\n\n### تقنيات المشروع\n| الطبقة | التقنية |\n|:---|:---|\n| واجهة المستخدم | WPF (.NET 10) |\n| أدوات الواجهة | MaterialDesignInXamlToolkit + MahApps.Metro |\n| ORM | Entity Framework Core 10 |\n| قاعدة البيانات | SQL Server / LocalDB |\n| DI Container | Microsoft.Extensions.DependencyInjection |\n| النمط | Service Layer + Result Pattern |\n| التدقيق (Audit) | AuditInterceptor (تلقائي) |\n\n---\n\n## 2. بنية المشروع\n\n```\nRadio.slnx\n├── Domain/                           — كيانات EF Core + DbContext + Migrations\n│   ├── Models/\n│   │   ├── BaseEntity.cs             — الفئة الأساسية (IsActive, CreatedAt, ...)\n│   │   ├── Configurations/          — Fluent API configurations\n│   │   ├── Enums.cs                  — MediaType, GuestClipStatus\n│   │   ├── Episode.cs, Guest.cs, Program.cs, ...\n│   │   ├── Employee.cs, StaffRole.cs, EpisodeEmployee.cs\n│   │   ├── EpisodeCorrespondent.cs, Correspondent.cs\n│   │   ├── SocialMediaPlatform.cs, SocialMediaPublishingLog.cs\n│   │   ├── SocialMediaPublishingLogPlatform.cs, WebsitePublishingLog.cs\n│   │   └── BroadcastWorkflowDBContext.cs\n│   └── Migrations/\n├── DataAccess/                       — خدمات + DTOs + صلاحيات + تدقيق\n│   ├── Common/\n│   │   ├── Result.cs                 — Result<T> Pattern\n│   │   ├── AppPermissions.cs         — ثوابت الصلاحيات\n│   │   ├── UserSession.cs            — معلومات المستخدم + صلاحياته\n│   │   └── EpisodeStatus.cs          — ثوابت حالة الحلقة\n│   ├── Data/\n│   │   └── AuditInterceptor.cs       — تدقيق تلقائي\n│   ├── DTOs/\n│   │   ├── ActiveEpisodeDto.cs       — عرض الحلقات\n│   │   ├── AllDtos.cs                — EpisodeGuestDto, EpisodeCorrespondentDto, ...\n│   │   ├── EmployeeDto.cs, StaffRoleDto.cs\n│   │   ├── SocialMediaPlatformDto.cs, SocialMediaPublishingLogDto.cs\n│   │   ├── PlatformPublishDto.cs, WebsitePublishingLogDto.cs\n│   │   └── ...\n│   ├── Services/\n│   │   ├── EpisodeService.cs         — IEpisodeService\n│   │   ├── PublishingService.cs      — IPublishingService\n│   │   ├── EmployeeService.cs        — IEmployeeService\n│   │   ├── GuestService.cs, CorrespondentService.cs\n│   │   ├── ExecutionService.cs, ProgramService.cs\n│   │   ├── AuthService.cs, UserService.cs\n│   │   └── ...\n│   ├── Validation/\n│   │   └── ValidationPipeline.cs\n│   └── Seeding/\n│       └── DbSeeder.cs               — بيانات أولية\n└── Radio/                             — WPF UI\n    ├── App.xaml / App.xaml.cs         — بدء التشغيل + DI\n    ├── MainWindow.xaml / .cs          — التنقل الرئيسي\n    ├── Views/\n    │   ├── Episodes/                  — EpisodesView, EpisodeFormControl\n    │   ├── Publishing/               — PublishingLogDialog, WebsitePublishDialog\n    │   ├── Common/                    — ReasonInputDialog\n    │   ├── Home/, Programs/, Guests/, ...\n    │   └── ...\n    ├── Forms/\n    │   └── LoginWindow.xaml\n    ├── Resources/                     — Styles, Themes\n    └── Converters/                    — محولات القيم\n```\n\n---\n\n## 3. قواعد معمارية أساسية (Non-Negotiable)\n\n| القاعدة | الشرح |\n|:---|:---|\n| **Result Pattern** | كل خدمة ترجع `Result` أو `Result<T>` — لا throws للbusiness errors |\n| **BaseEntity** | كل الكيانات (عدا جداول التعداد) ترث من `BaseEntity` |\n| **No Hard Delete** | `context.Remove()` ممنوع — استخدم `IsActive = false` |\n| **Global Query Filters** | مفعّلة تلقائياً على `IsActive` في DbContext |\n| **AuditInterceptor** | يعالج `CreatedAt`, `UpdatedAt`, `CreatedByUserId`, `UpdatedByUserId` تلقائياً |\n| **No InverseProperty on User** | تجنب `ICollection<>` على كيان `User` لتقليل التعقيد |\n| **IDbContextFactory** | أنشئ `DbContext` جديد لكل عملية — لا حقن مباشر للـ DbContext |\n| **StaffRoleId على Employee** | دور الموظف خاصية ثابتة كشخص — ليس على EpisodeEmployee |\n| **Primary Constructor** | الخدمات تستخدم `(IDbContextFactory<...> ctx) : this(ctx)` |\n| **Collection Sync** | `Id == 0 → INSERT`, `Id != 0 → UPDATE`, `غير موجود → IsActive = false` |\n\n---\n\n## 4. الكيانات وقاعدة البيانات\n\n### جميع الكيانات\n\n| الكيان | الجدول | المفتاح | يرث من |\n|:---|:---|:---|:---|\n| `Episode` | `Episodes` | `EpisodeId` | `BaseEntity` |\n| `Program` | `Programs` | `ProgramId` | `BaseEntity` |\n| `Guest` | `Guests` | `GuestId` | `BaseEntity` |\n| `EpisodeGuest` | `EpisodeGuests` | `EpisodeGuestId` | `BaseEntity` |\n| `Correspondent` | `Correspondents` | `CorrespondentId` | `BaseEntity` |\n| `EpisodeCorrespondent` | `EpisodeCorrespondents` | `Id` | `BaseEntity` |\n| `Employee` | `Employees` | `EmployeeId` | `BaseEntity` |\n| `StaffRole` | `StaffRoles` | `StaffRoleId` | `BaseEntity` |\n| `EpisodeEmployee` | `EpisodeEmployees` | `EpisodeEmployeeId` | `BaseEntity` |\n| `SocialMediaPlatform` | `SocialMediaPlatforms` | `SocialMediaPlatformId` | `BaseEntity` |\n| `SocialMediaPublishingLog` | `SocialMediaPublishingLogs` | `SocialMediaPublishingLogId` | `BaseEntity` |\n| `SocialMediaPublishingLogPlatform` | `SocialMediaPublishingLogPlatforms` | `Id` | `BaseEntity` |\n| `WebsitePublishingLog` | `WebsitePublishingLogs` | `WebsitePublishingLogId` | `BaseEntity` |\n| `User` | `Users` | `UserId` | `BaseEntity` |\n| `ExecutionLog` | `ExecutionLogs` | `ExecutionLogId` | `BaseEntity` |\n| `AuditLog` | `AuditLogs` | `AuditLogId` | لا (جدول تدقيق خاص) |\n\n### مخطط العلاقات\n\n```\nEpisode (1) ──── (N) EpisodeGuest (N) ───── (1) Guest\n   │                                      └─ (N) SocialMediaPublishingLog\n   │                                              └─ (N) SocialMediaPublishingLogPlatform (N) ─ (1) SocialMediaPlatform\n   │\n   ├── (N) EpisodeCorrespondent (N) ────── (1) Correspondent\n   │\n   ├── (N) EpisodeEmployee (N) ─────────── (1) Employee (N) ── (1) StaffRole\n   │\n   ├── (N) WebsitePublishingLog\n   │\n   └── (N) ExecutionLog\n```\n\n### حالات الحلقة (EpisodeStatus)\n\n| StatusId | الاسم | العرض | الانتقال المسموح |\n|:---:|:---|:---|:---|\n| 0 | `Planned` | مجدولة | ← `Executed` أو `Cancelled` |\n| 1 | `Executed` | منفذة | ← `Published` أو `Planned` (تراجع) |\n| 2 | `Published` | منشورة | ← `WebsitePublished` أو `Executed` (تراجع) |\n| 3 | `WebsitePublished` | منشورة على الموقع | ← `Published` (تراجع) |\n| 4 | `Cancelled` | ملغاة | لا انتقال |\n\n---\n\n## 5. سير عمل الحلقات (Episode Workflow)\n\n### المرحلة 1: إنشاء حلقة جديدة (`Planned`)\n**المسؤول:** قسم التنسيق\n1. فتح `EpisodeFormControl` ← زر "إضافة حلقة"\n2. تعبئة: البرنامج، التاريخ (DatePicker)، الوقت (TimePicker)، العنوان، الملاحظات\n3. تبويب الضيوف: اختيار ضيف + موضوع + موعد استضافة ← `DataGrid`\n4. تبويب المراسلين: اختيار مراسل + موضوع + وقت الظهور\n5. تبويب طاقم التنفيذ: اختيار موظفين (مخرج، مذيع، فني صوت)\n6. عند الحفظ: `Episodes (StatusId=0)` + `EpisodeGuests` + `EpisodeCorrespondents` + `EpisodeEmployees`\n\n### المرحلة 2: تسجيل التنفيذ (`Executed`)\n**المسؤول:** قسم الإنتاج\n1. زر "تسجيل التنفيذ" على حلقة `Planned`\n2. `ExecutionLogDialog` ← إدخال تفاصيل التنفيذ\n3. `StatusId = 1` + سجل في `ExecutionLogs`\n\n### المرحلة 3: النشر الاجتماعي (`Published`)\n**المسؤول:** قسم النشر الرقمي\n1. زر "النشر الرقمي" على حلقة `Executed`\n2. `PublishingLogDialog` ← قائمة ضيوف الحلقة\n3. لكل ضيف: نوع المحتوى (Audio/Video/Both)، عنوان المقطع، مدته\n4. اختيار منصات متعددة + رابط لكل منصة\n5. `StatusId = 2` + `SocialMediaPublishingLog` + `SocialMediaPublishingLogPlatform`\n\n### المرحلة 4: النشر على الموقع (`WebsitePublished`)\n**المسؤول:** قسم النشر الرقمي\n1. زر "النشر على الموقع" على حلقة `Executed` أو `Published`\n2. `WebsitePublishDialog` ← MediaType, Title, Notes\n3. `StatusId = 3` + `WebsitePublishingLog`\n\n### التراجع (Revert)\n- `Executed → Planned` | `Published → Executed` | `WebsitePublished → Published`\n- **شرط:** إدخال سبب التراجع عبر `ReasonInputDialog`\n- يتم تحديث `StatusId` وتسجيل السبب في `CancellationReason`\n\n---\n\n## 6. طبقة البيانات (DTOs)\n\n### DTOs الرئيسية\n\n```csharp\n// -- ActiveEpisodeDto.cs -- عرض الحلقات\npublic record ActiveEpisodeDto\n{\n    public int EpisodeId { get; init; }\n    public int ProgramId { get; init; }\n    public string? EpisodeName { get; init; }\n    public string? ProgramName { get; init; }\n    public string? GuestsDisplay { get; init; }\n    public DateTime? ScheduledExecutionTime { get; init; }\n    public string? StatusText { get; init; }\n    public byte StatusId { get; init; }\n    public string? SpecialNotes { get; init; }\n    public string? CancellationReason { get; set; }\n\n    public List<GuestDisplayItem> GuestItems { get; init; } = [];\n    public List<EpisodeCorrespondentDto> CorrespondentItems { get; init; } = [];\n    public List<EpisodeEmployeeDto> EmployeeItems { get; init; } = [];\n\n    // خصائص حسابية للأزرار\n    public bool CanMarkExecuted   => StatusId == EpisodeStatus.Planned;\n    public bool CanMarkPublished  => StatusId == EpisodeStatus.Executed;\n    public bool CanToggleWebsite  => StatusId >= EpisodeStatus.Executed && StatusId != EpisodeStatus.Cancelled;\n    public bool CanRevert         => StatusId is EpisodeStatus.Executed or EpisodeStatus.Published or EpisodeStatus.WebsitePublished;\n    public bool CanCancel         => StatusId is EpisodeStatus.Planned or EpisodeStatus.Executed;\n}\n\n// -- EpisodeDto.cs -- إنشاء/تحديث\npublic record EpisodeDto(\n    int EpisodeId, int ProgramId,\n    List<EpisodeGuestDto> Guests,\n    List<EpisodeCorrespondentDto> Correspondents,\n    List<EpisodeEmployeeDto> Employees,\n    string EpisodeName,\n    DateTime? ScheduledDate,       // من DatePicker\n    TimeSpan? BroadcastTime,       // من TimePicker\n    string? SpecialNotes);\n\npublic record EpisodeGuestDto(int EpisodeGuestId, int GuestId, string FullName, string? Topic, TimeSpan? HostingTime);\npublic record EpisodeCorrespondentDto(int Id, int CorrespondentId, string FullName, string? Topic);\npublic record EpisodeEmployeeDto(int EpisodeEmployeeId, int EmployeeId);\npublic record GuestDisplayItem(string Name, string? Topic, TimeSpan? HostingTime);\n\n// -- الموظفون والأدوار\npublic record EmployeeDto(int EmployeeId, string FullName, int? StaffRoleId, string? StaffRoleName, string? Notes);\npublic record StaffRoleDto(int StaffRoleId, string RoleName);\n\n// -- النشر الاجتماعي\npublic record SocialMediaPlatformDto(int PlatformId, string Name, string? Icon);\npublic record SocialMediaPublishingLogDto(int LogId, int EpisodeGuestId, MediaType MediaType, string? ClipTitle, TimeSpan? Duration, List<PlatformPublishDto> Platforms);\npublic record PlatformPublishDto(int PlatformId, string PlatformName, string? Url);\n\n// -- النشر على الموقع\npublic record WebsitePublishingLogDto(int Id, int EpisodeId, string? MediaType, string? Title, string? Notes, DateTime PublishedAt);\n```\n\n---\n\n## 7. الخدمات (Services)\n\n### الخدمات الموجودة\n\n| الواجهة | الملف | الغرض | الحالة |\n|:---|:---|:---|:---|\n| `IEpisodeService` | `EpisodeService.cs` | CRUD الحلقات + transitions | ✅ |\n| `IPublishingService` | `PublishingService.cs` | نشر اجتماعي + موقع | ✅ |\n| `IEmployeeService` | `EmployeeService.cs` | CRUD موظفين + أدوار | ✅ |\n| `IGuestService` | `GuestService.cs` | CRUD ضيوف | ✅ |\n| `ICorrespondentService` | `CorrespondentService.cs` | CRUD مراسلين | ✅ |\n| `ICoverageService` | `CoverageService.cs` | إدارة التغطيات | ✅ |\n| `IProgramService` | `ProgramService.cs` | CRUD برامج | ✅ |\n| `IUserService` | `UserService.cs` | مستخدمين + صلاحيات | ✅ |\n| `IExecutionService` | `ExecutionService.cs` | تسجيل التنفيذ | ✅ |\n| `IAuthService` | `AuthService.cs` | تسجيل الدخول | ✅ |\n| `IReportsService` | `ReportsService.cs` | تقارير | ✅ |\n\n### نمط الخدمة (Primary Constructor + IDbContextFactory)\n\n```csharp\npublic class ExampleService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IExampleService\n{\n    public async Task<Result<int>> DoSomethingAsync(Dto dto, UserSession session)\n    {\n        var permCheck = session.EnsurePermission(AppPermissions.PermissionName);\n        if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);\n\n        using var context = await contextFactory.CreateDbContextAsync();\n        // ... logic ...\n        await context.SaveChangesAsync();\n        return Result<int>.Success(value);\n    }\n}\n```\n\n---\n\n## 8. معايير واجهة المستخدم (UI Standards)\n\n### مساحات الأسماء (مهم — خطأ شائع)\n```xml\n✅ xmlns:materialDesign=\"http://materialdesigninxaml.net/winfx/xaml/themes\"\n❌ xmlns:md=\"...\"  ← يسبب فشل تحميل XAML\n```\n\n### مفاتيح الـ Styles المعتمدة\n\n| العنصر | المفتاح |\n|:---|:---|\n| TextBox | `Input.Text` |\n| TextBox متعدد الأسطر | `Input.Text.Multiline` |\n| ComboBox | `Input.ComboBox` |\n| DatePicker | `Input.DatePicker` |\n| TimePicker | `Input.TimePicker` |\n| زر رئيسي | `Btn.Primary` |\n| زر إلغاء | `Btn.Cancel` |\n| زر إضافة | `Btn.AddNew` |\n| زر حذف (أيقونة) | `Btn.Icon.Delete` |\n| زر تعديل (أيقونة) | `Btn.Icon.Edit` |\n| Header color zone | `Zone.Header.Primary` |\n| Footer | `Window.Footer` |\n| DataGrid | `DataGrid.Main` |\n| Row | `DataGrid.Row` |\n| Cell | `DataGrid.Cell` |\n| Cell (وسط) | `DataGrid.Cell.Center` |\n| Cell (إجراءات) | `DataGrid.Cell.Actions` |\n| ColumnHeader | `DataGrid.ColumnHeader.Center` |\n| View Base | `View.Base` |\n| بطاقة إحصائية | `Card.Stat` |\n| بحث | `Input.Search` |\n| بطاقة بث | `BroadcastCard` |\n\n### نمط نافذة الحوار\n\n**فتح من المتصل:**\n```csharp\nvar view = new MyFormDialog(services...);\nvar result = await DialogHost.Show(view, \"RootDialog\");\nif (result is true) await LoadDataAsync();\n```\n\n**إغلاق من داخل الحوار:**\n```csharp\nDialogHost.Close(\"RootDialog\", true);   // حفظ ناجح\nDialogHost.Close(\"RootDialog\", false);  // إلغاء\n```\n\n### تخطيط الشاشة القياسي\n\n```xml\n<UserControl Style=\"{StaticResource View.Base}\" FlowDirection=\"RightToLeft\">\n  <Grid>\n    <!-- Header -->\n    <materialDesign:ColorZone Style=\"{StaticResource Zone.Header.Primary}\">\n      <DockPanel>\n        <materialDesign:PackIcon Kind=\"IconName\" />\n        <TextBlock Text=\"العنوان\" FontSize=\"20\" FontWeight=\"Bold\" />\n        <Button Style=\"{StaticResource Btn.AddNew}\" DockPanel.Dock=\"Left\" />\n      </DockPanel>\n    </materialDesign:ColorZone>\n\n    <!-- Search + Stats -->\n    <Grid Grid.Row=\"1\" Margin=\"24,20,24,10\">\n      <TextBox Style=\"{StaticResource Input.Search}\" />\n    </Grid>\n\n    <!-- DataGrid -->\n    <materialDesign:Card Grid.Row=\"2\" Margin=\"24,10,24,24\"\n                          UniformCornerRadius=\"12\"\n                          materialDesign:ElevationAssist.Elevation=\"Dp1\">\n      <DataGrid Style=\"{StaticResource DataGrid.Main}\" />\n    </materialDesign:Card>\n  </Grid>\n</UserControl>\n```\n\n### تخطيط نموذج الحوار\n\n```xml\n<UserControl Width=\"860\" Height=\"700\" FlowDirection=\"RightToLeft\">\n  <materialDesign:Card Background=\"{StaticResource SurfaceBrush}\"\n                        Effect=\"{StaticResource Shadow.Dialog}\"\n                        UniformCornerRadius=\"16\">\n    <Grid>\n      <materialDesign:ColorZone Grid.Row=\"0\" Style=\"{StaticResource Zone.Header.Primary}\" />\n      <TabControl Grid.Row=\"1\" Style=\"{StaticResource MaterialDesignTabControl}\" />\n      <Border Grid.Row=\"2\" Style=\"{StaticResource Window.Footer}\">\n        <Button Style=\"{StaticResource Btn.Cancel}\" />\n        <Button Style=\"{StaticResource Btn.Primary}\" />\n      </Border>\n    </Grid>\n  </materialDesign:Card>\n</UserControl>\n```\n\n---\n\n## 9. نظام التنقل (MainWindow)\n\n### التبويبات (بالترتيب)\n\n| Tag | المحتوى | الصلاحية المطلوبة | الحالة |\n|:---|:---|:---|:---|\n| `Home` | لوحة التحكم | متاح للجميع | ✅ |\n| `Programs` | إدارة البرامج | `PROGRAM_MANAGE` | ✅ |\n| `Episodes` | سجل الحلقات | متاح للجميع | ✅ |\n| `Guests` | إدارة الضيوف | `GUEST_MANAGE` | ✅ |\n| `Correspondents` | المراسلون الميدانيون | `CORR_MANAGE` | ✅ |\n| `Coverage` | التغطيات | `CORR_MANAGE` | ✅ |\n| `Reports` | التقارير | `VIEW_REPORTS` | ✅ |\n| `Users` | إدارة المستخدمين | `USER_MANAGE` | ✅ |\n| `Employees` | طاقم العمل 🆕 | `STAFF_MANAGE` | ✅ |\n| `StaffRoles` | المسميات الوظيفية 🆕 | `STAFF_MANAGE` | ✅ |\n| `Permissions` | الصلاحيات | `USER_MANAGE` | ✅ |\n\n### إضافة تبويب جديد (4 خطوات)\n\n1. **`MainWindow.xaml`** ← إضافة `RadioButton` بـ `Tag` و `Style=HubTabItem` و `Click=Tab_Click`\n2. **`MainWindow.xaml.cs` → `LoadView()`** ← إضافة `case \"TagName\":` مع حقن الخدمات و `NavigateTo()`\n3. **`MainWindow.xaml.cs` → `ApplyPermissionSecurity()`** ← إخفاء/إظهار حسب الصلاحية\n4. **`App.xaml.cs`** ← تسجيل الخدمة في DI Container إذا كانت جديدة\n\n---\n\n## 10. نظام الصلاحيات\n\n### جميع الصلاحيات (`AppPermissions.cs`)\n\n```csharp\n// المستخدمون\nUserManage         = \"USER_MANAGE\"\n\n// البرامج\nProgramManage      = \"PROGRAM_MANAGE\"\n\n// الحلقات\nEpisodeManage      = \"EPISODE_MANAGE\"    // إضافة + تعديل\nEpisodeExecute     = \"EPISODE_EXECUTE\"   // تسجيل التنفيذ\nEpisodePublish     = \"EPISODE_PUBLISH\"   // النشر الاجتماعي\nEpisodeWebPublish  = \"EPISODE_WEB_PUBLISH\" // النشر على الموقع\nEpisodeEdit        = \"EPISODE_EDIT\"      // تعديل بعد الإنشاء\nEpisodeDelete      = \"EPISODE_DELETE\"    // حذف ناعم\nEpisodeRevert      = \"EPISODE_REVERT\"    // تراجع عن حالة\n\n// الضيوف\nGuestManage        = \"GUEST_MANAGE\"\n\n// المراسلون\nCoordinationManage = \"CORR_MANAGE\"\n\n// طاقم العمل 🆕\nStaffManage        = \"STAFF_MANAGE\"\n\n// التقارير\nViewReports        = \"VIEW_REPORTS\"\n```\n\n---\n\n## 11. قائمة المهام المتبقية\n\n### مكتمل ✅\n\n- [x] إضافة كيانات `Employee`, `StaffRole`, `EpisodeEmployee`, `EpisodeCorrespondent`\n- [x] إضافة كيانات النشر: `SocialMediaPlatform`, `SocialMediaPublishingLog`, `SocialMediaPublishingLogPlatform`, `WebsitePublishingLog`\n- [x] Migration: `StaffRoleId` ← `Employee` (وليس `EpisodeEmployee`)\n- [x] تحديث `ActiveEpisodeDto` بقوائم المراسلين والموظفين\n- [x] إنشاء `IEmployeeService` + `EmployeeService` (CRUD كامل)\n- [x] إنشاء `IPublishingService` + `PublishingService`\n- [x] إضافة تبويبات `Employees` و `StaffRoles` في `MainWindow`\n- [x] إضافة صلاحية `STAFF_MANAGE`\n- [x] إصلاح `MainWindow.xaml` (إضافة `Identifier=\"RootDialog\"`)\n- [x] تسجيل الخدمات في `App.xaml.cs` (\n- [x] تطوير `WebsitePublishDialog` مع ربط MediaType بـ enum\n- [x] ربط `WebsitePublishDialog` بـ `EpisodesView`\n- [x] دمج جميع ملفات الخطط في ملف واحد `AI_DEVELOPMENT_GUIDE.md`\n\n### 🔴 أولوية عالية\n\n- [ ] **إنشاء `EmployeesView.xaml` + `EmployeesView.xaml.cs`**\n  - عرض الموظفين في `DataGrid` مع اسم الدور الوظيفي\n  - إضافة/تعديل/حذف ناعم عبر `DialogHost`\n  - بحث نصي\n\n- [ ] **إنشاء `EmployeeFormDialog.xaml` + `EmployeeFormDialog.xaml.cs`**\n  - اسم كامل, ComboBox للأدوار, ملاحظات\n  - وضع إضافة/تعديل حسب `employeeId == 0`\n\n- [ ] **إنشاء `StaffRolesView.xaml` + `StaffRolesView.xaml.cs`**\n  - إدارة الأدوار (مذيع، مخرج، فني صوت...)\n  - عمودان: الاسم + إجراءات\n\n### 🟡 أولوية متوسطة\n\n- [ ] **ربط `EpisodeFormControl` بـ `IEmployeeService`**\n  - استبدال `IUserService` workaround في تبويب طاقم التنفيذ\n  - استخدام `IEmployeeService.GetAllActiveAsync()` بدلاً منه\n\n- [ ] **تطوير `PublishingLogDialog` للنشر الاجتماعي**\n  - عرض قائمة الضيوف لكل حلقة\n  - لكل ضيف: MediaType, ClipTitle, ClipDuration\n  - اختيار منصات متعددة وإدخال رابط لكل منصة\n  - حفظ `SocialMediaPublishingLog` + `SocialMediaPublishingLogPlatform`\n\n### 🟢 أولوية منخفضة\n\n- [ ] **إضافة Seed Data**\n  - `SocialMediaPlatforms`: Facebook, X, Instagram, TikTok, YouTube\n  - `StaffRoles`: مذيع, مخرج, فني صوت, مساعد إنتاج\n\n- [ ] **تفعيل MainWindow cases** — `Employees` و `StaffRoles` (إذا كانت معلقة)\n\n---\n\n## 12. أوامر البناء\n\n```powershell\n# بناء المشروع\ncd d:\\برمجة\\Project2026\\Project2026\\Radio\ndotnet build Radio/Radio.csproj\n\n# تشغيل مع مشاهدة التغييرات\ndotnet watch run --project Radio/Radio.csproj\n\n# تشغيل عادي\ndotnet run --project Radio/Radio.csproj\n\n# إضافة Migration\ndotnet ef migrations add MigrationName --project Domain --startup-project Radio\n\n# تطبيق Migration\ndotnet ef database update --project Domain --startup-project Radio\n\n# إزالة آخر Migration (إذا فشل)\ndotnet ef migrations remove --project Domain --startup-project Radio\n```\n\n---\n\n## 13. الأخطاء الشائعة\n\n| ❌ خطأ | ✅ الصحيح |\n|:---|:---|\n| `xmlns:md=\"...materialDesign...\"` | `xmlns:materialDesign=\"...materialDesign...\"` |\n| `StaffRoleId` على `EpisodeEmployee` | `StaffRoleId` على `Employee` مباشرة |\n| `context.Remove(entity)` | `entity.IsActive = false` |\n| `throw new Exception()` في الخدمة | `return Result.Fail(\"msg\")` |\n| `ItemsSource=...` في XAML | تعيين `ItemsSource` في code-behind |\n| `new ServiceClass()` في View | `_serviceProvider.GetRequiredService<IService>()` |\n| `dto.Id` في SyncGuests | `dto.EpisodeGuestId` |\n| `BroadcastTextBox` / `BroadcastComboBox` | `Input.Text` / `Input.ComboBox` |\n| `dto.ScheduledTime` | `dto.ScheduledDate` + `dto.BroadcastTime` |\n| تعديل حقول Audit يدوياً | تركها لـ `AuditInterceptor` |\n\n---\n\n> **⚠️ تحذير للنماذج المستقبلية:**\n> - لا تعدّل ملفات الـ Domain مباشرة إلا عبر Migration\n> - استخدم `Result Pattern` في جميع دوال الخدمات\n> - احترم `Global Query Filter` للـ `IsActive`\n> - لا تستخدم `InverseProperty` على كيان `User`\n> - **حدث هذا الملف بعد إتمام كل مرحلة**\n\n---\n*آخر تحديث: مايو 2026 — AI Agent Development Guide v5.0*"
+﻿# 📡 دليل تطوير نظام إدارة البث الإذاعي — Radio Broadcast Management System
+**الإصدار:** 5.2 | **آخر تحديث:** مايو 2026 | **Build Status:** ✅ 0 Errors
+
+> هذا الملف هو **المصدر الوحيد للحقيقة** لأي مطور أو نموذج ذكاء اصطناعي يعمل على المشروع.
+> اقرأه كاملاً قبل أي تعديل. يمثل هذا الملف دمجاً لجميع الخطط والسجلات السابقة.
+
+---
+
+## الفهرس
+
+1. [نظرة عامة عن المشروع](#1-نظرة-عامة-عن-المشروع)
+2. [بنية المشروع](#2-بنية-المشروع)
+3. [قواعد معمارية أساسية](#3-قواعد-معمارية-أساسية)
+4. [الكيانات وقاعدة البيانات](#4-الكيانات-وقاعدة-البيانات)
+5. [سير عمل الحلقات (Episode Workflow)](#5-سير-عمل-الحلقات-episode-workflow)
+6. [طبقة البيانات (DTOs)](#6-طبقة-البيانات-dtos)
+7. [الخدمات (Services)](#7-الخدمات-services)
+8. [معايير واجهة المستخدم (UI Standards)](#8-معايير-واجهة-المستخدم-ui-standards)
+9. [نظام التنقل (MainWindow)](#9-نظام-التنقل-mainwindow)
+10. [نظام الصلاحيات](#10-نظام-الصلاحيات)
+11. [قائمة المهام المتبقية](#11-قائمة-المهام-المتبقية)
+12. [أوامر البناء](#12-أوامر-البناء)
+13. [الأخطاء الشائعة](#13-الأخطاء-الشائعة)
+14. [مسرد المصطلحات](#14-مسرد-المصطلحات)
+
+---
+
+## 1. نظرة عامة عن المشروع
+
+تطبيق سطح مكتب **WPF** (.NET 10, C#) لإدارة سير عمل البث الإذاعي:
+- جدولة الحلقات مع الضيوف والمراسلين الميدانيين وطاقم الإنتاج
+- تتبع دورة حياة الحلقة: مجدولة → منفذة → منشورة → منشورة على الموقع
+- نشر المقاطع على منصات التواصل الاجتماعي والموقع الإلكتروني
+- نظام صلاحيات قائم على الأدوار مع تحكم كامل بالوصول
+
+### تقنيات المشروع
+| الطبقة | التقنية |
+|:---|:---|
+| واجهة المستخدم | WPF (.NET 10) |
+| أدوات الواجهة | MaterialDesignInXamlToolkit + MahApps.Metro |
+| ORM | Entity Framework Core 10 |
+| قاعدة البيانات | SQL Server / LocalDB |
+| DI Container | Microsoft.Extensions.DependencyInjection |
+| النمط | Service Layer + Result Pattern |
+| التدقيق (Audit) | AuditInterceptor (تلقائي) |
+| إدارة الأيقونات | MaterialDesign PackIcons |
+
+---
+
+## 2. بنية المشروع
+
+`
+Radio.slnx
+├── Domain/                           — كيانات EF Core + DbContext + Migrations
+│   ├── Models/
+│   │   ├── BaseEntity.cs             — الفئة الأساسية (IsActive, CreatedAt, ...)
+│   │   ├── Configurations/          — Fluent API configurations
+│   │   ├── Enums.cs                  — MediaType, GuestClipStatus
+│   │   ├── Episode.cs, Guest.cs, Program.cs, ...
+│   │   ├── Employee.cs, StaffRole.cs, EpisodeEmployee.cs
+│   │   ├── EpisodeCorrespondent.cs, Correspondent.cs
+│   │   ├── SocialMediaPlatform.cs, SocialMediaPublishingLog.cs
+│   │   ├── SocialMediaPublishingLogPlatform.cs, WebsitePublishingLog.cs
+│   │   └── BroadcastWorkflowDBContext.cs
+│   └── Migrations/
+├── DataAccess/                       — خدمات + DTOs + صلاحيات + تدقيق
+│   ├── Common/
+│   │   ├── Result.cs                 — Result<T> Pattern
+│   │   ├── AppPermissions.cs         — ثوابت الصلاحيات
+│   │   ├── UserSession.cs            — معلومات المستخدم + صلاحياته
+│   │   └── EpisodeStatus.cs          — ثوابت حالة الحلقة
+│   ├── Data/
+│   │   └── AuditInterceptor.cs       — تدقيق تلقائي
+│   ├── DTOs/
+│   │   ├── ActiveEpisodeDto.cs       — عرض الحلقات
+│   │   ├── EpisodeGuestDto.cs, EpisodeCorrespondentDto.cs
+│   │   ├── EmployeeDto.cs, StaffRoleDto.cs, SocialMediaPlatformDto.cs
+│   │   ├── SocialMediaPublishingLogDto.cs, PlatformPublishDto.cs
+│   │   └── WebsitePublishingLogDto.cs
+│   ├── Services/
+│   │   ├── EpisodeService.cs         — IEpisodeService
+│   │   ├── PublishingService.cs      — IPublishingService
+│   │   ├── PlatformService.cs        — IPlatformService 🆕
+│   │   ├── EmployeeService.cs        — IEmployeeService
+│   │   ├── GuestService.cs, CorrespondentService.cs
+│   │   ├── CoverageService.cs, ExecutionService.cs
+│   │   ├── ProgramService.cs, AuthService.cs
+│   │   └── UserService.cs, ReportsService.cs
+│   ├── Validation/
+│   │   └── ValidationPipeline.cs
+│   └── Seeding/
+│       └── DbSeeder.cs               — بيانات أولية
+└── Radio/                             — WPF UI
+    ├── App.xaml / App.xaml.cs         — بدء التشغيل + DI
+    ├── MainWindow.xaml / .cs          — التنقل الرئيسي
+    ├── Views/
+    │   ├── Episodes/                  — EpisodesView, EpisodeFormControl
+    │   ├── Publishing/               — PublishingLogDialog, WebsitePublishDialog
+    │   ├── Common/                    — ReasonInputDialog
+    │   ├── Admin/ 🆕                 — SocialPlatformsView, PlatformFormDialog
+    │   ├── Home/, Programs/, Guests/, ...
+    │   └── ...
+    ├── Forms/
+    │   └── LoginWindow.xaml
+    ├── Resources/                     — Styles, Themes
+    └── Converters/                    — محولات القيم
+`
+
+---
+
+## 3. قواعد معمارية أساسية (Non-Negotiable)
+
+| القاعدة | الشرح |
+|:---|:---|
+| **Result Pattern** | كل خدمة ترجع Result أو Result<T> — لا throws للbusiness errors |
+| **BaseEntity** | كل الكيانات (عدا جداول التعداد) ترث من BaseEntity |
+| **No Hard Delete** | context.Remove() ممنوع — استخدم IsActive = false |
+| **Global Query Filters** | مفعّلة تلقائياً على IsActive في DbContext |
+| **AuditInterceptor** | يعالج CreatedAt, UpdatedAt, CreatedByUserId, UpdatedByUserId تلقائياً |
+| **No InverseProperty on User** | تجنب ICollection<> على كيان User لتقليل التعقيد |
+| **IDbContextFactory** | أنشئ DbContext جديد لكل عملية — لا حقن مباشر للـ DbContext |
+| **StaffRoleId على Employee** | دور الموظف خاصية ثابتة كشخص — ليس على EpisodeEmployee |
+| **Primary Constructor** | الخدمات تستخدم (IDbContextFactory<...> ctx) — اختيارياً مع : this(ctx) |
+| **Collection Sync** | Id == 0 → INSERT, Id != 0 → UPDATE, غير موجود → IsActive = false |
+| **Dialog Pattern** | DialogHost.Show(UserControl, "RootDialog") ← إرجاع النتيجة عبر Close() |
+| **View → Service فقط** | الـ View تحقن الخدمة — لا تستخدم 
+ew ServiceClass() |
+| **UI عبر code-behind** | تعيين ItemsSource في code-behind، وليس في XAML |
+
+---
+
+## 4. الكيانات وقاعدة البيانات
+
+### جميع الكيانات
+
+| الكيان | الجدول | المفتاح | يرث من |
+|:---|:---|:---|:---|
+| Episode | Episodes | EpisodeId | BaseEntity |
+| Program | Programs | ProgramId | BaseEntity |
+| Guest | Guests | GuestId | BaseEntity |
+| EpisodeGuest | EpisodeGuests | EpisodeGuestId | BaseEntity |
+| Correspondent | Correspondents | CorrespondentId | BaseEntity |
+| EpisodeCorrespondent | EpisodeCorrespondents | Id | BaseEntity |
+| Employee | Employees | EmployeeId | BaseEntity |
+| StaffRole | StaffRoles | StaffRoleId | BaseEntity |
+| EpisodeEmployee | EpisodeEmployees | EpisodeEmployeeId | BaseEntity |
+| SocialMediaPlatform | SocialMediaPlatforms | SocialMediaPlatformId | BaseEntity |
+| SocialMediaPublishingLog | SocialMediaPublishingLogs | SocialMediaPublishingLogId | BaseEntity |
+| SocialMediaPublishingLogPlatform | SocialMediaPublishingLogPlatforms | Id | BaseEntity |
+| WebsitePublishingLog | WebsitePublishingLogs | WebsitePublishingLogId | BaseEntity |
+| User | Users | UserId | BaseEntity |
+| ExecutionLog | ExecutionLogs | ExecutionLogId | BaseEntity |
+| AuditLog | AuditLogs | AuditLogId | لا (جدول تدقيق خاص) |
+
+### مخطط العلاقات
+
+`
+Episode (1) ──── (N) EpisodeGuest (N) ───── (1) Guest
+   │                                      └─ (N) SocialMediaPublishingLog
+   │                                              └─ (N) SocialMediaPublishingLogPlatform (N) ─ (1) SocialMediaPlatform
+   │
+   ├── (N) EpisodeCorrespondent (N) ────── (1) Correspondent
+   │
+   ├── (N) EpisodeEmployee (N) ─────────── (1) Employee (N) ── (1) StaffRole
+   │
+   ├── (N) WebsitePublishingLog
+   │
+   └── (N) ExecutionLog
+`
+
+### حالات الحلقة (EpisodeStatus)
+
+| StatusId | الاسم | العرض | الانتقال المسموح |
+|:---:|:---|:---|:---|
+| 0 | Planned | مجدولة | ← Executed أو Cancelled |
+| 1 | Executed | منفذة | ← Published أو Planned (تراجع) |
+| 2 | Published | منشورة | ← WebsitePublished أو Executed (تراجع) |
+| 3 | WebsitePublished | منشورة على الموقع | ← Published (تراجع) |
+| 4 | Cancelled | ملغاة | لا انتقال |
+
+### MediaType (للنشر)
+
+| القيمة | الاسم | الوصف |
+|:---:|:---|:---|
+| 0 | Audio | مقطع صوتي |
+| 1 | Video | مقطع فيديو |
+| 2 | Both | صوت وفيديو معاً |
+
+### GuestClipStatus (للمقاطع)
+
+| القيمة | الاسم | الوصف |
+|:---:|:---|:---|
+| 0 | Pending | قيد الانتظار |
+| 1 | Ready | جاهز للنشر |
+| 2 | Published | منشور |
+
+---
+
+## 5. سير عمل الحلقات (Episode Workflow)
+
+### المرحلة 1: إنشاء حلقة جديدة (Planned)
+**المسؤول:** قسم التنسيق
+1. فتح EpisodeFormControl ← زر إضافة حلقة
+2. تعبئة: البرنامج، التاريخ (DatePicker)، الوقت (TimePicker)، العنوان، الملاحظات
+3. تبويب الضيوف: اختيار ضيف + موضوع + موعد استضافة ← DataGrid
+4. تبويب المراسلين: اختيار مراسل + موضوع + وقت الظهور
+5. تبويب طاقم التنفيذ: اختيار موظفين (مخرج، مذيع، فني صوت)
+6. عند الحفظ: Episodes (StatusId=0) + EpisodeGuests + EpisodeCorrespondents + EpisodeEmployees
+
+### المرحلة 2: تسجيل التنفيذ (Executed)
+**المسؤول:** قسم الإنتاج
+1. زر تسجيل التنفيذ على حلقة Planned
+2. ExecutionLogDialog ← إدخال تفاصيل التنفيذ
+3. StatusId = 1 + سجل في ExecutionLogs
+
+### المرحلة 3: النشر الاجتماعي (Published)
+**المسؤول:** قسم النشر الرقمي
+1. زر النشر الرقمي على حلقة Executed
+2. PublishingLogDialog ← قائمة ضيوف الحلقة
+3. لكل ضيف: نوع المحتوى (Audio/Video/Both)، عنوان المقطع، مدته
+4. اختيار منصات متعددة + رابط لكل منصة
+5. StatusId = 2 + SocialMediaPublishingLog + SocialMediaPublishingLogPlatform
+
+### المرحلة 4: النشر على الموقع (WebsitePublished)
+**المسؤول:** قسم النشر الرقمي
+1. زر النشر على الموقع على حلقة Executed أو Published
+2. WebsitePublishDialog ← MediaType, Title, Notes
+3. StatusId = 3 + WebsitePublishingLog
+
+### التراجع (Revert)
+- Executed → Planned | Published → Executed | WebsitePublished → Published
+- **شرط:** إدخال سبب التراجع عبر ReasonInputDialog
+- يتم تحديث StatusId وتسجيل السبب في CancellationReason
+
+---
+
+## 6. طبقة البيانات (DTOs)
+
+### DTOs الرئيسية
+
+`csharp
+// -- ActiveEpisodeDto.cs -- عرض الحلقات
+public record ActiveEpisodeDto
+{
+    public int EpisodeId { get; init; }
+    public int ProgramId { get; init; }
+    public string? EpisodeName { get; init; }
+    public string? ProgramName { get; init; }
+    public string? GuestsDisplay { get; init; }
+    public DateTime? ScheduledExecutionTime { get; init; }
+    public string? StatusText { get; init; }
+    public byte StatusId { get; init; }
+    public string? SpecialNotes { get; init; }
+    public string? CancellationReason { get; set; }
+
+    public List<GuestDisplayItem> GuestItems { get; init; } = [];
+    public List<EpisodeCorrespondentDto> CorrespondentItems { get; init; } = [];
+    public List<EpisodeEmployeeDto> EmployeeItems { get; init; } = [];
+
+    // خصائص حسابية للأزرار
+    public bool CanMarkExecuted   => StatusId == EpisodeStatus.Planned;
+    public bool CanMarkPublished  => StatusId == EpisodeStatus.Executed;
+    public bool CanToggleWebsite  => StatusId >= EpisodeStatus.Executed && StatusId != EpisodeStatus.Cancelled;
+    public bool CanRevert         => StatusId is EpisodeStatus.Executed or EpisodeStatus.Published or EpisodeStatus.WebsitePublished;
+    public bool CanCancel         => StatusId is EpisodeStatus.Planned or EpisodeStatus.Executed;
+}
+
+// -- EpisodeDto.cs -- إنشاء/تحديث
+public record EpisodeDto(
+    int EpisodeId, int ProgramId,
+    List<EpisodeGuestDto> Guests,
+    List<EpisodeCorrespondentDto> Correspondents,
+    List<EpisodeEmployeeDto> Employees,
+    string EpisodeName,
+    DateTime? ScheduledDate,       // من DatePicker
+    TimeSpan? BroadcastTime,       // من TimePicker
+    string? SpecialNotes);
+
+public record EpisodeGuestDto(int EpisodeGuestId, int GuestId, string FullName, string? Topic, TimeSpan? HostingTime);
+public record EpisodeCorrespondentDto(int Id, int CorrespondentId, string FullName, string? Topic);
+public record EpisodeEmployeeDto(int EpisodeEmployeeId, int EmployeeId);
+public record GuestDisplayItem(string Name, string? Topic, TimeSpan? HostingTime);
+
+// -- الموظفون والأدوار
+public record EmployeeDto(int EmployeeId, string FullName, int? StaffRoleId, string? StaffRoleName, string? Notes);
+public record StaffRoleDto(int StaffRoleId, string RoleName);
+
+// -- منصات التواصل الاجتماعي 🆕
+public record SocialMediaPlatformDto(int SocialMediaPlatformId, string Name, string? Icon);
+
+// -- النشر الاجتماعي
+public record SocialMediaPublishingLogDto(int LogId, int EpisodeGuestId, MediaType MediaType, string? ClipTitle, TimeSpan? Duration, List<PlatformPublishDto> Platforms);
+public record PlatformPublishDto(int PlatformId, string PlatformName, string? Url);
+
+// -- النشر على الموقع
+public record WebsitePublishingLogDto(int Id, int EpisodeId, string? MediaType, string? Title, string? Notes, DateTime PublishedAt);
+`
+
+---
+
+## 7. الخدمات (Services)
+
+### جميع الخدمات (مرتبة أبجدياً)
+
+| الواجهة | الملف | الغرض | طريقة الحقن | الحالة |
+|:---|:---|:---|:---|:---:|
+| IAuthService | AuthService.cs | تسجيل الدخول | Transient | ✅ |
+| ICorrespondentService | CorrespondentService.cs | CRUD مراسلين | Transient | ✅ |
+| ICoverageService | CoverageService.cs | إدارة التغطيات | Transient | ✅ |
+| IEmployeeService | EmployeeService.cs | CRUD موظفين + أدوار | Transient | ✅ |
+| IEpisodeService | EpisodeService.cs | CRUD الحلقات + transitions | Transient | ✅ |
+| IExecutionService | ExecutionService.cs | تسجيل التنفيذ | Transient | ✅ |
+| IGuestService | GuestService.cs | CRUD ضيوف | Transient | ✅ |
+| **IPlatformService** 🆕 | **PlatformService.cs** | **CRUD منصات التواصل** | **Transient** | **✅** |
+| IProgramService | ProgramService.cs | CRUD برامج | Transient | ✅ |
+| IPublishingService | PublishingService.cs | نشر اجتماعي + موقع | Transient | ✅ |
+| IReportsService | ReportsService.cs | تقارير | Transient | ✅ |
+| IUserService | UserService.cs | مستخدمين + صلاحيات | Transient | ✅ |
+
+### نمط الخدمة (Primary Constructor + IDbContextFactory)
+
+`csharp
+public class ExampleService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IExampleService
+{
+    public async Task<Result<int>> DoSomethingAsync(Dto dto, UserSession session)
+    {
+        var permCheck = session.EnsurePermission(AppPermissions.PermissionName);
+        if (!permCheck.IsSuccess)
+            return Result<int>.Fail(permCheck.ErrorMessage!);
+
+        using var context = await contextFactory.CreateDbContextAsync();
+        // ... logic ...
+        await context.SaveChangesAsync();
+        return Result<int>.Success(value);
+    }
+}
+`
+
+### ⚠️ قاعدة مهمة: تسجيل الخدمات
+عند إضافة خدمة جديدة، سجلها في Radio/App.xaml.cs بهذه الطريقة:
+`csharp
+builder.Services.AddTransient<IServiceInterface, ServiceImplementation>();
+`
+لا تستخدم AddScoped أو AddSingleton إلا لسبب واضح.
+
+---
+
+## 8. معايير واجهة المستخدم (UI Standards)
+
+### مساحات الأسماء (مهم — خطأ شائع)
+`xml
+✅ xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+❌ xmlns:md="..."  ← يسبب فشل تحميل XAML
+`
+
+### مفاتيح الـ Styles المعتمدة
+
+| العنصر | المفتاح |
+|:---|:---|
+| TextBox | Input.Text |
+| TextBox متعدد الأسطر | Input.Text.Multiline |
+| ComboBox | Input.ComboBox |
+| DatePicker | Input.DatePicker |
+| TimePicker | Input.TimePicker |
+| زر رئيسي | Btn.Primary |
+| زر إلغاء | Btn.Cancel |
+| زر إضافة | Btn.AddNew |
+| زر حذف (أيقونة) | Btn.Icon.Delete |
+| زر تعديل (أيقونة) | Btn.Icon.Edit |
+| Header color zone | Zone.Header.Primary |
+| Footer | Window.Footer |
+| DataGrid | DataGrid.Main |
+| Row | DataGrid.Row |
+| Cell | DataGrid.Cell |
+| Cell (وسط) | DataGrid.Cell.Center |
+| Cell (إجراءات) | DataGrid.Cell.Actions |
+| ColumnHeader | DataGrid.ColumnHeader.Center |
+| View Base | View.Base |
+| بطاقة إحصائية | Card.Stat |
+| بحث | Input.Search |
+| بطاقة بث | BroadcastCard |
+
+### أيقونات PackIcon الشائعة
+
+| الاستخدام | الأيقونة |
+|:---|:---|
+| منصات التواصل | FacebookWorkplace |
+| موظفون | PeopleGroup |
+| أدوار | BadgeAccount |
+| مستخدمون | AccountGroup |
+| ضيف | AccountVoice |
+| مراسل | Microphone |
+| برنامج | Radio |
+| حلقة | PlaylistEdit |
+| تقارير | ChartBar |
+| تغطية | CameraDocument |
+| تراجع | Undo |
+| حذف | Delete |
+| تعديل | Pencil |
+| إضافة | Plus |
+| حفظ | ContentSave |
+| إلغاء | Close |
+| بحث | Magnify |
+
+### نمط نافذة الحوار
+
+**فتح من المتصل:**
+`csharp
+var view = new MyFormDialog(services...);
+var result = await DialogHost.Show(view, "RootDialog");
+if (result is true) await LoadDataAsync();
+`
+
+**إغلاق من داخل الحوار (حفظ):**
+`csharp
+DialogHost.Close("RootDialog", yourResultObject);
+`
+
+**إغلاق من داخل الحوار (إلغاء):**
+`csharp
+DialogHost.Close("RootDialog", null);
+`
+
+### تخطيط الشاشة القياسي
+
+`xml
+<UserControl Style="{StaticResource View.Base}" FlowDirection="RightToLeft">
+  <Grid>
+    <!-- Header -->
+    <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
+      <DockPanel>
+        <materialDesign:PackIcon Kind="IconName" />
+        <TextBlock Text="العنوان" FontSize="20" FontWeight="Bold" />
+        <Button Style="{StaticResource Btn.AddNew}" DockPanel.Dock="Left" />
+      </DockPanel>
+    </materialDesign:ColorZone>
+
+    <!-- Search + Stats -->
+    <Grid Grid.Row="1" Margin="24,20,24,10">
+      <TextBox Style="{StaticResource Input.Search}" />
+    </Grid>
+
+    <!-- DataGrid -->
+    <materialDesign:Card Grid.Row="2" Margin="24,10,24,24"
+                          UniformCornerRadius="12"
+                          materialDesign:ElevationAssist.Elevation="Dp1">
+      <DataGrid Style="{StaticResource DataGrid.Main}" />
+    </materialDesign:Card>
+  </Grid>
+</UserControl>
+`
+
+### تخطيط نموذج الحوار
+
+`xml
+<UserControl Width="520" Height="Auto" FlowDirection="RightToLeft">
+  <materialDesign:Card Background="{StaticResource SurfaceBrush}"
+                        Effect="{StaticResource Shadow.Dialog}"
+                        UniformCornerRadius="16">
+    <Grid>
+      <!-- Header -->
+      <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
+        <DockPanel>
+          <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" />
+          <Button Style="{StaticResource Btn.Icon.Delete}" DockPanel.Dock="Left"
+                  Click="BtnClose_Click" />
+        </DockPanel>
+      </materialDesign:ColorZone>
+
+      <!-- Form Content -->
+      <StackPanel Grid.Row="1" Margin="24,16">
+        <TextBox Style="{StaticResource Input.Text}" materialDesign:HintAssist.Hint="الاسم *" />
+        <TextBox Style="{StaticResource Input.Text}" materialDesign:HintAssist.Hint="أيقونة (اختياري)" />
+      </StackPanel>
+
+      <!-- Footer -->
+      <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+          <Button Style="{StaticResource Btn.Cancel}" Content="إلغاء" Click="BtnCancel_Click" />
+          <Button Style="{StaticResource Btn.Primary}" Content="حفظ" Click="BtnSave_Click"
+                  Margin="8,0,0,0" />
+        </StackPanel>
+      </Border>
+    </Grid>
+  </materialDesign:Card>
+</UserControl>
+`
+
+---
+
+## 9. نظام التنقل (MainWindow)
+
+### التبويبات (بالترتيب من اليمين لليسار — حسب الـ FlowDirection)
+
+| Tag | المحتوى | الصلاحية المطلوبة | Icon | الحالة |
+|:---|:---|:---|:---|:---:|
+| Home | لوحة التحكم | متاح للجميع | Home | ✅ |
+| Programs | إدارة البرامج | PROGRAM_MANAGE | Radio | ✅ |
+| Episodes | سجل الحلقات | متاح للجميع | PlaylistEdit | ✅ |
+| Guests | إدارة الضيوف | GUEST_MANAGE | AccountVoice | ✅ |
+| Correspondents | المراسلون الميدانيون | CORR_MANAGE | Microphone | ✅ |
+| Coverage | التغطيات | CORR_MANAGE | CameraDocument | ✅ |
+| Reports | التقارير | VIEW_REPORTS | ChartBar | ✅ |
+| Users | إدارة المستخدمين | USER_MANAGE | AccountGroup | ✅ |
+| Employees | طاقم العمل 🆕 | STAFF_MANAGE | PeopleGroup | ✅ |
+| StaffRoles | المسميات الوظيفية 🆕 | STAFF_MANAGE | BadgeAccount | ✅ |
+| **SocialPlatforms** 🆕 | **منصات التواصل** | **STAFF_MANAGE** | **FacebookWorkplace** | **✅** |
+| Permissions | الصلاحيات | USER_MANAGE | Lock | ✅ |
+
+> ملاحظة: تبويب SocialPlatforms يعيد استخدام صلاحية STAFF_MANAGE (لا حاجة لصلاحية جديدة).
+
+### إضافة تبويب جديد (4 خطوات)
+
+1. **MainWindow.xaml** ← إضافة RadioButton بـ Tag و Style=HubTabItem و Click=Tab_Click
+2. **MainWindow.xaml.cs → LoadView()** ← إضافة case "TagName": مع حقن الخدمات و NavigateTo()
+3. **MainWindow.xaml.cs → ApplyPermissionSecurity()** ← إخفاء/إظهار حسب الصلاحية
+4. **App.xaml.cs** ← تسجيل الخدمة في DI Container إذا كانت جديدة
+
+**مثال كودي للإضافة:**
+`csharp
+// في MainWindow.xaml.cs → ApplyPermissionSecurity()
+bool canManageStaff = _session.HasPermission(AppPermissions.StaffManage);
+MenuSocialPlatforms.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
+
+// في MainWindow.xaml.cs → LoadView()
+case "SocialPlatforms":
+    var platformService = _serviceProvider.GetRequiredService<IPlatformService>();
+    NavigateTo(new Views.Admin.SocialPlatformsView(platformService, _session));
+    break;
+`
+
+---
+
+## 10. نظام الصلاحيات
+
+### جميع الصلاحيات (AppPermissions.cs)
+
+`csharp
+// المستخدمون
+UserManage         = "USER_MANAGE"
+
+// البرامج
+ProgramManage      = "PROGRAM_MANAGE"
+
+// الحلقات
+EpisodeManage      = "EPISODE_MANAGE"    // إضافة + تعديل
+EpisodeExecute     = "EPISODE_EXECUTE"   // تسجيل التنفيذ
+EpisodePublish     = "EPISODE_PUBLISH"   // النشر الاجتماعي
+EpisodeWebPublish  = "EPISODE_WEB_PUBLISH" // النشر على الموقع
+EpisodeEdit        = "EPISODE_EDIT"      // تعديل بعد الإنشاء
+EpisodeDelete      = "EPISODE_DELETE"    // حذف ناعم
+EpisodeRevert      = "EPISODE_REVERT"    // تراجع عن حالة
+
+// الضيوف
+GuestManage        = "GUEST_MANAGE"
+
+// المراسلون
+CoordinationManage = "CORR_MANAGE"
+
+// طاقم العمل 🆕 (يُستخدم أيضاً لـ SocialMediaPlatform)
+StaffManage        = "STAFF_MANAGE"
+
+// التقارير
+ViewReports        = "VIEW_REPORTS"
+`
+
+### 🔑 ملاحظات مهمة عن الصلاحيات
+- STAFF_MANAGE تُستخدم لـ **ثلاث تبويبات**: Employees, StaffRoles, SocialPlatforms
+- ليس كل تبويب يحتاج صلاحية جديدة — أعد استخدام الصلاحيات الموجودة حيثما أمكن
+- UserSession تحتوي على HasPermission() و EnsurePermission() للتحقق
+
+---
+
+## 11. قائمة المهام المتبقية
+
+### ✅ كافة المهام المخطط لها مكتملة
+
+| المجموعة | المهام | الحالة |
+|:---|:---|:---:|
+| **الكيانات** | Employee, StaffRole, EpisodeEmployee, EpisodeCorrespondent, SocialMediaPlatform, SocialMediaPublishingLog, WebsitePublishingLog | ✅ |
+| **الخدمات** | IEmployeeService, IPublishingService, IPlatformService + كافة الخدمات الأخرى | ✅ |
+| **واجهات المستخدم** | EmployeesView, EmployeeFormDialog, StaffRolesView, StaffRoleFormDialog, SocialPlatformsView, PlatformFormDialog, PublishingLogDialog, WebsitePublishDialog | ✅ |
+| **التكامل** | ربط EpisodeFormControl بـ IEmployeeService، تسجيل DI، تفعيل MainWindow | ✅ |
+| **Seed Data** | SocialMediaPlatforms (5 منصات)، StaffRoles (4 أدوار) | ✅ |
+| **الصلاحيات** | STAFF_MANAGE مضاف ومعتمد في التبويبات الثلاثة | ✅ |
+| **التوثيق** | AI_DEVELOPMENT_GUIDE.md محدث وكامل | ✅ |
+
+### 🔮 مقترحات للتطوير المستقبلي
+
+#### أولوية عالية
+- اختبارات آلية (Unit Tests) للخدمات الأساسية: EpisodeService, PublishingService, PlatformService
+- التحقق من أداء الاستعلامات ومراجعة N+1 patterns
+
+#### أولوية متوسطة
+- **تقارير متقدمة** — رسوم بيانية، إحصائيات شهرية، تصدير Excel/PDF
+- **نظام إشعارات** — تنبيهات المستخدمين عند تغيير حالة الحلقة
+- **تحسين الـ UI** — إضافة شريط تقدم، تأكيدات بصرية، رسائل نجاح/فشل بعد العمليات
+
+#### أولوية منخفضة
+- **تدويل (Localization)** — دعم لغات إضافية
+- **سجل التدقيق (Audit Log Viewer)** — واجهة لعرض سجل التغييرات
+- **إعادة تعيين كلمة المرور** — نافذة مخصصة مع التحقق
+
+---
+
+## 12. أوامر البناء
+
+`powershell
+# بناء المشروع
+cd D:\\Radio
+dotnet build Radio/Radio.csproj
+
+# تشغيل مع مشاهدة التغييرات
+dotnet watch run --project Radio/Radio.csproj
+
+# تشغيل عادي
+dotnet run --project Radio/Radio.csproj
+
+# إضافة Migration
+dotnet ef migrations add MigrationName --project Domain --startup-project Radio
+
+# تطبيق Migration
+dotnet ef database update --project Domain --startup-project Radio
+
+# إزالة آخر Migration (إذا فشل)
+dotnet ef migrations remove --project Domain --startup-project Radio
+
+# تنظيف وإعادة بناء (عند أخطاء غريبة)
+dotnet clean Radio/Radio.csproj && dotnet build Radio/Radio.csproj
+`
+
+---
+
+## 13. الأخطاء الشائعة
+
+| ❌ خطأ | ✅ الصحيح |
+|:---|:---|
+| xmlns:md="...materialDesign..." | xmlns:materialDesign="...materialDesign..." |
+| StaffRoleId على EpisodeEmployee | StaffRoleId على Employee مباشرة |
+| context.Remove(entity) | entity.IsActive = false |
+| 	hrow new Exception() في الخدمة | eturn Result.Fail("msg") |
+| ItemsSource=... في XAML | تعيين ItemsSource في code-behind |
+| 
+ew ServiceClass() في View | _serviceProvider.GetRequiredService<IService>() |
+| dto.Id في SyncGuests | dto.EpisodeGuestId |
+| BroadcastTextBox / BroadcastComboBox | Input.Text / Input.ComboBox |
+| dto.ScheduledTime | dto.ScheduledDate + dto.BroadcastTime |
+| تعديل حقول Audit يدوياً | تركها لـ AuditInterceptor |
+| استخدام MetroWindow في DialogHost | استخدام UserControl في DialogHost |
+| صلاحية جديدة لكل تبويب صغير | أعد استخدام صلاحيات موجودة (مثل STAFF_MANAGE) |
+
+---
+
+## 14. مسرد المصطلحات
+
+| المصطلح | المعنى |
+|:---|:---|
+| **Episode** | حلقة — وحدة البث الأساسية |
+| **Program** | برنامج إذاعي — تصنيف للحلقات |
+| **Guest** | ضيف — مشارك في الحلقة |
+| **Correspondent** | مراسل ميداني — يقدم تقارير من الميدان |
+| **Employee** | موظف — عضو طاقم الإنتاج (مخرج، مذيع، فني) |
+| **StaffRole** | مسمى وظيفي — دور الموظف في المؤسسة |
+| **Coverage** | تغطية — مهمة ميدانية |
+| **SocialMediaPlatform** | منصة تواصل اجتماعي — وجهة النشر الرقمي |
+| **SocialMediaPublishingLog** | سجل النشر الاجتماعي — توثيق نشر مقطع |
+| **WebsitePublishingLog** | سجل نشر الموقع — توثيق نشر على الموقع الإلكتروني |
+| **ExecutionLog** | سجل التنفيذ — توثيق وقت تنفيذ الحلقة |
+| **AuditLog** | سجل التدقيق — تتبع جميع التغييرات |
+| **MediaType** | نوع الوسائط — Audio, Video, Both |
+| **Result Pattern** | نمط النتيجة — إرجاح نجاح/فشل مع رسالة خطأ |
+| **Soft Delete** | حذف ناعم — تعطيل بدلاً من حذف فعلي |
+| **Revert** | تراجع — العودة لحالة سابقة في سير العمل |
+
+---
+
+> **⚠️ تحذير للنماذج المستقبلية:**
+> - لا تعدّل ملفات الـ Domain مباشرة إلا عبر Migration
+> - استخدم Result Pattern في جميع دوال الخدمات
+> - احترم Global Query Filter للـ IsActive
+> - لا تستخدم InverseProperty على كيان User
+> - استخدم IDbContextFactory ولا تحقن DbContext مباشرة
+> - سجّل كل خدمة جديدة في App.xaml.cs بـ AddTransient
+> - **حدّث هذا الملف بعد إتمام كل مرحلة**
+
+---
+*آخر تحديث: مايو 2026 — AI Agent Development Guide v5.2*

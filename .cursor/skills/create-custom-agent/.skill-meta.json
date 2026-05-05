@@ -1,0 +1,13 @@
+{
+  "sourceType": "github",
+  "source": "github",
+  "url": "https://github.com/dotnet/skills",
+  "repo": "dotnet/skills",
+  "ref": null,
+  "subpath": ".agents/skills/create-custom-agent",
+  "installSource": "dotnet/skills/.agents/skills/create-custom-agent",
+  "skillName": "create-custom-agent",
+  "scope": "legacy",
+  "installedAt": "2026-05-05T09:17:10.247Z",
+  "updatedAt": "2026-05-05T09:17:10.247Z"
+}

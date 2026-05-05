@@ -1,0 +1,176 @@
+<UserControl
+    x:Class="Radio.Views.Admin.SocialPlatformsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Width="800"
+    Height="800"
+    Style="{StaticResource View.Base}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Header  -->
+        <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
+            <DockPanel>
+                <materialDesign:PackIcon VerticalAlignment="Center" Kind="FacebookWorkplace" />
+                <TextBlock
+                    Margin="12,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Bold"
+                    Text="إدارة منصات التواصل الاجتماعي" />
+                <Button
+                    x:Name="BtnAddNew"
+                    Click="BtnAddNew_Click"
+                    Content="إضافة منصة"
+                    DockPanel.Dock="Left"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource Btn.AddNew}" />
+            </DockPanel>
+        </materialDesign:ColorZone>
+
+        <!--  Form Area (hidden by default)  -->
+        <Border
+            x:Name="FormBorder"
+            Grid.Row="1"
+            Margin="24,12,24,0"
+            Padding="20,16"
+            materialDesign:ElevationAssist.Elevation="Dp2"
+            Background="{StaticResource SurfaceBrush}"
+            CornerRadius="12"
+            Visibility="Collapsed">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    x:Name="TxtFormTitle"
+                    Grid.ColumnSpan="3"
+                    Margin="0,0,0,12"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Text="إضافة منصة جديدة" />
+
+                <TextBox
+                    x:Name="TxtName"
+                    Grid.Row="1"
+                    materialDesign:HintAssist.Hint="اسم المنصة *"
+                    materialDesign:TextFieldAssist.LeadingIcon="Facebook"
+                    Style="{StaticResource Input.Text}" />
+
+                <TextBox
+                    x:Name="TxtIcon"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    materialDesign:HintAssist.Hint="رمز الأيقونة (اختياري)"
+                    materialDesign:TextFieldAssist.LeadingIcon="FormatText"
+                    Style="{StaticResource Input.Text}" />
+
+                <StackPanel
+                    Grid.Row="2"
+                    Grid.ColumnSpan="3"
+                    Margin="0,16,0,0"
+                    HorizontalAlignment="Left"
+                    Orientation="Horizontal">
+                    <Button
+                        x:Name="BtnSave"
+                        Click="BtnSave_Click"
+                        Content="حفظ"
+                        Style="{StaticResource Btn.Primary}" />
+                    <Button
+                        Margin="12,0,0,0"
+                        Click="BtnCancel_Click"
+                        Content="إلغاء"
+                        Style="{StaticResource Btn.Cancel}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--  Search + DataGrid  -->
+        <Grid Grid.Row="2" Margin="24,12,24,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBox
+                x:Name="TxtSearch"
+                materialDesign:HintAssist.Hint="بحث..."
+                materialDesign:TextFieldAssist.LeadingIcon="Magnify"
+                Style="{StaticResource Input.Search}"
+                TextChanged="TxtSearch_TextChanged" />
+
+            <ProgressBar
+                x:Name="ProgressBar"
+                Grid.Row="1"
+                Margin="0,8,0,0"
+                IsIndeterminate="True"
+                Visibility="Collapsed" />
+
+            <materialDesign:Card
+                Grid.Row="1"
+                Margin="0,8,0,0"
+                materialDesign:ElevationAssist.Elevation="Dp1"
+                UniformCornerRadius="12">
+                <DataGrid
+                    x:Name="DataGrid"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    SelectionMode="Single"
+                    ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                    RowStyle="{StaticResource DataGrid.Row}"
+                    CellStyle="{StaticResource DataGrid.Cell}"
+                    Style="{StaticResource DataGrid.Main}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            Header="الاسم" />
+                        <DataGridTextColumn
+                            Width="100"
+                            Binding="{Binding Icon}"
+                            CellStyle="{StaticResource DataGrid.Cell.Center}"
+                            Header="الأيقونة" />
+                        <!--<DataGridTextColumn
+                            Width="140"
+                            Binding="{Binding CreatedAt}"
+                            CellStyle="{StaticResource DataGrid.Cell.Center}"
+                            Header="تاريخ الإضافة" />-->
+                        <DataGridTemplateColumn
+                            Width="180"
+                            CellStyle="{StaticResource DataGrid.Cell.Actions}"
+                            Header="إجراءات">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                        <Button
+                                            Click="BtnEdit_Click"
+                                            
+                                            Tag="{Binding}" />
+                                        <Button
+                                            Margin="8,0,0,0"
+                                            Click="BtnDelete_Click"
+                                            
+                                            Tag="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </materialDesign:Card>
+        </Grid>
+    </Grid>
+</UserControl>

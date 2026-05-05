@@ -1,0 +1,36 @@
+---
+description: Route large outputs through context-mode to preserve context window
+globs: ["**/*"]
+alwaysApply: true
+---
+
+## Context Preservation Rules
+
+When executing commands that may produce large output (>5KB), use the `context-mode` MCP tools:
+
+- Instead of running shell commands directly, use `context-mode.execute` with `language: "shell"`
+- Instead of reading large files, use `context-mode.execute_file`
+- When fetching documentation, use `context-mode.fetch_and_index` + `context-mode.search`
+- For any tool returning large output, use `context-mode.compress` to wrap it
+
+### Commands likely to produce large output
+- `git log`, `git diff`, `cat` large files, `find`, reading log files
+- `npm list`, `pip list`, dependency audits, `yarn why`
+- API responses, test suite output (>100 tests)
+- Browser snapshots, web page content, database dumps
+
+### Example usage
+
+```
+// Instead of: bash("git log --oneline -50")
+execute({ language: "shell", code: "git log --oneline -50", intent: "recent changes" })
+
+// Instead of: read_file("package-lock.json")
+execute_file({ file_path: "package-lock.json", code: "const d=JSON.parse(process.env.FILE_CONTENT); console.log('Packages:', Object.keys(d.dependencies||{}).length)" })
+
+// Compress any large text
+compress({ content: largeOutput, intent: "find error messages" })
+
+// Check how much context was saved this session
+report()
+```

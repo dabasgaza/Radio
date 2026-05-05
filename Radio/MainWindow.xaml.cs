@@ -66,6 +66,7 @@ namespace Radio
             bool canManageStaff = _session.HasPermission(AppPermissions.StaffManage);
             MenuEmployees.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
             MenuStaffRoles.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
+            MenuSocialPlatforms.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
 
             // البرامج والمراسلين
             MenuPrograms.Visibility = _session.HasPermission(AppPermissions.ProgramManage) ? Visibility.Visible : Visibility.Collapsed;
@@ -151,9 +152,14 @@ namespace Radio
                         NavigateTo(new UsersView(userService, _session));
                         break;
 
-                                        case "Employees":
+                        case "Employees":
                         var empService = _serviceProvider.GetRequiredService<IEmployeeService>();
                         NavigateTo(new EmployeesView(empService, _session));
+                        break;
+
+                    case "SocialPlatforms":
+                        var platformService = _serviceProvider.GetRequiredService<IPlatformService>();
+                        NavigateTo(new Views.Admin.SocialPlatformsView(platformService, _session));
                         break;
 
                     case "StaffRoles":

@@ -366,6 +366,13 @@
                         Tag="StaffRoles" />
 
                     <RadioButton
+                        x:Name="MenuSocialPlatforms"
+                        Click="Tab_Click"
+                        Content="منصات التواصل"
+                        Style="{StaticResource HubTabItem}"
+                        Tag="SocialPlatforms" />
+
+                    <RadioButton
                         x:Name="MenuPermissions"
                         Click="Tab_Click"
                         Content="الصلاحيات"
