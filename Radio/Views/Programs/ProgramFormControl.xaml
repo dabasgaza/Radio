@@ -59,7 +59,10 @@
             </materialDesign:ColorZone>
 
             <!--  Content  -->
-            <ScrollViewer Grid.Row="1" MaxHeight="500" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer
+                Grid.Row="1"
+                MaxHeight="500"
+                VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="28,24">
                     <TextBox
                         x:Name="TxtName"
@@ -91,7 +94,10 @@
             </ScrollViewer>
 
             <!--  Footer  -->
-            <Border Grid.Row="2" Padding="28,20" Style="{StaticResource Window.Footer}">
+            <Border
+                Grid.Row="2"
+                Padding="28,20"
+                Style="{StaticResource Window.Footer}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

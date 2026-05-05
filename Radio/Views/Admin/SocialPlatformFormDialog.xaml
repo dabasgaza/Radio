@@ -38,9 +38,7 @@
                             x:Name="TxtTitle"
                             Style="{StaticResource Type.TitleLarge.OnColor}"
                             Text="إضافة منصة جديدة" />
-                        <TextBlock
-                            Style="{StaticResource Type.BodyMedium.OnColor}"
-                            Text="أدخل اسم المنصة واختر أيقونتها من مكتبة Material Design" />
+                        <TextBlock Style="{StaticResource Type.BodyMedium.OnColor}" Text="أدخل اسم المنصة واختر أيقونتها من مكتبة Material Design" />
                     </StackPanel>
 
                     <Button

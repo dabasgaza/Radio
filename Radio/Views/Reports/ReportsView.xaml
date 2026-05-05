@@ -79,19 +79,24 @@
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Border
-                                        Width="40" Height="40"
+                                        Width="40"
+                                        Height="40"
                                         Background="{DynamicResource PrimaryHueLightBrush}"
                                         CornerRadius="10">
                                         <materialDesign:PackIcon
-                                            Width="20" Height="20"
+                                            Width="20"
+                                            Height="20"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             Foreground="{DynamicResource PrimaryHueMidBrush}"
                                             Kind="CalendarClock" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock FontSize="10.5" Opacity="0.5" Text="قيد التخطيط" />
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="10.5"
+                                            Opacity="0.5"
+                                            Text="قيد التخطيط" />
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtPlannedCount"
                                                 FontSize="22"
@@ -100,9 +105,9 @@
                                             <TextBlock
                                                 x:Name="TxtPlannedPct"
                                                 Margin="6,4,0,0"
+                                                VerticalAlignment="Bottom"
                                                 FontSize="11"
                                                 Opacity="0.45"
-                                                VerticalAlignment="Bottom"
                                                 Text="0%" />
                                         </StackPanel>
                                     </StackPanel>
@@ -133,19 +138,24 @@
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Border
-                                        Width="40" Height="40"
+                                        Width="40"
+                                        Height="40"
                                         Background="#E8F5E9"
                                         CornerRadius="10">
                                         <materialDesign:PackIcon
-                                            Width="20" Height="20"
+                                            Width="20"
+                                            Height="20"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             Foreground="#2E7D32"
                                             Kind="CheckDecagramOutline" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock FontSize="10.5" Opacity="0.5" Text="منفّذة" />
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="10.5"
+                                            Opacity="0.5"
+                                            Text="منفّذة" />
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtExecutedCount"
                                                 FontSize="22"
@@ -154,9 +164,9 @@
                                             <TextBlock
                                                 x:Name="TxtExecutedPct"
                                                 Margin="6,4,0,0"
+                                                VerticalAlignment="Bottom"
                                                 FontSize="11"
                                                 Opacity="0.45"
-                                                VerticalAlignment="Bottom"
                                                 Text="0%" />
                                         </StackPanel>
                                     </StackPanel>
@@ -187,19 +197,24 @@
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Border
-                                        Width="40" Height="40"
+                                        Width="40"
+                                        Height="40"
                                         Background="#E3F2FD"
                                         CornerRadius="10">
                                         <materialDesign:PackIcon
-                                            Width="20" Height="20"
+                                            Width="20"
+                                            Height="20"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             Foreground="#1565C0"
                                             Kind="CloudCheckOutline" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock FontSize="10.5" Opacity="0.5" Text="منشورة رقمياً" />
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="10.5"
+                                            Opacity="0.5"
+                                            Text="منشورة رقمياً" />
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtPublishedCount"
                                                 FontSize="22"
@@ -208,9 +223,9 @@
                                             <TextBlock
                                                 x:Name="TxtPublishedPct"
                                                 Margin="6,4,0,0"
+                                                VerticalAlignment="Bottom"
                                                 FontSize="11"
                                                 Opacity="0.45"
-                                                VerticalAlignment="Bottom"
                                                 Text="0%" />
                                         </StackPanel>
                                     </StackPanel>
@@ -241,19 +256,24 @@
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Border
-                                        Width="40" Height="40"
+                                        Width="40"
+                                        Height="40"
                                         Background="#FCE4EC"
                                         CornerRadius="10">
                                         <materialDesign:PackIcon
-                                            Width="20" Height="20"
+                                            Width="20"
+                                            Height="20"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             Foreground="#B71C1C"
                                             Kind="CalendarRemove" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock FontSize="10.5" Opacity="0.5" Text="ملغاة" />
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="10.5"
+                                            Opacity="0.5"
+                                            Text="ملغاة" />
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtCancelledCount"
                                                 FontSize="22"
@@ -262,9 +282,9 @@
                                             <TextBlock
                                                 x:Name="TxtCancelledPct"
                                                 Margin="6,4,0,0"
+                                                VerticalAlignment="Bottom"
                                                 FontSize="11"
                                                 Opacity="0.45"
-                                                VerticalAlignment="Bottom"
                                                 Text="0%" />
                                         </StackPanel>
                                     </StackPanel>
@@ -535,7 +555,10 @@
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     CornerRadius="12">
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="8" Opacity="0.12" ShadowDepth="1" />
+                        <DropShadowEffect
+                            BlurRadius="8"
+                            Opacity="0.12"
+                            ShadowDepth="1" />
                     </Border.Effect>
                     <DataGrid
                         x:Name="DgTopGuests"
@@ -596,7 +619,7 @@
                                             HorizontalAlignment="Center"
                                             Background="{StaticResource SecondaryLightBrush}"
                                             CornerRadius="14">
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                                 <materialDesign:PackIcon
                                                     Width="13"
                                                     Height="13"
@@ -656,7 +679,10 @@
                     Background="{DynamicResource MaterialDesignCardBackground}"
                     CornerRadius="12">
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="8" Opacity="0.12" ShadowDepth="1" />
+                        <DropShadowEffect
+                            BlurRadius="8"
+                            Opacity="0.12"
+                            ShadowDepth="1" />
                     </Border.Effect>
                     <DataGrid
                         x:Name="DgCancelled"
@@ -679,7 +705,10 @@
                                 Header="البرنامج">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <StackPanel Margin="8,0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <StackPanel
+                                            Margin="8,0"
+                                            VerticalAlignment="Center"
+                                            Orientation="Horizontal">
                                             <materialDesign:PackIcon
                                                 Width="15"
                                                 Height="15"
@@ -754,9 +783,13 @@
                     CornerRadius="12">
                     <WrapPanel VerticalAlignment="Center">
 
-                        <StackPanel Margin="0,0,16,0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel
+                            Margin="0,0,16,0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
                             <materialDesign:PackIcon
-                                Width="18" Height="18"
+                                Width="18"
+                                Height="18"
                                 Margin="0,0,6,0"
                                 VerticalAlignment="Center"
                                 Foreground="{DynamicResource PrimaryHueMidBrush}"
@@ -773,9 +806,13 @@
                                 Style="{StaticResource MaterialDesignDatePicker}" />
                         </StackPanel>
 
-                        <StackPanel Margin="0,0,16,0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel
+                            Margin="0,0,16,0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
                             <materialDesign:PackIcon
-                                Width="18" Height="18"
+                                Width="18"
+                                Height="18"
                                 Margin="0,0,6,0"
                                 VerticalAlignment="Center"
                                 Foreground="{DynamicResource PrimaryHueMidBrush}"
@@ -818,7 +855,8 @@
                             ToolTip="تصدير النتائج إلى Excel">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
-                                    Width="16" Height="16"
+                                    Width="16"
+                                    Height="16"
                                     Margin="0,0,6,0"
                                     VerticalAlignment="Center"
                                     Kind="MicrosoftExcel" />
@@ -830,8 +868,8 @@
                         <StackPanel
                             x:Name="PnlSearchSummary"
                             Margin="16,0,0,0"
-                            Orientation="Horizontal"
                             VerticalAlignment="Center"
+                            Orientation="Horizontal"
                             Visibility="Collapsed">
                             <Border
                                 Padding="10,4"
@@ -839,16 +877,17 @@
                                 CornerRadius="12">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        Width="14" Height="14"
+                                        Width="14"
+                                        Height="14"
                                         VerticalAlignment="Center"
                                         Foreground="{DynamicResource PrimaryHueMidBrush}"
                                         Kind="Information" />
                                     <TextBlock
                                         x:Name="TxtSearchSummary"
                                         Margin="6,0,0,0"
+                                        VerticalAlignment="Center"
                                         FontSize="12"
-                                        Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                        VerticalAlignment="Center" />
+                                        Foreground="{DynamicResource PrimaryHueMidBrush}" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -864,7 +903,10 @@
                     BorderThickness="0"
                     CornerRadius="12">
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="8" Opacity="0.12" ShadowDepth="1" />
+                        <DropShadowEffect
+                            BlurRadius="8"
+                            Opacity="0.12"
+                            ShadowDepth="1" />
                     </Border.Effect>
                     <DataGrid
                         x:Name="DgDateRange"
@@ -887,9 +929,13 @@
                                 Header="البرنامج">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <StackPanel Margin="8,0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <StackPanel
+                                            Margin="8,0"
+                                            VerticalAlignment="Center"
+                                            Orientation="Horizontal">
                                             <materialDesign:PackIcon
-                                                Width="15" Height="15"
+                                                Width="15"
+                                                Height="15"
                                                 VerticalAlignment="Center"
                                                 Foreground="{DynamicResource PrimaryHueMidBrush}"
                                                 Kind="RadioTower" />

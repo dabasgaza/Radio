@@ -362,5 +362,16 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# Config folders
+.kilo/
+.continue/
+.vscode/
+.vs/
+.cr/
+.cursor/
+.kilocode/
+.gemini/
+
+
 # NUL device file (Windows reserved name)
 nul

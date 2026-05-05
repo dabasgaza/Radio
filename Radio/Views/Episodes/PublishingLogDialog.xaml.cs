@@ -4,8 +4,6 @@ using DataAccess.Services.Messaging;
 using DataAccess.Validation;
 using Domain.Models;
 using MahApps.Metro.Controls;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -150,6 +148,10 @@ namespace Radio.Views.Episodes
             guest.MediaType = GetSelectedMediaType();
 
             // المنصات محفوظة تلقائياً عبر TwoWay Binding
+            // ⚠ لا نطبق NormalizeUrl هنا! لأن تعديل Url سيُنعكس
+            // على الـ TextBox عبر TwoWay Binding فيظهر "https://" في الحقل.
+            // التطبيع يتم فقط عند بناء DTO للحفظ (BtnSaveAll_Click)
+            // أو عند التحقق (GuestPublishingVm.Validate).
 
             // تحديث حالة الضيف والتحقق
             guest.RefreshStatus();
@@ -183,7 +185,11 @@ namespace Radio.Views.Episodes
                 _ => 2 // Both
             };
 
-            // تحميل منصات الضيف
+            // تحميل منصات الضيف (مع إزالة البروتوكول من الروابط للعرض)
+            foreach (var platform in guest.Platforms)
+            {
+                platform.Url = StripProtocol(platform.Url);
+            }
             IcPlatforms.ItemsSource = guest.Platforms;
 
             // عرض أخطاء التحقق إن وجدت
@@ -241,6 +247,100 @@ namespace Radio.Views.Episodes
         }
 
         // ═══════════════════════════════════════════
+        //  معالجة حقل الرابط (بادئة https://)
+        // ═══════════════════════════════════════════
+
+        /// <summary>
+        /// منع المستخدم من كتابة البروتوكول يدوياً في حقل الرابط
+        /// لأن البادئة https:// معروضة كنص ثابت بجانب الحقل
+        /// </summary>
+        private void Url_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (sender is not TextBox textBox) return;
+
+            // حساب النص الناتج بعد الإدخال
+            var newText = textBox.Text.Substring(0, textBox.SelectionStart)
+                + e.Text
+                + textBox.Text.Substring(textBox.SelectionStart + textBox.SelectionLength);
+
+            // إذا بدأ بـ http، نمنع الإدخال (المستخدم يحاول كتابة البروتوكول)
+            if (newText.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                newText.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// معالجة اللصق في حقل الرابط:
+        /// - إذا لصق المستخدم رابطاً كاملاً (https://...) نزيل البروتوكول تلقائياً
+        /// - نعترض Ctrl+V ونضع النص المنظف بدلاً منه
+        /// </summary>
+        private void Url_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.V || !(Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+                return;
+
+            if (sender is not TextBox textBox) return;
+
+            // قراءة النص من الحافظة
+            if (Clipboard.ContainsText())
+            {
+                var pasted = Clipboard.GetText().Trim();
+                var stripped = StripProtocol(pasted);
+
+                if (!string.IsNullOrEmpty(stripped))
+                {
+                    // وضع النص المنظف (بدون البروتوكول) في الحقل
+                    var caretPos = textBox.SelectionStart;
+                    var before = textBox.Text.Substring(0, caretPos);
+                    var after = textBox.Text.Substring(caretPos + textBox.SelectionLength);
+                    textBox.Text = before + stripped + after;
+                    textBox.CaretIndex = before.Length + stripped.Length;
+
+                    // رفع حدث التغيير يدوياً
+                    FormField_Changed(sender, EventArgs.Empty);
+                }
+
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// إزالة بروتوكول http:// أو https:// من الرابط
+        /// لعرضه في حقل الإدخال بدون البروتوكول (لأنه معروض كبادئة ثابتة)
+        /// </summary>
+        private static string? StripProtocol(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return url;
+
+            if (url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                return url["https://".Length..];
+
+            if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                return url["http://".Length..];
+
+            return url;
+        }
+
+        /// <summary>
+        /// دمج بادئة https:// مع إدخال المستخدم للحصول على الرابط الكامل
+        /// يُستخدم عند الحفظ
+        /// </summary>
+        private static string? NormalizeUrl(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return url;
+
+            // إذا كان الرابط يبدأ فعلاً ببروتوكول، أعده كما هو
+            if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                return url;
+
+            // إضافة https:// كبادئة
+            return $"https://{url}";
+        }
+
+        // ═══════════════════════════════════════════
         //  عرض أخطاء التحقق
         // ═══════════════════════════════════════════
 
@@ -284,7 +384,7 @@ namespace Radio.Views.Episodes
                     return;
                 }
 
-                // بناء قائمة DTOs
+                // بناء قائمة DTOs (الروابط مدمج معها https:// عبر NormalizeUrl)
                 var guestLogs = readyGuests.Select(g =>
                 {
                     var duration = BuildDuration(g.DurationMinutes, g.DurationSeconds);
@@ -300,7 +400,7 @@ namespace Radio.Views.Episodes
                             .Select(p => new PlatformPublishDto(
                                 p.SocialMediaPlatformId,
                                 p.PlatformName,
-                                p.Url))
+                                NormalizeUrl(p.Url)))
                             .ToList());
                 }).ToList();
 
@@ -369,136 +469,5 @@ namespace Radio.Views.Episodes
 
             return TimeSpan.FromSeconds(min * 60 + sec);
         }
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    //  ViewModels
-    // ═══════════════════════════════════════════════════════════
-
-    public enum GuestPublishingStatus { Pending, Partial, Ready }
-
-    /// <summary>
-    /// ViewModel لكل ضيف — يحتفظ ببيانات النشر الخاصة به
-    /// بدون فقدان البيانات عند التنقل بين الضيوف
-    /// مع دعم التحقق المركزي عبر ValidationPipeline
-    /// </summary>
-    public class GuestPublishingVm : INotifyPropertyChanged
-    {
-        public int EpisodeGuestId { get; set; }
-        public string FullName { get; set; } = string.Empty;
-        public string? Topic { get; set; }
-
-        private string? _clipTitle;
-        public string? ClipTitle
-        {
-            get => _clipTitle;
-            set { _clipTitle = value; OnPropertyChanged(); }
-        }
-
-        private int? _durationMinutes;
-        public int? DurationMinutes
-        {
-            get => _durationMinutes;
-            set { _durationMinutes = value; OnPropertyChanged(); }
-        }
-
-        private int? _durationSeconds;
-        public int? DurationSeconds
-        {
-            get => _durationSeconds;
-            set { _durationSeconds = value; OnPropertyChanged(); }
-        }
-
-        public MediaType MediaType { get; set; } = MediaType.Both;
-
-        public List<PlatformSelectionVm> Platforms { get; set; } = [];
-
-        private GuestPublishingStatus _status = GuestPublishingStatus.Pending;
-        public GuestPublishingStatus Status
-        {
-            get => _status;
-            set { _status = value; OnPropertyChanged(); }
-        }
-
-        private List<string> _validationErrors = [];
-        public List<string> ValidationErrors
-        {
-            get => _validationErrors;
-            set { _validationErrors = value; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// إعادة حساب حالة الضيف بناءً على البيانات المدخلة
-        /// </summary>
-        public void RefreshStatus()
-        {
-            var hasTitle = !string.IsNullOrWhiteSpace(ClipTitle);
-            var hasPlatform = Platforms.Any(p => p.IsSelected && !string.IsNullOrWhiteSpace(p.Url));
-
-            Status = (hasTitle, hasPlatform) switch
-            {
-                (true, true) => GuestPublishingStatus.Ready,
-                (false, false) => GuestPublishingStatus.Pending,
-                _ => GuestPublishingStatus.Partial
-            };
-        }
-
-        /// <summary>
-        /// تشغيل ValidationPipeline على بيانات الضيف وتخزين الأخطاء
-        /// </summary>
-        public void Validate()
-        {
-            var dto = new SocialMediaPublishingLogDto(
-                0,
-                EpisodeGuestId,
-                ClipTitle,
-                null,
-                MediaType,
-                Platforms
-                    .Where(p => p.IsSelected && !string.IsNullOrWhiteSpace(p.Url))
-                    .Select(p => new PlatformPublishDto(
-                        p.SocialMediaPlatformId,
-                        p.PlatformName,
-                        p.Url))
-                    .ToList());
-
-            var result = ValidationPipeline.ValidatePublishingLog(dto);
-
-            ValidationErrors = result.IsSuccess
-                ? []
-                : result.ErrorMessage!.Split(Environment.NewLine).ToList();
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
-
-    /// <summary>
-    /// ViewModel لكل منصة — يدعم INotifyPropertyChanged للتحديث المباشر
-    /// </summary>
-    public class PlatformSelectionVm : INotifyPropertyChanged
-    {
-        public int SocialMediaPlatformId { get; set; }
-        public string PlatformName { get; set; } = string.Empty;
-        public string PlatformIcon { get; set; } = "ShareVariant";
-
-        private bool _isSelected;
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set { _isSelected = value; OnPropertyChanged(); }
-        }
-
-        private string? _url;
-        public string? Url
-        {
-            get => _url;
-            set { _url = value; OnPropertyChanged(); }
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

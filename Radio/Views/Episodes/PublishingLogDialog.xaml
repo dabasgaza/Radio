@@ -38,12 +38,8 @@
                         Kind="CloudUploadOutline" />
 
                     <StackPanel Grid.Column="1" Margin="16,0">
-                        <TextBlock
-                            Style="{StaticResource Type.TitleLarge.OnColor}"
-                            Text="نشر مقاطع الضيوف على السوشيال ميديا" />
-                        <TextBlock
-                            Style="{StaticResource Type.BodyMedium.OnColor}"
-                            Text="سجّل بيانات النشر الرقمي لكل ضيف مع المنصات والروابط" />
+                        <TextBlock Style="{StaticResource Type.TitleLarge.OnColor}" Text="نشر مقاطع الضيوف على السوشيال ميديا" />
+                        <TextBlock Style="{StaticResource Type.BodyMedium.OnColor}" Text="سجّل بيانات النشر الرقمي لكل ضيف مع المنصات والروابط" />
                     </StackPanel>
 
                     <Button
@@ -223,8 +219,8 @@
                                 materialDesign:HintAssist.Hint="نوع الوسائط *"
                                 materialDesign:TextFieldAssist.LeadingIcon="Multimedia"
                                 SelectedIndex="2"
-                                Style="{StaticResource Input.ComboBox}"
-                                SelectionChanged="FormField_Changed">
+                                SelectionChanged="FormField_Changed"
+                                Style="{StaticResource Input.ComboBox}">
                                 <ComboBoxItem Content="مقطع صوتي" Tag="Audio" />
                                 <ComboBoxItem Content="مقطع مرئي" Tag="Video" />
                                 <ComboBoxItem Content="كلاهما" Tag="Both" />
@@ -284,9 +280,7 @@
                         </Grid>
 
                         <!--  فاصل  -->
-                        <Separator
-                            Margin="0,0,0,16"
-                            Background="{StaticResource DividerBrush}" />
+                        <Separator Margin="0,0,0,16" Background="{StaticResource DividerBrush}" />
 
                         <!--  عنوان قسم المنصات  -->
                         <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
@@ -323,10 +317,10 @@
                                             <CheckBox
                                                 Grid.Row="0"
                                                 Margin="0,0,0,10"
+                                                Checked="FormField_Changed"
                                                 FontSize="14"
                                                 FontWeight="Medium"
                                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                Checked="FormField_Changed"
                                                 Unchecked="FormField_Changed">
                                                 <StackPanel Orientation="Horizontal">
                                                     <materialDesign:PackIcon
@@ -339,15 +333,40 @@
                                                 </StackPanel>
                                             </CheckBox>
 
-                                            <!--  صف 2: حقل الرابط  -->
-                                            <TextBox
-                                                Grid.Row="1"
-                                                materialDesign:HintAssist.Hint="رابط النشر (يجب أن يبدأ بـ https://)"
-                                                materialDesign:TextFieldAssist.LeadingIcon="Link"
-                                                IsEnabled="{Binding IsSelected}"
-                                                Style="{StaticResource Input.Text}"
-                                                Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                TextChanged="FormField_Changed" />
+                                            <!--  صف 2: حقل الرابط مع بادئة https:// ثابتة  -->
+                                            <Grid Grid.Row="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--  بادئة https:// ثابتة غير قابلة للتعديل  -->
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Padding="12,0"
+                                                    VerticalAlignment="Stretch"
+                                                    Background="{StaticResource SurfaceVariantBrush}"
+                                                    BorderBrush="{StaticResource DividerBrush}"
+                                                    BorderThickness="1,1,0,1"
+                                                    CornerRadius="4,0,0,4">
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        FontSize="13"
+                                                        Foreground="{StaticResource TextSecondaryBrush}"
+                                                        Text="https://" />
+                                                </Border>
+
+                                                <!--  حقل إدخال الرابط (بدون البروتوكول)  -->
+                                                <TextBox
+                                                    Grid.Column="1"
+                                                    materialDesign:HintAssist.Hint="youtube.com/watch?v=..."
+                                                    IsEnabled="{Binding IsSelected}"
+                                                    PreviewKeyDown="Url_PreviewKeyDown"
+                                                    PreviewTextInput="Url_PreviewTextInput"
+                                                    Style="{StaticResource Input.Text}"
+                                                    Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    TextChanged="FormField_Changed" />
+                                            </Grid>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -374,7 +393,7 @@
                                 <ItemsControl x:Name="LstValidationMessages">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" Margin="0,3">
+                                            <StackPanel Margin="0,3" Orientation="Horizontal">
                                                 <materialDesign:PackIcon
                                                     Width="16"
                                                     Height="16"

@@ -139,31 +139,29 @@ namespace DataAccess.Validation
                 if (missingUrls.Any())
                     errors.Add($"يرجى إدخال رابط النشر للمنصات التالية: {string.Join("، ", missingUrls)}");
 
+                // التحقق من صحة الروابط — نقبل الروابط مع أو بدون بروتوكول
+                // لأن الواجهة قد تعرض https:// كبادئة ثابتة وتخزن الرابط بدونها
                 var invalidUrls = dto.Platforms
-                    .Where(p => !string.IsNullOrWhiteSpace(p.Url) && !p.Url.StartsWith("http"))
+                    .Where(p => !string.IsNullOrWhiteSpace(p.Url) && !IsValidUrl(p.Url))
                     .Select(p => p.PlatformName)
                     .ToList();
 
                 if (invalidUrls.Any())
-                    errors.Add($"روابط المنصات التالية غير صالحة (يجب أن تبدأ بـ http): {string.Join("، ", invalidUrls)}");
-            }
-
-            // التحقق من المدة
-            if (dto.Duration.HasValue)
-            {
-                if (dto.Duration.Value.TotalSeconds <= 0)
-                    errors.Add("مدة المقطع يجب أن تكون أكبر من صفر.");
-                if (dto.Duration.Value.TotalHours > 12)
-                    errors.Add("مدة المقطع لا يمكن أن تتجاوز 12 ساعة.");
+                    errors.Add($"روابط المنصات التالية غير صالحة: {string.Join("، ", invalidUrls)}");
             }
 
             return BuildResult(errors);
         }
 
+        public static Result ValidatePublishingBatch(List<SocialMediaPublishingLogDto> guestLogs)
+            => ValidatePublishingBatch(guestLogs, null);
+
         /// <summary>
-        /// تحقق دفعي مع دعم أسماء الضيوف — يُستخدم من PublishingLogDialog
+        /// التحقق من دفعة سجلات النشر مع أسماء الضيوف لرسائل خطأ أوضح
         /// </summary>
-        public static Result ValidatePublishingBatch(List<SocialMediaPublishingLogDto> guestLogs, List<string>? guestNames = null)
+        /// <param name="guestLogs">قائمة سجلات النشر</param>
+        /// <param name="guestNames">أسماء الضيوف (اختياري) — تُظهر اسم الضيف بدل رقمه في رسائل الخطأ</param>
+        public static Result ValidatePublishingBatch(List<SocialMediaPublishingLogDto> guestLogs, List<string>? guestNames)
         {
             var errors = new List<string>();
 
@@ -188,21 +186,22 @@ namespace DataAccess.Validation
                     if (log.Platforms != null)
                     {
                         var invalidUrls = log.Platforms
-                            .Where(p => !string.IsNullOrWhiteSpace(p.Url) && !p.Url.StartsWith("http"))
+                            .Where(p => !string.IsNullOrWhiteSpace(p.Url) && !IsValidUrl(p.Url))
                             .Select(p => p.PlatformName)
                             .ToList();
 
                         if (invalidUrls.Any())
-                            errors.Add($"{label}: روابط غير صالحة لـ {string.Join("، ", invalidUrls)} (يجب أن تبدأ بـ http).");
+                            errors.Add($"{label}: روابط غير صالحة لـ {string.Join("، ", invalidUrls)}.");
                     }
 
-                    // التحقق من المدة
+                    // التحقق من المدة (إذا وُجدت)
                     if (log.Duration.HasValue)
                     {
                         if (log.Duration.Value.TotalSeconds <= 0)
-                            errors.Add($"{label}: مدة المقطع يجب أن تكون أكبر من صفر.");
+                            errors.Add($"{label}: المدة يجب أن تكون أكبر من صفر.");
+
                         if (log.Duration.Value.TotalHours > 12)
-                            errors.Add($"{label}: مدة المقطع لا يمكن أن تتجاوز 12 ساعة.");
+                            errors.Add($"{label}: المدة لا يمكن أن تتجاوز 12 ساعة.");
                     }
                 }
             }
@@ -211,6 +210,35 @@ namespace DataAccess.Validation
         }
 
         #region Infrastructure
+
+        /// <summary>
+        /// التحقق من صحة الرابط — يقبل الروابط مع أو بدون بروتوكول
+        /// مثال صالح: "youtube.com/watch?v=..." أو "https://youtube.com/..."
+        /// مثال غير صالح: "hello world" أو "abc"
+        /// </summary>
+        private static bool IsValidUrl(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return false;
+
+            // إزالة البروتوكول إذا وُجد للتحقق من النطاق فقط
+            var clean = url.Trim();
+            if (clean.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                clean = clean["https://".Length..];
+            else if (clean.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                clean = clean["http://".Length..];
+
+            // يجب أن يحتوي على نقطة (نطاق) مثل youtube.com أو youtu.be
+            // ولا يحتوي على مسافات
+            if (clean.Contains(' ')) return false;
+
+            var dotIndex = clean.IndexOf('.');
+            if (dotIndex <= 0) return false;  // لا توجد نقطة أو النقطة في البداية
+
+            // بعد النقطة يجب أن يكون هناك حرف واحد على الأقل (مثل .com, .be)
+            if (dotIndex >= clean.Length - 1) return false;
+
+            return true;
+        }
 
         private static Result BuildResult(List<string> errors)
         {
