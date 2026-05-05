@@ -1,5 +1,6 @@
 ﻿using DataAccess.Common;
 using DataAccess.Services;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Forms;
 using Radio.Messaging;
@@ -111,6 +112,22 @@ namespace Radio
         {
             Environment.Exit(0);
             this.Close();
+        }
+
+        // ═══════════ حماية DialogHost من مشكلة Topmost ═══════════
+        // DialogHost من MaterialDesign يغيّر Topmost مؤقتاً عند فتح الحوار
+        // في بعض الحالات لا يُعيده لـ false — هذه المعالجات تضمن عدم بقاء التطبيق فوق كل شيء
+
+        private void DialogHost_DialogOpened(object sender, DialogOpenedEventArgs e)
+        {
+            // تأكد من أن النافذة ليست Topmost عند فتح أي حوار
+            this.Topmost = false;
+        }
+
+        private void DialogHost_DialogClosing(object sender, DialogClosingEventArgs e)
+        {
+            // تأكد من إعادة Topmost لـ false عند إغلاق أي حوار
+            this.Topmost = false;
         }
 
         private void BtnMinimize_Click(object sender, RoutedEventArgs e)

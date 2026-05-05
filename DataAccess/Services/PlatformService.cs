@@ -14,7 +14,7 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             .AsNoTracking()
             .Where(p => p.IsActive)
             .OrderBy(p => p.Name)
-            .Select(p => new SocialMediaPlatformDto(p.SocialMediaPlatformId, p.Name, p.Icon, p.CreatedAt))
+            .Select(p => new SocialMediaPlatformDto(p.SocialMediaPlatformId, p.Name, p.Icon))
             .ToListAsync();
     }
 

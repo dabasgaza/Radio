@@ -1,15 +1,15 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using MaterialDesignThemes.Wpf;
+using MahApps.Metro.Controls;
 
 namespace Radio.Views.Episodes
 {
-    public partial class EpisodeFormControl : UserControl
+    public partial class EpisodeFormControl : MetroWindow
     {
         private readonly IEpisodeService _episodeService;
         private readonly IProgramService _programService;
@@ -41,6 +41,11 @@ namespace Radio.Views.Episodes
             _employeeService = employeeService;
             _session = session;
             _episodeId = episodeId;
+
+            IsWindowDraggable = true;
+
+            Title = _episodeId.HasValue ? "تعديل بيانات الحلقة" : "جدولة حلقة إذاعية";
+            TxtTitle.Text = _episodeId.HasValue ? "تعديل بيانات الحلقة" : "جدولة حلقة إذاعية";
 
             DgGuests.ItemsSource = GuestList;
             DgCorrespondents.ItemsSource = CorrespondentList;
@@ -193,7 +198,7 @@ namespace Radio.Views.Episodes
                 (int)CbPrograms.SelectedValue,
                 GuestList.Select(g => new EpisodeGuestDto(g.EpisodeGuestId, g.GuestId, g.FullName, g.Topic, g.HostingTime, null)).ToList(),
                 CorrespondentList.Select(c => new EpisodeCorrespondentDto(c.Id, c.CorrespondentId, c.FullName, c.Topic, c.HostingTime)).ToList(),
-                EmployeeList.Select(e => new EpisodeEmployeeDto(0, e.EmployeeId)).ToList(),
+                EmployeeList.Select(emp => new EpisodeEmployeeDto(0, emp.EmployeeId)).ToList(),
                 TxtEpisodeName.Text.Trim(),
                 DpDate.SelectedDate,
                 TpBroadcastTime.SelectedTime?.TimeOfDay,
@@ -209,11 +214,11 @@ namespace Radio.Views.Episodes
                 result = createRes.IsSuccess ? Result.Success() : Result.Fail(createRes.ErrorMessage ?? "خطأ غير معروف");
             }
 
-            if (result.IsSuccess) DialogHost.Close("RootDialog", true);
+            if (result.IsSuccess) DialogResult = true;
             else MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحفظ.");
         }
 
-        private void BtnCancel_Click(object sender, RoutedEventArgs e) => DialogHost.Close("RootDialog", false);
+        private void BtnCancel_Click(object sender, RoutedEventArgs e) => DialogResult = false;
 
         // ── نماذج البيانات الداخلية (ViewModels) ──────────────────
 

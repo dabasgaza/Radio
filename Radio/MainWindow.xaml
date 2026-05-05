@@ -54,7 +54,10 @@
         </Style>
     </mah:MetroWindow.Resources>
 
-    <materialDesign:DialogHost Identifier="RootDialog">
+    <materialDesign:DialogHost
+        Identifier="RootDialog"
+        DialogClosing="DialogHost_DialogClosing"
+        DialogOpened="DialogHost_DialogOpened">
         <DockPanel>
             <!--  ═══════════ الشريط السفلي (Bottom Dock) ═══════════  -->
             <Border

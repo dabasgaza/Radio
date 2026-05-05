@@ -3,13 +3,13 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
-using MaterialDesignThemes.Wpf;
+using MahApps.Metro.Controls;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace Radio.Views.Publishing
 {
-    public partial class WebsitePublishDialog : UserControl
+    public partial class WebsitePublishDialog : MetroWindow
     {
         private readonly IPublishingService _publishingService;
         private readonly UserSession _session;
@@ -23,6 +23,9 @@ namespace Radio.Views.Publishing
             _publishingService = publishingService;
             _session = session;
             _episodeId = episodeId;
+
+            IsWindowDraggable = true;
+
             Loaded += (_, _) => InitializeForm();
         }
 
@@ -80,7 +83,7 @@ namespace Radio.Views.Publishing
                 if (result.IsSuccess)
                 {
                     MessageService.Current.ShowSuccess("تم نشر الحلقة على الموقع بنجاح");
-                    DialogHost.Close("RootDialog", true);
+                    DialogResult = true;
                 }
                 else
                 {
@@ -94,6 +97,6 @@ namespace Radio.Views.Publishing
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
-            => DialogHost.Close("RootDialog", false);
+            => DialogResult = false;
     }
 }

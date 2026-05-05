@@ -93,7 +93,7 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
                 {
                     EpisodeGuestId = g.EpisodeGuestId,
                     PublishedByUserId = session.UserId,
-                    MediaType = MediaType.Both, // سيتم تحديثه لاحقاً من الواجهة
+                    MediaType = g.MediaType,
                     ClipTitle = g.ClipTitle,
                     ClipDuration = g.Duration,
                     PublishedAt = now
@@ -163,13 +163,11 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
             var log = new SocialMediaPublishingLog
             {
                 EpisodeGuestId = dto.EpisodeGuestId,
+                MediaType = dto.MediaType,
                 ClipTitle = dto.ClipTitle,
                 ClipDuration = dto.Duration,
                 PublishedAt = DateTime.UtcNow,
-                PublishedByUserId = session.UserId,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                PublishedByUserId = session.UserId
             };
 
             context.SocialMediaPublishingLogs.Add(log);
@@ -182,10 +180,7 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
                 {
                     SocialMediaPublishingLogId = log.SocialMediaPublishingLogId,
                     SocialMediaPlatformId = platform.PlatformId,
-                    Url = platform.Url,
-                    IsActive = true,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    Url = platform.Url
                 };
                 context.SocialMediaPublishingLogPlatforms.Add(platformLink);
             }

@@ -15,8 +15,6 @@ public partial class SocialPlatformsView : UserControl
     private readonly IPlatformService _service;
     private readonly UserSession _session;
     private List<SocialMediaPlatformDto> _allItems = [];
-    private bool _isEditing;
-    private int _editingId;
 
     public SocialPlatformsView(IPlatformService service, UserSession session)
     {
@@ -33,6 +31,7 @@ public partial class SocialPlatformsView : UserControl
         {
             _allItems = await _service.GetAllActiveAsync();
             ApplySearchFilter();
+            UpdateStats();
         }
         finally
         {
@@ -48,91 +47,38 @@ public partial class SocialPlatformsView : UserControl
             : _allItems.Where(x => x.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
-    private void ShowForm(string title, SocialMediaPlatformDto? dto = null)
+    private void UpdateStats()
     {
-        TxtFormTitle.Text = title;
-        TxtName.Text = dto?.Name ?? string.Empty;
-        TxtIcon.Text = dto?.Icon ?? string.Empty;
-        _isEditing = dto != null;
-        _editingId = dto?.SocialMediaPlatformId ?? 0;
-        FormBorder.Visibility = Visibility.Visible;
-        TxtName.Focus();
-    }
-
-    private void HideForm()
-    {
-        FormBorder.Visibility = Visibility.Collapsed;
-        TxtName.Clear();
-        TxtIcon.Clear();
-        _isEditing = false;
-        _editingId = 0;
+        TxtTotal.Text = _allItems.Count.ToString();
     }
 
     private async void BtnAddNew_Click(object sender, RoutedEventArgs e)
     {
-        ShowForm("إضافة منصة جديدة");
+        var dialog = new SocialPlatformFormDialog(null, _service, _session);
+        if (dialog.ShowDialog() == true)
+        {
+            await LoadDataAsync();
+        }
     }
 
     private async void BtnEdit_Click(object sender, RoutedEventArgs e)
     {
         if (((FrameworkElement)sender).Tag is not SocialMediaPlatformDto dto) return;
-        ShowForm("تعديل بيانات المنصة", dto);
-    }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(TxtName.Text))
+        var dialog = new SocialPlatformFormDialog(dto, _service, _session);
+        if (dialog.ShowDialog() == true)
         {
-            MessageService.Current.ShowWarning("يرجى إدخال اسم المنصة.");
-            return;
+            await LoadDataAsync();
         }
-
-        var dto = new SocialMediaPlatformDto(
-            _isEditing ? _editingId : 0,
-            TxtName.Text.Trim(),
-            string.IsNullOrWhiteSpace(TxtIcon.Text) ? null : TxtIcon.Text.Trim());
-
-        if (_isEditing)
-        {
-            var response = await _service.UpdateAsync(dto, _session);
-            if (response.IsSuccess)
-            {
-                HideForm();
-                await LoadDataAsync();
-                MessageService.Current.ShowSuccess("تم تحديث المنصة بنجاح.");
-            }
-            else
-            {
-                MessageService.Current.ShowError(response.ErrorMessage);
-            }
-        }
-        else
-        {
-            var response = await _service.CreateAsync(dto, _session);
-            if (response.IsSuccess)
-            {
-                HideForm();
-                await LoadDataAsync();
-                MessageService.Current.ShowSuccess("تم إضافة المنصة بنجاح.");
-            }
-            else
-            {
-                MessageService.Current.ShowError(response.ErrorMessage);
-            }
-        }
-    }
-
-    private void BtnCancel_Click(object sender, RoutedEventArgs e)
-    {
-        HideForm();
     }
 
     private async void BtnDelete_Click(object sender, RoutedEventArgs e)
     {
         if (((FrameworkElement)sender).Tag is not SocialMediaPlatformDto dto) return;
 
-        var confirm = await MessageService.Current.ShowConfirmationAsync($"هل أنت متأكد من حذف المنصة \"{dto.Name}\"?",
-            "تأكيد");
+        var confirm = await MessageService.Current.ShowConfirmationAsync(
+            $"هل أنت متأكد من حذف المنصة \"{dto.Name}\"?",
+            "تأكيد الحذف");
 
         if (confirm)
         {
@@ -144,7 +90,7 @@ public partial class SocialPlatformsView : UserControl
             }
             else
             {
-                MessageService.Current.ShowError(response.ErrorMessage);
+                MessageService.Current.ShowError(response.ErrorMessage ?? "تعذر حذف المنصة.");
             }
         }
     }

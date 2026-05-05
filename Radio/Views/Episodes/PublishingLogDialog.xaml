@@ -1,12 +1,17 @@
-<UserControl
+<mah:MetroWindow
     x:Class="Radio.Views.Episodes.PublishingLogDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Width="860"
-    Height="700"
-    Style="{StaticResource View.Base}">
+    Title="نشر مقاطع الضيوف"
+    Width="900"
+    Height="720"
+    Style="{StaticResource Window.Dialog}"
+    WindowStartupLocation="CenterOwner">
+
     <materialDesign:Card
+        Margin="30"
         Background="{StaticResource SurfaceBrush}"
         Effect="{StaticResource Shadow.Dialog}"
         UniformCornerRadius="16">
@@ -17,140 +22,437 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!--  Header  -->
+            <!--  ═══════ Header ═══════  -->
             <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
-                <TextBlock
-                    Margin="16,0"
-                    FontSize="18"
-                    FontWeight="Bold"
-                    Text="نشر مقاطع الضيوف على السوشيال ميديا" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <materialDesign:PackIcon
+                        Width="32"
+                        Height="32"
+                        VerticalAlignment="Center"
+                        Kind="CloudUploadOutline" />
+
+                    <StackPanel Grid.Column="1" Margin="16,0">
+                        <TextBlock
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="نشر مقاطع الضيوف على السوشيال ميديا" />
+                        <TextBlock
+                            Style="{StaticResource Type.BodyMedium.OnColor}"
+                            Text="سجّل بيانات النشر الرقمي لكل ضيف مع المنصات والروابط" />
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="2"
+                        Click="BtnClose_Click"
+                        Foreground="White"
+                        Opacity="0.6"
+                        Style="{StaticResource MaterialDesignIconButton}">
+                        <materialDesign:PackIcon Kind="Close" />
+                    </Button>
+                </Grid>
             </materialDesign:ColorZone>
 
-            <!--  Content Grid: Guests List + Platform Selection  -->
-            <Grid Grid.Row="1" Margin="16">
+            <!--  ═══════ Content ═══════  -->
+            <Grid Grid.Row="1" Margin="24,20">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="240" />
+                    <ColumnDefinition Width="260" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!--  قائمة الضيوف على اليسار  -->
+                <!--  ═══════ العمود الأيسر: قائمة الضيوف مع حالة النشر ═══════  -->
                 <Border
                     Grid.Column="0"
-                    Margin="0,0,16,0"
-                    BorderBrush="#E0E0E0"
-                    BorderThickness="0,0,1,0">
-                    <StackPanel>
-                        <TextBlock
-                            Margin="0,0,0,12"
-                            FontSize="14"
-                            FontWeight="Bold"
-                            Text="الضيوف" />
+                    Margin="0,0,20,0"
+                    Padding="0"
+                    Background="{StaticResource SurfaceVariantBrush}"
+                    CornerRadius="12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!--  عنوان القائمة  -->
+                        <Border
+                            Padding="16,14"
+                            Background="{StaticResource PrimaryXLightBrush}"
+                            CornerRadius="12,12,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="20"
+                                    Height="20"
+                                    VerticalAlignment="Center"
+                                    Foreground="{StaticResource PrimaryMainBrush}"
+                                    Kind="AccountGroupOutline" />
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource PrimaryMainBrush}"
+                                    Text="قائمة الضيوف" />
+                            </StackPanel>
+                        </Border>
+
+                        <!--  قائمة الضيوف  -->
                         <ListBox
                             x:Name="LstGuests"
+                            Grid.Row="1"
                             Background="Transparent"
                             BorderThickness="0"
                             SelectionChanged="LstGuests_SelectionChanged">
+                            <ListBox.ItemContainerStyle>
+                                <Style BasedOn="{StaticResource MaterialDesignListBoxItem}" TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="12,8" />
+                                    <Setter Property="Margin" Value="4,2" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </ListBox.ItemContainerStyle>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Margin="0,8" Text="{Binding FullName}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--  أيقونة الحالة  -->
+                                        <materialDesign:PackIcon
+                                            Width="18"
+                                            Height="18"
+                                            VerticalAlignment="Center"
+                                            Kind="CircleMedium">
+                                            <materialDesign:PackIcon.Style>
+                                                <Style TargetType="materialDesign:PackIcon">
+                                                    <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Ready">
+                                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Partial">
+                                                            <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </materialDesign:PackIcon.Style>
+                                        </materialDesign:PackIcon>
+
+                                        <!--  اسم الضيف  -->
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Margin="8,0"
+                                            VerticalAlignment="Center"
+                                            FontSize="13"
+                                            Text="{Binding FullName}"
+                                            TextTrimming="CharacterEllipsis" />
+
+                                        <!--  شارة الحالة  -->
+                                        <Border
+                                            Grid.Column="2"
+                                            Padding="8,2"
+                                            VerticalAlignment="Center"
+                                            CornerRadius="4">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="Transparent" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Ready">
+                                                            <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Partial">
+                                                            <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock FontSize="10" FontWeight="Medium">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
+                                                        <Setter Property="Text" Value="انتظار" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Ready">
+                                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                                <Setter Property="Text" Value="جاهز" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Partial">
+                                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                                                <Setter Property="Text" Value="ناقص" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+                                    </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                    </StackPanel>
+                    </Grid>
                 </Border>
 
-                <!--  منصات النشر على اليمين  -->
-                <StackPanel Grid.Column="1" Margin="16,0,0,0">
-                    <!--  عنوان المقطع  -->
-                    <TextBlock
-                        Margin="0,0,0,8"
-                        FontSize="12"
-                        FontWeight="Bold"
-                        Foreground="#616161"
-                        Text="عنوان المقطع" />
-                    <TextBox
-                        x:Name="TxtClipTitle"
-                        Height="40"
-                        Margin="0,0,0,24"
-                        materialDesign:HintAssist.Hint="أدخل عنوان المقطع"
-                        Style="{StaticResource Input.Text}" />
+                <!--  ═══════ العمود الأيمن: بيانات النشر للضيف المحدد ═══════  -->
+                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="PnlGuestForm" IsEnabled="False">
 
-                    <!--  مدة المقطع  -->
-                    <TextBlock
-                        Margin="0,12,0,8"
-                        FontSize="12"
-                        FontWeight="Bold"
-                        Foreground="#616161"
-                        Text="مدة المقطع (دقيقة:ثانية)" />
-                    <TextBox
-                        x:Name="TxtDuration"
-                        Height="40"
-                        Margin="0,0,0,24"
-                        materialDesign:HintAssist.Hint="مثال: 05:30"
-                        Style="{StaticResource Input.Text}" />
+                        <!--  صف: عنوان المقطع + نوع الوسائط  -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
 
-                    <!--  المنصات  -->
-                    <TextBlock
-                        Margin="0,12,0,12"
-                        FontSize="14"
-                        FontWeight="Bold"
-                        Text="منصات النشر" />
-                    <ScrollViewer MaxHeight="350" VerticalScrollBarVisibility="Auto">
+                            <TextBox
+                                x:Name="TxtClipTitle"
+                                Grid.Column="0"
+                                materialDesign:HintAssist.Hint="عنوان المقطع *"
+                                materialDesign:TextFieldAssist.LeadingIcon="RenameBox"
+                                Style="{StaticResource Input.Text}"
+                                TextChanged="FormField_Changed" />
+
+                            <ComboBox
+                                x:Name="CmbMediaType"
+                                Grid.Column="2"
+                                materialDesign:HintAssist.Hint="نوع الوسائط *"
+                                materialDesign:TextFieldAssist.LeadingIcon="Multimedia"
+                                SelectedIndex="2"
+                                Style="{StaticResource Input.ComboBox}"
+                                SelectionChanged="FormField_Changed">
+                                <ComboBoxItem Content="مقطع صوتي" Tag="Audio" />
+                                <ComboBoxItem Content="مقطع مرئي" Tag="Video" />
+                                <ComboBoxItem Content="كلاهما" Tag="Both" />
+                            </ComboBox>
+                        </Grid>
+
+                        <!--  صف: مدة المقطع  -->
+                        <TextBlock
+                            Margin="0,0,0,8"
+                            FontSize="13"
+                            Foreground="{StaticResource TextHintBrush}"
+                            Text="مدة المقطع" />
+                        <Grid Margin="0,0,0,24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox
+                                x:Name="TxtMinutes"
+                                HorizontalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="دقائق"
+                                MaxLength="3"
+                                PreviewTextInput="TxtDuration_PreviewTextInput"
+                                Style="{StaticResource Input.Text}"
+                                TextChanged="FormField_Changed" />
+
+                            <TextBlock
+                                Grid.Column="1"
+                                Margin="8,0"
+                                VerticalAlignment="Center"
+                                FontSize="20"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource TextHintBrush}"
+                                Text=":" />
+
+                            <TextBox
+                                x:Name="TxtSeconds"
+                                Grid.Column="2"
+                                HorizontalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="ثوانٍ"
+                                MaxLength="2"
+                                PreviewTextInput="TxtDuration_PreviewTextInput"
+                                Style="{StaticResource Input.Text}"
+                                TextChanged="FormField_Changed" />
+
+                            <TextBlock
+                                Grid.Column="3"
+                                Margin="12,0"
+                                VerticalAlignment="Center"
+                                FontSize="12"
+                                Foreground="{StaticResource TextDisabledBrush}"
+                                Text="اتركهما فارغين إن لم تكن المدة معروفة"
+                                TextWrapping="Wrap" />
+                        </Grid>
+
+                        <!--  فاصل  -->
+                        <Separator
+                            Margin="0,0,0,16"
+                            Background="{StaticResource DividerBrush}" />
+
+                        <!--  عنوان قسم المنصات  -->
+                        <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="20"
+                                Height="20"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource PrimaryMainBrush}"
+                                Kind="ShareVariant" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="منصات النشر" />
+                        </StackPanel>
+
+                        <!--  بطاقات المنصات  -->
                         <ItemsControl x:Name="IcPlatforms">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border
-                                        Padding="0,12"
-                                        BorderBrush="#F0F0F0"
-                                        BorderThickness="0,0,0,1">
+                                        Margin="0,0,0,12"
+                                        Padding="16,14"
+                                        Background="{StaticResource SurfaceVariantBrush}"
+                                        CornerRadius="10">
                                         <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="160" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
 
-                                            <!--  CheckBox للمنصة  -->
+                                            <!--  صف 1: أيقونة المنصة + اسمها + CheckBox  -->
                                             <CheckBox
-                                                Grid.Column="0"
-                                                VerticalAlignment="Center"
-                                                Content="{Binding PlatformName}"
-                                                FontSize="12"
-                                                IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                                Grid.Row="0"
+                                                Margin="0,0,0,10"
+                                                FontSize="14"
+                                                FontWeight="Medium"
+                                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                Checked="FormField_Changed"
+                                                Unchecked="FormField_Changed">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <materialDesign:PackIcon
+                                                        Width="20"
+                                                        Height="20"
+                                                        Margin="0,0,8,0"
+                                                        VerticalAlignment="Center"
+                                                        Kind="{Binding PlatformIcon, TargetNullValue=ShareVariant, FallbackValue=ShareVariant}" />
+                                                    <TextBlock VerticalAlignment="Center" Text="{Binding PlatformName}" />
+                                                </StackPanel>
+                                            </CheckBox>
 
-                                            <!--  TextBox للرابط  -->
+                                            <!--  صف 2: حقل الرابط  -->
                                             <TextBox
-                                                Grid.Column="1"
-                                                Height="36"
-                                                Margin="12,0,0,0"
-                                                materialDesign:HintAssist.Hint="رابط النشر"
+                                                Grid.Row="1"
+                                                materialDesign:HintAssist.Hint="رابط النشر (يجب أن يبدأ بـ https://)"
+                                                materialDesign:TextFieldAssist.LeadingIcon="Link"
                                                 IsEnabled="{Binding IsSelected}"
                                                 Style="{StaticResource Input.Text}"
-                                                Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                TextChanged="FormField_Changed" />
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </ScrollViewer>
-                </StackPanel>
+
+                        <!--  ═══════ لوحة أخطاء التحقق ═══════  -->
+                        <Border
+                            x:Name="PnlValidationErrors"
+                            Margin="0,16,0,0"
+                            Padding="16,12"
+                            Background="#FFFDE7"
+                            BorderBrush="#FFB300"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock
+                                    x:Name="LblValidationHeader"
+                                    Margin="0,0,0,8"
+                                    FontSize="13"
+                                    FontWeight="SemiBold"
+                                    Foreground="#E65100" />
+                                <ItemsControl x:Name="LstValidationMessages">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="0,3">
+                                                <materialDesign:PackIcon
+                                                    Width="16"
+                                                    Height="16"
+                                                    Margin="0,0,6,0"
+                                                    VerticalAlignment="Center"
+                                                    Foreground="#E65100"
+                                                    Kind="AlertCircleOutline" />
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="12"
+                                                    Foreground="#BF360C"
+                                                    Text="{Binding}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
             </Grid>
 
-            <!--  Footer  -->
+            <!--  ═══════ Footer ═══════  -->
             <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
-                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                    <Button
-                        Margin="0,0,8,0"
-                        Padding="16,8"
-                        Click="BtnClose_Click"
-                        Content="إغلاق"
-                        Style="{StaticResource Btn.Cancel}" />
-                    <Button
-                        Padding="16,8"
-                        Click="BtnSave_Click"
-                        Content="حفظ النشر"
-                        Style="{StaticResource Btn.Primary}" />
-                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  ملخص الحالة  -->
+                    <StackPanel
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="18"
+                            Height="18"
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextHintBrush}"
+                            Kind="InformationOutline" />
+                        <TextBlock
+                            x:Name="TxtStatusSummary"
+                            Margin="8,0"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            Text="" />
+                    </StackPanel>
+
+                    <!--  أزرار الإجراءات  -->
+                    <StackPanel
+                        Grid.Column="2"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                        <Button
+                            Margin="0,0,12,0"
+                            Click="BtnClose_Click"
+                            Content="إلغاء"
+                            IsCancel="True"
+                            Style="{StaticResource Btn.Cancel}" />
+                        <Button
+                            x:Name="BtnSaveAll"
+                            Click="BtnSaveAll_Click"
+                            Style="{StaticResource Btn.Primary}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon VerticalAlignment="Center" Kind="ContentSaveAllOutline" />
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Text="حفظ الكل" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
     </materialDesign:Card>
-</UserControl>
+</mah:MetroWindow>

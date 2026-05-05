@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Radio.Views.Common;
 using System.Windows;
 using System.Windows.Controls;
-using MaterialDesignThemes.Wpf;
 using Radio.Views.Publishing;
 
 namespace Radio.Views.Episodes
@@ -78,18 +77,22 @@ namespace Radio.Views.Episodes
 
         private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
-            var view = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session);
-            var result = await DialogHost.Show(view, "RootDialog");
-            if (result is true) await LoadDataAsync();
+            var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            if (dialog.ShowDialog() == true) await LoadDataAsync();
         }
 
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var view = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session, ep.EpisodeId);
-                var result = await DialogHost.Show(view, "RootDialog");
-                if (result is true) await LoadDataAsync();
+                var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session, ep.EpisodeId)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                if (dialog.ShowDialog() == true) await LoadDataAsync();
             }
         }
 
@@ -110,7 +113,10 @@ namespace Radio.Views.Episodes
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
                 var execService = _serviceProvider.GetRequiredService<IExecutionService>();
-                var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
+                var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session)
+                {
+                    Owner = Window.GetWindow(this)
+                };
                 if (dialog.ShowDialog() == true) await LoadDataAsync();
             }
         }
@@ -121,9 +127,11 @@ namespace Radio.Views.Episodes
             {
                 var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
                 var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
-                var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests);
-                var result = await DialogHost.Show(dialog, "RootDialog");
-                if (result is true) await LoadDataAsync();
+                var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                if (dialog.ShowDialog() == true) await LoadDataAsync();
             }
         }
 
@@ -132,9 +140,11 @@ namespace Radio.Views.Episodes
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
                 var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
-                var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId);
-                var result = await DialogHost.Show(dialog, "RootDialog");
-                if (result is true) await LoadDataAsync();
+                var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                if (dialog.ShowDialog() == true) await LoadDataAsync();
             }
         }
 
@@ -142,7 +152,10 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var reasonDialog = new ReasonInputDialog("تراجع", "السبب:");
+                var reasonDialog = new ReasonInputDialog("تراجع", "السبب:")
+                {
+                    Owner = Window.GetWindow(this)
+                };
                 if (reasonDialog.ShowDialog() == true)
                 {
                     var res = await _episodeService.RevertEpisodeStatusAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
@@ -155,7 +168,10 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var reasonDialog = new ReasonInputDialog("إلغاء", "السبب:");
+                var reasonDialog = new ReasonInputDialog("إلغاء", "السبب:")
+                {
+                    Owner = Window.GetWindow(this)
+                };
                 if (reasonDialog.ShowDialog() == true)
                 {
                     var res = await _episodeService.CancelEpisodeAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
@@ -168,7 +184,10 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var reasonDialog = new ReasonInputDialog("تعديل سبب الإلغاء", "السبب:", ep.CancellationReason);
+                var reasonDialog = new ReasonInputDialog("تعديل سبب الإلغاء", "السبب:", ep.CancellationReason)
+                {
+                    Owner = Window.GetWindow(this)
+                };
                 if (reasonDialog.ShowDialog() == true)
                 {
                     var res = await _episodeService.UpdateCancellationReasonAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
