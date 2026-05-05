@@ -372,6 +372,9 @@ FodyWeavers.xsd
 .kilocode/
 .gemini/
 ..kilocode/skills/
+.github/
+
 
 # NUL device file (Windows reserved name)
 nul
+/.github
