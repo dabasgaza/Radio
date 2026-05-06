@@ -81,7 +81,12 @@ namespace Radio.Views.Episodes
             {
                 Owner = Window.GetWindow(this)
             };
-            if (dialog.ShowDialog() == true) await LoadDataAsync();
+            if (dialog.ShowDialog() == true)
+            {
+                await LoadDataAsync();
+                MessageService.Current.ShowSuccess("تم جدولة الحلقة بنجاح.");
+            }
+
         }
 
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
@@ -92,7 +97,12 @@ namespace Radio.Views.Episodes
                 {
                     Owner = Window.GetWindow(this)
                 };
-                if (dialog.ShowDialog() == true) await LoadDataAsync();
+                if (dialog.ShowDialog() == true)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess("تم تحديث بيانات الحلقة بنجاح.");
+                }
+
             }
         }
 
@@ -103,7 +113,13 @@ namespace Radio.Views.Episodes
                 if (await MessageService.Current.ShowConfirmationAsync($"حذف {selectedEpisode.EpisodeName}؟", "تأكيد"))
                 {
                     var res = await _episodeService.DeleteEpisodeAsync(selectedEpisode.EpisodeId, _session);
-                    if (res.IsSuccess) await LoadDataAsync();
+                    if (res.IsSuccess)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess($"تم حذف الحلقة «{selectedEpisode.EpisodeName}» بنجاح.");
+                    }
+                    else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل الحذف.");
+
                 }
             }
         }
@@ -113,11 +129,13 @@ namespace Radio.Views.Episodes
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
                 var execService = _serviceProvider.GetRequiredService<IExecutionService>();
-                var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session)
+                var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
+                if (dialog.ShowDialog() == true)
                 {
-                    Owner = Window.GetWindow(this)
-                };
-                if (dialog.ShowDialog() == true) await LoadDataAsync();
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
+                }
+
             }
         }
 
@@ -131,7 +149,12 @@ namespace Radio.Views.Episodes
                 {
                     Owner = Window.GetWindow(this)
                 };
-                if (dialog.ShowDialog() == true) await LoadDataAsync();
+                if (dialog.ShowDialog() == true)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess("تم تسجيل النشر الرقمي بنجاح.");
+                }
+
             }
         }
 
@@ -144,7 +167,37 @@ namespace Radio.Views.Episodes
                 {
                     Owner = Window.GetWindow(this)
                 };
-                if (dialog.ShowDialog() == true) await LoadDataAsync();
+                if (dialog.ShowDialog() == true)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess("تم نشر الحلقة على الموقع بنجاح.");
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// عرض سجلات الحلقة — يفتح نافذة EpisodeRecordsView التي تعرض
+        /// سجل التنفيذ والنشر الرقمي ونشر الموقع مع أزرار تعديل
+        /// </summary>
+        private void BtnViewRecords_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
+            {
+                var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
+                var executionService = _serviceProvider.GetRequiredService<IExecutionService>();
+
+                var dialog = new EpisodeRecordsView(
+                    publishingService,
+                    executionService,
+                    _session,
+                    _serviceProvider,
+                    ep.EpisodeId,
+                    ep.EpisodeName ?? string.Empty)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                dialog.ShowDialog();
             }
         }
 
@@ -152,14 +205,17 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var reasonDialog = new ReasonInputDialog("تراجع", "السبب:")
-                {
-                    Owner = Window.GetWindow(this)
-                };
+                var reasonDialog = new ReasonInputDialog("تراجع", "السبب:");
                 if (reasonDialog.ShowDialog() == true)
                 {
                     var res = await _episodeService.RevertEpisodeStatusAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
-                    if (res.IsSuccess) await LoadDataAsync();
+                    if (res.IsSuccess)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess("تم التراجع عن الحالة بنجاح.");
+                    }
+                    else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل التراجع.");
+
                 }
             }
         }
@@ -168,14 +224,17 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var reasonDialog = new ReasonInputDialog("إلغاء", "السبب:")
-                {
-                    Owner = Window.GetWindow(this)
-                };
+                var reasonDialog = new ReasonInputDialog("إلغاء", "السبب:");
                 if (reasonDialog.ShowDialog() == true)
                 {
                     var res = await _episodeService.CancelEpisodeAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
-                    if (res.IsSuccess) await LoadDataAsync();
+                    if (res.IsSuccess)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess("تم إلغاء الحلقة بنجاح.");
+                    }
+                    else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل الإلغاء.");
+
                 }
             }
         }
@@ -184,14 +243,17 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var reasonDialog = new ReasonInputDialog("تعديل سبب الإلغاء", "السبب:", ep.CancellationReason)
-                {
-                    Owner = Window.GetWindow(this)
-                };
+                var reasonDialog = new ReasonInputDialog("تعديل سبب الإلغاء", "السبب:", ep.CancellationReason);
                 if (reasonDialog.ShowDialog() == true)
                 {
                     var res = await _episodeService.UpdateCancellationReasonAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
-                    if (res.IsSuccess) await LoadDataAsync();
+                    if (res.IsSuccess)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess("تم تحديث سبب الإلغاء بنجاح.");
+                    }
+                    else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل تحديث السبب.");
+
                 }
             }
         }

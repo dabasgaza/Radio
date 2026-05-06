@@ -7,9 +7,16 @@ using MahApps.Metro.Controls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Radio.Messaging;
+
 
 namespace Radio.Views.Episodes
 {
+    /// <summary>
+    /// نافذة نشر/تعديل مقاطع الضيوف على السوشيال ميديا — تدعم وضعين:
+    ///   1. إنشاء جديد: تُنشئ سجلات نشر وتحوّل الحلقة إلى "منشورة رقمياً"
+    ///   2. تعديل موجود: تُحدّث بيانات السجلات دون تغيير حالة الحلقة
+    /// </summary>
     public partial class PublishingLogDialog : MetroWindow
     {
         private readonly IPublishingService _publishingService;
@@ -20,11 +27,39 @@ namespace Radio.Views.Episodes
         private bool _isUpdatingSelection;
         private bool _isDataLoaded;
 
+        /// <summary>
+        /// سجلات النشر الموجودة — null يعني وضع إنشاء جديد
+        /// في وضع التعديل، تحتوي على بيانات النشر السابقة لكل ضيف
+        /// </summary>
+        private readonly List<SocialMediaPublishingLogDto>? _existingLogs;
+
+        /// <summary>
+        /// هل نحن في وضع التعديل؟
+        /// </summary>
+        private bool IsEditMode => _existingLogs is not null;
+
+        /// <summary>
+        /// وضع إنشاء جديد — يُنشئ سجلات نشر ويحوّل الحلقة إلى "منشورة رقمياً"
+        /// </summary>
         public PublishingLogDialog(
             IPublishingService publishingService,
             UserSession session,
             int episodeId,
             List<EpisodeGuestDto> guests)
+            : this(publishingService, session, episodeId, guests, null)
+        {
+        }
+
+        /// <summary>
+        /// وضع التعديل — يُحدّث سجلات النشر الموجودة دون تغيير حالة الحلقة
+        /// إذا مُرّر existingLogs = null يعمل كوضع إنشاء جديد
+        /// </summary>
+        public PublishingLogDialog(
+            IPublishingService publishingService,
+            UserSession session,
+            int episodeId,
+            List<EpisodeGuestDto> guests,
+            List<SocialMediaPublishingLogDto>? existingLogs)
         {
             InitializeComponent();
 
@@ -36,9 +71,9 @@ namespace Radio.Views.Episodes
             _publishingService = publishingService;
             _session = session;
             _episodeId = episodeId;
+            _existingLogs = existingLogs;
 
             IsWindowDraggable = true;
-
             Loaded += async (_, _) => await LoadAsync(guests);
         }
 
@@ -62,19 +97,43 @@ namespace Radio.Views.Episodes
                 }).ToList();
 
                 // إنشاء ViewModel لكل ضيف مع نسخة مستقلة من المنصات
-                _guestVms = (guests ?? []).Select(g => new GuestPublishingVm
+                // في وضع التعديل: ندمج البيانات المحفوظة مسبقاً مع قالب المنصات
+                _guestVms = (guests ?? []).Select(g =>
                 {
-                    EpisodeGuestId = g.EpisodeGuestId,
-                    FullName = g.FullName,
-                    Topic = g.Topic,
-                    Platforms = _platformTemplates.Select(pt => new PlatformSelectionVm
+                    // البحث عن سجل موجود لهذا الضيف (في وضع التعديل)
+                    var existingLog = _existingLogs?
+                        .FirstOrDefault(l => l.EpisodeGuestId == g.EpisodeGuestId);
+
+                    return new GuestPublishingVm
                     {
-                        SocialMediaPlatformId = pt.SocialMediaPlatformId,
-                        PlatformName = pt.PlatformName,
-                        PlatformIcon = pt.PlatformIcon,
-                        IsSelected = false,
-                        Url = string.Empty
-                    }).ToList()
+                        EpisodeGuestId = g.EpisodeGuestId,
+                        FullName = g.FullName,
+                        Topic = g.Topic,
+
+                        // تعبئة البيانات من السجل الموجود إن وُجد
+                        ClipTitle = existingLog?.ClipTitle,
+                        DurationMinutes = existingLog?.Duration?.Minutes,
+                        DurationSeconds = existingLog?.Duration?.Seconds,
+                        MediaType = existingLog?.MediaType ?? MediaType.Both,
+
+                        // دمج المنصات: المنصات المحددة سابقاً مع روابطها + المنصات غير المحددة
+                        Platforms = _platformTemplates.Select(pt =>
+                        {
+                            var existingPlatform = existingLog?.Platforms
+                                .FirstOrDefault(p => p.PlatformId == pt.SocialMediaPlatformId);
+
+                            return new PlatformSelectionVm
+                            {
+                                SocialMediaPlatformId = pt.SocialMediaPlatformId,
+                                PlatformName = pt.PlatformName,
+                                PlatformIcon = pt.PlatformIcon,
+                                IsSelected = existingPlatform is not null,
+                                Url = existingPlatform is not null
+                                    ? StripProtocol(existingPlatform.Url)
+                                    : string.Empty
+                            };
+                        }).ToList()
+                    };
                 }).ToList();
 
                 LstGuests.ItemsSource = _guestVms;
@@ -89,8 +148,22 @@ namespace Radio.Views.Episodes
                 _isDataLoaded = true;
                 _isUpdatingSelection = false;
 
+                // تحديث حالة كل ضيف بناءً على البيانات المحفوظة
+                foreach (var guest in _guestVms)
+                {
+                    guest.RefreshStatus();
+                    guest.Validate();
+                }
+
                 LstGuests.SelectedIndex = 0;
                 UpdateStatusSummary();
+
+                // تحويل المظهر إلى وضع التعديل إذا لزم
+                if (IsEditMode)
+                {
+                    Title = "تعديل بيانات النشر الرقمي";
+                    BtnSaveAll.Content = "حفظ التعديلات";
+                }
             }
             catch (Exception ex)
             {
@@ -389,8 +462,17 @@ namespace Radio.Views.Episodes
                 {
                     var duration = BuildDuration(g.DurationMinutes, g.DurationSeconds);
 
+                    // في وضع التعديل: نستخدم معرّف السجل الموجود
+                    var logId = 0;
+                    if (IsEditMode)
+                    {
+                        var existingLog = _existingLogs!
+                            .FirstOrDefault(l => l.EpisodeGuestId == g.EpisodeGuestId);
+                        logId = existingLog?.LogId ?? 0;
+                    }
+
                     return new SocialMediaPublishingLogDto(
-                        0,
+                        logId,
                         g.EpisodeGuestId,
                         g.ClipTitle,
                         duration,
@@ -415,20 +497,39 @@ namespace Radio.Views.Episodes
                     return;
                 }
 
-                // حفظ عبر الخدمة (دفعة واحدة)
+                // حفظ عبر الخدمة
                 BtnSaveAll.IsEnabled = false;
 
-                var result = await _publishingService.LogSocialPublishingAsync(_episodeId, guestLogs, _session);
-
-                if (result.IsSuccess)
+                if (IsEditMode)
                 {
+                    // ═══ وضع التعديل: تحديث كل سجل على حدة ═══
+                    var successCount = 0;
+                    foreach (var logDto in guestLogs)
+                    {
+                        var result = await _publishingService.UpdateSocialPublishingLogAsync(logDto, _session);
+                        if (result.IsSuccess)
+                            successCount++;
+                    }
+
                     MessageService.Current.ShowSuccess(
-                        $"تم نشر مقاطع {readyGuests.Count} ضيف بنجاح.");
+                        $"تم تعديل بيانات نشر {successCount} ضيف بنجاح.");
                     DialogResult = true;
                 }
                 else
                 {
-                    MessageService.Current.ShowError(result.ErrorMessage ?? "خطأ في حفظ بيانات النشر.");
+                    // ═══ وضع الإنشاء: حفظ دفعة واحدة ═══
+                    var result = await _publishingService.LogSocialPublishingAsync(_episodeId, guestLogs, _session);
+
+                    if (result.IsSuccess)
+                    {
+                        MessageService.Current.ShowSuccess(
+                            $"تم نشر مقاطع {readyGuests.Count} ضيف بنجاح.");
+                        DialogResult = true;
+                    }
+                    else
+                    {
+                        MessageService.Current.ShowError(result.ErrorMessage ?? "خطأ في حفظ بيانات النشر.");
+                    }
                 }
             }
             catch (Exception ex)

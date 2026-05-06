@@ -157,7 +157,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Header.App" TargetType="Border">
-        <Setter Property="Height" Value="64" />
+        <Setter Property="Height" Value="56" />
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />

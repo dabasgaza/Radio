@@ -4,13 +4,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Title="نشر الحلقة على الموقع الإلكتروني"
-    Width="520"
-    Height="500"
+    Title="نشر على الموقع الإلكتروني"
+    Width="500"
+    Height="450"
     Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterOwner">
 
-    <materialDesign:Card Margin="30" Style="{StaticResource Card.Form}">
+    <materialDesign:Card
+        Margin="30"
+        Background="{StaticResource SurfaceBrush}"
+        Effect="{StaticResource Shadow.Dialog}"
+        UniformCornerRadius="16">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -24,6 +28,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <materialDesign:PackIcon
@@ -36,9 +41,17 @@
                         Grid.Column="1"
                         Margin="16,0"
                         VerticalAlignment="Center"
-                        FontSize="18"
-                        FontWeight="Bold"
+                        Style="{StaticResource Type.TitleLarge.OnColor}"
                         Text="نشر الحلقة على الموقع الإلكتروني" />
+
+                    <Button
+                        Grid.Column="2"
+                        Click="BtnCancel_Click"
+                        Foreground="White"
+                        Opacity="0.6"
+                        Style="{StaticResource MaterialDesignIconButton}">
+                        <materialDesign:PackIcon Kind="Close" />
+                    </Button>
                 </Grid>
             </materialDesign:ColorZone>
 
@@ -55,9 +68,9 @@
                     <ComboBox
                         x:Name="CmbMediaType"
                         materialDesign:HintAssist.Hint="اختر نوع الوسيط"
-                        DisplayMemberPath="Content"
+                        Style="{StaticResource Input.ComboBox}"
                         SelectedValuePath="Tag"
-                        Style="{StaticResource Input.ComboBox}">
+                        DisplayMemberPath="Content">
                         <ComboBoxItem Content="فيديو" Tag="Video" />
                         <ComboBoxItem Content="صوتي" Tag="Audio" />
                         <ComboBoxItem Content="فيديو وصوت" Tag="Both" />
@@ -110,6 +123,16 @@
                     Foreground="#616161"
                     Text="" />
             </StackPanel>
+            
+            <!-- حاوية الإشعارات -->
+            <StackPanel
+                x:Name="NotificationHost"
+                Grid.Row="1"
+                Margin="0,0,0,20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Panel.ZIndex="999" />
+
 
             <!--  Footer  -->
             <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
@@ -122,6 +145,7 @@
                         IsCancel="True"
                         Style="{StaticResource Btn.Cancel}" />
                     <Button
+                        x:Name="BtnPublish"
                         Padding="16,8"
                         Click="BtnPublish_Click"
                         Content="نشر على الموقع"

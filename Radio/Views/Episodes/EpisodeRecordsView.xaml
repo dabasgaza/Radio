@@ -1,0 +1,285 @@
+<mah:MetroWindow
+    x:Class="Radio.Views.Episodes.EpisodeRecordsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="سجلات الحلقة"
+    Width="650"
+    MaxHeight="700"
+    SizeToContent="Height"
+    Style="{StaticResource Window.Dialog}"
+    WindowStartupLocation="CenterOwner">
+
+    <materialDesign:Card
+        Margin="30"
+        Background="{StaticResource SurfaceBrush}"
+        Effect="{StaticResource Shadow.Dialog}"
+        UniformCornerRadius="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  ═══════ الهيدر ═══════  -->
+            <materialDesign:ColorZone Grid.Row="0" 
+                                      PreviewMouseLeftButtonDown="ColorZone_PreviewMouseLeftButtonDown"
+                                      Style="{StaticResource Zone.Header.Primary}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <materialDesign:PackIcon
+                        Width="32"
+                        Height="32"
+                        VerticalAlignment="Center"
+                        Kind="ClipboardTextOutline" />
+
+                    <StackPanel Grid.Column="1" Margin="16,0">
+                        <TextBlock
+                            x:Name="TxtHeaderTitle"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="سجلات الحلقة" />
+                        <TextBlock
+                            x:Name="TxtHeaderSubtitle"
+                            Style="{StaticResource Type.BodyMedium.OnColor}"
+                            Text="عرض وتعديل سجلات التنفيذ والنشر" />
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="2"
+                        Click="BtnClose_Click"
+                        Foreground="White"
+                        Opacity="0.6"
+                        Style="{StaticResource MaterialDesignIconButton}">
+                        <materialDesign:PackIcon Kind="Close" />
+                    </Button>
+                </Grid>
+            </materialDesign:ColorZone>
+
+            <!--  ═══════ المحتوى ═══════  -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="24,20">
+
+                    <!--  ═══════ قسم: سجل التنفيذ ═══════  -->
+                    <Border
+                        x:Name="PnlExecution"
+                        Margin="0,0,0,16"
+                        Padding="16,14"
+                        Background="{StaticResource SurfaceVariantBrush}"
+                        CornerRadius="10"
+                        Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  أيقونة + تسمية  -->
+                            <Border
+                                Width="40"
+                                Height="40"
+                                VerticalAlignment="Top"
+                                Background="#E8F5E9"
+                                CornerRadius="10">
+                                <materialDesign:PackIcon
+                                    Width="22"
+                                    Height="22"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="#4CAF50"
+                                    Kind="PlayCircleOutline" />
+                            </Border>
+
+                            <!--  تفاصيل التنفيذ  -->
+                            <StackPanel Grid.Column="1" Margin="14,0,0,0">
+                                <TextBlock
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    Text="✅ سجل التنفيذ" />
+                                <TextBlock
+                                    x:Name="TxtExecDetails"
+                                    Margin="0,6,0,0"
+                                    FontSize="12"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <!--  زر التعديل  -->
+                            <Button
+                                Grid.Column="2"
+                                VerticalAlignment="Top"
+                                Click="BtnEditExecution_Click"
+                                Style="{StaticResource Btn.Icon.Edit}"
+                                ToolTip="تعديل سجل التنفيذ">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    Kind="PencilOutline" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!--  ═══════ قسم: النشر الرقمي (سوشال) ═══════  -->
+                    <Border
+                        x:Name="PnlSocial"
+                        Margin="0,0,0,16"
+                        Padding="16,14"
+                        Background="{StaticResource SurfaceVariantBrush}"
+                        CornerRadius="10"
+                        Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border
+                                Width="40"
+                                Height="40"
+                                VerticalAlignment="Top"
+                                Background="#E3F2FD"
+                                CornerRadius="10">
+                                <materialDesign:PackIcon
+                                    Width="22"
+                                    Height="22"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="#2196F3"
+                                    Kind="ShareVariant" />
+                            </Border>
+
+                            <StackPanel Grid.Column="1" Margin="14,0,0,0">
+                                <TextBlock
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    Text="📱 النشر الرقمي" />
+                                <TextBlock
+                                    x:Name="TxtSocialDetails"
+                                    Margin="0,6,0,0"
+                                    FontSize="12"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <Button
+                                Grid.Column="2"
+                                VerticalAlignment="Top"
+                                Click="BtnEditSocial_Click"
+                                Style="{StaticResource Btn.Icon.Edit}"
+                                ToolTip="تعديل بيانات النشر الرقمي">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    Kind="PencilOutline" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!--  ═══════ قسم: نشر الموقع ═══════  -->
+                    <Border
+                        x:Name="PnlWebsite"
+                        Margin="0,0,0,16"
+                        Padding="16,14"
+                        Background="{StaticResource SurfaceVariantBrush}"
+                        CornerRadius="10"
+                        Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border
+                                Width="40"
+                                Height="40"
+                                VerticalAlignment="Top"
+                                Background="#EDE7F6"
+                                CornerRadius="10">
+                                <materialDesign:PackIcon
+                                    Width="22"
+                                    Height="22"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="#5C6BC0"
+                                    Kind="Web" />
+                            </Border>
+
+                            <StackPanel Grid.Column="1" Margin="14,0,0,0">
+                                <TextBlock
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    Text="🌐 نشر الموقع الإلكتروني" />
+                                <TextBlock
+                                    x:Name="TxtWebDetails"
+                                    Margin="0,6,0,0"
+                                    FontSize="12"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <Button
+                                Grid.Column="2"
+                                VerticalAlignment="Top"
+                                Click="BtnEditWebsite_Click"
+                                Style="{StaticResource Btn.Icon.Edit}"
+                                ToolTip="تعديل نشر الموقع">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    Kind="PencilOutline" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!--  ═══════ رسالة: لا توجد سجلات ═══════  -->
+                    <Border
+                        x:Name="PnlNoRecords"
+                        Padding="24,20"
+                        Background="#FFF8E1"
+                        CornerRadius="10"
+                        Visibility="Collapsed">
+                        <StackPanel HorizontalAlignment="Center">
+                            <materialDesign:PackIcon
+                                Width="40"
+                                Height="40"
+                                HorizontalAlignment="Center"
+                                Foreground="#FFB300"
+                                Kind="InformationOutline" />
+                            <TextBlock
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="13"
+                                Foreground="#795548"
+                                Text="لا توجد سجلات لهذه الحلقة بعد." />
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!--  حاوية الإشعارات  -->
+            <StackPanel
+                x:Name="NotificationHost"
+                Grid.Row="1"
+                Margin="0,0,0,20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Panel.ZIndex="999" />
+
+        </Grid>
+    </materialDesign:Card>
+</mah:MetroWindow>

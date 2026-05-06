@@ -6,6 +6,8 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using MahApps.Metro.Controls;
+using Radio.Messaging;
+
 
 namespace Radio.Views.Episodes
 {
@@ -50,9 +52,11 @@ namespace Radio.Views.Episodes
             DgGuests.ItemsSource = GuestList;
             DgCorrespondents.ItemsSource = CorrespondentList;
             DgEmployees.ItemsSource = EmployeeList;
-
+            Loaded += (_, _) => NotificationManager.RegisterHost(NotificationHost);
+            Unloaded += (_, _) => NotificationManager.RegisterHost(null!);
             Loaded += async (_, _) => await InitializeDataAsync();
         }
+
 
         private async Task InitializeDataAsync()
         {
@@ -198,7 +202,7 @@ namespace Radio.Views.Episodes
                 (int)CbPrograms.SelectedValue,
                 GuestList.Select(g => new EpisodeGuestDto(g.EpisodeGuestId, g.GuestId, g.FullName, g.Topic, g.HostingTime, null)).ToList(),
                 CorrespondentList.Select(c => new EpisodeCorrespondentDto(c.Id, c.CorrespondentId, c.FullName, c.Topic, c.HostingTime)).ToList(),
-                EmployeeList.Select(emp => new EpisodeEmployeeDto(0, emp.EmployeeId)).ToList(),
+                EmployeeList.Select(e => new EpisodeEmployeeDto(0, e.EmployeeId, e.FullName, e.StaffRoleName)).ToList(),
                 TxtEpisodeName.Text.Trim(),
                 DpDate.SelectedDate,
                 TpBroadcastTime.SelectedTime?.TimeOfDay,
@@ -214,9 +218,14 @@ namespace Radio.Views.Episodes
                 result = createRes.IsSuccess ? Result.Success() : Result.Fail(createRes.ErrorMessage ?? "خطأ غير معروف");
             }
 
-            if (result.IsSuccess) DialogResult = true;
+            if (result.IsSuccess)
+            {
+                MessageService.Current.ShowSuccess(_episodeId.HasValue ? "تم تحديث بيانات الحلقة بنجاح" : "تم جدولة الحلقة بنجاح");
+                DialogResult = true;
+            }
             else MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحفظ.");
         }
+
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e) => DialogResult = false;
 

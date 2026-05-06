@@ -2,15 +2,23 @@
     x:Class="Radio.Views.Episodes.EpisodeFormControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Title="جدولة حلقة إذاعية"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="بيانات الحلقة"
     Width="900"
     Height="750"
     Style="{StaticResource Window.Dialog}"
-    WindowStartupLocation="CenterOwner">
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
 
-    <materialDesign:Card Margin="30" Style="{StaticResource Card.Form}">
+    <materialDesign:Card
+        Margin="30"
+        Background="{StaticResource SurfaceBrush}"
+        Effect="{StaticResource Shadow.Dialog}"
+        UniformCornerRadius="16">
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -472,6 +480,16 @@
 
             </TabControl>
 
+            <!--  حاوية الإشعارات  -->
+            <StackPanel
+                x:Name="NotificationHost"
+                Grid.Row="1"
+                Margin="0,0,0,20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Panel.ZIndex="999" />
+
+
             <!--  ═══════ 3. الذيل ═══════  -->
             <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
                 <Grid>
@@ -485,7 +503,6 @@
                         Grid.Column="0"
                         Click="BtnCancel_Click"
                         Content="تراجع"
-                        IsCancel="True"
                         Style="{StaticResource Btn.Cancel}" />
 
                     <Button

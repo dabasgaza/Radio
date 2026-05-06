@@ -1,0 +1,274 @@
+<UserControl
+    x:Class="Radio.Views.Episodes.PublishingRecordsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Width="1100"
+    Height="850"
+    Style="{StaticResource View.Base}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  ═══════ 1. الهيدر ═══════  -->
+        <materialDesign:ColorZone
+            Padding="24,16"
+            materialDesign:ElevationAssist.Elevation="Dp2"
+            Style="{StaticResource Zone.Header.Primary}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="32"
+                            Height="32"
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextOnPrimaryBrush}"
+                            Kind="ClipboardTextOutline" />
+                        <TextBlock
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="سجلات النشر" />
+                    </StackPanel>
+                    <TextBlock
+                        Margin="44,4,0,0"
+                        Opacity="0.8"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
+                        Text="عرض وتعديل جميع سجلات التنفيذ والنشر الرقمي ونشر الموقع الإلكتروني" />
+                </StackPanel>
+
+                <!--  زر إعادة تحميل السجلات  -->
+                <Button
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Click="BtnRefresh_Click"
+                    Style="{StaticResource MaterialDesignIconButton}"
+                    ToolTip="إعادة تحميل السجلات">
+                    <materialDesign:PackIcon
+                        Width="24"
+                        Height="24"
+                        Foreground="White"
+                        Kind="Refresh" />
+                </Button>
+            </Grid>
+        </materialDesign:ColorZone>
+
+        <!--  ═══════ 2. شريط البحث والفلترة ═══════  -->
+        <Grid Grid.Row="1" Margin="24,24,24,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  حقل البحث  -->
+            <TextBox
+                x:Name="TxtSearch"
+                Grid.Column="0"
+                VerticalAlignment="Stretch"
+                materialDesign:HintAssist.Hint="البحث في السجلات (اسم الحلقة، البرنامج، الضيف...)"
+                materialDesign:TextFieldAssist.HasClearButton="True"
+                Style="{StaticResource Input.Search}"
+                TextChanged="TxtSearch_TextChanged" />
+
+            <!--  فلتر النوع  -->
+            <ComboBox
+                x:Name="CmbRecordType"
+                Grid.Column="2"
+                VerticalAlignment="Stretch"
+                materialDesign:HintAssist.Hint="نوع السجل"
+                materialDesign:TextFieldAssist.LeadingIcon="FilterOutline"
+                SelectedIndex="0"
+                SelectionChanged="CmbRecordType_SelectionChanged"
+                Style="{StaticResource Input.ComboBox}">
+                <ComboBoxItem Content="الكل" Tag="All" />
+                <ComboBoxItem Content="✅ التنفيذ" Tag="Execution" />
+                <ComboBoxItem Content="📱 النشر الرقمي" Tag="SocialMedia" />
+                <ComboBoxItem Content="🌐 نشر الموقع" Tag="Website" />
+            </ComboBox>
+        </Grid>
+
+        <!--  ═══════ 3. قائمة السجلات ═══════  -->
+        <ListBox
+            x:Name="DgRecords"
+            Grid.Row="2"
+            Margin="32,8,32,24"
+            Background="Transparent"
+            BorderThickness="0"
+            MouseDoubleClick="DgRecords_MouseDoubleClick"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            Style="{StaticResource MaterialDesignListBox}">
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,0,0,10" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <materialDesign:Card
+                        Padding="0"
+                        materialDesign:ElevationAssist.Elevation="Dp1"
+                        Background="{StaticResource SurfaceBrush}"
+                        UniformCornerRadius="12">
+
+                        <!--  تأثير hover على البطاقة  -->
+                        <materialDesign:Card.Style>
+                            <Style TargetType="materialDesign:Card">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp3" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </materialDesign:Card.Style>
+
+                        <Grid Margin="16,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  أيقونة النوع  -->
+                            <Border
+                                Width="42"
+                                Height="42"
+                                VerticalAlignment="Center"
+                                Background="#F5F5F5"
+                                CornerRadius="10">
+                                <materialDesign:PackIcon
+                                    Width="22"
+                                    Height="22"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="{Binding RecordColor}"
+                                    Kind="{Binding RecordIcon}" />
+                            </Border>
+
+                            <!--  تفاصيل السجل  -->
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="14,0,0,0"
+                                VerticalAlignment="Center">
+                                <!--  السطر الأول: ملخص  -->
+                                <TextBlock
+                                    FontSize="14"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    Text="{Binding Summary}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <!--  السطر الثاني: الحلقة + البرنامج  -->
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    FontSize="12"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    TextTrimming="CharacterEllipsis">
+                                    <Run Text="{Binding EpisodeName, Mode=OneWay}" />
+                                    <Run Text=" • " />
+                                    <Run Text="{Binding ProgramName, Mode=OneWay}" />
+                                </TextBlock>
+                                <!--  السطر الثالث: التاريخ + المنفّذ  -->
+                                <TextBlock
+                                    Margin="0,2,0,0"
+                                    FontSize="11"
+                                    Foreground="{StaticResource TextHintBrush}">
+                                    <Run Text="{Binding RecordedBy, Mode=OneWay}" />
+                                    <Run Text=" • " />
+                                    <Run Text="{Binding RecordDate, StringFormat='yyyy/MM/dd hh:mm tt', Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!--  شارة النوع  -->
+                            <Border
+                                Grid.Column="2"
+                                Padding="10,4"
+                                VerticalAlignment="Center"
+                                CornerRadius="6">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#E0E0E0" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RecordType}" Value="Execution">
+                                                <Setter Property="Background" Value="#E8F5E9" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RecordType}" Value="SocialMedia">
+                                                <Setter Property="Background" Value="#E3F2FD" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RecordType}" Value="Website">
+                                                <Setter Property="Background" Value="#EDE7F6" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock FontSize="11" FontWeight="Medium">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#757575" />
+                                            <Setter Property="Text" Value="—" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RecordType}" Value="Execution">
+                                                    <Setter Property="Foreground" Value="#4CAF50" />
+                                                    <Setter Property="Text" Value="تنفيذ" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding RecordType}" Value="SocialMedia">
+                                                    <Setter Property="Foreground" Value="#2196F3" />
+                                                    <Setter Property="Text" Value="رقمي" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding RecordType}" Value="Website">
+                                                    <Setter Property="Foreground" Value="#5C6BC0" />
+                                                    <Setter Property="Text" Value="موقع" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+
+                            <!--  زر التعديل — يفتح نافذة التعديل المناسبة حسب نوع السجل  -->
+                            <Button
+                                Grid.Column="3"
+                                Margin="12,0,0,0"
+                                VerticalAlignment="Center"
+                                Click="BtnEditRecord_Click"
+                                Cursor="Hand"
+                                Style="{StaticResource Btn.Icon.Edit}"
+                                ToolTip="تعديل هذا السجل">
+                                <materialDesign:PackIcon
+                                    Width="18"
+                                    Height="18"
+                                    Foreground="{StaticResource TextSecondaryBrush}"
+                                    Kind="PencilOutline" />
+                            </Button>
+
+                        </Grid>
+                    </materialDesign:Card>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

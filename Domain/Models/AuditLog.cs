@@ -15,8 +15,8 @@ public partial class AuditLog
 
     public int? RecordId { get; set; }
 
-    [Required, MaxLength(10)]
-    public string Action { get; set; } = null!; // INSERT, UPDATE, DELETE
+    [Required, MaxLength(20)]
+    public string Action { get; set; } = null!; // INSERT, UPDATE, DELETE, SOFT_DELETED, PUBLISHING_EDIT
 
     public string? OldValues { get; set; } // JSON
     public string? NewValues { get; set; } // JSON

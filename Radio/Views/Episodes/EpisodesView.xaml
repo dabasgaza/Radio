@@ -340,6 +340,28 @@
                                                 Kind="Web" />
                                         </Button>
 
+                                        <!--  فاصل  -->
+                                        <Border
+                                            Width="1"
+                                            Height="24"
+                                            Margin="14,0"
+                                            VerticalAlignment="Center"
+                                            Background="{StaticResource DividerBrush}" />
+
+                                        <!--  زر عرض السجلات — يظهر فقط إذا كانت الحلقة منفّذة أو بعدها  -->
+                                        <Button
+                                            Background="#5C6BC0"
+                                            Click="BtnViewRecords_Click"
+                                            IsEnabled="{Binding CanViewRecords}"
+                                            Style="{StaticResource Btn.Icon}"
+                                            ToolTip="عرض السجلات">
+                                            <materialDesign:PackIcon
+                                                Width="18"
+                                                Height="18"
+                                                Foreground="White"
+                                                Kind="ClipboardTextOutline" />
+                                        </Button>
+
                                         <Border
                                             Width="1"
                                             Height="24"

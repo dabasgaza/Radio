@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow
+<mah:MetroWindow
     x:Class="Radio.Views.Guests.GuestFormDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -131,6 +131,16 @@
                     </Border>
                 </StackPanel>
             </ScrollViewer>
+
+            <!--  حاوية الإشعارات  -->
+            <StackPanel
+                x:Name="NotificationHost"
+                Grid.Row="1"
+                Margin="0,0,0,20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Panel.ZIndex="999" />
+
 
 
             <Border Grid.Row="2" Style="{StaticResource Window.Footer}">

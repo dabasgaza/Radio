@@ -1,10 +1,12 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
 using Radio.Views.Common;
+using Radio.Messaging;
 using System.Windows;
+
 
 namespace Radio.Views.Guests
 {
@@ -35,7 +37,11 @@ namespace Radio.Views.Guests
                 TxtPhone.Text = _existingGuest.PhoneNumber;
                 TxtEmail.Text = _existingGuest.EmailAddress;
             }
+
+            Loaded += (_, _) => NotificationManager.RegisterHost(NotificationHost);
+            Unloaded += (_, _) => NotificationManager.RegisterHost(null!);
         }
+
 
         /// <summary>
         /// حفظ الضيف (إضافة أو تعديل) بعد التحقق من صحة المدخلات.

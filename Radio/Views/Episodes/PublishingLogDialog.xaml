@@ -417,6 +417,16 @@
                 </ScrollViewer>
             </Grid>
 
+            <!--  حاوية الإشعارات  -->
+            <StackPanel
+                x:Name="NotificationHost"
+                Grid.Row="1"
+                Margin="0,0,0,20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Panel.ZIndex="999" />
+
+
             <!--  ═══════ Footer ═══════  -->
             <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
                 <Grid>
