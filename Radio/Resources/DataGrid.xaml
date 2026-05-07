@@ -68,7 +68,7 @@
         BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}"
         TargetType="DataGridColumnHeader">
 
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Height" Value="48" />
         <Setter Property="Padding" Value="16,0" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />

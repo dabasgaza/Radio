@@ -88,9 +88,9 @@
                                 <TextBlock
                                     Margin="10,0,0,0"
                                     VerticalAlignment="Center"
-                                    FontSize="14"
                                     FontWeight="SemiBold"
                                     Foreground="{StaticResource PrimaryMainBrush}"
+                                    Style="{StaticResource Type.BodyMedium}"
                                     Text="قائمة الضيوف" />
                             </StackPanel>
                         </Border>
@@ -144,7 +144,7 @@
                                             Grid.Column="1"
                                             Margin="8,0"
                                             VerticalAlignment="Center"
-                                            FontSize="13"
+                                            Style="{StaticResource Type.Caption}"
                                             Text="{Binding FullName}"
                                             TextTrimming="CharacterEllipsis" />
 
@@ -167,9 +167,9 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-                                            <TextBlock FontSize="10" FontWeight="Medium">
+                                            <TextBlock FontWeight="Medium">
                                                 <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
+                                                    <Style BasedOn="{StaticResource Type.Overline}" TargetType="TextBlock">
                                                         <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}" />
                                                         <Setter Property="Text" Value="انتظار" />
                                                         <Style.Triggers>
@@ -230,8 +230,8 @@
                         <!--  صف: مدة المقطع  -->
                         <TextBlock
                             Margin="0,0,0,8"
-                            FontSize="13"
                             Foreground="{StaticResource TextHintBrush}"
+                            Style="{StaticResource Type.Caption}"
                             Text="مدة المقطع" />
                         <Grid Margin="0,0,0,24">
                             <Grid.ColumnDefinitions>
@@ -254,9 +254,8 @@
                                 Grid.Column="1"
                                 Margin="8,0"
                                 VerticalAlignment="Center"
-                                FontSize="20"
-                                FontWeight="Bold"
                                 Foreground="{StaticResource TextHintBrush}"
+                                Style="{StaticResource Type.HeadlineMedium}"
                                 Text=":" />
 
                             <TextBox
@@ -273,8 +272,8 @@
                                 Grid.Column="3"
                                 Margin="12,0"
                                 VerticalAlignment="Center"
-                                FontSize="12"
                                 Foreground="{StaticResource TextDisabledBrush}"
+                                Style="{StaticResource Type.Overline}"
                                 Text="اتركهما فارغين إن لم تكن المدة معروفة"
                                 TextWrapping="Wrap" />
                         </Grid>
@@ -293,8 +292,8 @@
                             <TextBlock
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Center"
-                                FontSize="14"
                                 FontWeight="SemiBold"
+                                Style="{StaticResource Type.BodyMedium}"
                                 Text="منصات النشر" />
                         </StackPanel>
 
@@ -318,9 +317,8 @@
                                                 Grid.Row="0"
                                                 Margin="0,0,0,10"
                                                 Checked="FormField_Changed"
-                                                FontSize="14"
-                                                FontWeight="Medium"
                                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                Style="{StaticResource MaterialDesignCheckBox}"
                                                 Unchecked="FormField_Changed">
                                                 <StackPanel Orientation="Horizontal">
                                                     <materialDesign:PackIcon
@@ -351,8 +349,8 @@
                                                     CornerRadius="4,0,0,4">
                                                     <TextBlock
                                                         VerticalAlignment="Center"
-                                                        FontSize="13"
                                                         Foreground="{StaticResource TextSecondaryBrush}"
+                                                        Style="{StaticResource Type.Caption}"
                                                         Text="https://" />
                                                 </Border>
 
@@ -387,9 +385,9 @@
                                 <TextBlock
                                     x:Name="LblValidationHeader"
                                     Margin="0,0,0,8"
-                                    FontSize="13"
                                     FontWeight="SemiBold"
-                                    Foreground="#E65100" />
+                                    Foreground="#E65100"
+                                    Style="{StaticResource Type.Caption}" />
                                 <ItemsControl x:Name="LstValidationMessages">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -403,8 +401,8 @@
                                                     Kind="AlertCircleOutline" />
                                                 <TextBlock
                                                     VerticalAlignment="Center"
-                                                    FontSize="12"
                                                     Foreground="#BF360C"
+                                                    Style="{StaticResource Type.Overline}"
                                                     Text="{Binding}" />
                                             </StackPanel>
                                         </DataTemplate>
@@ -451,8 +449,8 @@
                             x:Name="TxtStatusSummary"
                             Margin="8,0"
                             VerticalAlignment="Center"
-                            FontSize="12"
                             Foreground="{StaticResource TextSecondaryBrush}"
+                            Style="{StaticResource Type.Overline}"
                             Text="" />
                     </StackPanel>
 

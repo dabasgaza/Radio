@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow
+<mah:MetroWindow
     x:Class="Radio.Views.Users.UserFormDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -79,9 +79,9 @@
                             Kind="ShieldAccount" />
                         <TextBlock
                             Margin="10,0"
-                            FontSize="12"
                             FontWeight="Bold"
                             Opacity="0.6"
+                            Style="{StaticResource Type.Overline}"
                             Text="بيانات الحساب والصلاحيات" />
                     </StackPanel>
 
@@ -149,8 +149,8 @@
                                 x:Name="TxtPwdHint"
                                 Margin="10,0"
                                 VerticalAlignment="Center"
-                                FontSize="11"
                                 Foreground="#4527A0"
+                                Style="{StaticResource Type.Caption}"
                                 Text="اترك كلمة المرور فارغة إذا كنت لا تريد تغييرها" />
                         </StackPanel>
                     </Border>
@@ -164,9 +164,9 @@
                             Kind="ContactPhone" />
                         <TextBlock
                             Margin="10,0"
-                            FontSize="12"
                             FontWeight="Bold"
                             Opacity="0.6"
+                            Style="{StaticResource Type.Overline}"
                             Text="معلومات التواصل والاتصال" />
                     </StackPanel>
 

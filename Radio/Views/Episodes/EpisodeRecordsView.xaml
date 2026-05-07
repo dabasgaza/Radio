@@ -96,15 +96,15 @@
                             <!--  تفاصيل التنفيذ  -->
                             <StackPanel Grid.Column="1" Margin="14,0,0,0">
                                 <TextBlock
-                                    FontSize="14"
                                     FontWeight="SemiBold"
                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                    Style="{StaticResource Type.BodyMedium}"
                                     Text="✅ سجل التنفيذ" />
                                 <TextBlock
                                     x:Name="TxtExecDetails"
                                     Margin="0,6,0,0"
-                                    FontSize="12"
                                     Foreground="{StaticResource TextSecondaryBrush}"
+                                    Style="{StaticResource Type.Caption}"
                                     TextWrapping="Wrap" />
                             </StackPanel>
 
@@ -156,15 +156,15 @@
 
                             <StackPanel Grid.Column="1" Margin="14,0,0,0">
                                 <TextBlock
-                                    FontSize="14"
                                     FontWeight="SemiBold"
                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                    Style="{StaticResource Type.BodyMedium}"
                                     Text="📱 النشر الرقمي" />
                                 <TextBlock
                                     x:Name="TxtSocialDetails"
                                     Margin="0,6,0,0"
-                                    FontSize="12"
                                     Foreground="{StaticResource TextSecondaryBrush}"
+                                    Style="{StaticResource Type.Caption}"
                                     TextWrapping="Wrap" />
                             </StackPanel>
 
@@ -215,15 +215,15 @@
 
                             <StackPanel Grid.Column="1" Margin="14,0,0,0">
                                 <TextBlock
-                                    FontSize="14"
                                     FontWeight="SemiBold"
                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                    Style="{StaticResource Type.BodyMedium}"
                                     Text="🌐 نشر الموقع الإلكتروني" />
                                 <TextBlock
                                     x:Name="TxtWebDetails"
                                     Margin="0,6,0,0"
-                                    FontSize="12"
                                     Foreground="{StaticResource TextSecondaryBrush}"
+                                    Style="{StaticResource Type.Caption}"
                                     TextWrapping="Wrap" />
                             </StackPanel>
 
@@ -259,8 +259,8 @@
                             <TextBlock
                                 Margin="0,10,0,0"
                                 HorizontalAlignment="Center"
-                                FontSize="13"
                                 Foreground="#795548"
+                                Style="{StaticResource Type.Caption}"
                                 Text="لا توجد سجلات لهذه الحلقة بعد." />
                         </StackPanel>
                     </Border>

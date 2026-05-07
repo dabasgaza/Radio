@@ -25,8 +25,9 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
+        // ── لا حاجة لـ Include مع Select — EF Core يُترجم Select إلى SQL JOIN مباشرة ──
         return await context.Employees
-            .Include(e => e.StaffRole)
+            .AsNoTracking()
             .Select(e => new EmployeeDto(
                 e.EmployeeId,
                 e.FullName,

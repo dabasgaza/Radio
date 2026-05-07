@@ -245,11 +245,11 @@
     <Thickness x:Key="SpacingXLarge">32</Thickness>
 
     <!--  FontSize Tokens  -->
-    <sys:Double x:Key="FontSizeCaption">12</sys:Double>
-    <sys:Double x:Key="FontSizeBody">14</sys:Double>
-    <sys:Double x:Key="FontSizeInput">15</sys:Double>
-    <sys:Double x:Key="FontSizeTitle">22</sys:Double>
-    <sys:Double x:Key="FontSizeHeadline">32</sys:Double>
+    <sys:Double x:Key="FontSizeCaption">10</sys:Double>
+    <sys:Double x:Key="FontSizeBody">12</sys:Double>
+    <sys:Double x:Key="FontSizeInput">13</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">18</sys:Double>
+    <sys:Double x:Key="FontSizeHeadline">26</sys:Double>
 
     <!--
         ═══════════════════════════════════════════════════════════

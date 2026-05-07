@@ -49,6 +49,12 @@ public class CorrespondentCoverageConfiguration : IEntityTypeConfiguration<Corre
               .HasForeignKey(d => d.GuestId)
               .OnDelete(DeleteBehavior.Restrict);
 
+        // 4. فهارس الأداء (Performance Indexes)
+        builder.HasIndex(e => e.CorrespondentId)
+              .HasDatabaseName("IX_Coverages_CorrespondentId");
+
+        builder.HasIndex(e => e.GuestId)
+              .HasDatabaseName("IX_Coverages_GuestId");
 
     }
 }

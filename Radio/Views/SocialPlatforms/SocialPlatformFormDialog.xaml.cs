@@ -4,7 +4,7 @@ using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using System.Windows;
 
-namespace Radio.Views.Admin;
+namespace Radio.Views.SocialPlatforms;
 
 public partial class SocialPlatformFormDialog
 {

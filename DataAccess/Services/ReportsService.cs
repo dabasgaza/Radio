@@ -109,42 +109,45 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // نجلب بيانات الضيوف مع حلقاتهم من DB
-        var raw = await context.EpisodeGuests
+        // ── تنفيذ GROUP BY في قاعدة البيانات بدلاً من تحميل الكل في الذاكرة ──
+        var grouped = await context.EpisodeGuests
             .AsNoTracking()
-            .Include(eg => eg.Guest)
-            .Include(eg => eg.Episode)
-            .ToListAsync();
-
-        // نجمّع في الذاكرة لأن التجميع يحتاج منطق C#
-        var grouped = raw
             .GroupBy(eg => eg.GuestId)
-            .Select(g =>
+            .Select(g => new
             {
-                var latest = g.OrderByDescending(eg => eg.Episode?.ScheduledExecutionTime).First();
-                return new
-                {
-                    GuestId = g.Key,
-                    FullName = latest.Guest?.FullName ?? "غير معروف",
-                    Organization = latest.Guest?.Organization,
-                    AppearanceCount = g.Count(),
-                    LastTopic = latest.Topic,
-                    LastAppearance = latest.Episode?.ScheduledExecutionTime
-                };
+                GuestId = g.Key,
+                AppearanceCount = g.Count(),
+                LastEpisodeGuestId = g
+                    .OrderByDescending(eg => eg.Episode.ScheduledExecutionTime)
+                    .Select(eg => eg.EpisodeGuestId)
+                    .FirstOrDefault()
             })
             .OrderByDescending(x => x.AppearanceCount)
             .Take(topCount)
-            .ToList();
+            .ToListAsync();
 
-        return grouped.Select((x, i) => new TopGuestDto(
-            i + 1,
-            x.GuestId,
-            x.FullName,
-            x.Organization,
-            x.AppearanceCount,
-            x.LastTopic,
-            x.LastAppearance
-        )).ToList();
+        // ── جلب تفاصيل آخر ظهور فقط للضيوف المطلوبين ──
+        var lastGuestIds = grouped.Select(x => x.LastEpisodeGuestId).ToList();
+        var lastDetails = await context.EpisodeGuests
+            .AsNoTracking()
+            .Include(eg => eg.Guest)
+            .Include(eg => eg.Episode)
+            .Where(eg => lastGuestIds.Contains(eg.EpisodeGuestId))
+            .ToDictionaryAsync(eg => eg.EpisodeGuestId);
+
+        return grouped.Select((x, i) =>
+        {
+            lastDetails.TryGetValue(x.LastEpisodeGuestId, out var last);
+            return new TopGuestDto(
+                i + 1,
+                x.GuestId,
+                last?.Guest?.FullName ?? "غير معروف",
+                last?.Guest?.Organization,
+                x.AppearanceCount,
+                last?.Topic,
+                last?.Episode?.ScheduledExecutionTime
+            );
+        }).ToList();
     }
 
     public async Task<List<CancelledEpisodeDto>> GetCancelledEpisodesAsync()

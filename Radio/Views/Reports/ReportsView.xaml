@@ -92,22 +92,17 @@
                                             Kind="CalendarClock" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock
-                                            FontSize="10.5"
-                                            Opacity="0.5"
-                                            Text="قيد التخطيط" />
+                                        <TextBlock Style="{StaticResource Type.Caption}" Text="قيد التخطيط" />
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtPlannedCount"
-                                                FontSize="22"
-                                                Foreground="{DynamicResource MaterialDesignBody}"
+                                                Style="{StaticResource Type.Numeric.Large}"
                                                 Text="0" />
                                             <TextBlock
                                                 x:Name="TxtPlannedPct"
                                                 Margin="6,4,0,0"
                                                 VerticalAlignment="Bottom"
-                                                FontSize="11"
-                                                Opacity="0.45"
+                                                Style="{StaticResource Type.Overline}"
                                                 Text="0%" />
                                         </StackPanel>
                                     </StackPanel>
@@ -151,22 +146,17 @@
                                             Kind="CheckDecagramOutline" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock
-                                            FontSize="10.5"
-                                            Opacity="0.5"
-                                            Text="منفّذة" />
+                                        <TextBlock Style="{StaticResource Type.Caption}" Text="منفّذة" />
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtExecutedCount"
-                                                FontSize="22"
-                                                Foreground="{DynamicResource MaterialDesignBody}"
+                                                Style="{StaticResource Type.Numeric.Large}"
                                                 Text="0" />
                                             <TextBlock
                                                 x:Name="TxtExecutedPct"
                                                 Margin="6,4,0,0"
                                                 VerticalAlignment="Bottom"
-                                                FontSize="11"
-                                                Opacity="0.45"
+                                                Style="{StaticResource Type.Overline}"
                                                 Text="0%" />
                                         </StackPanel>
                                     </StackPanel>
@@ -210,22 +200,17 @@
                                             Kind="CloudCheckOutline" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock
-                                            FontSize="10.5"
-                                            Opacity="0.5"
-                                            Text="منشورة رقمياً" />
+                                        <TextBlock Style="{StaticResource Type.Caption}" Text="منشورة رقمياً" />
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtPublishedCount"
-                                                FontSize="22"
-                                                Foreground="{DynamicResource MaterialDesignBody}"
+                                                Style="{StaticResource Type.Numeric.Large}"
                                                 Text="0" />
                                             <TextBlock
                                                 x:Name="TxtPublishedPct"
                                                 Margin="6,4,0,0"
                                                 VerticalAlignment="Bottom"
-                                                FontSize="11"
-                                                Opacity="0.45"
+                                                Style="{StaticResource Type.Overline}"
                                                 Text="0%" />
                                         </StackPanel>
                                     </StackPanel>
@@ -269,22 +254,17 @@
                                             Kind="CalendarRemove" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock
-                                            FontSize="10.5"
-                                            Opacity="0.5"
-                                            Text="ملغاة" />
+                                        <TextBlock Style="{StaticResource Type.Caption}" Text="ملغاة" />
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtCancelledCount"
-                                                FontSize="22"
-                                                Foreground="{DynamicResource MaterialDesignBody}"
+                                                Style="{StaticResource Type.Numeric.Large}"
                                                 Text="0" />
                                             <TextBlock
                                                 x:Name="TxtCancelledPct"
                                                 Margin="6,4,0,0"
                                                 VerticalAlignment="Bottom"
-                                                FontSize="11"
-                                                Opacity="0.45"
+                                                Style="{StaticResource Type.Overline}"
                                                 Text="0%" />
                                         </StackPanel>
                                     </StackPanel>
@@ -407,9 +387,9 @@
                                             <TextBlock
                                                 x:Name="StatusText"
                                                 VerticalAlignment="Center"
-                                                FontSize="11"
                                                 FontWeight="Medium"
                                                 Foreground="{DynamicResource MaterialDesignBody}"
+                                                Style="{StaticResource Type.Caption}"
                                                 Text="{Binding StatusText}"
                                                 TextAlignment="Center" />
                                         </Border>
@@ -516,8 +496,8 @@
                                                     Kind="Check" />
                                                 <TextBlock
                                                     Margin="5,0,0,0"
-                                                    FontSize="14"
                                                     Foreground="White"
+                                                    Style="{StaticResource Type.BodyMedium}"
                                                     Text="{Binding PublishedEpisodes}" />
                                             </StackPanel>
                                         </Border>
@@ -585,9 +565,9 @@
                                             <TextBlock
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
-                                                FontSize="12"
                                                 FontWeight="SemiBold"
                                                 Foreground="{StaticResource PrimaryMainBrush}"
+                                                Style="{StaticResource Type.Caption}"
                                                 Text="{Binding Rank}" />
                                         </Border>
                                     </DataTemplate>
@@ -627,9 +607,9 @@
                                                     Kind="Microphone" />
                                                 <TextBlock
                                                     Margin="5,0,0,0"
-                                                    FontSize="13"
                                                     FontWeight="SemiBold"
                                                     Foreground="{StaticResource InfoBrush}"
+                                                    Style="{StaticResource Type.BodySmall}"
                                                     Text="{Binding AppearanceCount}" />
                                             </StackPanel>
                                         </Border>
@@ -886,8 +866,8 @@
                                         x:Name="TxtSearchSummary"
                                         Margin="6,0,0,0"
                                         VerticalAlignment="Center"
-                                        FontSize="12"
-                                        Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                        Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                        Style="{StaticResource Type.Caption}" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -977,9 +957,9 @@
                                             <TextBlock
                                                 x:Name="StatusText2"
                                                 VerticalAlignment="Center"
-                                                FontSize="11"
                                                 FontWeight="Medium"
                                                 Foreground="{DynamicResource MaterialDesignBody}"
+                                                Style="{StaticResource Type.Overline}"
                                                 Text="{Binding StatusText}"
                                                 TextAlignment="Center" />
                                         </Border>

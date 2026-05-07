@@ -93,16 +93,8 @@ namespace Radio.Views.Publishing
             TxtNotes.Text = log.Notes ?? string.Empty;
             TxtPublishTime.Text = log.PublishedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
 
-            // تعيين نوع الوسائط من النص المخزن
-            var mediaType = log.MediaType ?? "Video";
-            for (int i = 0; i < CmbMediaType.Items.Count; i++)
-            {
-                if (CmbMediaType.Items[i] is ComboBoxItem item && item.Tag?.ToString() == mediaType)
-                {
-                    CmbMediaType.SelectedIndex = i;
-                    break;
-                }
-            }
+            // تعيين نوع الوسائط مباشرة باستخدام SelectedValue والارتباط بـ Tag
+            CmbMediaType.SelectedValue = log.MediaType ?? "Video";
         }
 
         /// <summary>
@@ -128,16 +120,8 @@ namespace Radio.Views.Publishing
                     return;
                 }
 
-                // التحقق من نوع الوسيط
-                if (CmbMediaType.SelectedItem is not ComboBoxItem mediaTypeItem)
-                {
-                    MessageService.Current.ShowError("اختر نوع الوسيط");
-                    CmbMediaType.Focus();
-                    return;
-                }
-
-                // استخدم Tag بدلاً من Content — Tag يحتوي على اسم enum (Video/Audio/Both)
-                string mediaType = mediaTypeItem.Tag?.ToString() ?? "Video";
+                // الحصول على نوع الوسيط من القيمة المختارة (Tag)
+                string mediaType = CmbMediaType.SelectedValue?.ToString() ?? "Video";
 
                 if (IsEditMode)
                 {

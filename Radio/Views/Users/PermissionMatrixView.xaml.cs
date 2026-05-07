@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -10,7 +10,7 @@ namespace Radio.Views.Users
     /// <summary>
     /// شاشة مصفوفة الصلاحيات — تسمح بعرض وتعديل صلاحيات الأدوار.
     /// </summary>
-    public partial class PermissionMatrixView
+    public partial class PermissionMatrixView : UserControl
     {
         private readonly IUserService _userService;
         private readonly UserSession _session;
@@ -21,8 +21,6 @@ namespace Radio.Views.Users
             InitializeComponent();
             _userService = userService;
             _session = session;
-
-            IsWindowDraggable = true;
 
             Loaded += async (_, _) => await LoadRolesAsync();
         }
@@ -129,21 +127,6 @@ namespace Radio.Views.Users
             {
                 BtnSavePermissions.IsEnabled = true;
             }
-        }
-
-        #endregion
-
-        #region UI Events
-
-        private void BtnClose_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
-                DragMove();
         }
 
         #endregion

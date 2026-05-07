@@ -21,6 +21,11 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
                .IsRequired()
                .HasMaxLength(100);
 
+        // ── فهرس فريد على SystemName لمنع تكرار أسماء الصلاحيات ──
+        builder.HasIndex(e => e.SystemName)
+               .IsUnique()
+               .HasDatabaseName("UQ_Permissions_SystemName");
+
         builder.HasData(
             new Permission { PermissionId = 1, SystemName = "USER_MANAGE", DisplayName = "إدارة المستخدمين", Module = "المستخدمين" },
             new Permission { PermissionId = 2, SystemName = "PROGRAM_MANAGE", DisplayName = "إدارة البرامج", Module = "البرامج" },

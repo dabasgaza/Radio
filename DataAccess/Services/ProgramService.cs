@@ -95,8 +95,10 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             
         if (program == null) return Result.Fail("البرنامج المحدد غير موجود أو تم حذفه مسبقاً.");
 
-        // ✅ قاعدة عمل: منع حذف برنامج مرتبط بحلقات نشطة
-        if (program.Episodes.Any(e => !e.IsActive))
+        // ── فحص وجود حلقات نشطة باستخدام AnyAsync بدلاً من Lazy Loading ──
+        var hasActiveEpisodes = await context.Episodes
+            .AnyAsync(e => e.ProgramId == programId);
+        if (hasActiveEpisodes)
             return Result.Fail("لا يمكن حذف برنامج مرتبط بحلقات نشطة. يرجى حذف الحلقات أولاً.");
 
         program.IsActive = false;

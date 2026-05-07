@@ -62,12 +62,20 @@ namespace Radio.Views.Episodes
                 // الآن أصبحت البيانات جاهزة — نسمح للفلترة بالعمل
                 _isDataLoaded = true;
 
+                UpdateStats();
                 RebindRecords();
             }
             catch (Exception ex)
             {
                 MessageService.Current.ShowError($"خطأ في تحميل السجلات: {ex.Message}");
             }
+        }
+
+        private void UpdateStats()
+        {
+            TxtTotalRecords.Text = _allRecords.Count.ToString();
+            TxtTodayRecords.Text = _allRecords.Count(r => r.RecordDate.Date == DateTime.Today).ToString();
+            TxtPlatformCoverage.Text = _allRecords.Select(r => r.RecordType).Distinct().Count().ToString();
         }
 
         /// <summary>

@@ -1,7 +1,5 @@
-using DataAccess.Common;
 using DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Radio.Views.Admin;
 using Radio.Views.Correspondents;
 using Radio.Views.Episodes;
 using Radio.Views.Guests;
@@ -14,6 +12,7 @@ using Radio.Views.Users;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
+using Radio.Views.SocialPlatforms;
 
 namespace Radio.Services
 {
@@ -88,7 +87,8 @@ namespace Radio.Services
             switch (viewName)
             {
                 case "Home":
-                    return new HomeView();
+                    var homeReportService = _serviceProvider.GetRequiredService<IReportsService>();
+                    return new HomeView(homeReportService);
 
                 case "Users":
                     return new UsersView(userService, _session);
@@ -137,6 +137,9 @@ namespace Radio.Services
                     var pubRecService = _serviceProvider.GetRequiredService<IPublishingService>();
                     var execRecService = _serviceProvider.GetRequiredService<IExecutionService>();
                     return new PublishingRecordsView(pubRecService, execRecService, _session, _serviceProvider);
+
+                case "PermissionMatrix":
+                    return new PermissionMatrixView(userService, _session);
 
                 default:
                     return null;

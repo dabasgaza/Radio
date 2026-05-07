@@ -61,14 +61,13 @@
                 <StackPanel Margin="0,0,0,16">
                     <TextBlock
                         Margin="0,0,0,8"
-                        FontSize="12"
                         FontWeight="Bold"
                         Foreground="#616161"
+                        Style="{StaticResource Type.Caption}"
                         Text="نوع الوسيط *" />
                     <ComboBox
                         x:Name="CmbMediaType"
                         materialDesign:HintAssist.Hint="اختر نوع الوسيط"
-                        DisplayMemberPath="Content"
                         SelectedValuePath="Tag"
                         Style="{StaticResource Input.ComboBox}">
                         <ComboBoxItem Content="فيديو" Tag="Video" />
@@ -81,9 +80,9 @@
                 <StackPanel Margin="0,0,0,16">
                     <TextBlock
                         Margin="0,0,0,8"
-                        FontSize="12"
                         FontWeight="Bold"
                         Foreground="#616161"
+                        Style="{StaticResource Type.Caption}"
                         Text="عنوان النشر *" />
                     <TextBox
                         x:Name="TxtTitle"
@@ -96,9 +95,9 @@
                 <StackPanel Margin="0,0,0,16">
                     <TextBlock
                         Margin="0,0,0,8"
-                        FontSize="12"
                         FontWeight="Bold"
                         Foreground="#616161"
+                        Style="{StaticResource Type.Caption}"
                         Text="ملاحظات (اختياري)" />
                     <TextBox
                         x:Name="TxtNotes"
@@ -112,15 +111,15 @@
                 <!--  تاريخ النشر (تلقائي)  -->
                 <TextBlock
                     Margin="0,12,0,0"
-                    FontSize="11"
                     FontStyle="Italic"
                     Foreground="#999"
+                    Style="{StaticResource Type.Overline}"
                     Text="سيتم النشر فوراً في:" />
                 <TextBlock
                     x:Name="TxtPublishTime"
                     Margin="0,4,0,0"
-                    FontSize="12"
                     Foreground="#616161"
+                    Style="{StaticResource Type.Caption}"
                     Text="" />
             </StackPanel>
 

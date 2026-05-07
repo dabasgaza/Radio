@@ -1,14 +1,10 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Radio.Views.Admin;
+namespace Radio.Views.SocialPlatforms;
 
 public partial class SocialPlatformsView : UserControl
 {

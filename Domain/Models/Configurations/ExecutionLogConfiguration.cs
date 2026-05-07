@@ -45,5 +45,12 @@ public class ExecutionLogConfiguration : IEntityTypeConfiguration<ExecutionLog>
               .WithMany(p => p.ExecutionLogs)
               .HasForeignKey(d => d.ExecutedByUserId)
               .OnDelete(DeleteBehavior.Restrict);
+
+        // 4. فهارس الأداء (Performance Indexes)
+        builder.HasIndex(e => e.EpisodeId)
+              .HasDatabaseName("IX_ExecutionLogs_EpisodeId");
+
+        builder.HasIndex(e => e.ExecutedByUserId)
+              .HasDatabaseName("IX_ExecutionLogs_ExecutedByUserId");
     }
 }

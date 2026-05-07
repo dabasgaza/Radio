@@ -1,27 +1,21 @@
-﻿<mah:MetroWindow
+<UserControl
     x:Class="Radio.Views.Users.PermissionMatrixView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Title="إدارة صلاحيات الوصول المتقدمة"
-    Width="1000"
-    Height="650"
-    Style="{StaticResource Window.Dialog}"
-    WindowStartupLocation="CenterScreen">
+    Style="{StaticResource View.Base}">
 
     <materialDesign:Card
-        Margin="30"
-        materialDesign:ElevationAssist.Elevation="Dp3"
-        Background="{DynamicResource MaterialDesignPaper}"
-        UniformCornerRadius="20">
+        Margin="0"
+        materialDesign:ElevationAssist.Elevation="Dp0"
+        Background="Transparent">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <materialDesign:ColorZone MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Style="{StaticResource Zone.Header.Primary}">
+            <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -60,17 +54,7 @@
                             </StackPanel>
                         </Button>
 
-                        <Button
-                            Margin="20,0,0,0"
-                            Click="BtnClose_Click"
-                            Foreground="White"
-                            Opacity="0.5"
-                            Style="{StaticResource MaterialDesignIconButton}">
-                            <materialDesign:PackIcon
-                                Width="24"
-                                Height="24"
-                                Kind="Close" />
-                        </Button>
+
                     </StackPanel>
                 </Grid>
             </materialDesign:ColorZone>
@@ -120,7 +104,7 @@
                                         <TextBlock
                                             Margin="15,0"
                                             VerticalAlignment="Center"
-                                            FontSize="16"
+                                            Style="{StaticResource Type.BodyLarge}"
                                             Text="{Binding RoleDescription}" />
                                     </StackPanel>
                                 </DataTemplate>
@@ -171,8 +155,8 @@
 
                                                 <StackPanel VerticalAlignment="Center">
                                                     <TextBlock
-                                                        FontSize="15"
                                                         Foreground="{DynamicResource MaterialDesignBody}"
+                                                        Style="{StaticResource Type.BodyMedium}"
                                                         Text="{Binding DisplayName}" />
                                                     <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                                                         <materialDesign:PackIcon
@@ -182,8 +166,8 @@
                                                             Opacity="0.4" />
                                                         <TextBlock
                                                             Margin="5,0"
-                                                            FontSize="10"
                                                             Opacity="0.5"
+                                                            Style="{StaticResource Type.Overline}"
                                                             Text="{Binding Module}" />
                                                     </StackPanel>
                                                 </StackPanel>
@@ -205,4 +189,4 @@
             </Grid>
         </Grid>
     </materialDesign:Card>
-</mah:MetroWindow>
+</UserControl>

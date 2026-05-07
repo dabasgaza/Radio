@@ -31,11 +31,19 @@ namespace Radio.Views.Employees
             {
                 _allEmployees = await _employeeService.GetAllActiveAsync();
                 DgEmployees.ItemsSource = _allEmployees;
+                UpdateStats();
             }
             catch (Exception)
             {
                 MessageService.Current.ShowError("حدث خطأ أثناء تحميل الموظفين.");
             }
+        }
+
+        private void UpdateStats()
+        {
+            TxtTotalEmployees.Text = _allEmployees.Count.ToString();
+            TxtActiveEmployees.Text = _allEmployees.Count.ToString(); // Assuming GetAllActiveAsync returns active ones
+            TxtOccupiedRoles.Text = _allEmployees.Select(e => e.StaffRoleId).Distinct().Count().ToString();
         }
 
         private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)

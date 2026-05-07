@@ -55,7 +55,18 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
               .HasForeignKey(e => e.ProgramId)
               .OnDelete(DeleteBehavior.Cascade);
 
+        // 4. فهارس الأداء (Performance Indexes)
+        // ── فهرس على StatusId لتسريع فلترة الحلقات حسب الحالة ──
+        builder.HasIndex(e => e.StatusId)
+              .HasDatabaseName("IX_Episodes_StatusId");
 
+        // ── فهرس على ProgramId لتسريع JOIN مع البرامج ──
+        builder.HasIndex(e => e.ProgramId)
+              .HasDatabaseName("IX_Episodes_ProgramId");
+
+        // ── فهرس على ScheduledExecutionTime لتسريع فلترة التاريخ ──
+        builder.HasIndex(e => e.ScheduledExecutionTime)
+              .HasDatabaseName("IX_Episodes_ScheduledExecutionTime");
 
     }
 }

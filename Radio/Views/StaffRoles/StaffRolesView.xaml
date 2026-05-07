@@ -8,6 +8,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -15,17 +16,15 @@
         <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
             <DockPanel>
                 <materialDesign:PackIcon
-                    Width="28"
-                    Height="28"
+                    Width="24"
+                    Height="24"
                     Margin="0,0,10,0"
                     VerticalAlignment="Center"
                     Kind="BadgeAccount" />
                 <TextBlock
                     VerticalAlignment="Center"
-                    DockPanel.Dock="Right"
-                    FontSize="20"
-                    FontWeight="Bold"
-                    Text="المسميات الوظيفية" />
+                    Style="{StaticResource Type.TitleLarge}"
+                    Text="أدوار الموظفين" />
                 <Button
                     HorizontalAlignment="Left"
                     Click="BtnAdd_Click"
@@ -35,10 +34,35 @@
             </DockPanel>
         </materialDesign:ColorZone>
 
-        <!--  DataGrid  -->
+        <!--  Stats  -->
         <materialDesign:Card
             Grid.Row="1"
-            Margin="24,20,24,24"
+            Width="250"
+            Margin="24,20,24,0"
+            HorizontalAlignment="Right"
+            Style="{StaticResource Card.Stat}">
+            <StackPanel>
+                <Border Style="{StaticResource StatIcon.Primary}">
+                    <materialDesign:PackIcon
+                        Width="24"
+                        Height="24"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource PrimaryMainBrush}"
+                        Kind="ShieldStar" />
+                </Border>
+                <TextBlock Style="{StaticResource Type.Caption}" Text="إجمالي الأدوار الوظيفية" />
+                <TextBlock
+                    x:Name="TxtTotalRoles"
+                    Style="{StaticResource Type.Numeric.Large}"
+                    Text="0" />
+            </StackPanel>
+        </materialDesign:Card>
+
+        <!--  DataGrid  -->
+        <materialDesign:Card
+            Grid.Row="2"
+            Margin="24,10,24,24"
             materialDesign:ElevationAssist.Elevation="Dp1"
             UniformCornerRadius="12">
             <DataGrid
@@ -53,29 +77,30 @@
                         Binding="{Binding RoleName}"
                         Header="اسم الدور الوظيفي" />
                     <DataGridTemplateColumn
-                        Width="120"
+                        Width="100"
                         CellStyle="{StaticResource DataGrid.Cell.Actions}"
                         Header="إجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                     <Button
-                                        Width="34"
-                                        Height="34"
-                                        Margin="2"
                                         Click="BtnEdit_Click"
-                                        Style="{StaticResource Btn.Primary}"
+                                        Style="{StaticResource Btn.Icon.Edit}"
                                         Tag="{Binding StaffRoleId}">
-                                        <materialDesign:PackIcon Kind="Pencil" />
+                                        <materialDesign:PackIcon
+                                            Width="16"
+                                            Height="16"
+                                            Kind="Pencil" />
                                     </Button>
                                     <Button
-                                        Width="34"
-                                        Height="34"
-                                        Margin="2"
+                                        Margin="8,0,0,0"
                                         Click="BtnDelete_Click"
-                                        Style="{StaticResource Btn.Cancel}"
+                                        Style="{StaticResource Btn.Icon.Delete}"
                                         Tag="{Binding StaffRoleId}">
-                                        <materialDesign:PackIcon Kind="Delete" />
+                                        <materialDesign:PackIcon
+                                            Width="16"
+                                            Height="16"
+                                            Kind="Delete" />
                                     </Button>
                                 </StackPanel>
                             </DataTemplate>

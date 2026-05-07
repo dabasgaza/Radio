@@ -28,7 +28,9 @@ namespace Radio.Views.StaffRoles
         {
             try
             {
-                DgRoles.ItemsSource = await _employeeService.GetAllRolesAsync();
+                var roles = await _employeeService.GetAllRolesAsync();
+                DgRoles.ItemsSource = roles;
+                TxtTotalRoles.Text = roles.Count.ToString();
             }
             catch (Exception)
             {

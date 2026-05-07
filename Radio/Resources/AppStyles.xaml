@@ -61,7 +61,7 @@
         BasedOn="{StaticResource MaterialDesignOutlinedComboBox}"
         TargetType="ComboBox">
 
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
@@ -89,7 +89,7 @@
         BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}"
         TargetType="DatePicker">
 
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
@@ -139,7 +139,7 @@
         x:Key="BroadcastTextBox"
         BasedOn="{StaticResource MaterialDesignFilledTextBox}"
         TargetType="TextBox">
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.HasOutlinedTextField" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />

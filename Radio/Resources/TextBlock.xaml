@@ -22,7 +22,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.Display" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="45" />
+        <Setter Property="FontSize" Value="36" />
         <Setter Property="FontWeight" Value="Light" />
         <Setter Property="LineHeight" Value="52" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -36,7 +36,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.Headline" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontSize" Value="26" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="LineHeight" Value="40" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -58,7 +58,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.TitleLarge" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontSize" Value="18" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="LineHeight" Value="28" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -79,7 +79,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.TitleMedium" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="LineHeight" Value="24" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -92,7 +92,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.TitleSmall" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="LineHeight" Value="20" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -105,7 +105,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.BodyLarge" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="LineHeight" Value="24" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -119,9 +119,19 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.BodyMedium" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="LineHeight" Value="20" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  نص صغير أساسي  -->
+    <Style x:Key="Type.BodySmall" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="LineHeight" Value="18" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -150,7 +160,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.Label" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="LineHeight" Value="20" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -162,7 +172,7 @@
         x:Key="Type.Label.Section"
         BasedOn="{StaticResource Type.Label}"
         TargetType="TextBlock">
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="10" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Opacity" Value="0.55" />
         <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
@@ -174,7 +184,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.Caption" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="10" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="LineHeight" Value="16" />
         <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
@@ -197,7 +207,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.Overline" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontSize" Value="9" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="LineHeight" Value="16" />
         <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
@@ -210,14 +220,14 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.Numeric.Large" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontSize" Value="22" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
     <Style x:Key="Type.Numeric.Medium" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontSize" Value="16" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -229,7 +239,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.Clock" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -241,7 +251,7 @@
         ═══════════════════════════════════════════════════════════
     -->
     <Style x:Key="Type.DataGrid.Cell" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -254,7 +264,7 @@
         x:Key="Type.DataGrid.CellPrimary"
         BasedOn="{StaticResource Type.DataGrid.Cell}"
         TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 

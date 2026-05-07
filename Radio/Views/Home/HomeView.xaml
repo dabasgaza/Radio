@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="Radio.Views.Home.HomeView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,9 +10,249 @@
     d:DesignWidth="800"
     Style="{StaticResource View.Base}"
     mc:Ignorable="d">
-    <Image
-        Margin="0,0,0,20"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        Source="/Resources/Img/Logo.jpeg" />
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> 
+            <!--  Header  -->
+            <RowDefinition Height="Auto" /> 
+            <!--  Stats Cards  -->
+            <RowDefinition Height="*" />    
+            <!--  Content Area  -->
+        </Grid.RowDefinitions>
+
+        <!--  1. Header Section  -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,30">
+            <TextBlock Style="{StaticResource Type.Headline}" Text="مرحباً بك في نظام بث برو" />
+            <TextBlock
+                Margin="0,4,0,0"
+                Style="{StaticResource Type.BodyMedium.Secondary}"
+                Text="نظرة عامة على سير العمل والنشاط الميداني لليوم" />
+        </StackPanel>
+
+        <!--  2. Statistics Cards  -->
+        <UniformGrid
+            Grid.Row="1"
+            Margin="-8,0"
+            Columns="4">
+            <!--  Today's Episodes  -->
+            <materialDesign:Card
+                Margin="8"
+                Padding="20"
+                materialDesign:ElevationAssist.Elevation="Dp2"
+                UniformCornerRadius="12">
+                <StackPanel>
+                    <materialDesign:PackIcon
+                        Width="28"
+                        Height="28"
+                        Foreground="{DynamicResource PrimaryMainBrush}"
+                        Kind="CalendarStar" />
+                    <TextBlock
+                        Margin="0,12,0,0"
+                        Style="{StaticResource Type.Caption}"
+                        Text="حلقات اليوم" />
+                    <TextBlock
+                        x:Name="TxtTodayCount"
+                        Style="{StaticResource Type.Numeric.Large}"
+                        Text="12" />
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!--  Active Guests  -->
+            <materialDesign:Card
+                Margin="8"
+                Padding="20"
+                materialDesign:ElevationAssist.Elevation="Dp2"
+                UniformCornerRadius="12">
+                <StackPanel>
+                    <materialDesign:PackIcon
+                        Width="28"
+                        Height="28"
+                        Foreground="{DynamicResource SuccessBrush}"
+                        Kind="AccountVoice" />
+                    <TextBlock
+                        Margin="0,12,0,0"
+                        Style="{StaticResource Type.Caption}"
+                        Text="الضيوف المجدولين" />
+                    <TextBlock
+                        x:Name="TxtGuestCount"
+                        Style="{StaticResource Type.Numeric.Large}"
+                        Text="5" />
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!--  Pending Logs  -->
+            <materialDesign:Card
+                Margin="8"
+                Padding="20"
+                materialDesign:ElevationAssist.Elevation="Dp2"
+                UniformCornerRadius="12">
+                <StackPanel>
+                    <materialDesign:PackIcon
+                        Width="28"
+                        Height="28"
+                        Foreground="{DynamicResource WarningBrush}"
+                        Kind="History" />
+                    <TextBlock
+                        Margin="0,12,0,0"
+                        Style="{StaticResource Type.Caption}"
+                        Text="سجلات قيد التنفيذ" />
+                    <TextBlock
+                        x:Name="TxtPendingLogs"
+                        Style="{StaticResource Type.Numeric.Large}"
+                        Text="8" />
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!--  System Users  -->
+            <materialDesign:Card
+                Margin="8"
+                Padding="20"
+                materialDesign:ElevationAssist.Elevation="Dp2"
+                UniformCornerRadius="12">
+                <StackPanel>
+                    <materialDesign:PackIcon
+                        Width="28"
+                        Height="28"
+                        Foreground="{DynamicResource InfoBrush}"
+                        Kind="ShieldAccount" />
+                    <TextBlock
+                        Margin="0,12,0,0"
+                        Style="{StaticResource Type.Caption}"
+                        Text="المستخدمين النشطين" />
+                    <TextBlock
+                        x:Name="TxtActiveUsers"
+                        Style="{StaticResource Type.Numeric.Large}"
+                        Text="4" />
+                </StackPanel>
+            </materialDesign:Card>
+        </UniformGrid>
+
+        <!--  3. Bottom Content (Today's List & Activity)  -->
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Today's Episodes List  -->
+            <materialDesign:Card
+                Grid.Column="0"
+                Margin="0,0,12,0"
+                Padding="20"
+                materialDesign:ElevationAssist.Elevation="Dp1"
+                UniformCornerRadius="12">
+                <DockPanel>
+                    <StackPanel
+                        Margin="0,0,0,15"
+                        DockPanel.Dock="Top"
+                        Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource PrimaryMainBrush}"
+                            Kind="PlaylistPlay" />
+                        <TextBlock
+                            Margin="8,0"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource Type.TitleMedium}"
+                            Text="حلقات قيد البث اليوم" />
+                    </StackPanel>
+
+                    <DataGrid
+                        x:Name="DgTodayEpisodes"
+                        AutoGenerateColumns="False"
+                        CellStyle="{StaticResource DataGrid.Cell}"
+                        ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                        IsReadOnly="True"
+                        Style="{StaticResource DataGrid.Main}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="Auto"
+                                Binding="{Binding ScheduledExecutionTime, StringFormat=hh:mm tt}"
+                                Header="الوقت" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding EpisodeName}"
+                                Header="اسم الحلقة" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding ProgramName}"
+                                Header="البرنامج" />
+                            <DataGridTemplateColumn Width="Auto" Header="الحالة">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <materialDesign:Chip
+                                            Height="24"
+                                            Background="{DynamicResource PrimaryXLightBrush}"
+                                            Content="{Binding StatusDisplayName}"
+                                            FontSize="9"
+                                            Foreground="{DynamicResource PrimaryMainBrush}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </materialDesign:Card>
+
+            <!--  Quick Info / Announcements  -->
+            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                <materialDesign:Card
+                    Padding="20"
+                    materialDesign:ElevationAssist.Elevation="Dp1"
+                    Background="{DynamicResource PrimaryMainBrush}"
+                    Foreground="White"
+                    UniformCornerRadius="12">
+                    <StackPanel>
+                        <TextBlock
+                            Foreground="White"
+                            Style="{StaticResource Type.TitleSmall}"
+                            Text="ملاحظة النظام" />
+                        <TextBlock
+                            Margin="0,8"
+                            Foreground="White"
+                            Opacity="0.9"
+                            Style="{StaticResource Type.Caption}"
+                            Text="يرجى مراجعة كافة سجلات التنفيذ قبل نهاية الدوام الرسمي لضمان أرشفة التقارير بشكل صحيح."
+                            TextWrapping="Wrap" />
+                        <Button
+                            Margin="0,8,0,0"
+                            Padding="8,0"
+                            HorizontalAlignment="Right"
+                            Content="فتح التقارير"
+                            Foreground="White"
+                            Style="{StaticResource MaterialDesignFlatButton}" />
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <materialDesign:Card
+                    Margin="0,16,0,0"
+                    Padding="20"
+                    materialDesign:ElevationAssist.Elevation="Dp1"
+                    UniformCornerRadius="12">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Type.TitleSmall}" Text="البرامج الأكثر تفاعلاً" />
+                        <ItemsControl x:Name="IcActivePrograms" Margin="0,12,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,4">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource Type.BodyMedium}"
+                                            Text="{Binding ProgramName}" />
+                                        <TextBlock
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold"
+                                            Foreground="{DynamicResource PrimaryMainBrush}"
+                                            Style="{StaticResource Type.Caption}"
+                                            Text="{Binding TotalEpisodes}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </materialDesign:Card>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </UserControl>

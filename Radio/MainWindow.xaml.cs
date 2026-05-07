@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Forms;
@@ -163,11 +163,17 @@ namespace Radio
         private void OpenPermissionDialog()
         {
             var userService = _serviceProvider.GetRequiredService<IUserService>();
-            var permWindow = new PermissionMatrixView(userService, _session)
+            var view = new PermissionMatrixView(userService, _session);
+            var window = new MahApps.Metro.Controls.MetroWindow
             {
-                Owner = this
+                Content = view,
+                Title = "إدارة الصلاحيات",
+                Width = 1000,
+                Height = 650,
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
-            permWindow.ShowDialog();
+            window.ShowDialog();
         }
 
         // ─── معالجات النافذة ────────────────────────────────────

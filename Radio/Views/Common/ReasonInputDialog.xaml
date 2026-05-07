@@ -22,8 +22,8 @@
             x:Name="TxtPrompt"
             Grid.Row="0"
             Margin="0,0,0,12"
-            FontSize="14"
             FontWeight="SemiBold"
+            Style="{StaticResource Type.BodyLarge}"
             Text="يرجى إدخال سبب العملية:" />
 
         <TextBox
