@@ -37,7 +37,7 @@
         <!--  الأبعاد والحشوة  -->
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
 
@@ -48,7 +48,7 @@
         <!--  Material Design Hints  -->
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusMedium}" />
         <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
@@ -101,9 +101,9 @@
         x:Key="Input.Search"
         BasedOn="{StaticResource MaterialDesignOutlinedTextBox}"
         TargetType="TextBox">
-        <Setter Property="Height" Value="48" />
+        <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="CaretBrush" Value="{StaticResource PrimaryMainBrush}" />
@@ -115,7 +115,7 @@
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="Magnify" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="20" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="24" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusFull}" />
         <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
         <!--<Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="Transparent" />-->
 
@@ -140,7 +140,7 @@
 
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
@@ -150,7 +150,7 @@
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="LockOutline" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="20" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusMedium}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
 
         <Style.Triggers>

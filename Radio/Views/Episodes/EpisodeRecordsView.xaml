@@ -11,11 +11,7 @@
     Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterOwner">
 
-    <materialDesign:Card
-        Margin="30"
-        Background="{StaticResource SurfaceBrush}"
-        Effect="{StaticResource Shadow.Dialog}"
-        UniformCornerRadius="16">
+    <materialDesign:Card Margin="30" Style="{StaticResource Card.Form}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -23,9 +19,10 @@
             </Grid.RowDefinitions>
 
             <!--  ═══════ الهيدر ═══════  -->
-            <materialDesign:ColorZone Grid.Row="0" 
-                                      PreviewMouseLeftButtonDown="ColorZone_PreviewMouseLeftButtonDown"
-                                      Style="{StaticResource Zone.Header.Primary}">
+            <materialDesign:ColorZone
+                Grid.Row="0"
+                MouseLeftButtonDown="ColorZone_MouseLeftButtonDown"
+                Style="{StaticResource Zone.Header.Primary}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />

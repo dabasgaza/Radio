@@ -128,7 +128,7 @@
         <Setter Property="Padding" Value="16,0" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
 
         <!--  Template مخصص يزيل focus rectangle المزعج  -->
         <Setter Property="Template">
@@ -170,7 +170,7 @@
         x:Key="DataGrid.Cell.First"
         BasedOn="{StaticResource DataGrid.Cell}"
         TargetType="DataGridCell">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
         <Setter Property="FontWeight" Value="Medium" />
 
         <Style.Triggers>
@@ -279,7 +279,7 @@
         <Setter Property="CanUserResizeRows" Value="False" />
 
         <!--  المظهر  -->
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="GridLinesVisibility" Value="Horizontal" />
         <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource DividerBrush}" />

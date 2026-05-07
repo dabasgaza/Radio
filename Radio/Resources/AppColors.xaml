@@ -6,7 +6,10 @@
     ║  الثيم:  Indigo Primary / Light Blue Secondary / Light Mode              ║
     ╚══════════════════════════════════════════════════════════════════════════╝
 -->
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!--
         ═══════════════════════════════════════════════════════════
@@ -240,5 +243,19 @@
     <Thickness x:Key="SpacingMedium">16</Thickness>
     <Thickness x:Key="SpacingLarge">24</Thickness>
     <Thickness x:Key="SpacingXLarge">32</Thickness>
+
+    <!--  FontSize Tokens  -->
+    <sys:Double x:Key="FontSizeCaption">12</sys:Double>
+    <sys:Double x:Key="FontSizeBody">14</sys:Double>
+    <sys:Double x:Key="FontSizeInput">15</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">22</sys:Double>
+    <sys:Double x:Key="FontSizeHeadline">32</sys:Double>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        7. TYPOGRAPHY — الخطوط المعتمدة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <FontFamily x:Key="AppFontFamily">pack://application:,,,/Radio;component/Resources/Cairo/Cairo-Regular.ttf#Cairo</FontFamily>
 
 </ResourceDictionary>

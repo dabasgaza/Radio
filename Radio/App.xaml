@@ -57,6 +57,7 @@
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/AppColors.xaml" />
+                <ResourceDictionary Source="Resources/AppStyles.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════

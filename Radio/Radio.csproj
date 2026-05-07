@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -53,6 +53,8 @@
 
   <ItemGroup>
     <Resource Include="Resources\Img\Logo.jpeg" />
+    <Resource Include="Resources\Cairo\*.ttf" />
+    <Resource Include="Resources\Tajawal\*.ttf" />
   </ItemGroup>
 
 </Project>

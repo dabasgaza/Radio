@@ -10,6 +10,7 @@ namespace Radio.Messaging
     {
         private readonly DispatcherTimer _closeTimer;
         private readonly TimeSpan _duration = TimeSpan.FromSeconds(4);
+        private bool _isExiting; // ── علم حماية لمنع استدعاء AnimateExit مرتين ──
 
         public NotificationControl(NotificationType type, string title, string message)
         {
@@ -90,6 +91,10 @@ namespace Radio.Messaging
 
         private void AnimateExit()
         {
+            // ── منع الاستدعاء المزدوج: المؤقت وشريط التقدم يتنافسان على نفس الدالة ──
+            if (_isExiting) return;
+            _isExiting = true;
+
             _closeTimer.Stop();
 
             var slideOut = new DoubleAnimation

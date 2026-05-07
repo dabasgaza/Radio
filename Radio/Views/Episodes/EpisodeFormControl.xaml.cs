@@ -6,8 +6,6 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using MahApps.Metro.Controls;
-using Radio.Messaging;
-
 
 namespace Radio.Views.Episodes
 {
@@ -44,6 +42,7 @@ namespace Radio.Views.Episodes
             _session = session;
             _episodeId = episodeId;
 
+            // ── تفعيل سحب النافذة وتحديد العنوان حسب نوع العملية ──
             IsWindowDraggable = true;
 
             Title = _episodeId.HasValue ? "تعديل بيانات الحلقة" : "جدولة حلقة إذاعية";
@@ -52,11 +51,9 @@ namespace Radio.Views.Episodes
             DgGuests.ItemsSource = GuestList;
             DgCorrespondents.ItemsSource = CorrespondentList;
             DgEmployees.ItemsSource = EmployeeList;
-            Loaded += (_, _) => NotificationManager.RegisterHost(NotificationHost);
-            Unloaded += (_, _) => NotificationManager.RegisterHost(null!);
+
             Loaded += async (_, _) => await InitializeDataAsync();
         }
-
 
         private async Task InitializeDataAsync()
         {
@@ -193,39 +190,59 @@ namespace Radio.Views.Episodes
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
+            // ── التحقق من المدخلات الإلزامية ──
             if (CbPrograms.SelectedValue == null) { MessageService.Current.ShowWarning("يرجى اختيار البرنامج."); return; }
             if (string.IsNullOrWhiteSpace(TxtEpisodeName.Text)) { MessageService.Current.ShowWarning("يرجى إدخال عنوان الحلقة."); return; }
             if (DpDate.SelectedDate == null) { MessageService.Current.ShowWarning("يرجى تحديد تاريخ البث."); return; }
 
-            var dto = new EpisodeDto(
-                _episodeId ?? 0,
-                (int)CbPrograms.SelectedValue,
-                GuestList.Select(g => new EpisodeGuestDto(g.EpisodeGuestId, g.GuestId, g.FullName, g.Topic, g.HostingTime, null)).ToList(),
-                CorrespondentList.Select(c => new EpisodeCorrespondentDto(c.Id, c.CorrespondentId, c.FullName, c.Topic, c.HostingTime)).ToList(),
-                EmployeeList.Select(e => new EpisodeEmployeeDto(0, e.EmployeeId, e.FullName, e.StaffRoleName)).ToList(),
-                TxtEpisodeName.Text.Trim(),
-                DpDate.SelectedDate,
-                TpBroadcastTime.SelectedTime?.TimeOfDay,
-                TxtSpecialNotes.Text?.Trim()
-            );
+            // ── تعطيل زر الحفظ أثناء العملية لمنع النقر المكرر ──
+            BtnSave.IsEnabled = false;
 
-            Result result;
-            if (_episodeId.HasValue)
-                result = await _episodeService.UpdateEpisodeAsync(dto, _session);
-            else
+            try
             {
-                var createRes = await _episodeService.CreateEpisodeAsync(dto, _session);
-                result = createRes.IsSuccess ? Result.Success() : Result.Fail(createRes.ErrorMessage ?? "خطأ غير معروف");
-            }
+                var dto = new EpisodeDto(
+                    _episodeId ?? 0,
+                    (int)CbPrograms.SelectedValue,
+                    GuestList.Select(g => new EpisodeGuestDto(g.EpisodeGuestId, g.GuestId, g.FullName, g.Topic, g.HostingTime, null)).ToList(),
+                    CorrespondentList.Select(c => new EpisodeCorrespondentDto(c.Id, c.CorrespondentId, c.FullName, c.Topic, c.HostingTime)).ToList(),
+                    EmployeeList.Select(emp => new EpisodeEmployeeDto(0, emp.EmployeeId)).ToList(),
+                    TxtEpisodeName.Text.Trim(),
+                    DpDate.SelectedDate,
+                    TpBroadcastTime.SelectedTime?.TimeOfDay,
+                    TxtSpecialNotes.Text?.Trim()
+                );
 
-            if (result.IsSuccess)
-            {
-                MessageService.Current.ShowSuccess(_episodeId.HasValue ? "تم تحديث بيانات الحلقة بنجاح" : "تم جدولة الحلقة بنجاح");
-                DialogResult = true;
+                // ── تنفيذ عملية الحفظ (إضافة أو تعديل) ──
+                Result result;
+                if (_episodeId.HasValue)
+                    result = await _episodeService.UpdateEpisodeAsync(dto, _session);
+                else
+                {
+                    var createRes = await _episodeService.CreateEpisodeAsync(dto, _session);
+                    result = createRes.IsSuccess ? Result.Success() : Result.Fail(createRes.ErrorMessage ?? "خطأ غير معروف");
+                }
+
+                // ── عرض رسالة النتيجة للمستخدم ──
+                if (result.IsSuccess)
+                {
+                    DialogResult = true;
+                }
+                else
+                {
+                    MessageService.Current.ShowError(result.ErrorMessage ?? "فشل حفظ بيانات الحلقة.");
+                }
             }
-            else MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحفظ.");
+            catch (Exception ex)
+            {
+                // ── معالجة أي استثناء غير متوقع ──
+                MessageService.Current.ShowError($"حدث خطأ غير متوقع أثناء الحفظ: {ex.Message}");
+            }
+            finally
+            {
+                // ── إعادة تفعيل زر الحفظ ──
+                BtnSave.IsEnabled = true;
+            }
         }
-
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e) => DialogResult = false;
 
@@ -256,6 +273,11 @@ namespace Radio.Views.Episodes
             public int EmployeeId { get; set; } = employeeId;
             public string FullName { get; set; } = fullName;
             public string StaffRoleName { get; set; } = staffRoleName;
+        }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();    
         }
     }
 }

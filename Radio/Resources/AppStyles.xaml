@@ -1,4 +1,4 @@
-﻿
+
 <!--  AppStyles.xaml  -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -6,23 +6,31 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
 
-    <!--  ═══════════ Typography (Segoe UI) ═══════════  -->
+    <!--  ═══════════ Global Font Settings ═══════════  -->
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+    </Style>
+    <Style TargetType="{x:Type Control}">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+    </Style>
+
+    <!--  ═══════════ Typography ═══════════  -->
     <Style x:Key="HeadlineLarge" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeHeadline}" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
     <Style x:Key="TitleLarge" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
     <Style x:Key="BodyMedium" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
     <Style x:Key="DataGridTextStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>

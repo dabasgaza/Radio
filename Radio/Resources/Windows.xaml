@@ -35,7 +35,7 @@
         <Setter Property="WindowTitleBrush" Value="{StaticResource PrimaryDarkBrush}" />
         <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="16" />
         <Setter Property="ShowTitleBar" Value="False" />
     </Style>
@@ -57,7 +57,7 @@
         <Setter Property="ShowMaxRestoreButton" Value="False" />
         <Setter Property="ShowMinButton" Value="False" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
@@ -79,7 +79,7 @@
         <Setter Property="ShowTitleBar" Value="False" />
         <Setter Property="ResizeMode" Value="NoResize" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
@@ -95,7 +95,7 @@
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -214,7 +214,7 @@
         <Setter Property="Width" Value="450" />
         <!--  التوجيه والخط  -->
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="TextElement.FontFamily" Value="Hacen Tunisia" />
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="TextElement.FontSize" Value="15" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>

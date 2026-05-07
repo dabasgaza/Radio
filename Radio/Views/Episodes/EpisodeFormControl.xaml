@@ -9,12 +9,12 @@
     Title="بيانات الحلقة"
     Width="900"
     Height="750"
+    FlowDirection="RightToLeft"
     Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
     <materialDesign:Card
-        Margin="30"
         Background="{StaticResource SurfaceBrush}"
         Effect="{StaticResource Shadow.Dialog}"
         UniformCornerRadius="16">
@@ -32,6 +32,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <materialDesign:PackIcon
@@ -54,6 +55,15 @@
                             Style="{StaticResource Type.BodyMedium.OnColor}"
                             Text="يرجى إدخال تفاصيل البرنامج ومواعيد البث والضيوف والمراسلين" />
                     </StackPanel>
+
+                    <!--  زر إغلاق النافذة  -->
+                    <Button
+                        Grid.Column="2"
+                        Click="BtnClose_Click"
+                        Foreground="White"
+                        Style="{StaticResource MaterialDesignIconButton}">
+                        <materialDesign:PackIcon Kind="Close" />
+                    </Button>
                 </Grid>
             </materialDesign:ColorZone>
 
@@ -479,16 +489,6 @@
                 </TabItem>
 
             </TabControl>
-
-            <!--  حاوية الإشعارات  -->
-            <StackPanel
-                x:Name="NotificationHost"
-                Grid.Row="1"
-                Margin="0,0,0,20"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
-                Panel.ZIndex="999" />
-
 
             <!--  ═══════ 3. الذيل ═══════  -->
             <Border Grid.Row="2" Style="{StaticResource Window.Footer}">

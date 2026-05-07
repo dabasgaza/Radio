@@ -68,9 +68,9 @@
                     <ComboBox
                         x:Name="CmbMediaType"
                         materialDesign:HintAssist.Hint="اختر نوع الوسيط"
-                        Style="{StaticResource Input.ComboBox}"
+                        DisplayMemberPath="Content"
                         SelectedValuePath="Tag"
-                        DisplayMemberPath="Content">
+                        Style="{StaticResource Input.ComboBox}">
                         <ComboBoxItem Content="فيديو" Tag="Video" />
                         <ComboBoxItem Content="صوتي" Tag="Audio" />
                         <ComboBoxItem Content="فيديو وصوت" Tag="Both" />
@@ -123,8 +123,8 @@
                     Foreground="#616161"
                     Text="" />
             </StackPanel>
-            
-            <!-- حاوية الإشعارات -->
+
+            <!--  حاوية الإشعارات  -->
             <StackPanel
                 x:Name="NotificationHost"
                 Grid.Row="1"

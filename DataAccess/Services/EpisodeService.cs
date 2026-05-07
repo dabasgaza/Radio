@@ -27,7 +27,6 @@ public interface IEpisodeService
     Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session);
     Task<Result> CancelEpisodeAsync(int episodeId, string reason, UserSession session);
     Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session);
-    Task<List<EpisodeEmployeeDto>> GetEpisodeEmployeesAsync(int episodeId);
 }
 
 public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IEpisodeService
@@ -76,17 +75,8 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                     .ToList(),
 
                 EmployeeItems = e.EpisodeEmployees
-                    .Select(ee => new EpisodeEmployeeDto(
-                        ee.EpisodeEmployeeId,
-                        ee.EmployeeId,
-                        ee.Employee.FullName,
-                        ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
+                    .Select(ee => new EpisodeEmployeeDto(ee.EpisodeEmployeeId, ee.EmployeeId, ee.Employee.FullName, ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
                     .ToList(),
-
-                // ملخص أسماء الموظفين وأدوارهم لعرضه في بطاقات الحلقات
-                EmployeesDisplay = string.Join(" · ",
-                    e.EpisodeEmployees
-                        .Select(ee => ee.Employee.FullName)),
 
             }).ToListAsync();
     }
@@ -130,36 +120,12 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                     .ToList(),
 
                 EmployeeItems = e.EpisodeEmployees
-                    .Select(ee => new EpisodeEmployeeDto(
-                        ee.EpisodeEmployeeId,
-                        ee.EmployeeId,
-                        ee.Employee.FullName,
-                        ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
+                    .Select(ee => new EpisodeEmployeeDto(ee.EpisodeEmployeeId, ee.EmployeeId, ee.Employee.FullName, ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
                     .ToList(),
-
-                EmployeesDisplay = string.Join(" · ",
-                    e.EpisodeEmployees
-                        .Select(ee => ee.Employee.FullName)),
 
             }).FirstOrDefaultAsync();
     }
 
-    /// <summary>
-    /// يجلب الموظفين الكاملين لحلقة معينة بما فيهم الاسم الكامل والمسمى الوظيفي.
-    /// </summary>
-    public async Task<List<EpisodeEmployeeDto>> GetEpisodeEmployeesAsync(int episodeId)
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context.EpisodeEmployees
-            .AsNoTracking()
-            .Where(ee => ee.EpisodeId == episodeId)
-            .Select(ee => new EpisodeEmployeeDto(
-                ee.EpisodeEmployeeId,
-                ee.EmployeeId,
-                ee.Employee.FullName,
-                ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
-            .ToListAsync();
-    }
     /// <summary>
     /// يجلب الضيوف الكاملين لحلقة معينة بما فيهم الاسم الكامل والموضوع وساعة الاستضافة.
     /// يُستخدم عند فتح نموذج التعديل.
@@ -460,8 +426,9 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var existingById = existing.ToDictionary(e => e.EpisodeEmployeeId);
         var newIds = newItems.Where(i => i.Id != 0).Select(i => i.Id).ToHashSet();
 
+        // حذف ناعم للعناصر المحذوفة من الواجهة بدلاً من الحذف الصلب
         foreach (var ex in existing.Where(e => !newIds.Contains(e.EpisodeEmployeeId)))
-            ep.EpisodeEmployees.Remove(ex);
+            ex.IsActive = false;
 
         foreach (var dto in newItems)
         {
