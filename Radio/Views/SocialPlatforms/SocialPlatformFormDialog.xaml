@@ -6,7 +6,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="بيانات المنصة"
     Width="520"
-    Height="400"
+    Height="500"
     Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterScreen">
 

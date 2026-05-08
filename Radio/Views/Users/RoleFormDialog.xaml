@@ -1,0 +1,121 @@
+<mah:MetroWindow
+    x:Class="Radio.Views.Users.RoleFormDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="إدارة تعريف الدور"
+    Width="500"
+    Height="400"
+    SizeToContent="Height"
+    Style="{StaticResource Window.Dialog}"
+    WindowStartupLocation="CenterOwner">
+
+    <materialDesign:Card Margin="25" UniformCornerRadius="24" 
+                         materialDesign:ElevationAssist.Elevation="Dp8"
+                         Effect="{StaticResource Shadow.Dialog}"
+                         BorderThickness="1" BorderBrush="{StaticResource DividerBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Header  -->
+            <Border Background="{StaticResource PrimaryDarkBrush}" CornerRadius="24,24,0,0">
+                <Grid Margin="24,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="28"
+                            Height="28"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="ShieldAccount" />
+                        <TextBlock
+                            x:Name="TxtDialogTitle"
+                            Margin="16,0"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="إضافة دور أمان جديد" />
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Click="BtnCancel_Click"
+                            Padding="0"
+                            Width="32"
+                            Height="32"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Foreground="White">
+                        <materialDesign:PackIcon Kind="Close" Width="24" Height="24" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!--  Body  -->
+            <StackPanel Grid.Row="1" Margin="24">
+
+                <!--  Role Name  -->
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock
+                        Margin="0,0,0,8"
+                        FontWeight="Bold"
+                        Style="{StaticResource Type.Caption}"
+                        Text="اسم الدور (Role Name) *" />
+                    <TextBox
+                        x:Name="TxtRoleName"
+                        materialDesign:HintAssist.Hint="مثال: مدير النظام, محرر محتوى"
+                        Style="{StaticResource Input.Text}" />
+                </StackPanel>
+
+                <!--  Description  -->
+                <StackPanel Margin="0,0,0,8">
+                    <TextBlock
+                        Margin="0,0,0,8"
+                        FontWeight="Bold"
+                        Style="{StaticResource Type.Caption}"
+                        Text="وصف الدور" />
+                    <TextBox
+                        x:Name="TxtDescription"
+                        Height="80"
+                        materialDesign:HintAssist.Hint="اشرح باختصار صلاحيات هذا الدور..."
+                        AcceptsReturn="True"
+                        Style="{StaticResource Input.Text}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </StackPanel>
+
+            <!--  Footer  -->
+            <Border
+                Grid.Row="2"
+                Padding="24,16"
+                Background="{StaticResource Neutral50Brush}"
+                CornerRadius="0,0,24,24">
+                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                    <Button
+                        x:Name="BtnSave"
+                        Click="BtnSave_Click"
+                        Style="{StaticResource Btn.Primary}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon VerticalAlignment="Center" Kind="ContentSave" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="حفظ الدور" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Margin="12,0"
+                        Click="BtnCancel_Click"
+                        Content="إلغاء"
+                        Style="{StaticResource Btn.Secondary}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </materialDesign:Card>
+</mah:MetroWindow>

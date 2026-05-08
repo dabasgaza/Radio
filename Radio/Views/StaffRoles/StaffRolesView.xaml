@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    FlowDirection="RightToLeft"
     Style="{StaticResource View.Base}">
     <Grid>
         <Grid.RowDefinitions>
@@ -14,24 +13,44 @@
 
         <!--  Header  -->
         <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
-            <DockPanel>
-                <materialDesign:PackIcon
-                    Width="24"
-                    Height="24"
-                    Margin="0,0,10,0"
-                    VerticalAlignment="Center"
-                    Kind="BadgeAccount" />
-                <TextBlock
-                    VerticalAlignment="Center"
-                    Style="{StaticResource Type.TitleLarge}"
-                    Text="أدوار الموظفين" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="35"
+                            Height="35"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="BadgeAccount" />
+                        <TextBlock
+                            Margin="15,0"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="إدارة مسميات الوظائف" />
+                    </StackPanel>
+                    <TextBlock
+                        Margin="50,5,0,0"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
+                        Text="تعريف المسميات الوظيفية وتصنيف الأدوار الإدارية والبرمجية" />
+                </StackPanel>
+
                 <Button
-                    HorizontalAlignment="Left"
+                    Grid.Column="1"
                     Click="BtnAdd_Click"
-                    Content="إضافة دور"
-                    DockPanel.Dock="Left"
-                    Style="{StaticResource Btn.AddNew}" />
-            </DockPanel>
+                    Style="{StaticResource Btn.AddNew}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon VerticalAlignment="Center" Kind="Plus" />
+                        <TextBlock
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="إضافة مسمى وظيفي" />
+                    </StackPanel>
+                </Button>
+            </Grid>
         </materialDesign:ColorZone>
 
         <!--  Stats  -->

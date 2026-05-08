@@ -44,6 +44,7 @@
                 <Button
                     x:Name="BtnAddNew"
                     Grid.Column="1"
+                    Margin="10,0"
                     VerticalAlignment="Center"
                     Click="BtnAddNew_Click"
                     Style="{StaticResource Btn.AddNew}">
@@ -133,10 +134,7 @@
 
                 <DataGrid.Columns>
                     <!--  عمود اسم المنصة مع أيقونة  -->
-                    <DataGridTemplateColumn
-                        Width="*"
-                        CellStyle="{StaticResource DataGrid.Cell.First}"
-                        Header="اسم المنصة">
+                    <DataGridTemplateColumn Width="*" Header="اسم المنصة">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">

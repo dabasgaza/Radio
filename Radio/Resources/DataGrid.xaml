@@ -26,54 +26,54 @@
         WCAG AA: #1A237E (Indigo 800) على أبيض = 11.3:1 ✅
         ═══════════════════════════════════════════════════════════
     -->
-    <Style
-        x:Key="DataGrid.ColumnHeader"
-        BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}"
-        TargetType="DataGridColumnHeader">
-
+    <Style x:Key="DataGrid.ColumnHeader" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Height" Value="48" />
+        <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="16,0" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="SeparatorVisibility" Value="Collapsed" />
-
-        <Style.Triggers>
-            <!--  تأثير hover على الرأس مع الحفاظ على اللون الأبيض للنص  -->
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource PrimaryMainBrush}" />
-                <Setter Property="Foreground" Value="White" />
-                <Setter Property="Cursor" Value="Hand" />
-            </Trigger>
-            <!--  مؤشر الترتيب يبقى أبيض  -->
-            <Trigger Property="SortDirection" Value="Ascending">
-                <Setter Property="Foreground" Value="White" />
-            </Trigger>
-            <Trigger Property="SortDirection" Value="Descending">
-                <Setter Property="Foreground" Value="White" />
-            </Trigger>
-        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridColumnHeader">
+                    <Grid>
+                        <Border
+                            x:Name="HeaderBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{StaticResource DividerBrush}"
+                            BorderThickness="0,0,0,1">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource PrimaryMainBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
+    <Style
+        x:Key="DataGrid.ColumnHeader.Right"
+        BasedOn="{StaticResource DataGrid.ColumnHeader}"
+        TargetType="DataGridColumnHeader">
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+    </Style>
 
-    <!--
-        ==================================================================
-        DataGrid.ColumnHeader.Center — رأس العمود مع توسيط النص
-        ==================================================================
-    -->
     <Style
         x:Key="DataGrid.ColumnHeader.Center"
         BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}"
         TargetType="DataGridColumnHeader">
-
-        <Setter Property="FontSize" Value="13" />
-        <Setter Property="Height" Value="48" />
-        <Setter Property="Padding" Value="16,0" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="SeparatorVisibility" Value="Collapsed" />
+        <Setter Property="FontWeight" Value="Bold" />
     </Style>
+
+
+
 
     <!--
         ═══════════════════════════════════════════════════════════
@@ -222,6 +222,26 @@
                         BorderThickness="{TemplateBinding BorderThickness}"
                         SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style
+        x:Key="DataGrid.Cell.Right"
+        BasedOn="{StaticResource DataGrid.Cell}"
+        TargetType="DataGridCell">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Right" VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +12,9 @@ namespace DataAccess.Services
         Task<Result> UpdateUserAsync(UserDto dto, string? newPassword, UserSession session);
         Task<Result> ToggleUserStatusAsync(int userId, bool isActive, UserSession session);
         Task<List<RoleDto>> GetRolesAsync();
+        Task<Result> CreateRoleAsync(RoleDto dto, UserSession session);
+        Task<Result> UpdateRoleAsync(RoleDto dto, UserSession session);
+        Task<Result> DeleteRoleAsync(int roleId, UserSession session);
         Task<List<PermissionViewModel>> GetPermissionsMatrixAsync(int roleId);
         Task<Result> UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session);
         Task<Result> DeleteUserAsync(int userId, UserSession session);
@@ -133,6 +136,71 @@ namespace DataAccess.Services
                     RoleDescription = r.RoleDescription
                 })
                 .ToListAsync();
+        }
+
+        public async Task<Result> CreateRoleAsync(RoleDto dto, UserSession session)
+        {
+            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+            await using var context = await contextFactory.CreateDbContextAsync();
+
+            if (await context.Roles.AnyAsync(r => r.RoleName == dto.RoleName))
+                return Result.Fail("اسم الدور موجود مسبقاً");
+
+            var role = new Role
+            {
+                RoleName = dto.RoleName,
+                RoleDescription = dto.RoleDescription,
+                IsActive = true,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            context.Roles.Add(role);
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+
+        public async Task<Result> UpdateRoleAsync(RoleDto dto, UserSession session)
+        {
+            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var role = await context.Roles.FindAsync(dto.RoleId);
+            if (role == null) return Result.Fail("الدور غير موجود");
+
+            if (await context.Roles.AnyAsync(r => r.RoleName == dto.RoleName && r.RoleId != dto.RoleId))
+                return Result.Fail("اسم الدور موجود مسبقاً");
+
+            role.RoleName = dto.RoleName;
+            role.RoleDescription = dto.RoleDescription;
+            role.UpdatedAt = DateTime.Now;
+
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+
+        public async Task<Result> DeleteRoleAsync(int roleId, UserSession session)
+        {
+            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+            await using var context = await contextFactory.CreateDbContextAsync();
+            var role = await context.Roles.FindAsync(roleId);
+            if (role == null) return Result.Fail("الدور غير موجود");
+
+            if (await context.Users.AnyAsync(u => u.RoleId == roleId))
+                return Result.Fail("لا يمكن حذف الدور لأنه مرتبط بمستخدمين حاليين");
+
+            // حذف الصلاحيات المرتبطة أولاً
+            var perms = await context.RolePermissions.Where(rp => rp.RoleId == roleId).ToListAsync();
+            context.RolePermissions.RemoveRange(perms);
+
+            context.Roles.Remove(role);
+            await context.SaveChangesAsync();
+            return Result.Success();
         }
 
         public async Task<List<PermissionViewModel>> GetPermissionsMatrixAsync(int roleId)

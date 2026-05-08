@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -63,9 +63,20 @@ namespace Radio.Views.Users
         /// </summary>
         private async void BtnAddUser_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new UserFormDialog(null, _userService, _session);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new UserFormDialog(null, _userService, _session);
+                dialog.Owner = mainWindow;
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         /// <summary>
@@ -76,9 +87,20 @@ namespace Radio.Views.Users
             if (sender is not Button btn || btn.DataContext is not UserDto user)
                 return;
 
-            var dialog = new UserFormDialog(user, _userService, _session);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new UserFormDialog(user, _userService, _session);
+                dialog.Owner = mainWindow;
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         #endregion

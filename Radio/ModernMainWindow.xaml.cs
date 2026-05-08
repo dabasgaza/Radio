@@ -30,7 +30,9 @@ namespace Radio
             ["MenuUsers"] = "Users",
             ["MenuEmployees"] = "Employees",
             ["MenuStaffRoles"] = "StaffRoles",
+            ["MenuSecurityRoles"] = "SecurityRoles",
             ["MenuPermissionMatrix"] = "PermissionMatrix",
+            ["MenuPermissions"] = "Permissions",
             ["MenuSocialPlatforms"] = "SocialPlatforms",
         };
 
@@ -40,6 +42,9 @@ namespace Radio
             ["Publishing"] = false,
             ["Admin"] = false
         };
+
+        public async Task ShowOverlay() => await this.ShowOverlayAsync();
+        public async Task HideOverlay() => await this.HideOverlayAsync();
 
         public ModernMainWindow(UserSession session, IServiceProvider serviceProvider)
         {
@@ -95,22 +100,37 @@ namespace Radio
             MenuUsers.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
             MenuEmployees.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
             MenuStaffRoles.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
+            MenuSecurityRoles.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
             MenuPermissionMatrix.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
+            MenuPermissions.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
             MenuSocialPlatforms.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
 
             AdminHeaderLabel.Visibility = (canManageUsers || canManageStaff) ? Visibility.Visible : Visibility.Collapsed;
             AdminItems.Visibility = AdminHeaderLabel.Visibility;
         }
 
+        public void NavigateToView(string viewName)
+        {
+            var view = _navigationService.NavigateTo(viewName);
+            if (view != null)
+            {
+                MainContentArea.Content = view;
+
+                // تحديث حالة الأزرار في القائمة الجانبية (اختياري ولكن يفضل للجمالية)
+                var buttonName = NavRouteMap.FirstOrDefault(x => x.Value == viewName).Key;
+                if (!string.IsNullOrEmpty(buttonName))
+                {
+                    var button = this.FindName(buttonName) as RadioButton;
+                    if (button != null) button.IsChecked = true;
+                }
+            }
+        }
+
         private void NavRailItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is RadioButton rb && NavRouteMap.TryGetValue(rb.Name, out var viewName))
             {
-                var view = _navigationService.NavigateTo(viewName);
-                if (view != null)
-                {
-                    MainContentArea.Content = view;
-                }
+                NavigateToView(viewName);
             }
         }
 

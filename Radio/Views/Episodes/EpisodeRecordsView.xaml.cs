@@ -177,13 +177,21 @@ namespace Radio.Views.Episodes
         {
             if (_executionLog is null) return;
 
-            var dialog = new ExecutionLogDialog(_episodeId, _executionService, _session, _executionLog)
+            await this.ShowOverlayAsync();
+            try
             {
-                Owner = Window.GetWindow(this)
-            };
+                var dialog = new ExecutionLogDialog(_episodeId, _executionService, _session, _executionLog)
+                {
+                    Owner = this
+                };
 
-            if (dialog.ShowDialog() == true)
-                await LoadRecordsAsync();  // إعادة تحميل البيانات بعد التعديل
+                if (dialog.ShowDialog() == true)
+                    await LoadRecordsAsync();
+            }
+            finally
+            {
+                await this.HideOverlayAsync();
+            }
         }
 
         /// <summary>
@@ -194,6 +202,7 @@ namespace Radio.Views.Episodes
         {
             if (!_socialLogs.Any()) return;
 
+            await this.ShowOverlayAsync();
             try
             {
                 // استرجاع قائمة الضيوف (مطلوبة لـ PublishingLogDialog)
@@ -202,7 +211,7 @@ namespace Radio.Views.Episodes
 
                 var dialog = new PublishingLogDialog(_publishingService, _session, _episodeId, guests, _socialLogs)
                 {
-                    Owner = Window.GetWindow(this)
+                    Owner = this
                 };
 
                 if (dialog.ShowDialog() == true)
@@ -211,6 +220,10 @@ namespace Radio.Views.Episodes
             catch (Exception ex)
             {
                 MessageService.Current.ShowError($"خطأ: {ex.Message}");
+            }
+            finally
+            {
+                await this.HideOverlayAsync();
             }
         }
 
@@ -221,13 +234,21 @@ namespace Radio.Views.Episodes
         {
             if (_websiteLog is null) return;
 
-            var dialog = new WebsitePublishDialog(_publishingService, _session, _episodeId, _websiteLog)
+            await this.ShowOverlayAsync();
+            try
             {
-                Owner = Window.GetWindow(this)
-            };
+                var dialog = new WebsitePublishDialog(_publishingService, _session, _episodeId, _websiteLog)
+                {
+                    Owner = this
+                };
 
-            if (dialog.ShowDialog() == true)
-                await LoadRecordsAsync();
+                if (dialog.ShowDialog() == true)
+                    await LoadRecordsAsync();
+            }
+            finally
+            {
+                await this.HideOverlayAsync();
+            }
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)

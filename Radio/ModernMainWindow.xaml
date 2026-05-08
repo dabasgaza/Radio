@@ -62,8 +62,9 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <materialDesign:DialogHost Identifier="ModernRootDialog">
-        <Grid>
+    <Grid>
+        <materialDesign:DialogHost Identifier="ModernRootDialog" OverlayBackground="{StaticResource OverlayScrimBrush}">
+            <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -532,6 +533,23 @@
                             </RadioButton>
 
                             <RadioButton
+                                x:Name="MenuSecurityRoles"
+                                Click="NavRailItem_Click"
+                                Style="{StaticResource Modern.Nav.Item}"
+                                Tag="SecurityRoles">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="22"
+                                        Height="22"
+                                        Kind="ShieldAccount" />
+                                    <TextBlock
+                                        Margin="16,0"
+                                        VerticalAlignment="Center"
+                                        Text="تعريف أدوار المستخدمين" />
+                                </StackPanel>
+                            </RadioButton>
+
+                            <RadioButton
                                 x:Name="MenuPermissionMatrix"
                                 Click="NavRailItem_Click"
                                 Style="{StaticResource Modern.Nav.Item}"
@@ -547,6 +565,23 @@
                                         Text="مصفوفة الصلاحيات" />
                                 </StackPanel>
                             </RadioButton>
+
+                            <RadioButton
+                                x:Name="MenuPermissions"
+                                Click="NavRailItem_Click"
+                                Style="{StaticResource Modern.Nav.Item}"
+                                Tag="Permissions">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="22"
+                                        Height="22"
+                                        Kind="ShieldKeyOutline" />
+                                    <TextBlock
+                                        Margin="16,0"
+                                        VerticalAlignment="Center"
+                                        Text="تعريف الصلاحيات" />
+                                </StackPanel>
+                            </RadioButton>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -560,13 +595,7 @@
             <Grid Grid.Row="1" Grid.Column="1">
                 <ContentControl x:Name="MainContentArea" Margin="24" />
 
-                <!--  Notification Host  -->
-                <StackPanel
-                    x:Name="NotificationHost"
-                    Margin="0,0,0,20"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Panel.ZIndex="999" />
+
 
                 <!--  ON AIR Widget (System Styled)  -->
                 <Border
@@ -645,5 +674,14 @@
                 </Border>
             </Popup>
         </Grid>
-    </materialDesign:DialogHost>
-</mah:MetroWindow>
+            </materialDesign:DialogHost>
+
+            <!--  Notification Host (Topmost Layer)  -->
+            <StackPanel
+                x:Name="NotificationHost"
+                Margin="0,0,0,20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Panel.ZIndex="9999" />
+        </Grid>
+    </mah:MetroWindow>

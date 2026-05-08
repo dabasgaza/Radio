@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -17,6 +17,7 @@ namespace Radio.Messaging
         /// </summary>
         public static void RegisterHost(Panel panel)
         {
+            if (panel == null) return;
             _hostPanel = panel;
         }
 
@@ -46,15 +47,20 @@ namespace Radio.Messaging
         /// </summary>
         private static Panel? GetHost()
         {
-            if (_hostPanel is not null)
-                return _hostPanel;
-
-            var window = Application.Current.Windows
+            // 1. محاولة العثور على Host في النافذة النشطة حالياً (الأولوية القصوى)
+            var activeWindow = Application.Current.Windows
                 .OfType<Window>()
                 .LastOrDefault(w => w.IsActive)
                 ?? Application.Current.Windows.OfType<Window>().LastOrDefault();
 
-            return window is null ? null : FindVisualChild<Panel>(window, "NotificationHost");
+            if (activeWindow != null)
+            {
+                var foundHost = FindVisualChild<Panel>(activeWindow, "NotificationHost");
+                if (foundHost != null) return foundHost;
+            }
+
+            // 2. الرجوع للمسجل يدوياً إذا فشل البحث التلقائي
+            return _hostPanel;
         }
 
         private static T? FindVisualChild<T>(DependencyObject parent, string name) where T : FrameworkElement

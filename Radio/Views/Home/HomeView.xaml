@@ -12,11 +12,11 @@
     mc:Ignorable="d">
     <Grid Margin="30">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> 
+            <RowDefinition Height="Auto" />
             <!--  Header  -->
-            <RowDefinition Height="Auto" /> 
+            <RowDefinition Height="Auto" />
             <!--  Stats Cards  -->
-            <RowDefinition Height="*" />    
+            <RowDefinition Height="*" />
             <!--  Content Area  -->
         </Grid.RowDefinitions>
 

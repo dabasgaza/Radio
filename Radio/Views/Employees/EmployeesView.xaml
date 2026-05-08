@@ -15,24 +15,41 @@
 
         <!--  Header  -->
         <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource Zone.Header.Primary}">
-            <DockPanel>
-                <materialDesign:PackIcon
-                    Width="24"
-                    Height="24"
-                    Margin="0,0,10,0"
-                    VerticalAlignment="Center"
-                    Kind="AccountGroup" />
-                <TextBlock
-                    VerticalAlignment="Center"
-                    Style="{StaticResource Type.TitleLarge}"
-                    Text="الموظفون" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="35"
+                            Height="35"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="AccountGroup" />
+                        <TextBlock
+                            Margin="15,0"
+                            Style="{StaticResource Type.Headline.OnColor}"
+                            Text="منظومة إدارة الموظفين" />
+                    </StackPanel>
+                    <TextBlock
+                        Margin="50,5,0,0"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
+                        Text="إدارة ملفات الموظفين، تتبع البيانات الوظيفية، وتنظيم الهيكل الإداري" />
+                </StackPanel>
+
                 <Button
-                    HorizontalAlignment="Left"
+                    Grid.Column="1"
                     Click="BtnAdd_Click"
-                    Content="موظف جديد"
-                    DockPanel.Dock="Left"
-                    Style="{StaticResource Btn.AddNew}" />
-            </DockPanel>
+                    Style="{StaticResource Btn.AddNew}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon VerticalAlignment="Center" Kind="Plus" />
+                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="موظف جديد" />
+                    </StackPanel>
+                </Button>
+            </Grid>
         </materialDesign:ColorZone>
 
         <!--  Quick Stats  -->

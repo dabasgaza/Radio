@@ -50,10 +50,23 @@ public partial class SocialPlatformsView : UserControl
 
     private async void BtnAddNew_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new SocialPlatformFormDialog(null, _service, _session);
-        if (dialog.ShowDialog() == true)
+        var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+        if (mainWindow != null) await mainWindow.ShowOverlay();
+
+        try
         {
-            await LoadDataAsync();
+            var dialog = new SocialPlatformFormDialog(null, _service, _session)
+            {
+                Owner = mainWindow
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                await LoadDataAsync();
+            }
+        }
+        finally
+        {
+            if (mainWindow != null) await mainWindow.HideOverlay();
         }
     }
 
@@ -61,10 +74,23 @@ public partial class SocialPlatformsView : UserControl
     {
         if (((FrameworkElement)sender).Tag is not SocialMediaPlatformDto dto) return;
 
-        var dialog = new SocialPlatformFormDialog(dto, _service, _session);
-        if (dialog.ShowDialog() == true)
+        var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+        if (mainWindow != null) await mainWindow.ShowOverlay();
+
+        try
         {
-            await LoadDataAsync();
+            var dialog = new SocialPlatformFormDialog(dto, _service, _session)
+            {
+                Owner = mainWindow
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                await LoadDataAsync();
+            }
+        }
+        finally
+        {
+            if (mainWindow != null) await mainWindow.HideOverlay();
         }
     }
 

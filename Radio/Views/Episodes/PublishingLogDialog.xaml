@@ -255,7 +255,7 @@
                                 Margin="8,0"
                                 VerticalAlignment="Center"
                                 Foreground="{StaticResource TextHintBrush}"
-                                Style="{StaticResource Type.HeadlineMedium}"
+                                Style="{StaticResource Type.Headline.OnColor}"
                                 Text=":" />
 
                             <TextBox

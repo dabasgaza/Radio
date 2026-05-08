@@ -108,6 +108,7 @@
     <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource Neutral400Color}" />
     <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="TextHintBrush" Color="{StaticResource Neutral600Color}" />
+    <SolidColorBrush x:Key="OverlayScrimBrush" Color="Black" Opacity="0.45" />
 
     <!--  Border / Divider Brushes  -->
     <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource Neutral300Color}" />
@@ -140,6 +141,8 @@
     <!--  خلفية صفوف متناوبة خفيفة جداً  -->
     <SolidColorBrush x:Key="RowHoverBrush" Color="#E8EAF6" />
     <!--  خلفية عند تمرير الماوس (نفس Primary50 تقريباً)  -->
+
+    <SolidColorBrush x:Key="Neutral50Brush" Color="{StaticResource Neutral50Color}" />
 
     <!--
         ═══════════════════════════════════════════════════════════

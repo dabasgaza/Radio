@@ -40,9 +40,22 @@ namespace Radio.Views.StaffRoles
 
         private async void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new StaffRoleFormDialog(_employeeService, _session, roleId: 0);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new StaffRoleFormDialog(_employeeService, _session, roleId: 0)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
@@ -52,9 +65,22 @@ namespace Radio.Views.StaffRoles
             var role = btn.DataContext as StaffRoleDto;
             if (role == null) return;
 
-            var dialog = new StaffRoleFormDialog(_employeeService, _session, role.StaffRoleId);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new StaffRoleFormDialog(_employeeService, _session, role.StaffRoleId)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)

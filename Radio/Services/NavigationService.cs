@@ -141,6 +141,13 @@ namespace Radio.Services
                 case "PermissionMatrix":
                     return new PermissionMatrixView(userService, _session);
 
+                case "SecurityRoles":
+                    return new SecurityRolesView(userService, _session);
+
+                case "Permissions":
+                    var permService = _serviceProvider.GetRequiredService<IPermissionService>();
+                    return new PermissionsView(permService);
+
                 default:
                     return null;
             }

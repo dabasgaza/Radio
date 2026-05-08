@@ -77,32 +77,50 @@ namespace Radio.Views.Episodes
 
         private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session)
-            {
-                Owner = Window.GetWindow(this)
-            };
-            if (dialog.ShowDialog() == true)
-            {
-                await LoadDataAsync();
-                MessageService.Current.ShowSuccess("تم جدولة الحلقة بنجاح.");
-            }
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
 
+            try
+            {
+                var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                {
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess("تم جدولة الحلقة بنجاح.");
+                }
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session, ep.EpisodeId)
-                {
-                    Owner = Window.GetWindow(this)
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync();
-                    MessageService.Current.ShowSuccess("تم تحديث بيانات الحلقة بنجاح.");
-                }
+                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+                if (mainWindow != null) await mainWindow.ShowOverlay();
 
+                try
+                {
+                    var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session, ep.EpisodeId)
+                    {
+                        Owner = mainWindow
+                    };
+                    if (dialog.ShowDialog() == true)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess("تم تحديث بيانات الحلقة بنجاح.");
+                    }
+                }
+                finally
+                {
+                    if (mainWindow != null) await mainWindow.HideOverlay();
+                }
             }
         }
 
@@ -128,14 +146,26 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var execService = _serviceProvider.GetRequiredService<IExecutionService>();
-                var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
-                if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync();
-                    MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
-                }
+                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+                if (mainWindow != null) await mainWindow.ShowOverlay();
 
+                try
+                {
+                    var execService = _serviceProvider.GetRequiredService<IExecutionService>();
+                    var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session)
+                    {
+                        Owner = mainWindow
+                    };
+                    if (dialog.ShowDialog() == true)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
+                    }
+                }
+                finally
+                {
+                    if (mainWindow != null) await mainWindow.HideOverlay();
+                }
             }
         }
 
@@ -143,18 +173,27 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
-                var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
-                var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests)
-                {
-                    Owner = Window.GetWindow(this)
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync();
-                    MessageService.Current.ShowSuccess("تم تسجيل النشر الرقمي بنجاح.");
-                }
+                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+                if (mainWindow != null) await mainWindow.ShowOverlay();
 
+                try
+                {
+                    var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
+                    var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
+                    var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests)
+                    {
+                        Owner = mainWindow
+                    };
+                    if (dialog.ShowDialog() == true)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess("تم تسجيل النشر الرقمي بنجاح.");
+                    }
+                }
+                finally
+                {
+                    if (mainWindow != null) await mainWindow.HideOverlay();
+                }
             }
         }
 
@@ -162,17 +201,26 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
-                var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId)
-                {
-                    Owner = Window.GetWindow(this)
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync();
-                    MessageService.Current.ShowSuccess("تم نشر الحلقة على الموقع بنجاح.");
-                }
+                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+                if (mainWindow != null) await mainWindow.ShowOverlay();
 
+                try
+                {
+                    var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
+                    var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId)
+                    {
+                        Owner = mainWindow
+                    };
+                    if (dialog.ShowDialog() == true)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess("تم نشر الحلقة على الموقع بنجاح.");
+                    }
+                }
+                finally
+                {
+                    if (mainWindow != null) await mainWindow.HideOverlay();
+                }
             }
         }
 
@@ -180,24 +228,34 @@ namespace Radio.Views.Episodes
         /// عرض سجلات الحلقة — يفتح نافذة EpisodeRecordsView التي تعرض
         /// سجل التنفيذ والنشر الرقمي ونشر الموقع مع أزرار تعديل
         /// </summary>
-        private void BtnViewRecords_Click(object sender, RoutedEventArgs e)
+        private async void BtnViewRecords_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
-                var executionService = _serviceProvider.GetRequiredService<IExecutionService>();
+                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+                if (mainWindow != null) await mainWindow.ShowOverlay();
 
-                var dialog = new EpisodeRecordsView(
-                    publishingService,
-                    executionService,
-                    _session,
-                    _serviceProvider,
-                    ep.EpisodeId,
-                    ep.EpisodeName ?? string.Empty)
+                try
                 {
-                    Owner = Window.GetWindow(this)
-                };
-                dialog.ShowDialog();
+                    var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
+                    var executionService = _serviceProvider.GetRequiredService<IExecutionService>();
+
+                    var dialog = new EpisodeRecordsView(
+                        publishingService,
+                        executionService,
+                        _session,
+                        _serviceProvider,
+                        ep.EpisodeId,
+                        ep.EpisodeName ?? string.Empty)
+                    {
+                        Owner = mainWindow
+                    };
+                    dialog.ShowDialog();
+                }
+                finally
+                {
+                    if (mainWindow != null) await mainWindow.HideOverlay();
+                }
             }
         }
 

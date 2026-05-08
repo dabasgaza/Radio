@@ -4,9 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Title="{Binding Title, RelativeSource={RelativeSource Self}}"
-    Width="520"
-    Height="450"
+    Width="550"
+    Height="500"
     Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterScreen">
 
@@ -34,20 +33,25 @@
                         Kind="AccountBadge" />
 
                     <StackPanel Grid.Column="1" Margin="16,0">
-                        <TextBlock
-                            x:Name="TxtTitle"
-                            Style="{StaticResource Type.TitleLarge.OnColor}"
-                            Text="{Binding Title, RelativeSource={RelativeSource Self}}" />
+                        <TextBlock x:Name="TxtTitle" 
+                                   Text="إدارة الموظفين"
+                                   Style="{StaticResource Type.TitleLarge.OnColor}" />
+                        
                         <TextBlock Style="{StaticResource Type.BodyMedium.OnColor}" Text="أدخل البيانات الأساسية للموظف" />
                     </StackPanel>
 
                     <Button
                         Grid.Column="2"
+                        Width="32"
+                        Height="32"
+                        Padding="0"
                         Click="BtnClose_Click"
                         Foreground="White"
-                        Opacity="0.6"
-                        Style="{StaticResource MaterialDesignIconButton}">
-                        <materialDesign:PackIcon Kind="Close" />
+                        Style="{StaticResource MaterialDesignFlatButton}">
+                        <materialDesign:PackIcon
+                            Width="24"
+                            Height="24"
+                            Kind="Close" />
                     </Button>
                 </Grid>
             </materialDesign:ColorZone>
@@ -55,17 +59,20 @@
             <!--  Form fields  -->
             <ScrollViewer
                 Grid.Row="1"
+                Margin="10"
                 Padding="28,20"
                 VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <TextBox
                         x:Name="TxtFullName"
+                        Margin="0,10,0,0"
                         materialDesign:HintAssist.Hint="الاسم الكامل *"
                         materialDesign:TextFieldAssist.LeadingIcon="AccountOutline"
                         Style="{StaticResource Input.Text}" />
 
                     <ComboBox
                         x:Name="CmbStaffRole"
+                        Margin="0,10"
                         materialDesign:HintAssist.Hint="الدور الوظيفي"
                         materialDesign:TextFieldAssist.LeadingIcon="BadgeAccountOutline"
                         DisplayMemberPath="RoleName"

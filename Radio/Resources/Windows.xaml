@@ -38,6 +38,8 @@
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="ShowTitleBar" Value="False" />
+        <Setter Property="OverlayBrush" Value="{StaticResource OverlayScrimBrush}" />
+        <Setter Property="OverlayOpacity" Value="1.0" />
     </Style>
 
     <!--
@@ -53,6 +55,8 @@
         <Setter Property="WindowStyle" Value="None" />
         <Setter Property="ShowTitleBar" Value="False" />
         <Setter Property="UseNoneWindowStyle" Value="True" />
+        <Setter Property="OverlayBrush" Value="{StaticResource OverlayScrimBrush}" />
+        <Setter Property="OverlayOpacity" Value="1.0" />
         <Setter Property="ShowCloseButton" Value="False" />
         <Setter Property="ShowMaxRestoreButton" Value="False" />
         <Setter Property="ShowMinButton" Value="False" />

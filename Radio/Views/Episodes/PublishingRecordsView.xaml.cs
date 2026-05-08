@@ -168,6 +168,9 @@ namespace Radio.Views.Episodes
         /// </summary>
         private async void OpenEditDialog(PublishingRecordDto record)
         {
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
             try
             {
                 var ownerWindow = Window.GetWindow(this);
@@ -190,6 +193,10 @@ namespace Radio.Views.Episodes
             catch (Exception ex)
             {
                 MessageService.Current.ShowError($"خطأ في فتح نافذة التعديل: {ex.Message}");
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
             }
         }
 

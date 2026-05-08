@@ -1,0 +1,141 @@
+<UserControl
+    x:Class="Radio.Views.Users.SecurityRolesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Style="{StaticResource View.Base}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Header  -->
+        <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="35"
+                            Height="35"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="ShieldAccountVariant" />
+                        <TextBlock
+                            Margin="15,0"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="تعريف أدوار الأمان" />
+                    </StackPanel>
+                    <TextBlock
+                        Margin="50,5,0,0"
+                        Style="{StaticResource Type.BodyMedium.OnColor}"
+                        Text="إدارة مستويات الوصول الأمنية للنظام وتخصيص الصلاحيات" />
+                </StackPanel>
+
+                <Button
+                    x:Name="BtnAddRole"
+                    Grid.Column="1"
+                    Click="BtnAddRole_Click"
+                    Style="{StaticResource Btn.AddNew}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon VerticalAlignment="Center" Kind="Plus" />
+                        <TextBlock
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="إضافة دور جديد" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </materialDesign:ColorZone>
+
+        <!--  Content  -->
+        <Grid Grid.Row="1" Margin="24">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" UniformCornerRadius="16">
+                <DataGrid
+                    x:Name="DgRoles"
+                    Margin="0"
+                    AutoGenerateColumns="False"
+                    CellStyle="{StaticResource DataGrid.Cell}"
+                    ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                    IsReadOnly="True"
+                    RowStyle="{StaticResource DataGrid.Row}"
+                    Style="{StaticResource DataGrid.Main}">
+                    <DataGrid.Columns>
+                        <!--  المعرف  -->
+                        <DataGridTextColumn
+                            Width="50"
+                            Binding="{Binding RoleId}"
+                            CellStyle="{StaticResource DataGrid.Cell.Center}"
+                            Header="م" />
+
+                        <!--  اسم الدور  -->
+                        <DataGridTextColumn
+                            Width="250"
+                            Binding="{Binding RoleName}"
+                            CellStyle="{StaticResource DataGrid.Cell.Center}"
+                            FontWeight="Bold"
+                            Header="اسم الدور" />
+
+                        <!--  الوصف  -->
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding RoleDescription}"
+                            Header="الوصف" />
+
+                        <!--  الإجراءات  -->
+                        <DataGridTemplateColumn
+                            Width="200"
+                            CellStyle="{StaticResource DataGrid.Cell.Actions}"
+                            Header="الإجراءات"
+                            HeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                        <Button
+                                            Background="{StaticResource SecondaryMainBrush}"
+                                            BorderBrush="{StaticResource SecondaryMainBrush}"
+                                            Click="BtnManagePermissions_Click"
+                                            Style="{StaticResource Btn.Icon.Edit}"
+                                            ToolTip="تخصيص الصلاحيات">
+                                            <materialDesign:PackIcon
+                                                Width="18"
+                                                Height="18"
+                                                Foreground="White"
+                                                Kind="ShieldLock" />
+                                        </Button>
+                                        <Button
+                                            Margin="12,0,0,0"
+                                            Click="BtnEdit_Click"
+                                            Style="{StaticResource Btn.Icon.Edit}"
+                                            ToolTip="تعديل البيانات">
+                                            <materialDesign:PackIcon
+                                                Width="18"
+                                                Height="18"
+                                                Kind="Pencil" />
+                                        </Button>
+                                        <Button
+                                            Margin="12,0,0,0"
+                                            Click="BtnDelete_Click"
+                                            Style="{StaticResource Btn.Icon.Delete}"
+                                            ToolTip="حذف">
+                                            <materialDesign:PackIcon
+                                                Width="18"
+                                                Height="18"
+                                                Kind="Delete" />
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </materialDesign:Card>
+        </Grid>
+    </Grid>
+</UserControl>

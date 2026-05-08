@@ -63,18 +63,44 @@ namespace Radio.Views.Employees
 
         private async void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new EmployeeFormDialog(_employeeService, _session, employeeId: 0);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new EmployeeFormDialog(_employeeService, _session, employeeId: 0)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not EmployeeDto emp) return;
 
-            var dialog = new EmployeeFormDialog(_employeeService, _session, emp.EmployeeId);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new EmployeeFormDialog(_employeeService, _session, emp.EmployeeId)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)

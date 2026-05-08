@@ -7,15 +7,17 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="بيانات الحلقة"
-    Width="900"
-    Height="750"
+    Width="950"
+    Height="800"
     FlowDirection="RightToLeft"
     Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
     <materialDesign:Card
+        Margin="30"
         Background="{StaticResource SurfaceBrush}"
+        materialDesign:ElevationAssist.Elevation="Dp8"
         Effect="{StaticResource Shadow.Dialog}"
         UniformCornerRadius="16">
 

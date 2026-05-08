@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -66,9 +66,22 @@ namespace Radio.Views.Correspondents
         /// </summary>
         private async void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new CorrespondentFormDialog(null, _service, _session);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new CorrespondentFormDialog(null, _service, _session)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         /// <summary>
@@ -79,9 +92,22 @@ namespace Radio.Views.Correspondents
             if (sender is not Button btn || btn.DataContext is not CorrespondentDto cor)
                 return;
 
-            var dialog = new CorrespondentFormDialog(cor, _service, _session);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new CorrespondentFormDialog(cor, _service, _session)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         /// <summary>

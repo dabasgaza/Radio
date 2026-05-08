@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -86,9 +86,22 @@ namespace Radio.Views.Guests
         /// </summary>
         private async void BtnAddGuest_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new GuestFormDialog(null, _guestService, _session);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new GuestFormDialog(null, _guestService, _session)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         /// <summary>
@@ -100,9 +113,22 @@ namespace Radio.Views.Guests
             if (sender is not Button btn || btn.DataContext is not GuestDto guest)
                 return;
 
-            var dialog = new GuestFormDialog(guest, _guestService, _session);
-            if (dialog.ShowDialog() == true)
-                await LoadDataAsync();   // ✅ await بدلاً من fire-and-forget
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
+            try
+            {
+                var dialog = new GuestFormDialog(guest, _guestService, _session)
+                {
+                    Owner = mainWindow
+                };
+                if (dialog.ShowDialog() == true)
+                    await LoadDataAsync();
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         /// <summary>

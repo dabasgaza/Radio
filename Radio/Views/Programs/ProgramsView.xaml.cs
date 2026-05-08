@@ -85,6 +85,9 @@ namespace Radio.Views.Programs
         /// </summary>
         private async void BtnAddProgram_Click(object sender, RoutedEventArgs e)
         {
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
+
             try
             {
                 var view = new ProgramFormControl(null, _programService, _session);
@@ -96,6 +99,10 @@ namespace Radio.Views.Programs
             {
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة إضافة البرنامج.");
             }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
+            }
         }
 
         /// <summary>
@@ -105,6 +112,9 @@ namespace Radio.Views.Programs
         {
             if (sender is not Button btn || btn.DataContext is not ProgramDto prog)
                 return;
+
+            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+            if (mainWindow != null) await mainWindow.ShowOverlay();
 
             try
             {
@@ -116,6 +126,10 @@ namespace Radio.Views.Programs
             catch (Exception)
             {
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة تعديل البرنامج.");
+            }
+            finally
+            {
+                if (mainWindow != null) await mainWindow.HideOverlay();
             }
         }
 
