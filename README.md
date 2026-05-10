@@ -39,6 +39,40 @@
 
 ---
 
+## 📊 Entity Relationship Diagram | مخطط الكيانات والعلاقات
+
+يوضح المخطط التالي بنية قاعدة البيانات والعلاقات المعقدة بين الكيانات المختلفة، مما يضمن تدفق البيانات بشكل منطقي ومنظم:
+
+```mermaid
+erDiagram
+    PROGRAM ||--o{ EPISODE : "يتضمن"
+    EPISODE ||--o{ EPISODE_GUEST : "يستضيف"
+    EPISODE ||--o{ EPISODE_CORRESPONDENT : "يشرك"
+    EPISODE ||--o{ EPISODE_EMPLOYEE : "ينفذ بواسطة"
+    EPISODE ||--o{ EXECUTION_LOG : "يوثق في"
+    EPISODE ||--o{ WEBSITE_PUBLISHING_LOG : "ينشر في"
+    
+    EPISODE_STATUS ||--o{ EPISODE : "يحدد حالة"
+    
+    GUEST ||--o{ EPISODE_GUEST : "يشارك في"
+    CORRESPONDENT ||--o{ EPISODE_CORRESPONDENT : "يغطي"
+    EMPLOYEE ||--o{ EPISODE_EMPLOYEE : "يعمل على"
+    STAFF_ROLE ||--o{ EMPLOYEE : "يحدد دور"
+    
+    EPISODE_GUEST ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG : "مصدر لـ"
+    SOCIAL_MEDIA_PUBLISHING_LOG ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG_PLATFORM : "يستهدف"
+    SOCIAL_MEDIA_PLATFORM ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG_PLATFORM : "معرف في"
+    
+    USER ||--o{ EXECUTION_LOG : "قام بالتنفيذ"
+    USER ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG : "قام بالنشر"
+    USER ||--o{ WEBSITE_PUBLISHING_LOG : "قام بالنشر"
+    ROLE ||--o{ USER : "يسند إلى"
+    PERMISSION ||--o{ ROLE_PERMISSION : "تمنح لـ"
+    ROLE ||--o{ ROLE_PERMISSION : "يحتوي على"
+```
+
+---
+
 ## 🔄 Detailed Operational Workflow | تفاصيل سير العمل اليومي
 
 يحاكي النظام بدقة دورة العمل اليومية الحقيقية داخل المحطات الإذاعية، ويمر عبر الخطوات التفصيلية التالية:
