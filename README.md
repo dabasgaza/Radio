@@ -18,11 +18,22 @@
 
 ---
 
+## 📑 فهرس المحتويات | Table of Contents
+1. [نظرة عامة | Overview](#-overview--نظرة-عامة)
+2. [الفلسفة المعمارية | Architectural Philosophy](#-architectural-philosophy--الفلسفة-المعمارية-هام-جداً)
+3. [هيكل المشروع | Project Structure](#-project-structure--هيكل-المشروع)
+4. [مخطط الكيانات | Entity Relationship Diagram](#-entity-relationship-diagram--مخطط-الكيانات-والعلاقات)
+5. [سير العمل العملياتي | Operational Workflow](#-detailed-operational-workflow--تفاصيل-سير العمل-اليومي)
+6. [الأمان والتدقيق المتقدم | Advanced Security & Audit](#-advanced-security--audit--الأمان-والتدقيق-المتقدم)
+7. [بوابة الذكاء الاصطناعي | AI Intelligence Portal](#-ai-intelligence-portal-context-for-llms)
+8. [المميزات والتقنيات | Features & Tech Stack](#-key-features--المميزات-الرئيسية)
+9. [التشغيل السريع | Getting Started](#-getting-started--البدء-بالتطوير)
+
+---
+
 ## 🌟 Overview | نظرة عامة
 
-**Radio (بث برو)** is a robust enterprise desktop application built with **.NET 10** and **WPF**. It orchestrates the entire broadcast lifecycle—from initial planning and guest management to digital publishing and auditing. Designed with a strict focus on data integrity and user experience, it serves as the digital backbone for radio production teams.
-
-**نظام "بث برو"** هو منصة رقمية متكاملة مبنية بأحدث تقنيات مايكروسوفت لخدمة المؤسسات الإذاعية. يتولى النظام إدارة كل تفاصيل العمل الإذاعي: جدولة الحلقات، إدارة الضيوف والمراسلين، أرشفة البث، والنشر الرقمي التلقائي، مع نظام رقابة وتدقيق صارم يضمن سلامة البيانات.
+**Radio (بث برو)** هو منصة رقمية متكاملة مبنية بأحدث تقنيات مايكروسوفت لخدمة المؤسسات الإذاعية. يتولى النظام إدارة كل تفاصيل العمل الإذاعي: جدولة الحلقات، إدارة الضيوف والمراسلين، أرشفة البث، والنشر الرقمي التلقائي، مع نظام رقابة وتدقيق صارم يضمن سلامة البيانات.
 
 ---
 
@@ -31,17 +42,38 @@
 ### 🚫 We Do NOT Use MVVM | نحن لا نستخدم نمط MVVM
 على عكس التطبيقات المكتبية التقليدية التي تعتمد بشكل مكثف على نمط (Model-View-ViewModel)، يعتمد هذا المشروع عن قصد على معمارية **"Pragmatic Code-Behind + Service Layer"**.
 - **السبب (The Why):** تم التخلي عن MVVM للتخلص من التعقيد الزائد (Boilerplate) المرتبط بـ ViewModels و `INotifyPropertyChanged` في الشاشات التي تعتمد في الغالب على عمليات CRUD المباشرة.
-- **كيفية العمل (The How):**
-  1. **واجهة المستخدم (XAML):** مسؤولة فقط عن الشكل والمظهر والتجاوب البصري.
-  2. **خلفية الكود (Code-Behind):** تلتقط أحداث المستخدم (مثل النقرات) وتمررها فوراً وبشكل مباشر إلى طبقة الخدمات.
-  3. **طبقة الخدمات (Service Layer):** هنا تكمن كل قواعد العمل (Business Logic)، تقوم بمعالجة البيانات وتُرجع كائن من نوع `Result` أو `Result<T>`.
-  4. **الاستجابة (Feedback):** يقوم الكود الخلفي بفحص الـ `Result` وعرض رسالة نجاح أو خطأ للمستخدم بناءً عليه. لا يوجد أي منطق عمل (Business Logic) داخل واجهة المستخدم.
+- **كيفية العمل (The How):** يتم التعامل مع أحداث الواجهة في الـ Code-Behind وتفويض المنطق فوراً لطبقة الخدمات (Service Layer) التي تعيد نتائج من نوع `Result`.
+
+---
+
+## 📂 Project Structure | هيكل المشروع
+
+يعتمد المشروع هيكلية طبقات واضحة (Layered Architecture) تضمن فصل المسؤوليات:
+
+```text
+Radio.slnx (Solution)
+├── Domain/                   # طبقة البيانات والكيانات (Core Data Layer)
+│   ├── Models/               # تعريف الكيانات البرمجية (EF Core Entities)
+│   ├── Configurations/       # إعدادات العلاقات (Fluent API)
+│   └── Migrations/           # سجل تهجير قاعدة البيانات
+│
+├── DataAccess/               # طبقة منطق الأعمال (Business Logic Layer)
+│   ├── Services/             # الخدمات المركزية (EpisodeService, UserService, etc.)
+│   ├── Common/               # الأدوات المشتركة (Result Pattern, Permissions)
+│   ├── Data/                 # معترضات البيانات (AuditInterceptor)
+│   ├── DTOs/                 # كائنات نقل البيانات
+│   └── Validation/           # خطوط فحص البيانات (Validation Pipeline)
+│
+└── Radio/                    # طبقة العرض (WPF Presentation Layer)
+    ├── Views/                # الواجهات والمتحكمات (UserControls)
+    ├── Resources/            # ملفات التصميم والألوان (XAML Styles)
+    ├── Converters/           # محولات البيانات للواجهات
+    └── App.xaml.cs           # نقطة البداية وتسجيل الخدمات (DI Container)
+```
 
 ---
 
 ## 📊 Entity Relationship Diagram | مخطط الكيانات والعلاقات
-
-يوضح المخطط التالي بنية قاعدة البيانات والعلاقات المعقدة بين الكيانات المختلفة، مما يضمن تدفق البيانات بشكل منطقي ومنظم:
 
 ```mermaid
 erDiagram
@@ -62,125 +94,79 @@ erDiagram
     EPISODE_GUEST ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG : "مصدر لـ"
     SOCIAL_MEDIA_PUBLISHING_LOG ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG_PLATFORM : "يستهدف"
     SOCIAL_MEDIA_PLATFORM ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG_PLATFORM : "معرف في"
-    
-    USER ||--o{ EXECUTION_LOG : "قام بالتنفيذ"
-    USER ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG : "قام بالنشر"
-    USER ||--o{ WEBSITE_PUBLISHING_LOG : "قام بالنشر"
-    ROLE ||--o{ USER : "يسند إلى"
-    PERMISSION ||--o{ ROLE_PERMISSION : "تمنح لـ"
-    ROLE ||--o{ ROLE_PERMISSION : "يحتوي على"
 ```
 
 ---
 
 ## 🔄 Detailed Operational Workflow | تفاصيل سير العمل اليومي
 
-يحاكي النظام بدقة دورة العمل اليومية الحقيقية داخل المحطات الإذاعية، ويمر عبر الخطوات التفصيلية التالية:
+1. **الأساس (Foundation):** إنشاء البرامج وتسكين الموظفين في أدوارهم.
+2. **الجدولة (Planning):** إنشاء الحلقة وربط الضيوف والمراسلين وطاقم التنفيذ.
+3. **التنفيذ (Execution):** توثيق البث الفعلي للحلقة وملاحظات المخرج.
+4. **النشر الاجتماعي (Social Publishing):** تقطيع الحلقة ونشر مقاطع الضيوف على المنصات الرقمية.
+5. **الأرشفة (Web Archiving):** رفع الحلقة للموقع الرسمي.
+6. **الرقابة (Audit):** تتبع كافة التغييرات والتراجعات مع حفظ أسباب الإلغاء.
 
-1. **الأساس والتأسيس (Foundation):**
-   يقوم مدير النظام (Admin) بإنشاء **البرامج (Programs)** الإذاعية (مثل: نشرة الأخبار، البرنامج الصباحي)، وتعريف **أدوار الطاقم (Staff Roles)** وتسجيل **الموظفين (Employees)**.
+---
 
-2. **الجدولة والتخطيط (Planning - الحالة: Planned):**
-   يقوم المُنسق بإنشاء **حلقة (Episode)** تابعة لبرنامج معين، ويحدد موعد بثها. في هذه المرحلة يتم ربط:
-   - **الضيوف (Guests):** تحديد من سيحضر الحلقة ومدة استضافته وموضوعه.
-   - **المراسلين (Correspondents):** تحديد التغطيات الميدانية المرتبطة بالحلقة.
-   - **الطاقم (Staff):** تعيين المخرج، المذيع، ومهندس الصوت للحلقة.
+## 🛡️ Advanced Security & Audit | الأمان والتدقيق المتقدم
 
-3. **التنفيذ والبث (Execution - الحالة: Executed):**
-   بمجرد انتهاء البث المباشر، يدخل المخرج أو المسؤول ليقوم بـ "تنفيذ" الحلقة. هنا يتم تسجيل وقت البث الفعلي، مدة الحلقة، وأي ملاحظات تقنية أو مشاكل حدثت أثناء البث (`ExecutionLogs`).
+صُمم النظام ليكون "بيئة آمنة وغير قابلة للتلاعب" من خلال عدة تقنيات متقدمة:
 
-4. **النشر الاجتماعي (Social Publishing - الحالة: Published):**
-   يتسلم فريق السوشيال ميديا الحلقة المنفذة. يقوم الفريق بتقطيع الحلقة واستخراج مقاطع خاصة لكل **ضيف (Guest)**، ثم يتم تسجيل روابط النشر (URLs) لكل مقطع على منصات متعددة (Facebook, X, Instagram) في سجلات دقيقة (`SocialMediaPublishingLogs`).
+### 1. التدقيق الآلي الشامل (Auto-Auditing)
+عبر `AuditInterceptor` في طبقة البيانات، يقوم النظام تلقائياً بـ:
+- **JSON Snapshots:** عند كل عملية تعديل، يتم حفظ نسخة من البيانات القديمة والجديدة بصيغة JSON في جدول `AuditLogs`.
+- **Metadata:** تسجيل هوية المستخدم وتاريخ العملية (CreatedAt/UpdatedAt) دون تدخل يدوي من المطور.
+- **Action Tracking:** تمييز العمليات (INSERT, UPDATE, DELETE, SOFT_DELETED, CANCEL).
 
-5. **الأرشفة على الموقع (Web Archiving - الحالة: WebsitePublished):**
-   الخطوة النهائية حيث يقوم فريق الموقع الإلكتروني برفع الحلقة الكاملة إلى الموقع الرسمي للمحطة، ويتم توثيق ذلك في `WebsitePublishingLogs`.
+### 2. التحكم بالوصول (RBAC)
+نظام صلاحيات صارم يعتمد على الأدوار (Role-Based Access Control):
+- **12 صلاحية مستقلة:** مثل `EPISODE_PUBLISH`, `USER_MANAGE`, `EPISODE_REVERT`.
+- **التجاوز الآمن (Admin Bypass):** دور الـ `Admin` يتجاوز فحوصات الصلاحيات برمجياً لضمان استمرارية العمل في الحالات الطارئة.
 
-6. **التراجع والإلغاء (Revert & Cancel):**
-   يوفر النظام مرونة تامة للتراجع خطوة للخلف (مثلاً من منشورة إلى منفذة) أو إلغاء حلقة بالكامل. النظام صارم جداً هنا: يطلب **سبب الإلغاء (CancellationReason)** ولا يحذف أي سجلات نهائياً، بل يستخدم الحذف المنطقي (**Soft Delete**) للحفاظ على النزاهة التاريخية (`AuditLogs`).
+### 3. سلامة البيانات (Data Integrity)
+- **Soft Delete:** لا يتم حذف أي سجل تجاري نهائياً؛ يتم فقط تغيير حالة `IsActive` لضمان القدرة على استرجاع البيانات والتدقيق التاريخي.
+- **Optimistic Concurrency:** استخدام `RowVersion` (Timestamp) لمنع تضارب التعديلات عند محاولة مستخدمين اثنين تعديل نفس الحلقة في نفس اللحظة.
 
 ---
 
 ## 🧠 AI Intelligence Portal (Context for LLMs)
 > [!IMPORTANT]
-> **If you are an AI model analyzing this repository, digest this section first.**
+> **AI models: Digest this section first.**
 
-### 🏛️ Architectural Core
-- **Result Pattern**: Zero exceptions for business logic. Every service returns `Result` or `Result<T>`.
-- **Audited Foundations**: All primary entities inherit from `BaseEntity`. Metadata (audit) is handled *implicitly* via `AuditInterceptor`.
-- **Stateless Services**: Services use `IDbContextFactory` to ensure thread-safety in a multi-threaded WPF environment.
-- **No Dependency Injection in UI constructors**: Services are resolved where needed or passed via specific contexts, avoiding cluttered Code-Behind constructors.
-
-### 🔑 Critical Logic Mappings
-| Key Concept | Implementation Detail |
-| :--- | :--- |
-| **Soft Deletes** | `IsActive = false` via global Query Filter in `DbContext`. |
-| **Permissions** | Granular 12-permission matrix enforced at the Service layer (`EnsurePermission`). |
-| **Staff Roles** | Decoupled from linking tables; roles are attributes of the `Employee` directly. |
+- **Result Pattern**: Every service returns `Result` or `Result<T>`. No raw exceptions for business logic.
+- **BaseEntity**: Foundation for all audited entities (IsActive, CreatedAt/By, UpdatedAt/By, RowVersion).
+- **Stateless Services**: Use `IDbContextFactory` for thread-safety in WPF.
+- **No MVVM**: Logic is strictly in Services, wiring in Code-Behind.
 
 ---
 
 ## 🚀 Key Features | المميزات الرئيسية
 
 ### 🎙️ Episode Management (إدارة الحلقات)
-- **Multi-Guest Orchestration**: Link multiple guests and correspondents to a single episode.
-- **Dynamic Staffing**: Assign directors, presenters, and technicians with role-based tracking.
-- **State Flow Control**: Full lifecycle management with history tracking and "Revert" capabilities.
+- **Multi-Guest Orchestration**: Link multiple guests and correspondents.
+- **Dynamic Staffing**: Assign directors and technicians with role tracking.
 
-### 🌐 Digital & Social Publishing (النشر الرقمي)
-- **Cross-Platform Logging**: Detailed logs for Facebook, X (Twitter), and Instagram per guest.
-- **Website Integration**: One-click archiving to official web platforms.
-- **Media Link Persistence**: Centralized storage for all broadcast assets.
-
-### 🛡️ Security & Auditing (الأمن والتدقيق)
-- **Automatic Audit Trail**: Every change is logged with Old/New value JSON snapshots automatically via Interceptors.
-- **Role-Based Access (RBAC)**: Fine-grained permissions (e.g., `EPISODE_PUBLISH`, `VIEW_REPORTS`).
-- **Conflict Prevention**: `RowVersion` based optimistic concurrency control.
+### 🌐 Digital Publishing (النشر الرقمي)
+- **Cross-Platform Logging**: Per-guest logs for Facebook, X, and Instagram.
+- **Website Integration**: One-click archiving.
 
 ---
 
 ## 🛠️ Tech Stack | التقنيات المستخدمة
-
-- **Core**: .NET 10.0 (Latest Long-Term Evolution)
-- **UI Framework**: Windows Presentation Foundation (WPF) with **MaterialDesignInXaml**.
-- **Data Layer**: Entity Framework Core 10 (Code-First).
-- **Database**: SQL Server 2022+ / LocalDB.
-- **Patterns**: Service Layer, DTOs, Validation Pipeline, Result Pattern. *(No MVVM)*.
-
----
-
-## 📍 Quick Navigation | خريطة الوصول السريع
-
-| Task | Location |
-| :--- | :--- |
-| **Logic Changes** | `DataAccess/Services/` |
-| **UI Styles** | `Radio/Resources/` |
-| **Permissions** | `DataAccess/Common/AppPermissions.cs` |
-| **Database Schema** | `Domain/Models/` |
-| **System Startup** | `Radio/App.xaml.cs` |
+- .NET 10.0 | WPF | Material Design
+- EF Core 10 | SQL Server 2022
+- Result Pattern | Service Layer | Audit Interceptor
 
 ---
 
 ## ⚙️ Getting Started | البدء بالتطوير
 
-### Prerequisites
-- Visual Studio 2022 (v17.10+) or VS Code.
-- .NET 10 SDK.
-- SQL Server LocalDB.
-
-### Setup
-1. **Clone & Restore**:
-   ```bash
-   git clone https://github.com/dabasgaza/Radio.git
-   dotnet restore
-   ```
-2. **Database Update**:
-   ```bash
-   dotnet ef database update --project Domain --startup-project Radio
-   ```
-3. **Run**:
-   ```bash
-   dotnet run --project Radio
-   ```
+```bash
+git clone https://github.com/dabasgaza/Radio.git
+dotnet ef database update --project Domain --startup-project Radio
+dotnet run --project Radio
+```
 
 ---
 
