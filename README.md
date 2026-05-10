@@ -21,7 +21,7 @@
 ## 📑 فهرس المحتويات | Table of Contents
 1. [نظرة عامة | Overview](#-overview--نظرة-عامة)
 2. [الفلسفة المعمارية | Architectural Philosophy](#-architectural-philosophy--الفلسفة-المعمارية-هام-جداً)
-3. [هيكل المشروع | Project Structure](#-project-structure--هيكل-المشروع)
+3. [هيكل المشروع التفصيلي | Project Structure](#-project-structure--هيكل-المشروع-التفصيلي)
 4. [مخطط الكيانات | Entity Relationship Diagram](#-entity-relationship-diagram--مخطط-الكيانات-والعلاقات)
 5. [سير العمل العملياتي | Operational Workflow](#-detailed-operational-workflow--تفاصيل-سير العمل-اليومي)
 6. [الأمان والتدقيق المتقدم | Advanced Security & Audit](#-advanced-security--audit--الأمان-والتدقيق-المتقدم)
@@ -46,29 +46,40 @@
 
 ---
 
-## 📂 Project Structure | هيكل المشروع
+## 📂 Project Structure | هيكل المشروع التفصيلي
 
-يعتمد المشروع هيكلية طبقات واضحة (Layered Architecture) تضمن فصل المسؤوليات:
+يعتمد المشروع هيكلية طبقات مفصلة تضمن تنظيم الكود وسهولة صيانته:
 
 ```text
 Radio.slnx (Solution)
-├── Domain/                   # طبقة البيانات والكيانات (Core Data Layer)
-│   ├── Models/               # تعريف الكيانات البرمجية (EF Core Entities)
-│   ├── Configurations/       # إعدادات العلاقات (Fluent API)
-│   └── Migrations/           # سجل تهجير قاعدة البيانات
+├── 📂 Domain/                     # طبقة البيانات والكيانات الأساسية
+│   ├── 📂 Models/                 # تعريف الكيانات البرمجية (Entities) مثل Episode, User, Guest
+│   │   └── BaseEntity.cs          # الكيان الأساسي الذي يحمل بيانات التدقيق (Auditing)
+│   ├── 📂 Configurations/         # إعدادات العلاقات و Fluent API (كل كيان له ملف مستقل)
+│   ├── 📂 Metadata/               # توصيف إضافي للبيانات وسمات التحقق
+│   ├── 📂 Migrations/             # سجل تهجير وتحديثات قاعدة البيانات (Code-First)
+│   └── BroadcastWorkflowDBContext.cs # سياق قاعدة البيانات والتهيئة المركزية
 │
-├── DataAccess/               # طبقة منطق الأعمال (Business Logic Layer)
-│   ├── Services/             # الخدمات المركزية (EpisodeService, UserService, etc.)
-│   ├── Common/               # الأدوات المشتركة (Result Pattern, Permissions)
-│   ├── Data/                 # معترضات البيانات (AuditInterceptor)
-│   ├── DTOs/                 # كائنات نقل البيانات
-│   └── Validation/           # خطوط فحص البيانات (Validation Pipeline)
+├── 📂 DataAccess/                 # طبقة منطق الأعمال والوصول للبيانات
+│   ├── 📂 Services/               # الخدمات المركزية (مثل EpisodeService) - تحتوي على الـ Logic
+│   ├── 📂 Common/                 # الأدوات المشتركة (Result Pattern, AppPermissions, UserSession)
+│   ├── 📂 Data/                   # معترضات البيانات (AuditInterceptor) المسؤولة عن التدقيق التلقائي
+│   ├── 📂 DTOs/                   # كائنات نقل البيانات (Data Transfer Objects) بين الطبقات
+│   ├── 📂 Validation/             # خطوط فحص البيانات (Validation Pipeline) لضمان سلامة المدخلات
+│   └── 📂 Seeding/                # بيانات التشغيل الأولي (Admin + الصلاحيات الافتراضية)
 │
-└── Radio/                    # طبقة العرض (WPF Presentation Layer)
-    ├── Views/                # الواجهات والمتحكمات (UserControls)
-    ├── Resources/            # ملفات التصميم والألوان (XAML Styles)
-    ├── Converters/           # محولات البيانات للواجهات
-    └── App.xaml.cs           # نقطة البداية وتسجيل الخدمات (DI Container)
+└── 📂 Radio/                      # طبقة العرض (WPF Presentation Layer)
+    ├── 📂 Views/                  # الواجهات الرئيسية والمتحكمات (UserControls)
+    ├── 📂 Forms/                  # النوافذ المنبثقة وصناديق الحوار (Dialogs)
+    ├── 📂 Resources/              # القواميس والمصادر (Material Design, Colors, Icons, Styles)
+    │   ├── Brushes.xaml           # تعريف الألوان والفرش
+    │   └── ControlStyles.xaml     # تخصيص مظهر الأدوات
+    ├── 📂 Converter/              # محولات البيانات المستخدمة في Binding (Visibility, Boolean, etc.)
+    ├── 📂 Messaging/              # نظام الرسائل والتنبيهات الداخلي
+    ├── 📂 Services/               # خدمات واجهة المستخدم (مثل MessageService, NavigationService)
+    ├── MainWindow.xaml            # النافذة الرئيسية للتطبيق
+    ├── appsettings.json           # إعدادات الاتصال بقاعدة البيانات
+    └── App.xaml.cs                # نقطة البداية، تسجيل الـ DI، وتهيئة تطبيق WPF
 ```
 
 ---
