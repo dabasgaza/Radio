@@ -200,7 +200,7 @@
                                             Kind="CloudCheckOutline" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock Style="{StaticResource Type.Caption}" Text="منشورة رقمياً" />
+                                        <TextBlock Style="{StaticResource Type.Caption}" Text="منشورة" />
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <TextBlock
                                                 x:Name="TxtPublishedCount"

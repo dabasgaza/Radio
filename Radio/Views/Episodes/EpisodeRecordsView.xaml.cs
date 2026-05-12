@@ -187,8 +187,8 @@ namespace Radio.Views.Episodes
 
                 if (dialog.ShowDialog() == true)
                 {
-                    await LoadRecordsAsync();
                     MessageService.Current.ShowSuccess("تم تعديل سجل التنفيذ بنجاح.");
+                    await LoadRecordsAsync();
                 }
             }
             finally
@@ -219,8 +219,8 @@ namespace Radio.Views.Episodes
 
                 if (dialog.ShowDialog() == true)
                 {
-                    await LoadRecordsAsync();
                     MessageService.Current.ShowSuccess("تم تعديل بيانات النشر الرقمي بنجاح.");
+                    await LoadRecordsAsync();
                 }
             }
             catch (Exception ex)
@@ -250,8 +250,8 @@ namespace Radio.Views.Episodes
 
                 if (dialog.ShowDialog() == true)
                 {
-                    await LoadRecordsAsync();
                     MessageService.Current.ShowSuccess("تم تعديل بيانات نشر الموقع بنجاح.");
+                    await LoadRecordsAsync();
                 }
             }
             finally

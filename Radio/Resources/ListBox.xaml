@@ -175,38 +175,109 @@
 
     <!--
         ═══════════════════════════════════════════════════════════
-        Chip.Status — شرائح الحالة (Active / Inactive / Pending)
-        الاستخدام: داخل خلايا الـ DataGrid وبطاقات الإحصاء
+        Chip.Status — شرائح الحالة المتميزة (Border-based)
+        الاستخدام: بديل لـ MaterialDesign:Chip لتجنب مشاكل الاقتطاع ودعم التدرجات
         ═══════════════════════════════════════════════════════════
     -->
-    <Style x:Key="Chip.Active" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="10,4" />
+    <Style x:Key="StatusChip.Base" TargetType="Border">
+        <Setter Property="CornerRadius" Value="14" />
+        <Setter Property="Padding" Value="12,4" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="MinWidth" Value="150" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
-    <Style x:Key="Chip.Inactive" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource DividerBrush}" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="10,4" />
+    <!--  نسخة الـ RadioButton من ستايل الـ Chip  -->
+    <Style x:Key="StatusChip.Radio" TargetType="RadioButton">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="MinWidth" Value="160" />
+        <Setter Property="Padding" Value="12,4" />
+        <Setter Property="Margin" Value="0,4" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border
+                        x:Name="Bd"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="16">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.85" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="White" />
+                            <Setter TargetName="Bd" Property="BorderThickness" Value="1.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
-    <Style x:Key="Chip.Warning" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="10,4" />
+    <Style
+        x:Key="StatusChip.Planned"
+        BasedOn="{StaticResource StatusChip.Base}"
+        TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource WarningBrush}" />
     </Style>
 
-    <Style x:Key="Chip.Error" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="10,4" />
+    <Style
+        x:Key="StatusChip.Executed"
+        BasedOn="{StaticResource StatusChip.Base}"
+        TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
     </Style>
 
-    <Style x:Key="Chip.Primary" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="10,4" />
+    <Style
+        x:Key="StatusChip.Published"
+        BasedOn="{StaticResource StatusChip.Base}"
+        TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SuccessGradientBrush}" />
     </Style>
+
+    <Style
+        x:Key="StatusChip.WebPublished"
+        BasedOn="{StaticResource StatusChip.Base}"
+        TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource InfoGradientBrush}" />
+    </Style>
+
+    <Style
+        x:Key="StatusChip.Cancelled"
+        BasedOn="{StaticResource StatusChip.Base}"
+        TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource ErrorBrush}" />
+    </Style>
+
+    <!--  ستايلات متوافقة مع التسميات القديمة لضمان عدم الكسر  -->
+    <Style
+        x:Key="Chip.Active"
+        BasedOn="{StaticResource StatusChip.Published}"
+        TargetType="Border" />
+    <Style
+        x:Key="Chip.Inactive"
+        BasedOn="{StaticResource StatusChip.Planned}"
+        TargetType="Border" />
+    <Style
+        x:Key="Chip.Warning"
+        BasedOn="{StaticResource StatusChip.Executed}"
+        TargetType="Border" />
+    <Style
+        x:Key="Chip.Error"
+        BasedOn="{StaticResource StatusChip.Cancelled}"
+        TargetType="Border" />
+    <Style
+        x:Key="Chip.Primary"
+        BasedOn="{StaticResource StatusChip.WebPublished}"
+        TargetType="Border" />
 
 </ResourceDictionary>

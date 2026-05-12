@@ -128,7 +128,6 @@
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/ColorZone.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml" />
 
 
                 <!--
@@ -145,6 +144,7 @@
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/NavRail.xaml" />
+                <ResourceDictionary Source="Resources/PopupBox.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
 
@@ -152,10 +152,8 @@
                 ══════════════════════════════════════════════════
                 Global Converters
                 ══════════════════════════════════════════════════
-            --> 
+            -->
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-           
-            <converter:NullToCollapsedConverter x:Key="NullToCollapsedConverter" />
 
             <converter:PermissionVisibilityConverter x:Key="PermissionVisibilityConverter" />
 
@@ -163,7 +161,11 @@
 
             <converter:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
 
-            <converter:MediaTypeDisplayConverter x:Key="MediaTypeDisplayConverter" />
+            <converter:NullToCollapsedConverter x:Key="NullToCollapsedConverter" />
+
+            <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+
+            <converters:MediaTypeDisplayConverter x:Key="MediaTypeDisplayConverter" />
 
             <!--
                 ══════════════════════════════════════════════════

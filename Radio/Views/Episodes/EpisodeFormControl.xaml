@@ -16,8 +16,8 @@
 
     <materialDesign:Card
         Margin="30"
-        Background="{StaticResource SurfaceBrush}"
         materialDesign:ElevationAssist.Elevation="Dp8"
+        Background="{StaticResource SurfaceBrush}"
         Effect="{StaticResource Shadow.Dialog}"
         UniformCornerRadius="16">
 

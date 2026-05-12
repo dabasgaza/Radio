@@ -1,12 +1,9 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// EpisodesView.xaml.cs — المرحلة الأولى: الأساسيات السريعة
+// EpisodesView.xaml.cs — المرحلة الثانية: أنماط العرض المتقدمة
 // ═══════════════════════════════════════════════════════════════════════════
-// التحسينات المُنفَّذة:
-//   1. فلاتر سريعة حسب الحالة (StatusFilter)
-//   2. بحث موسّع يشمل الضيوف والمراسلين والملاحظات
-//   3. عداد نتائج البحث والتصفية
-//   4. اختصارات لوحة المفاتيح (Ctrl+N, Ctrl+F, Ctrl+K)
-//   5. إخفاء الأزرار المعطلة عبر Visibility Converter (في XAML)
+// التحسينات:
+//   المرحلة 1: فلاتر Chips + بحث موسّع + عداد نتائج + اختصارات + إخفاء أزرار
+//   المرحلة 2: ثلاثة أنماط عرض + ترتيب + تصفية حسب البرنامج
 // ═══════════════════════════════════════════════════════════════════════════
 
 using DataAccess.Common;
@@ -19,6 +16,7 @@ using Radio.Views.Publishing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MaterialDesignThemes.Wpf;
 
 namespace Radio.Views.Episodes
 {
@@ -33,8 +31,20 @@ namespace Radio.Views.Episodes
         private readonly IServiceProvider _serviceProvider;
         private List<ActiveEpisodeDto> _allEpisodes = [];
 
-        // ─── حقل الفلتر النشط ───
-        private byte? _activeStatusFilter = null; // null = الكل
+        // ─── أصناف مساعدة ───
+        public class FilterChipItem
+        {
+            public string Type { get; set; } = string.Empty;
+            public string Label { get; set; } = string.Empty;
+        }
+
+        // ─── حالة الفلاتر والعرض ───
+        private byte? _activeStatusFilter = null;
+        private EpisodeViewMode _currentViewMode = EpisodeViewMode.Cards;
+        private string? _activeProgramFilter = null;
+
+        // ─── خيارات الترتيب ───
+        private static readonly string[] SortOptions = ["التاريخ (الأحدث)", "التاريخ (الأقدم)", "الحالة", "البرنامج", "اسم الحلقة"];
 
         public EpisodesView(
             IEpisodeService epService,
@@ -60,9 +70,11 @@ namespace Radio.Views.Episodes
                 : Visibility.Collapsed;
 
             Loaded += async (_, _) => await LoadDataAsync();
-
-            // ─── تسجيل اختصارات لوحة المفاتيح ───
             KeyDown += EpisodesView_KeyDown;
+
+            // ─── تهيئة خيارات الترتيب ───
+            CmbSortBy.ItemsSource = SortOptions;
+            CmbSortBy.SelectedIndex = 0;
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -70,20 +82,17 @@ namespace Radio.Views.Episodes
         // ═══════════════════════════════════════════════════════════
         private void EpisodesView_KeyDown(object sender, KeyEventArgs e)
         {
-            // Ctrl+N → جدولة حلقة جديدة
             if (e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.N)
             {
                 e.Handled = true;
                 BtnAddEpisode_Click(sender, e);
             }
-            // Ctrl+F → التركيز على حقل البحث
             else if (e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.F)
             {
                 e.Handled = true;
                 TxtSearch.Focus();
                 TxtSearch.SelectAll();
             }
-            // Ctrl+K → عرض اختصارات لوحة المفاتيح
             else if (e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.K)
             {
                 e.Handled = true;
@@ -91,10 +100,7 @@ namespace Radio.Views.Episodes
             }
         }
 
-        private void BtnKeyboardHelp_Click(object sender, RoutedEventArgs e)
-        {
-            ShowKeyboardShortcuts();
-        }
+        private void BtnKeyboardHelp_Click(object sender, RoutedEventArgs e) => ShowKeyboardShortcuts();
 
         private void ShowKeyboardShortcuts()
         {
@@ -113,22 +119,47 @@ namespace Radio.Views.Episodes
         {
             try
             {
+                LoadingOverlay.Visibility = Visibility.Visible;
+                EmptyStateOverlay.Visibility = Visibility.Collapsed;
+                CardsView.Visibility = Visibility.Collapsed;
+                TableView.Visibility = Visibility.Collapsed;
+                CompactView.Visibility = Visibility.Collapsed;
+
                 _allEpisodes = (await _episodeService.GetActiveEpisodesAsync()).ToList();
+                PopulateProgramFilter();
                 RebindAndUpdateStats();
             }
             catch (Exception ex)
             {
                 MessageService.Current.ShowError("حدث خطأ أثناء تحميل الحلقات: " + ex.Message);
             }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
+            }
         }
 
         // ═══════════════════════════════════════════════════════════
-        // إعادة الربط وتحديث الإحصائيات (مع دعم الفلاتر والبحث الموسّع)
+        // تعبئة تصفية البرامج
+        // ═══════════════════════════════════════════════════════════
+        private void PopulateProgramFilter()
+        {
+            var programs = _allEpisodes
+                .Select(e => e.ProgramName)
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .Distinct()
+                .OrderBy(p => p)
+                .ToList();
+
+            CmbProgramFilter.ItemsSource = programs;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // إعادة الربط وتحديث الإحصائيات
         // ═══════════════════════════════════════════════════════════
         private void RebindAndUpdateStats()
         {
             var keyword = TxtSearch.Text?.Trim();
-
             var filtered = _allEpisodes.AsEnumerable();
 
             // ─── فلتر الحالة ───
@@ -138,7 +169,14 @@ namespace Radio.Views.Episodes
                 filtered = filtered.Where(ep => ep.StatusId == sid);
             }
 
-            // ─── بحث موسّع (عناوين + برامج + ضيوف + مراسلين + ملاحظات) ───
+            // ─── فلتر البرنامج ───
+            if (!string.IsNullOrWhiteSpace(_activeProgramFilter))
+            {
+                var prog = _activeProgramFilter;
+                filtered = filtered.Where(ep => ep.ProgramName == prog);
+            }
+
+            // ─── بحث موسّع ───
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 filtered = filtered.Where(ep =>
@@ -150,21 +188,105 @@ namespace Radio.Views.Episodes
                     ep.CorrespondentItems.Any(c => c.FullName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false));
             }
 
+            // ─── ترتيب ───
+            var sortIndex = CmbSortBy.SelectedIndex;
+            filtered = sortIndex switch
+            {
+                0 => filtered.OrderByDescending(e => e.ScheduledExecutionTime),   // الأحدث
+                1 => filtered.OrderBy(e => e.ScheduledExecutionTime),             // الأقدم
+                2 => filtered.OrderBy(e => e.StatusId).ThenByDescending(e => e.ScheduledExecutionTime), // الحالة
+                3 => filtered.OrderBy(e => e.ProgramName, StringComparer.OrdinalIgnoreCase),             // البرنامج
+                4 => filtered.OrderBy(e => e.EpisodeName, StringComparer.OrdinalIgnoreCase),             // الاسم
+                _ => filtered.OrderByDescending(e => e.ScheduledExecutionTime)
+            };
+
             var resultList = filtered.ToList();
-            DgEpisodes.ItemsSource = resultList;
 
-            // ─── تحديث الإحصائيات ───
-            UpdateStatistics(_allEpisodes); // الإحصائيات دائماً على الكل
+            // ─── ربط البيانات حسب نمط العرض ───
+            CardsView.ItemsSource = resultList;
+            TableView.ItemsSource = resultList;
+            CompactView.ItemsSource = resultList;
 
-            // ─── تحديث عدادات Chips ───
+            // ─── تحديث الإحصائيات والفلاتر النشطة ───
             UpdateChipCounts();
+            UpdateActiveFilterChips();
+            TxtResultsCount.Text = $"{resultList.Count} حلقة";
 
-            // ─── تحديث عداد النتائج ───
-            TxtResultCount.Text = $"عرض {resultList.Count} من {_allEpisodes.Count} حلقة";
+            if (resultList.Count == 0)
+            {
+                EmptyStateOverlay.Visibility = Visibility.Visible;
+                CardsView.Visibility = Visibility.Collapsed;
+                TableView.Visibility = Visibility.Collapsed;
+                CompactView.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                EmptyStateOverlay.Visibility = Visibility.Collapsed;
+                ApplyViewMode();
+            }
+        }
+
+        private void UpdateActiveFilterChips()
+        {
+            var activeChips = new List<FilterChipItem>();
+
+            if (!string.IsNullOrWhiteSpace(_activeProgramFilter))
+            {
+                activeChips.Add(new FilterChipItem { Type = "Program", Label = $"البرنامج: {_activeProgramFilter}" });
+            }
+
+            // الترتيب (إذا لم يكن الافتراضي)
+            if (CmbSortBy.SelectedIndex > 0)
+            {
+                activeChips.Add(new FilterChipItem { Type = "Sort", Label = $"الترتيب: {SortOptions[CmbSortBy.SelectedIndex]}" });
+            }
+
+            ItemsActiveChips.ItemsSource = activeChips;
+            PnlActiveChips.Visibility = activeChips.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+            // تحديث الـ Badge
+            int totalActiveFilters = activeChips.Count;
+            if (_activeStatusFilter.HasValue) totalActiveFilters++; // نعتبر حالة التبويب فلتر نشط أيضاً في الـ Badge
+
+            if (totalActiveFilters > 0)
+            {
+                FilterBadge.Visibility = Visibility.Visible;
+                TxtFilterCount.Text = totalActiveFilters.ToString();
+            }
+            else
+            {
+                FilterBadge.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void Chip_DeleteClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is Chip chip && chip.DataContext is FilterChipItem item)
+            {
+                if (item.Type == "Program")
+                {
+                    CmbProgramFilter.SelectedItem = null;
+                }
+                else if (item.Type == "Sort")
+                {
+                    CmbSortBy.SelectedIndex = 0;
+                }
+            }
+        }
+
+        private void BtnResetFilters_Click(object sender, RoutedEventArgs e)
+        {
+            TxtSearch.Clear();
+            FilterAll.IsChecked = true;
+            _activeStatusFilter = null;
+            CmbProgramFilter.SelectedItem = null;
+            CmbSortBy.SelectedIndex = 0;
+            BtnToggleAdvancedFilters.IsChecked = false;
+            RebindAndUpdateStats();
         }
 
         // ═══════════════════════════════════════════════════════════
-        // فلاتر الحالة السريعة (Chips)
+        // فلاتر الحالة (Chips)
         // ═══════════════════════════════════════════════════════════
         private void StatusFilter_Click(object sender, RoutedEventArgs e)
         {
@@ -177,22 +299,63 @@ namespace Radio.Views.Episodes
                     nameof(FilterPublished) => EpisodeStatus.Published,
                     nameof(FilterWebPublished) => EpisodeStatus.WebsitePublished,
                     nameof(FilterCancelled) => EpisodeStatus.Cancelled,
-                    _ => null // الكل
+                    _ => null
                 };
                 RebindAndUpdateStats();
             }
         }
 
-        // ═══════════════════════════════════════════════════════════
-        // تحديث عدادات Chips
-        // ═══════════════════════════════════════════════════════════
+
+
         private void UpdateChipCounts()
         {
             ChipPlanned.Text = $"مجدولة ({_allEpisodes.Count(e => e.StatusId == EpisodeStatus.Planned)})";
             ChipExecuted.Text = $"منفّذة ({_allEpisodes.Count(e => e.StatusId == EpisodeStatus.Executed)})";
-            ChipPublished.Text = $"منشورة رقمياً ({_allEpisodes.Count(e => e.StatusId == EpisodeStatus.Published)})";
+            ChipPublished.Text = $"منشورة ({_allEpisodes.Count(e => e.StatusId == EpisodeStatus.Published)})";
             ChipWebPublished.Text = $"منشورة على الموقع ({_allEpisodes.Count(e => e.StatusId == EpisodeStatus.WebsitePublished)})";
             ChipCancelled.Text = $"ملغاة ({_allEpisodes.Count(e => e.StatusId == EpisodeStatus.Cancelled)})";
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // تصفية حسب البرنامج
+        // ═══════════════════════════════════════════════════════════
+        private void CmbProgramFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _activeProgramFilter = CmbProgramFilter.SelectedItem as string;
+            RebindAndUpdateStats();
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // ترتيب
+        // ═══════════════════════════════════════════════════════════
+        private void CmbSortBy_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_allEpisodes.Count > 0)
+                RebindAndUpdateStats();
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // تبديل أنماط العرض
+        // ═══════════════════════════════════════════════════════════
+        private void ViewMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is RadioButton rb)
+            {
+                _currentViewMode = rb.Name switch
+                {
+                    nameof(ViewTable) => EpisodeViewMode.Table,
+                    nameof(ViewCompact) => EpisodeViewMode.Compact,
+                    _ => EpisodeViewMode.Cards
+                };
+                ApplyViewMode();
+            }
+        }
+
+        private void ApplyViewMode()
+        {
+            CardsView.Visibility = _currentViewMode == EpisodeViewMode.Cards ? Visibility.Visible : Visibility.Collapsed;
+            TableView.Visibility = _currentViewMode == EpisodeViewMode.Table ? Visibility.Visible : Visibility.Collapsed;
+            CompactView.Visibility = _currentViewMode == EpisodeViewMode.Compact ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -201,7 +364,7 @@ namespace Radio.Views.Episodes
         private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e) => RebindAndUpdateStats();
 
         // ═══════════════════════════════════════════════════════════
-        // إجراءات سير العمل (تبقى كما هي)
+        // إجراءات سير العمل
         // ═══════════════════════════════════════════════════════════
         private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
@@ -269,8 +432,8 @@ namespace Radio.Views.Episodes
                     var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session) { Owner = mainWindow };
                     if (dialog.ShowDialog() == true)
                     {
-                        await LoadDataAsync();
                         MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
+                        await LoadDataAsync();
                     }
                 }
                 finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
@@ -290,8 +453,8 @@ namespace Radio.Views.Episodes
                     var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests) { Owner = mainWindow };
                     if (dialog.ShowDialog() == true)
                     {
-                        await LoadDataAsync();
                         MessageService.Current.ShowSuccess("تم تسجيل النشر الرقمي بنجاح.");
+                        await LoadDataAsync();
                     }
                 }
                 finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
@@ -310,8 +473,8 @@ namespace Radio.Views.Episodes
                     var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId) { Owner = mainWindow };
                     if (dialog.ShowDialog() == true)
                     {
-                        await LoadDataAsync();
                         MessageService.Current.ShowSuccess("تم نشر الحلقة على الموقع بنجاح.");
+                        await LoadDataAsync();
                     }
                 }
                 finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
@@ -328,7 +491,9 @@ namespace Radio.Views.Episodes
                 {
                     var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
                     var executionService = _serviceProvider.GetRequiredService<IExecutionService>();
-                    var dialog = new EpisodeRecordsView(publishingService, executionService, _session, _serviceProvider, ep.EpisodeId, ep.EpisodeName ?? string.Empty)
+                    var dialog = new EpisodeRecordsView(
+                        publishingService, executionService, _session, _serviceProvider,
+                        ep.EpisodeId, ep.EpisodeName ?? string.Empty)
                     { Owner = mainWindow };
                     dialog.ShowDialog();
                 }
@@ -372,14 +537,24 @@ namespace Radio.Views.Episodes
             }
         }
 
-        // ═══════════════════════════════════════════════════════════
-        // تحديث الإحصائيات
-        // ═══════════════════════════════════════════════════════════
-        private void UpdateStatistics(List<ActiveEpisodeDto> data)
+        private async void BtnEditCancellationReason_Click(object sender, RoutedEventArgs e)
         {
-            TxtTotal.Text = data.Count.ToString();
-            TxtExecuted.Text = data.Count(e => e.StatusId == EpisodeStatus.Executed).ToString();
-            TxtPublished.Text = data.Count(e => e.StatusId == EpisodeStatus.Published || e.StatusId == EpisodeStatus.WebsitePublished).ToString();
+            if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
+            {
+                var reasonDialog = new ReasonInputDialog("تعديل سبب الإلغاء", "السبب:", ep.CancellationReason);
+                if (reasonDialog.ShowDialog() == true)
+                {
+                    var res = await _episodeService.UpdateCancellationReasonAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
+                    if (res.IsSuccess)
+                    {
+                        await LoadDataAsync();
+                        MessageService.Current.ShowSuccess("تم تحديث سبب الإلغاء بنجاح.");
+                    }
+                    else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل تحديث السبب.");
+                }
+            }
         }
+
+
     }
 }
