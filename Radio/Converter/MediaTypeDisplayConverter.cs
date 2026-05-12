@@ -3,7 +3,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Radio.Converters;
+namespace Radio.Converter;
 
 public class MediaTypeDisplayConverter : IValueConverter
 {

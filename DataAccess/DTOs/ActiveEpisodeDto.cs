@@ -16,9 +16,10 @@ namespace DataAccess.DTOs
 
         public bool CanMarkExecuted => StatusId == EpisodeStatus.Planned;
         public bool CanMarkPublished => StatusId == EpisodeStatus.Executed;
-        public bool CanToggleWebsitePublish => StatusId >= EpisodeStatus.Executed && StatusId != EpisodeStatus.Cancelled;
+        public bool CanToggleWebsitePublish => StatusId is EpisodeStatus.Executed or EpisodeStatus.Published;
         public bool CanRevert => StatusId is EpisodeStatus.Executed or EpisodeStatus.Published or EpisodeStatus.WebsitePublished;
         public bool CanCancel => StatusId is EpisodeStatus.Planned or EpisodeStatus.Executed;
+        public bool CanViewRecords => StatusId is EpisodeStatus.Executed or EpisodeStatus.Published or EpisodeStatus.WebsitePublished;
 
         public List<GuestDisplayItem> GuestItems { get; init; } = [];
         public List<EpisodeCorrespondentDto> CorrespondentItems { get; init; } = [];

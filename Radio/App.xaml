@@ -24,7 +24,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converter="clr-namespace:Radio.Converter"
-    xmlns:converters="clr-namespace:Radio.Converters"
+    xmlns:converters="clr-namespace:Radio.Converter"
     xmlns:local="clr-namespace:Radio"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
@@ -128,6 +128,7 @@
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/ColorZone.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml" />
 
 
                 <!--
@@ -151,8 +152,10 @@
                 ══════════════════════════════════════════════════
                 Global Converters
                 ══════════════════════════════════════════════════
-            -->
+            --> 
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+           
+            <converter:NullToCollapsedConverter x:Key="NullToCollapsedConverter" />
 
             <converter:PermissionVisibilityConverter x:Key="PermissionVisibilityConverter" />
 
@@ -160,7 +163,7 @@
 
             <converter:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
 
-            <converters:MediaTypeDisplayConverter x:Key="MediaTypeDisplayConverter" />
+            <converter:MediaTypeDisplayConverter x:Key="MediaTypeDisplayConverter" />
 
             <!--
                 ══════════════════════════════════════════════════

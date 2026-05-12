@@ -1,0 +1,13 @@
+{
+  "name": "context-mode",
+  "version": "1.0.0",
+  "description": "Context-mode hooks for context window protection",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": ["shell", "read", ".*ctx_execute.*", ".*ctx_execute_file.*", ".*ctx_batch_execute.*"]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "context-mode hook kiro pretooluse"
+  }
+}

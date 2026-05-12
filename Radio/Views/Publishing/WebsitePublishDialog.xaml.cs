@@ -138,7 +138,6 @@ namespace Radio.Views.Publishing
 
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess("تم تعديل نشر الموقع بنجاح");
                         DialogResult = true;
                     }
                     else
@@ -161,7 +160,6 @@ namespace Radio.Views.Publishing
 
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess("تم نشر الحلقة على الموقع بنجاح");
                         DialogResult = true;
                     }
                     else

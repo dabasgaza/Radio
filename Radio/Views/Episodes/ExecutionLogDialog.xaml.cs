@@ -118,7 +118,6 @@ namespace Radio.Views.Episodes
 
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess("تم تعديل سجل التنفيذ بنجاح.");
                         DialogResult = true;
                     }
                     else
@@ -141,7 +140,6 @@ namespace Radio.Views.Episodes
 
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
                         DialogResult = true;
                     }
                     else

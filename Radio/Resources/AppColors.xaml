@@ -108,7 +108,10 @@
     <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource Neutral400Color}" />
     <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="TextHintBrush" Color="{StaticResource Neutral600Color}" />
-    <SolidColorBrush x:Key="OverlayScrimBrush" Color="Black" Opacity="0.45" />
+    <SolidColorBrush
+        x:Key="OverlayScrimBrush"
+        Opacity="0.45"
+        Color="Black" />
 
     <!--  Border / Divider Brushes  -->
     <SolidColorBrush x:Key="BorderDefaultBrush" Color="{StaticResource Neutral300Color}" />
@@ -164,6 +167,18 @@
     <LinearGradientBrush x:Key="SeconderyGradientBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Offset="0.0" Color="{StaticResource Secondary700Color}" />
         <GradientStop Offset="1.0" Color="{StaticResource Secondary500Color}" />
+    </LinearGradientBrush>
+
+    <!--  تدرج النجاح (الأخضر)  -->
+    <LinearGradientBrush x:Key="SuccessGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="#43A047" />
+        <GradientStop Offset="1.0" Color="#2E7D32" />
+    </LinearGradientBrush>
+
+    <!--  تدرج المعلومات/النشر (الأزرق)  -->
+    <LinearGradientBrush x:Key="InfoGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="#42A5F5" />
+        <GradientStop Offset="1.0" Color="#1976D2" />
     </LinearGradientBrush>
 
     <!--  ═════════════════════ DIALOG HEADER GRADIENTS ═════════════════════  -->

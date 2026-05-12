@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Radio.Messaging;
+using DataAccess.Common;
 
 
 namespace Radio.Views.Episodes
@@ -502,17 +503,27 @@ namespace Radio.Views.Episodes
 
                 if (IsEditMode)
                 {
-                    // ═══ وضع التعديل: تحديث كل سجل على حدة ═══
-                    var successCount = 0;
+                    // ═══ وضع التعديل: تحديث كل سجل أو إنشاؤه إذا كان جديداً للضيف ═══
                     foreach (var logDto in guestLogs)
                     {
-                        var result = await _publishingService.UpdateSocialPublishingLogAsync(logDto, _session);
-                        if (result.IsSuccess)
-                            successCount++;
+                        Result result;
+                        if (logDto.LogId > 0)
+                        {
+                            result = await _publishingService.UpdateSocialPublishingLogAsync(logDto, _session);
+                        }
+                        else
+                        {
+                            // ضيف جديد تمت إضافته أثناء التعديل
+                            result = await _publishingService.SavePublishingLogAsync(logDto, _session);
+                        }
+
+                        if (!result.IsSuccess)
+                        {
+                            MessageService.Current.ShowError(result.ErrorMessage ?? "خطأ في حفظ أحد السجلات.");
+                            return; // توقف عند أول خطأ لضمان سلامة البيانات
+                        }
                     }
 
-                    MessageService.Current.ShowSuccess(
-                        $"تم تعديل بيانات نشر {successCount} ضيف بنجاح.");
                     DialogResult = true;
                 }
                 else
@@ -522,8 +533,6 @@ namespace Radio.Views.Episodes
 
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess(
-                            $"تم نشر مقاطع {readyGuests.Count} ضيف بنجاح.");
                         DialogResult = true;
                     }
                     else
