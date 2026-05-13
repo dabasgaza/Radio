@@ -8,7 +8,7 @@ namespace DataAccess.DTOs
         public int ProgramId { get; init; }
         public string? EpisodeName { get; init; }
         public string? ProgramName { get; init; }
-        public string? GuestsDisplay { get; init; }
+        public string? GuestsDisplay { get; set; }
         public DateTime? ScheduledExecutionTime { get; init; }
         public string? StatusText { get; init; }
         public byte StatusId { get; init; }

@@ -53,6 +53,17 @@ public partial class BroadcastWorkflowDBContext : DbContext
             new EpisodeStatus { StatusId = 4, StatusName = "Cancelled", DisplayName = "ملغاة", SortOrder = 4 }
         );
 
+        // إضافة فهارس لتحسين الأداء
+        modelBuilder.Entity<Episode>().HasIndex(e => e.StatusId);
+        modelBuilder.Entity<Episode>().HasIndex(e => e.ScheduledExecutionTime);
+        modelBuilder.Entity<EpisodeGuest>().HasIndex(eg => eg.EpisodeId);
+        modelBuilder.Entity<SocialMediaPublishingLog>().HasIndex(l => l.EpisodeGuestId);
+        modelBuilder.Entity<SocialMediaPublishingLog>().HasIndex(l => l.PublishedAt);
+        modelBuilder.Entity<WebsitePublishingLog>().HasIndex(l => l.EpisodeId);
+        modelBuilder.Entity<WebsitePublishingLog>().HasIndex(l => l.PublishedAt);
+        modelBuilder.Entity<ExecutionLog>().HasIndex(l => l.EpisodeId);
+        modelBuilder.Entity<ExecutionLog>().HasIndex(l => l.CreatedAt);
+
 
         // ✨ إصلاح خلل الحذف المنطقي: تطبيق الفلتر على أي كيان يرث من BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())

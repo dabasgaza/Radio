@@ -1,7 +1,9 @@
 using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
+using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DataAccess.Services;
 
@@ -56,7 +58,7 @@ public interface IPublishingService
 }
 
 // ✨ استخدام Primary Constructor
-public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IPublishingService
+public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory, IMemoryCache cache, TelemetryClient telemetryClient) : IPublishingService
 {
     public async Task<Result> LogWebsitePublishingAsync(int episodeId, string title, MediaType mediaType, string notes, UserSession session)
     {
@@ -122,6 +124,7 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
             var now = DateTime.UtcNow;
 
             // 2. إنشاء سجلات النشر لكل ضيف
+            var logs = new List<SocialMediaPublishingLog>();
             foreach (var g in guestLogs)
             {
                 var log = new SocialMediaPublishingLog
@@ -133,11 +136,23 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
                     ClipDuration = g.Duration,
                     PublishedAt = now
                 };
-
+                logs.Add(log);
                 context.SocialMediaPublishingLogs.Add(log);
-                await context.SaveChangesAsync(); // نحتاج الـ ID لربط المنصات
 
-                // 3. إنشاء روابط المنصات لكل سجل
+                // 4. تحديث ClipStatus للضيف
+                var episodeGuest = await context.EpisodeGuests.FindAsync(g.EpisodeGuestId);
+                if (episodeGuest != null)
+                {
+                    episodeGuest.ClipStatus = GuestClipStatus.Published;
+                }
+            }
+
+            // حفظ السجلات للحصول على IDs
+            await context.SaveChangesAsync();
+
+            // 3. إنشاء روابط المنصات لكل سجل
+            foreach (var (log, g) in logs.Zip(guestLogs, (l, g) => (l, g)))
+            {
                 foreach (var p in g.Platforms)
                 {
                     var platformLink = new SocialMediaPublishingLogPlatform
@@ -147,13 +162,6 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
                         Url = p.Url
                     };
                     context.SocialMediaPublishingLogPlatforms.Add(platformLink);
-                }
-
-                // 4. تحديث ClipStatus للضيف
-                var episodeGuest = await context.EpisodeGuests.FindAsync(g.EpisodeGuestId);
-                if (episodeGuest != null)
-                {
-                    episodeGuest.ClipStatus = GuestClipStatus.Published;
                 }
             }
 
@@ -176,12 +184,33 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
     /// </summary>
     public async Task<List<SocialMediaPlatformDto>> GetAllPlatformsAsync()
     {
-        using var context = await contextFactory.CreateDbContextAsync();
-        return await context.SocialMediaPlatforms
-            .AsNoTracking()
-            .Where(p => p.IsActive)
-            .Select(p => new SocialMediaPlatformDto(p.SocialMediaPlatformId, p.Name, p.Icon))
-            .ToListAsync();
+        var operation = telemetryClient.StartOperation<Microsoft.ApplicationInsights.DataContracts.RequestTelemetry>("GetAllPlatforms");
+        try
+        {
+            var result = await cache.GetOrCreateAsync("platforms", async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
+                using var context = await contextFactory.CreateDbContextAsync();
+                return await context.SocialMediaPlatforms
+                    .AsNoTracking()
+                    .Where(p => p.IsActive)
+                    .Select(p => new SocialMediaPlatformDto(p.SocialMediaPlatformId, p.Name, p.Icon))
+                    .ToListAsync();
+            });
+            telemetryClient.TrackMetric("PlatformsCount", result.Count);
+            operation.Telemetry.Success = true;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            telemetryClient.TrackException(ex);
+            operation.Telemetry.Success = false;
+            throw;
+        }
+        finally
+        {
+            operation.Dispose();
+        }
     }
 
     /// <summary>
@@ -289,8 +318,9 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         // لا نحتاج صلاحية خاصة — مجرد قراءة
         using var context = await contextFactory.CreateDbContextAsync();
 
-        var log = await context.SocialMediaPublishingLogs
+                var log = await context.SocialMediaPublishingLogs
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(l => l.Platforms)
             .Where(l => l.EpisodeGuestId == episodeGuestId && l.IsActive)
             .OrderByDescending(l => l.PublishedAt)  // أحدث سجل أولاً
@@ -323,8 +353,9 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         using var context = await contextFactory.CreateDbContextAsync();
 
         // البحث عن سجلات النشر الرقمي المرتبطة بضيوف الحلقة
-        var logs = await context.SocialMediaPublishingLogs
+                var logs = await context.SocialMediaPublishingLogs
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(l => l.Platforms)
                 .ThenInclude(p => p.SocialMediaPlatform)
             .Include(l => l.EpisodeGuest)
@@ -462,55 +493,44 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
     /// استرجاع قائمة موحّدة من جميع سجلات النشر (الأنواع الثلاثة)
     /// تُستخدم في شاشة العرض الشامل مع دعم الفلترة حسب الحلقة
     /// </summary>
-    public async Task<List<PublishingRecordDto>> GetAllPublishingRecordsAsync(int? episodeId = null)
+        public async Task<List<PublishingRecordDto>> GetAllPublishingRecordsAsync(int? episodeId = null)
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
         var records = new List<PublishingRecordDto>();
 
-        // 1. سجلات التنفيذ
+        // 1. سجلات التنفيذ — AsSplitQuery + Select مباشر
         var execQuery = context.ExecutionLogs
             .AsNoTracking()
-            .Include(l => l.Episode)
-                .ThenInclude(e => e.Program)
-            .Include(l => l.ExecutedByUser)
+            .AsSplitQuery()
             .Where(l => l.IsActive);
 
-        // فلترة حسب الحلقة إن طُلبت
         if (episodeId.HasValue)
             execQuery = execQuery.Where(l => l.EpisodeId == episodeId.Value);
 
         var execLogs = await execQuery
             .OrderByDescending(l => l.CreatedAt)
+            .Select(l => new PublishingRecordDto
+            {
+                RecordId = l.ExecutionLogId,
+                RecordType = "Execution",
+                EpisodeId = l.EpisodeId,
+                EpisodeName = l.Episode != null ? l.Episode.EpisodeName : null,
+                ProgramName = l.Episode != null && l.Episode.Program != null ? l.Episode.Program.ProgramName : null,
+                Summary = l.DurationMinutes.HasValue ? $"مدة التنفيذ: {l.DurationMinutes} دقيقة" : null,
+                RecordDate = l.CreatedAt,
+                RecordedBy = l.ExecutedByUser != null ? l.ExecutedByUser.FullName : null,
+                RecordIcon = "PlayCircleOutline",
+                RecordColor = "#4CAF50"
+            })
             .ToListAsync();
 
-        foreach (var log in execLogs)
-        {
-            records.Add(new PublishingRecordDto
-            {
-                RecordId = log.ExecutionLogId,
-                RecordType = "Execution",
-                EpisodeId = log.EpisodeId,
-                EpisodeName = log.Episode?.EpisodeName,
-                ProgramName = log.Episode?.Program?.ProgramName,
-                Summary = $"مدة التنفيذ: {log.DurationMinutes} دقيقة",
-                RecordDate = log.CreatedAt,
-                RecordedBy = log.ExecutedByUser?.FullName,
-                RecordIcon = "PlayCircleOutline",
-                RecordColor = "#4CAF50"  // أخضر
-            });
-        }
+        records.AddRange(execLogs);
 
-        // 2. سجلات النشر الرقمي (سوشال ميديا)
+        // 2. سجلات النشر الرقمي (سوشال ميديا) — استعلام Select لتقليل الأعمدة
         var socialQuery = context.SocialMediaPublishingLogs
             .AsNoTracking()
-            .Include(l => l.EpisodeGuest)
-                .ThenInclude(eg => eg.Guest)
-            .Include(l => l.EpisodeGuest.Episode)
-                .ThenInclude(e => e.Program)
-            .Include(l => l.PublishedByUser)
-            .Include(l => l.Platforms)
-                .ThenInclude(p => p.SocialMediaPlatform)
+            .AsSplitQuery()
             .Where(l => l.IsActive);
 
         if (episodeId.HasValue)
@@ -518,37 +538,53 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
 
         var socialLogs = await socialQuery
             .OrderByDescending(l => l.PublishedAt)
+            .Select(l => new PublishingRecordDto
+            {
+                RecordId = l.SocialMediaPublishingLogId,
+                RecordType = "SocialMedia",
+                EpisodeId = l.EpisodeGuest.EpisodeId,
+                EpisodeName = l.EpisodeGuest.Episode != null ? l.EpisodeGuest.Episode.EpisodeName : null,
+                ProgramName = l.EpisodeGuest.Episode != null && l.EpisodeGuest.Episode.Program != null ? l.EpisodeGuest.Episode.Program.ProgramName : null,
+                RecordDate = l.PublishedAt,
+                RecordedBy = l.PublishedByUser != null ? l.PublishedByUser.FullName : null,
+                RecordIcon = "ShareVariant",
+                RecordColor = "#2196F3"
+            })
             .ToListAsync();
 
-        foreach (var log in socialLogs)
+        // نُجمّع أسماء الضيوف والمنصات في الذاكرة (string.Join لا يُترجم)
+        if (socialLogs.Count > 0)
         {
-            // تجميع أسماء المنصات المنشورة للعرض كملخص
-            var platformNames = log.Platforms
-                .Where(p => p.IsActive)
-                .Select(p => p.SocialMediaPlatform?.Name ?? "غير معروف")
-                .ToList();
+            var socialLogIds = socialLogs.Select(s => s.RecordId).ToList();
+            var platformData = await context.SocialMediaPublishingLogPlatforms
+                .AsNoTracking()
+                .Where(p => socialLogIds.Contains(p.SocialMediaPublishingLogId) && p.IsActive)
+                .Select(p => new
+                {
+                    p.SocialMediaPublishingLogId,
+                    PlatformName = p.SocialMediaPlatform != null ? p.SocialMediaPlatform.Name : null,
+                    GuestName = p.SocialMediaPublishingLog.EpisodeGuest.Guest.FullName
+                })
+                .ToListAsync();
 
-            records.Add(new PublishingRecordDto
+            var platformLookup = platformData.GroupBy(p => p.SocialMediaPublishingLogId)
+                                              .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var log in socialLogs)
             {
-                RecordId = log.SocialMediaPublishingLogId,
-                RecordType = "SocialMedia",
-                EpisodeId = log.EpisodeGuest.EpisodeId,
-                EpisodeName = log.EpisodeGuest?.Episode?.EpisodeName,
-                ProgramName = log.EpisodeGuest?.Episode?.Program?.ProgramName,
-                Summary = $"{log.EpisodeGuest?.Guest?.FullName} → {string.Join("، ", platformNames)}",
-                RecordDate = log.PublishedAt,
-                RecordedBy = log.PublishedByUser?.FullName,
-                RecordIcon = "ShareVariant",
-                RecordColor = "#2196F3"  // أزرق
-            });
+                if (platformLookup.TryGetValue(log.RecordId, out var platforms))
+                {
+                    log.Summary = $"{platforms.First().GuestName} → {string.Join("، ", platforms.Select(p => p.PlatformName ?? "غير معروف"))}";
+                }
+            }
         }
 
-        // 3. سجلات نشر الموقع الإلكتروني
+        records.AddRange(socialLogs);
+
+        // 3. سجلات نشر الموقع الإلكتروني — Select مباشر + AsSplitQuery
         var webQuery = context.WebsitePublishingLogs
             .AsNoTracking()
-            .Include(l => l.Episode)
-                .ThenInclude(e => e.Program)
-            .Include(l => l.PublishedByUser)
+            .AsSplitQuery()
             .Where(l => l.IsActive);
 
         if (episodeId.HasValue)
@@ -556,24 +592,22 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
 
         var webLogs = await webQuery
             .OrderByDescending(l => l.PublishedAt)
+            .Select(l => new PublishingRecordDto
+            {
+                RecordId = l.WebsitePublishingLogId,
+                RecordType = "Website",
+                EpisodeId = l.EpisodeId,
+                EpisodeName = l.Episode != null ? l.Episode.EpisodeName : null,
+                ProgramName = l.Episode != null && l.Episode.Program != null ? l.Episode.Program.ProgramName : null,
+                Summary = l.Title ?? "بدون عنوان",
+                RecordDate = l.PublishedAt,
+                RecordedBy = l.PublishedByUser != null ? l.PublishedByUser.FullName : null,
+                RecordIcon = "Web",
+                RecordColor = "#5C6BC0"
+            })
             .ToListAsync();
 
-        foreach (var log in webLogs)
-        {
-            records.Add(new PublishingRecordDto
-            {
-                RecordId = log.WebsitePublishingLogId,
-                RecordType = "Website",
-                EpisodeId = log.EpisodeId,
-                EpisodeName = log.Episode?.EpisodeName,
-                ProgramName = log.Episode?.Program?.ProgramName,
-                Summary = log.Title ?? "بدون عنوان",
-                RecordDate = log.PublishedAt,
-                RecordedBy = log.PublishedByUser?.FullName,
-                RecordIcon = "Web",
-                RecordColor = "#5C6BC0"  // بنفسجي
-            });
-        }
+        records.AddRange(webLogs);
 
         // ترتيب نهائي: الأحدث أولاً
         return records

@@ -36,25 +36,34 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var today = DateTime.UtcNow.Date;
         var tomorrow = today.AddDays(1);
 
-        // ✅ نجلب البيانات الخام من DB أولاً مع Include للضيوف
+        // ✅ Select مباشر + AsSplitQuery: نجلب الحقول المطلوبة فقط بدلاً من الكيانات كاملة
         var raw = await context.Episodes
             .AsNoTracking()
-            .Include(e => e.Program)
-            .Include(e => e.EpisodeStatus)
-            .Include(e => e.EpisodeGuests)
-                .ThenInclude(eg => eg.Guest)
+            .AsSplitQuery()
             .Where(e => e.ScheduledExecutionTime >= today && e.ScheduledExecutionTime < tomorrow)
             .OrderBy(e => e.ScheduledExecutionTime)
+            .Select(e => new
+            {
+                e.EpisodeId,
+                e.EpisodeName,
+                ProgramName = e.Program != null ? e.Program.ProgramName : null,
+                e.ScheduledExecutionTime,
+                StatusDisplayName = e.EpisodeStatus != null ? e.EpisodeStatus.DisplayName : null,
+                Guests = e.EpisodeGuests
+                    .OrderBy(g => g.HostingTime)
+                    .Select(g => new GuestDisplayItem(g.Guest.FullName, g.Topic, g.HostingTime))
+                    .ToList()
+            })
             .ToListAsync();
 
-        // ✅ ثم نطبق التنسيق في الذاكرة (C#) لأن FormatGuestsDisplay لا تُترجم إلى SQL
+        // ✅ تحويل النتيجة إلى DTOs في الذاكرة مع تنسيق أسماء الضيوف
         return raw.Select(e => new TodayEpisodeDto(
             e.EpisodeId,
             e.EpisodeName,
-            e.Program.ProgramName,
-            FormatGuestsDisplay(e.EpisodeGuests),
+            e.ProgramName ?? "—",
+            FormatGuestItemsDisplay(e.Guests),
             e.ScheduledExecutionTime,
-            e.EpisodeStatus.DisplayName
+            e.StatusDisplayName ?? "غير معروف"
         )).ToList();
     }
 
@@ -83,25 +92,34 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         var toEndOfDay = to.Date.AddDays(1);
 
-        // ✅ نجلب البيانات الخام مع Include للضيوف
+        // ✅ Select مباشر + AsSplitQuery: نجلب الحقول المطلوبة فقط
         var raw = await context.Episodes
             .AsNoTracking()
-            .Include(e => e.Program)
-            .Include(e => e.EpisodeStatus)
-            .Include(e => e.EpisodeGuests)
-                .ThenInclude(eg => eg.Guest)
+            .AsSplitQuery()
             .Where(e => e.ScheduledExecutionTime >= from.Date && e.ScheduledExecutionTime < toEndOfDay)
             .OrderBy(e => e.ScheduledExecutionTime)
+            .Select(e => new
+            {
+                e.EpisodeId,
+                e.EpisodeName,
+                ProgramName = e.Program != null ? e.Program.ProgramName : null,
+                e.ScheduledExecutionTime,
+                StatusDisplayName = e.EpisodeStatus != null ? e.EpisodeStatus.DisplayName : null,
+                Guests = e.EpisodeGuests
+                    .OrderBy(g => g.HostingTime)
+                    .Select(g => new GuestDisplayItem(g.Guest.FullName, g.Topic, g.HostingTime))
+                    .ToList()
+            })
             .ToListAsync();
 
-        // ✅ ثم نطبق التنسيق في الذاكرة
+        // ✅ تحويل النتيجة إلى DTOs في الذاكرة مع تنسيق أسماء الضيوف
         return raw.Select(e => new DateRangeEpisodeDto(
             e.EpisodeId,
             e.EpisodeName,
-            e.Program.ProgramName,
-            FormatGuestsDisplay(e.EpisodeGuests),
+            e.ProgramName ?? "—",
+            FormatGuestItemsDisplay(e.Guests),
             e.ScheduledExecutionTime,
-            e.EpisodeStatus.DisplayName
+            e.StatusDisplayName ?? "غير معروف"
         )).ToList();
     }
 
@@ -210,6 +228,30 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         }).ToList();
     }
 
+    /// <summary>
+    /// تنسيق أسماء الضيوف وعناوينهم ومواعيدهم من قائمة GuestDisplayItem
+    /// </summary>
+    private static string FormatGuestItemsDisplay(IEnumerable<GuestDisplayItem> guests)
+    {
+        var list = guests.ToList();
+
+        if (list.Count == 0)
+            return "لا يوجد ضيف";
+
+        return string.Join(" ، ", list.Select(g =>
+        {
+            var name = g.Name ?? "غير معروف";
+            if (g.HostingTime.HasValue)
+                name += $" ({g.HostingTime.Value:hh\\:mm})";
+            if (!string.IsNullOrWhiteSpace(g.Topic))
+                name += $" — {g.Topic}";
+            return name;
+        }));
+    }
+
+    /// <summary>
+    /// تنسيق أسماء الضيوف من كيانات EpisodeGuest (للاستخدام الداخلي فقط)
+    /// </summary>
     private static string FormatGuestsDisplay(IEnumerable<EpisodeGuest> guests)
     {
         var list = guests.OrderBy(g => g.HostingTime).ToList();

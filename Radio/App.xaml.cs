@@ -5,6 +5,8 @@ using DataAccess.Services.Messaging;
 using Domain.Models;
 using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +41,12 @@ namespace Radio
             builder.Services.AddSingleton<AuditInterceptor>();
             builder.Services.AddSingleton<IMessageService, WpfMessageService>();
 
+            // Application Insights
+            var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+            telemetryConfiguration.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+            builder.Services.AddSingleton(telemetryConfiguration);
+            builder.Services.AddSingleton<TelemetryClient>();
+
             // 3. Application Services
             builder.Services.AddTransient<IAuthService, AuthService>();
             builder.Services.AddTransient<IGuestService, GuestService>();
@@ -50,11 +58,15 @@ namespace Radio
             builder.Services.AddTransient<IReportsService, ReportsService>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<ICoverageService, CoverageService>();
+            builder.Services.AddSingleton<ICachedLookupService, CachedLookupService>();
             builder.Services.AddTransient<IEmployeeService, EmployeeService>();
             builder.Services.AddTransient<IPlatformService, PlatformService>();
             builder.Services.AddTransient<IPermissionService, PermissionService>();
 
-            // 4. UI
+            // 4. Caching
+            builder.Services.AddMemoryCache();
+
+            // 5. UI
             builder.Services.AddTransient<LoginWindow>();
             builder.Services.AddTransient<ModernMainWindow>();
 

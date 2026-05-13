@@ -23,7 +23,7 @@ public record PublishingRecordDto
     public string? ProgramName { get; init; }
 
     /// <summary>ملخص قصير: اسم الضيف أو عنوان المقطع أو عنوان النشر</summary>
-    public string? Summary { get; init; }
+    public string? Summary { get; set; }
 
     /// <summary>تاريخ إنشاء السجل</summary>
     public DateTime RecordDate { get; init; }

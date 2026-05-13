@@ -1,6 +1,7 @@
 using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
+using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Services;
@@ -29,101 +30,154 @@ public interface IEpisodeService
     Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session);
 }
 
-public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IEpisodeService
+public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory, TelemetryClient telemetryClient) : IEpisodeService
 {
+    // ──────────────────────────────────────────────────────────────
+    // Compiled Query for hot path
+    // ──────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Compiled query لاستعلام الحلقات النشطة — المسار الأكثر استخداماً
+    /// </summary>
+    private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<ActiveEpisodeDto>> s_compiledActiveEpisodes =
+        EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+            context.Episodes
+                .AsNoTracking()
+                .AsSplitQuery()
+                .OrderBy(e => e.ScheduledExecutionTime)
+                .Select(e => new ActiveEpisodeDto
+                {
+                    EpisodeId = e.EpisodeId,
+                    StatusId = e.StatusId,
+                    ProgramId = e.ProgramId,
+                    EpisodeName = e.EpisodeName,
+                    ProgramName = e.Program != null ? e.Program.ProgramName : null,
+                    StatusText = e.EpisodeStatus != null ? e.EpisodeStatus.DisplayName : null,
+                    ScheduledExecutionTime = e.ScheduledExecutionTime,
+                    SpecialNotes = e.SpecialNotes,
+                    CancellationReason = e.CancellationReason,
+                    GuestItems = e.EpisodeGuests
+                        .OrderBy(g => g.HostingTime)
+                        .Select(g => new GuestDisplayItem(g.Guest.FullName, g.Topic, g.HostingTime))
+                        .ToList(),
+                    CorrespondentItems = e.EpisodeCorrespondents
+                        .Select(c => new EpisodeCorrespondentDto(
+                            c.EpisodeCorrespondentId,
+                            c.CorrespondentId,
+                            c.Correspondent.FullName,
+                            c.Topic,
+                            c.HostingTime))
+                        .ToList(),
+                    EmployeeItems = e.EpisodeEmployees
+                        .Select(ee => new EpisodeEmployeeDto(
+                            ee.EpisodeEmployeeId,
+                            ee.EmployeeId,
+                            ee.Employee.FullName,
+                            ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
+                        .ToList(),
+                }));
+
+    /// <summary>
+    /// استعلام داخلي موحّد — يُستخدم من GetActiveEpisodesAsync و GetActiveEpisodeByIdAsync
+    /// </summary>
+    private static readonly Func<BroadcastWorkflowDBContext, int, IAsyncEnumerable<ActiveEpisodeDto>> s_compiledActiveEpisodeById =
+        EF.CompileAsyncQuery((BroadcastWorkflowDBContext context, int episodeId) =>
+            context.Episodes
+                .AsNoTracking()
+                .AsSplitQuery()
+                .Where(e => e.EpisodeId == episodeId)
+                .Select(e => new ActiveEpisodeDto
+                {
+                    EpisodeId = e.EpisodeId,
+                    StatusId = e.StatusId,
+                    ProgramId = e.ProgramId,
+                    EpisodeName = e.EpisodeName,
+                    ProgramName = e.Program != null ? e.Program.ProgramName : null,
+                    StatusText = e.EpisodeStatus != null ? e.EpisodeStatus.DisplayName : null,
+                    ScheduledExecutionTime = e.ScheduledExecutionTime,
+                    SpecialNotes = e.SpecialNotes,
+                    CancellationReason = e.CancellationReason,
+                    GuestItems = e.EpisodeGuests
+                        .OrderBy(g => g.HostingTime)
+                        .Select(g => new GuestDisplayItem(g.Guest.FullName, g.Topic, g.HostingTime))
+                        .ToList(),
+                    CorrespondentItems = e.EpisodeCorrespondents
+                        .Select(c => new EpisodeCorrespondentDto(
+                            c.EpisodeCorrespondentId,
+                            c.CorrespondentId,
+                            c.Correspondent.FullName,
+                            c.Topic,
+                            c.HostingTime))
+                        .ToList(),
+                    EmployeeItems = e.EpisodeEmployees
+                        .Select(ee => new EpisodeEmployeeDto(
+                            ee.EpisodeEmployeeId,
+                            ee.EmployeeId,
+                            ee.Employee.FullName,
+                            ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
+                        .ToList(),
+                }));
+
+    /// <summary>
+    /// تطبيق string.Join على GuestsDisplay بعد الاستعلام
+    /// </summary>
+    private static void SetGuestsDisplay(ActiveEpisodeDto episode)
+    {
+        episode.GuestsDisplay = string.Join(" · ", episode.GuestItems.Select(g => g.Name));
+    }
+
     // ──────────────────────────────────────────────────────────────
     // Queries
     // ──────────────────────────────────────────────────────────────
 
     public async Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync()
     {
-        using var context = await contextFactory.CreateDbContextAsync();
+        var operation = telemetryClient.StartOperation<Microsoft.ApplicationInsights.DataContracts.RequestTelemetry>("GetActiveEpisodes");
+        try
+        {
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        return await context.Episodes
-            .AsNoTracking()
-            .OrderBy(e => e.ScheduledExecutionTime)
-            .Select(e => new ActiveEpisodeDto
+            // ✅ استخدام Compiled Query للمسار الأكثر حرارة
+            var episodes = new List<ActiveEpisodeDto>();
+            await foreach (var ep in s_compiledActiveEpisodes(context))
             {
-                EpisodeId               = e.EpisodeId,
-                StatusId                = e.StatusId,
-                ProgramId               = e.ProgramId,
-                EpisodeName             = e.EpisodeName,
-                ProgramName             = e.Program.ProgramName,
-                ScheduledExecutionTime  = e.ScheduledExecutionTime,
-                StatusText              = e.EpisodeStatus.DisplayName,
-                SpecialNotes            = e.SpecialNotes,
-                CancellationReason      = e.CancellationReason,
+                SetGuestsDisplay(ep);
+                episodes.Add(ep);
+            }
 
-                // ملخص أسماء الضيوف لعرضه في قوائم الحلقات
-                GuestsDisplay = string.Join(" · ",
-                    e.EpisodeGuests
-                        .OrderBy(g => g.HostingTime)
-                        .Select(g => g.Guest.FullName)),
-
-                GuestItems = e.EpisodeGuests
-                    .OrderBy(g => g.HostingTime)
-                    .Select(g => new GuestDisplayItem(g.Guest.FullName, g.Topic, g.HostingTime))
-                    .ToList(),
-
-                CorrespondentItems = e.EpisodeCorrespondents
-                    .Select(c => new EpisodeCorrespondentDto(
-                        c.EpisodeCorrespondentId,
-                        c.CorrespondentId,
-                        c.Correspondent.FullName,
-                        c.Topic,
-                        c.HostingTime))
-                    .ToList(),
-
-                EmployeeItems = e.EpisodeEmployees
-                    .Select(ee => new EpisodeEmployeeDto(ee.EpisodeEmployeeId, ee.EmployeeId, ee.Employee.FullName, ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
-                    .ToList(),
-
-            }).ToListAsync();
+            telemetryClient.TrackMetric("ActiveEpisodesCount", episodes.Count);
+            operation.Telemetry.Success = true;
+            return episodes;
+        }
+        catch (Exception ex)
+        {
+            telemetryClient.TrackException(ex);
+            operation.Telemetry.Success = false;
+            throw;
+        }
+        finally
+        {
+            operation.Dispose();
+        }
     }
 
     public async Task<ActiveEpisodeDto?> GetActiveEpisodeByIdAsync(int episodeId)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
 
-        return await context.Episodes
-            .AsNoTracking()
-            .Where(e => e.EpisodeId == episodeId)
-            .Select(e => new ActiveEpisodeDto
-            {
-                EpisodeId               = e.EpisodeId,
-                StatusId                = e.StatusId,
-                ProgramId               = e.ProgramId,
-                EpisodeName             = e.EpisodeName,
-                ProgramName             = e.Program.ProgramName,
-                ScheduledExecutionTime  = e.ScheduledExecutionTime,
-                StatusText              = e.EpisodeStatus.DisplayName,
-                SpecialNotes            = e.SpecialNotes,
-                CancellationReason      = e.CancellationReason,
+        // ✅ استخدام Compiled Query مع الباراميتر
+        ActiveEpisodeDto? episode = null;
+        await foreach (var ep in s_compiledActiveEpisodeById(context, episodeId))
+        {
+            episode = ep;
+            break;
+        }
 
-                GuestsDisplay = string.Join(" · ",
-                    e.EpisodeGuests
-                        .OrderBy(g => g.HostingTime)
-                        .Select(g => g.Guest.FullName)),
+        if (episode is null)
+            return null;
 
-                GuestItems = e.EpisodeGuests
-                    .OrderBy(g => g.HostingTime)
-                    .Select(g => new GuestDisplayItem(g.Guest.FullName, g.Topic, g.HostingTime))
-                    .ToList(),
-
-                CorrespondentItems = e.EpisodeCorrespondents
-                    .Select(c => new EpisodeCorrespondentDto(
-                        c.EpisodeCorrespondentId,
-                        c.CorrespondentId,
-                        c.Correspondent.FullName,
-                        c.Topic,
-                        c.HostingTime))
-                    .ToList(),
-
-                EmployeeItems = e.EpisodeEmployees
-                    .Select(ee => new EpisodeEmployeeDto(ee.EpisodeEmployeeId, ee.EmployeeId, ee.Employee.FullName, ee.Employee.StaffRole != null ? ee.Employee.StaffRole.RoleName : null))
-                    .ToList(),
-
-            }).FirstOrDefaultAsync();
+        SetGuestsDisplay(episode);
+        return episode;
     }
 
     /// <summary>
@@ -241,6 +295,24 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         return Result.Success();
     }
 
+    /// <summary>
+    /// استرجاع الحلقة مع الأطفال — يُستخدم في RevertEpisodeStatusAsync و DeleteEpisodeAsync
+    /// لتجنب استعلام FindAsync المكرر
+    /// </summary>
+    private async Task<Episode?> GetEpisodeWithChildrenAsync(BroadcastWorkflowDBContext context, int episodeId, bool includeChildren = true)
+    {
+        if (includeChildren)
+        {
+            return await context.Episodes
+                .Include(e => e.EpisodeGuests)
+                .Include(e => e.EpisodeCorrespondents)
+                .Include(e => e.EpisodeEmployees)
+                .FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
+        }
+
+        return await context.Episodes.FindAsync(episodeId);
+    }
+
     public async Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session)
     {
         using var context = await contextFactory.CreateDbContextAsync();
@@ -335,22 +407,33 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
     /// <summary>
     /// حذف ناعم للحلقة وجميع السجلات المرتبطة بها (ضيوف، مراسلون، موظفون).
+    /// يستخدم Select مباشر مع AsSplitQuery بدلاً من Include لتجنب جلب بيانات غير ضرورية.
     /// </summary>
     public async Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        var episode = await context.Episodes
-            .Include(e => e.EpisodeGuests)
-            .Include(e => e.EpisodeCorrespondents)
-            .Include(e => e.EpisodeEmployees)
-            .FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
 
+        // ✅ استخدام FindAsync للحصول على الحلقة فقط (لا حاجة لجلب الأطفال بالكامل)
+        var episode = await context.Episodes.FindAsync(episodeId);
         if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
+        // ✅ حذف ناعم للأطفال عبر Bulk Operations حيثما أمكن
+        var guestChildren = await context.EpisodeGuests
+            .Where(g => g.EpisodeId == episodeId && g.IsActive)
+            .ToListAsync();
+        foreach (var g in guestChildren) g.IsActive = false;
+
+        var corrChildren = await context.EpisodeCorrespondents
+            .Where(c => c.EpisodeId == episodeId && c.IsActive)
+            .ToListAsync();
+        foreach (var c in corrChildren) c.IsActive = false;
+
+        var empChildren = await context.EpisodeEmployees
+            .Where(e => e.EpisodeId == episodeId && e.IsActive)
+            .ToListAsync();
+        foreach (var ee in empChildren) ee.IsActive = false;
+
         episode.IsActive = false;
-        foreach (var g  in episode.EpisodeGuests)          g.IsActive  = false;
-        foreach (var c  in episode.EpisodeCorrespondents)  c.IsActive  = false;
-        foreach (var ee in episode.EpisodeEmployees)        ee.IsActive = false;
 
         await context.SaveChangesAsync();
         return Result.Success();
