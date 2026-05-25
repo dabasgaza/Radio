@@ -1,4 +1,4 @@
-﻿using DataAccess.DTOs;
+using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +22,7 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         using var context = await contextFactory.CreateDbContextAsync();
 
         var stats = await context.Episodes.AsNoTracking()
+            .Where(e => e.IsActive)
             .GroupBy(e => e.EpisodeStatus.StatusName)
             .Select(g => new { StatusName = g.Key, Count = g.Count() })
             .ToListAsync();
@@ -40,7 +41,7 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var raw = await context.Episodes
             .AsNoTracking()
             .AsSplitQuery()
-            .Where(e => e.ScheduledExecutionTime >= today && e.ScheduledExecutionTime < tomorrow)
+            .Where(e => e.IsActive && e.ScheduledExecutionTime >= today && e.ScheduledExecutionTime < tomorrow)
             .OrderBy(e => e.ScheduledExecutionTime)
             .Select(e => new
             {
@@ -79,7 +80,7 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 Category = p.Category,
                 TotalEpisodes = p.Episodes.Count(),
                 // ✨ استخدام الثوابت بدلاً من الأرقام السحرية
-                PublishedEpisodes = p.Episodes.Count(e => e.StatusId == EpisodeStatus.Published)
+                PublishedEpisodes = p.Episodes.Count(e => e.IsActive && e.StatusId == EpisodeStatus.Published)
             })
             .OrderByDescending(x => x.TotalEpisodes)
             .Take(5)
@@ -96,7 +97,7 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var raw = await context.Episodes
             .AsNoTracking()
             .AsSplitQuery()
-            .Where(e => e.ScheduledExecutionTime >= from.Date && e.ScheduledExecutionTime < toEndOfDay)
+            .Where(e => e.IsActive && e.ScheduledExecutionTime >= from.Date && e.ScheduledExecutionTime < toEndOfDay)
             .OrderBy(e => e.ScheduledExecutionTime)
             .Select(e => new
             {

@@ -1,4 +1,4 @@
-﻿using DataAccess.Services.Messaging;
+using DataAccess.Services.Messaging;
 using MaterialDesignThemes.Wpf;
 using System.Windows;
 using System.Windows.Controls;
@@ -86,7 +86,7 @@ public class WpfMessageService : IMessageService
             btns.Children.Add(btnNo);
             view.Children.Add(btns);
 
-            var result = await DialogHost.Show(view);
+            var result = await DialogHost.Show(view, "ModernRootDialog");
             return result is bool boolResult && boolResult;
         }
         catch

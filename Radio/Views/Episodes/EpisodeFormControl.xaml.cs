@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
@@ -18,6 +19,11 @@ namespace Radio.Views.Episodes
         private readonly IEmployeeService _employeeService;
         private readonly UserSession _session;
         private readonly int? _episodeId;
+        private int _selectedProgramId;
+        private DateTime? _selectedDateTime;
+        private List<ConflictInfo> _currentConflicts = [];
+        private readonly EpisodeDraftService _draftService = new();
+        private DispatcherTimer? _autoSaveTimer;
 
         // ── قوائم Observable مرتبطة بالجداول ──
         public ObservableCollection<GuestRow> GuestList { get; } = [];
@@ -92,6 +98,14 @@ namespace Radio.Views.Episodes
                         var emp = allEmployees.FirstOrDefault(em => em.EmployeeId == e.EmployeeId);
                         EmployeeList.Add(new EmployeeRow(e.EmployeeId, emp?.FullName ?? "غير معروف", emp?.StaffRoleName ?? "—"));
                     }
+                    UpdateSectionCounts();
+                }
+                else
+                {
+                    // ── للحلقات الجديدة: استعادة مسودة واستart الـ Auto-save ──
+                    await TryRestoreDraftAsync();
+                    StartAutoSave();
+                    UpdateSectionCounts();
                 }
             }
             catch (Exception ex)
@@ -119,6 +133,7 @@ namespace Radio.Views.Episodes
                 : (TimeSpan?)null;
 
             GuestList.Add(new GuestRow(0, guest.GuestId, guest.FullName, topic, hostingTime));
+            UpdateSectionCounts();
 
             // تصفير حقول الإضافة
             CbAllGuests.SelectedItem = null;
@@ -130,6 +145,7 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is GuestRow row)
                 GuestList.Remove(row);
+            UpdateSectionCounts();
         }
 
         // ── إدارة المراسلين ────────────────────────────────────────
@@ -151,6 +167,7 @@ namespace Radio.Views.Episodes
                 : (TimeSpan?)null;
 
             CorrespondentList.Add(new CorrespondentRow(0, corr.CorrespondentId, corr.FullName, topic, hostingTime));
+            UpdateSectionCounts();
 
             CbAllCorrespondents.SelectedItem = null;
             TxtCorrespondentTopic.Clear();
@@ -161,6 +178,7 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is CorrespondentRow row)
                 CorrespondentList.Remove(row);
+            UpdateSectionCounts();
         }
 
         // ── إدارة طاقم العمل ──────────────────────────────────────
@@ -177,6 +195,7 @@ namespace Radio.Views.Episodes
             }
 
             EmployeeList.Add(new EmployeeRow(emp.EmployeeId, emp.FullName, emp.StaffRoleName ?? "—"));
+            UpdateSectionCounts();
             CbAllEmployees.SelectedItem = null;
         }
 
@@ -184,9 +203,113 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is EmployeeRow row)
                 EmployeeList.Remove(row);
+            UpdateSectionCounts();
         }
 
         // ── الحفظ والإلغاء ────────────────────────────────────────
+
+        // ═══════════════════════════════════════════════════════
+        // تحديث عدادات الأقسام
+        // ═══════════════════════════════════════════════════════
+        private void UpdateSectionCounts()
+        {
+            GuestCountText.Text = GuestList.Count.ToString();
+            CorrespondentCountText.Text = CorrespondentList.Count.ToString();
+            StaffCountText.Text = EmployeeList.Count.ToString();
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // الحفظ التلقائي والمسودات
+        // ═══════════════════════════════════════════════════════
+        private void StartAutoSave()
+        {
+            if (_episodeId.HasValue) return; // لا نحفظ مسودات للتعديل
+            _autoSaveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
+            _autoSaveTimer.Tick += async (_, _) => await SaveDraftAsync();
+            _autoSaveTimer.Start();
+        }
+
+        private async Task SaveDraftAsync()
+        {
+            var draft = CollectDraftData();
+            await _draftService.SaveDraftAsync(draft);
+            PnlAutoSave.Visibility = Visibility.Visible;
+            TxtAutoSaveStatus.Text = $"تم الحفظ تلقائياً — {DateTime.Now:hh:mm tt}";
+        }
+
+        private EpisodeDraft CollectDraftData()
+        {
+            var program = CbPrograms.SelectedItem as dynamic;
+            return new EpisodeDraft
+            {
+                ProgramId = CbPrograms.SelectedValue as int?,
+                ProgramName = program?.ProgramName,
+                EpisodeName = TxtEpisodeName.Text?.Trim(),
+                ScheduledDate = DpDate.SelectedDate,
+                BroadcastTime = TpBroadcastTime.SelectedTime?.TimeOfDay,
+                SpecialNotes = TxtSpecialNotes.Text?.Trim(),
+                Guests = GuestList.Select(g => new DraftGuestItem
+                {
+                    GuestId = g.GuestId,
+                    FullName = g.FullName,
+                    Topic = g.Topic,
+                    HostingTime = g.HostingTime
+                }).ToList(),
+                Correspondents = CorrespondentList.Select(c => new DraftCorrespondentItem
+                {
+                    CorrespondentId = c.CorrespondentId,
+                    FullName = c.FullName,
+                    Topic = c.Topic,
+                    HostingTime = c.HostingTime
+                }).ToList(),
+                Employees = EmployeeList.Select(e => new DraftEmployeeItem
+                {
+                    EmployeeId = e.EmployeeId,
+                    FullName = e.FullName,
+                    StaffRoleName = e.StaffRoleName
+                }).ToList()
+            };
+        }
+
+        private async Task TryRestoreDraftAsync()
+        {
+            if (!_draftService.HasDraft()) return;
+
+            var result = await MessageService.Current.ShowConfirmationAsync(
+                "تم العثور على مسودة غير محفوظة لجلسة سابقة.\nهل تريد استعادتها؟",
+                "استعادة المسودة");
+
+            if (result)
+            {
+                var draft = await _draftService.LoadDraftAsync();
+                if (draft != null)
+                {
+                    if (draft.ProgramId.HasValue)
+                        CbPrograms.SelectedValue = draft.ProgramId.Value;
+                    TxtEpisodeName.Text = draft.EpisodeName ?? "";
+                    if (draft.ScheduledDate.HasValue)
+                        DpDate.SelectedDate = draft.ScheduledDate.Value;
+                    if (draft.BroadcastTime.HasValue)
+                        TpBroadcastTime.SelectedTime = DateTime.Today.Add(draft.BroadcastTime.Value);
+                    TxtSpecialNotes.Text = draft.SpecialNotes ?? "";
+
+                    foreach (var g in draft.Guests)
+                        GuestList.Add(new GuestRow(0, g.GuestId, g.FullName ?? "", g.Topic, g.HostingTime));
+                    foreach (var c in draft.Correspondents)
+                        CorrespondentList.Add(new CorrespondentRow(0, c.CorrespondentId, c.FullName ?? "", c.Topic, c.HostingTime));
+                    foreach (var e in draft.Employees)
+                        EmployeeList.Add(new EmployeeRow(e.EmployeeId, e.FullName ?? "", e.StaffRoleName ?? ""));
+
+                    UpdateSectionCounts();
+                    PnlAutoSave.Visibility = Visibility.Visible;
+                    TxtAutoSaveStatus.Text = $"تم استعادة مسودة من {draft.SavedAt:hh:mm tt}";
+                }
+            }
+            else
+            {
+                _draftService.DeleteDraft();
+            }
+        }
 
         private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
@@ -225,6 +348,7 @@ namespace Radio.Views.Episodes
                 // ── عرض رسالة النتيجة للمستخدم ──
                 if (result.IsSuccess)
                 {
+                    _draftService.DeleteDraft();
                     DialogResult = true;
                 }
                 else
@@ -244,7 +368,103 @@ namespace Radio.Views.Episodes
             }
         }
 
-        private void BtnCancel_Click(object sender, RoutedEventArgs e) => DialogResult = false;
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            _autoSaveTimer?.Stop();
+            DialogResult = false;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // كشف تعارض المواعيد
+        // ═══════════════════════════════════════════════════════
+        private void CbPrograms_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _selectedProgramId = CbPrograms.SelectedValue as int? ?? 0;
+            _ = CheckForConflictsAsync();
+        }
+
+        private void DpDate_SelectedDateChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            UpdateSelectedDateTime();
+            _ = CheckForConflictsAsync();
+        }
+
+        private void TpBroadcastTime_SelectedTimeChanged(object? sender, RoutedEventArgs e)
+        {
+            UpdateSelectedDateTime();
+            _ = CheckForConflictsAsync();
+        }
+
+        private void UpdateSelectedDateTime()
+        {
+            if (DpDate.SelectedDate.HasValue)
+            {
+                var date = DpDate.SelectedDate.Value;
+                var time = TpBroadcastTime.SelectedTime.HasValue
+                    ? TpBroadcastTime.SelectedTime.Value.TimeOfDay
+                    : TimeSpan.Zero;
+                _selectedDateTime = date.Date.Add(time);
+            }
+            else
+                _selectedDateTime = null;
+        }
+
+        private async Task CheckForConflictsAsync()
+        {
+            if (_selectedProgramId <= 0 || !_selectedDateTime.HasValue)
+            {
+                ConflictPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            try
+            {
+                _currentConflicts = await _episodeService.GetConflictingEpisodesAsync(
+                    _selectedProgramId, _selectedDateTime.Value, _episodeId);
+
+                if (_currentConflicts.Count == 0)
+                {
+                    ConflictPanel.Visibility = Visibility.Collapsed;
+                    return;
+                }
+
+                ConflictPanel.Visibility = Visibility.Visible;
+                bool hasHigh = _currentConflicts.Any(c => c.Level == ConflictLevel.High);
+
+                if (hasHigh)
+                {
+                    ConflictPanel.SetCurrentValue(Border.BackgroundProperty, FindResource("ErrorLightBrush") ?? System.Windows.Media.Brushes.LightPink);
+                    ConflictTitle.Text = "تعارض عالي — نفس البرنامج والوقت";
+                    ConflictTitle.Foreground = (System.Windows.Media.Brush)FindResource("ErrorBrush");
+                    ConflictMessage.Text = $"توجد {_currentConflicts.Count(c => c.Level == ConflictLevel.High)} حلقة في نفس البرنامج والوقت.";
+                }
+                else
+                {
+                    ConflictPanel.SetCurrentValue(Border.BackgroundProperty, FindResource("WarningLightBrush") ?? System.Windows.Media.Brushes.LightYellow);
+                    ConflictTitle.Text = "تعارض محتمل";
+                    ConflictTitle.Foreground = (System.Windows.Media.Brush)FindResource("WarningBrush");
+                    ConflictMessage.Text = $"توجد {_currentConflicts.Count} حلقة في نفس الفترة الزمنية.";
+                }
+
+                BtnConflictDetails.Visibility = _currentConflicts.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            catch
+            {
+                ConflictPanel.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void BtnConflictDetails_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentConflicts.Count == 0) return;
+
+            var details = string.Join("\n", _currentConflicts.Select(c =>
+                $"• {c.EpisodeName} ({c.ProgramName}) — {c.ScheduledTime:yyyy/MM/dd hh:mm tt} — {(c.Level == ConflictLevel.High ? "تعارض عالي" : "تعارض متوسط")}"));
+
+            MessageService.Current.ShowInfo(
+                $"التعارضات المكتشفة ({_currentConflicts.Count}):\n\n{details}",
+                "تفاصيل تعارض المواعيد");
+        }
 
         // ── نماذج البيانات الداخلية (ViewModels) ──────────────────
 

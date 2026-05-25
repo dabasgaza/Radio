@@ -17,12 +17,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using MaterialDesignThemes.Wpf;
+using System.Diagnostics;
 
 namespace Radio.Views.Episodes
 {
     public partial class EpisodesView : UserControl
     {
         private readonly IEpisodeService _episodeService;
+        private bool _isUpdatingBatchBar;
         private readonly IProgramService _programService;
         private readonly IGuestService _guestService;
         private readonly ICorrespondentService _correspondentService;
@@ -30,6 +32,9 @@ namespace Radio.Views.Episodes
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
         private List<ActiveEpisodeDto> _allEpisodes = [];
+
+        // ─── تفضيلات العرض المحفوظة ───
+        private readonly EpisodeViewPreferences _prefs = EpisodeViewPreferences.Load();
 
         // ─── أصناف مساعدة ───
         public class FilterChipItem
@@ -42,6 +47,9 @@ namespace Radio.Views.Episodes
         private byte? _activeStatusFilter = null;
         private EpisodeViewMode _currentViewMode = EpisodeViewMode.Cards;
         private string? _activeProgramFilter = null;
+        private DateTime? _dateFrom;
+        private DateTime? _dateTo;
+        private string? _activeDatePreset; // "Today", "ThisWeek", "ThisMonth", "Custom"
 
         // ─── خيارات الترتيب ───
         private static readonly string[] SortOptions = ["التاريخ (الأحدث)", "التاريخ (الأقدم)", "الحالة", "البرنامج", "اسم الحلقة"];
@@ -69,12 +77,17 @@ namespace Radio.Views.Episodes
                 ? Visibility.Visible
                 : Visibility.Collapsed;
 
-            Loaded += async (_, _) => await LoadDataAsync();
             KeyDown += EpisodesView_KeyDown;
 
             // ─── تهيئة خيارات الترتيب ───
             CmbSortBy.ItemsSource = SortOptions;
-            CmbSortBy.SelectedIndex = 0;
+
+            Loaded += async (_, _) =>
+            {
+                RestorePreferences();
+                await LoadDataAsync();
+                ApplySearchFromPrefs();
+            };
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -176,6 +189,18 @@ namespace Radio.Views.Episodes
                 filtered = filtered.Where(ep => ep.ProgramName == prog);
             }
 
+            // ─── فلتر نطاق التاريخ ───
+            if (_dateFrom.HasValue)
+            {
+                var from = _dateFrom.Value.Date;
+                filtered = filtered.Where(ep => ep.ScheduledExecutionTime.HasValue && ep.ScheduledExecutionTime.Value.Date >= from);
+            }
+            if (_dateTo.HasValue)
+            {
+                var to = _dateTo.Value.Date;
+                filtered = filtered.Where(ep => ep.ScheduledExecutionTime.HasValue && ep.ScheduledExecutionTime.Value.Date <= to);
+            }
+
             // ─── بحث موسّع ───
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -235,6 +260,23 @@ namespace Radio.Views.Episodes
                 activeChips.Add(new FilterChipItem { Type = "Program", Label = $"البرنامج: {_activeProgramFilter}" });
             }
 
+            // فلتـر نطاق التاريخ
+            if (!string.IsNullOrWhiteSpace(_activeDatePreset))
+            {
+                string label = _activeDatePreset switch
+                {
+                    "Today" => "اليوم",
+                    "ThisWeek" => "هذا الأسبوع",
+                    "ThisMonth" => "هذا الشهر",
+                    "Custom" when _dateFrom.HasValue && _dateTo.HasValue => $"من {_dateFrom:yyyy/MM/dd} إلى {_dateTo:yyyy/MM/dd}",
+                    "Custom" when _dateFrom.HasValue => $"من {_dateFrom:yyyy/MM/dd}",
+                    "Custom" when _dateTo.HasValue => $"حتى {_dateTo:yyyy/MM/dd}",
+                    _ => ""
+                };
+                if (!string.IsNullOrWhiteSpace(label))
+                    activeChips.Add(new FilterChipItem { Type = "Date", Label = $"التاريخ: {label}" });
+            }
+
             // الترتيب (إذا لم يكن الافتراضي)
             if (CmbSortBy.SelectedIndex > 0)
             {
@@ -271,6 +313,11 @@ namespace Radio.Views.Episodes
                 {
                     CmbSortBy.SelectedIndex = 0;
                 }
+                else if (item.Type == "Date")
+                {
+                    ClearDateFilter();
+                }
+                SavePreferences();
             }
         }
 
@@ -281,8 +328,275 @@ namespace Radio.Views.Episodes
             _activeStatusFilter = null;
             CmbProgramFilter.SelectedItem = null;
             CmbSortBy.SelectedIndex = 0;
+            ClearDateFilter();
             BtnToggleAdvancedFilters.IsChecked = false;
             RebindAndUpdateStats();
+            SavePreferences();
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // فلاتر نطاق التاريخ
+        // ═══════════════════════════════════════════════════════════
+        private void QuickDateFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var today = DateTime.Today;
+
+            if (sender == BtnToday)
+            {
+                _dateFrom = today;
+                _dateTo = today;
+                _activeDatePreset = "Today";
+            }
+            else if (sender == BtnThisWeek)
+            {
+                int diff = (int)today.DayOfWeek; // Sunday=0
+                if (diff == 0) diff = 7; // Treat Sunday as end of week in Arabic culture
+                _dateFrom = today.AddDays(-(diff - 1)); // Monday
+                _dateTo = _dateFrom.Value.AddDays(6); // Sunday
+                _activeDatePreset = "ThisWeek";
+            }
+            else if (sender == BtnThisMonth)
+            {
+                _dateFrom = new DateTime(today.Year, today.Month, 1);
+                _dateTo = _dateFrom.Value.AddMonths(1).AddDays(-1);
+                _activeDatePreset = "ThisMonth";
+            }
+
+            UpdateDateFilterUI();
+            RebindAndUpdateStats();
+            SavePreferences();
+        }
+
+        private void DpDateFrom_SelectedDateChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            _dateFrom = DpDateFrom.SelectedDate;
+            _activeDatePreset = "Custom";
+            UpdateDateFilterUI();
+            RebindAndUpdateStats();
+            SavePreferences();
+        }
+
+        private void DpDateTo_SelectedDateChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            _dateTo = DpDateTo.SelectedDate;
+            _activeDatePreset = "Custom";
+            UpdateDateFilterUI();
+            RebindAndUpdateStats();
+            SavePreferences();
+        }
+
+        private void BtnClearDateFilter_Click(object sender, RoutedEventArgs e)
+        {
+            ClearDateFilter();
+            RebindAndUpdateStats();
+            SavePreferences();
+        }
+
+        private void ClearDateFilter()
+        {
+            _dateFrom = null;
+            _dateTo = null;
+            _activeDatePreset = null;
+            DpDateFrom.SelectedDate = null;
+            DpDateTo.SelectedDate = null;
+            BtnCustomRange.IsChecked = false;
+            UpdateDateFilterUI();
+        }
+
+        private void UpdateDateFilterUI()
+        {
+            bool hasDateFilter = _dateFrom.HasValue || _dateTo.HasValue;
+            BtnClearDateFilter.Visibility = hasDateFilter ? Visibility.Visible : Visibility.Collapsed;
+
+            // Highlight active preset buttons
+            BtnToday.Opacity = (_activeDatePreset == "Today") ? 1.0 : 0.6;
+            BtnToday.FontWeight = (_activeDatePreset == "Today") ? FontWeights.Bold : FontWeights.Normal;
+            BtnThisWeek.Opacity = (_activeDatePreset == "ThisWeek") ? 1.0 : 0.6;
+            BtnThisWeek.FontWeight = (_activeDatePreset == "ThisWeek") ? FontWeights.Bold : FontWeights.Normal;
+            BtnThisMonth.Opacity = (_activeDatePreset == "ThisMonth") ? 1.0 : 0.6;
+            BtnThisMonth.FontWeight = (_activeDatePreset == "ThisMonth") ? FontWeights.Bold : FontWeights.Normal;
+        }
+
+        private void BtnCustomRange_Checked(object sender, RoutedEventArgs e)
+        {
+            SyncDateRangeUI();
+        }
+
+        private void BtnCustomRange_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SyncDateRangeUI();
+        }
+
+        private void SyncDateRangeUI()
+        {
+            PnlDateRange.Visibility = BtnCustomRange.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // العمليات المجمعة (Batch Operations)
+        // ═══════════════════════════════════════════════════════════
+        private void ItemCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingBatchBar) return;
+            UpdateBatchActionBar();
+        }
+
+        private void UpdateBatchActionBar()
+        {
+            var selected = _allEpisodes.Where(e => e.IsSelected).ToList();
+            int count = selected.Count;
+
+            BatchActionBar.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            TxtSelectedCount.Text = $"{count} محددة";
+
+            // الإجراءات المشتركة (intersection logic)
+            bool canExecuted = selected.Count > 0 && selected.All(e => e.CanMarkExecuted);
+            bool canPublished = selected.Count > 0 && selected.All(e => e.CanMarkPublished);
+            bool canCancel = selected.Count > 0 && selected.All(e => e.CanCancel);
+            bool canDelete = selected.Count > 0;
+
+            BtnBatchExecuted.Visibility = canExecuted ? Visibility.Visible : Visibility.Collapsed;
+            BtnBatchPublished.Visibility = canPublished ? Visibility.Visible : Visibility.Collapsed;
+            BtnBatchCancel.Visibility = canCancel ? Visibility.Visible : Visibility.Collapsed;
+            BtnBatchDelete.Visibility = canDelete ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void SelectAllCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            try { _isUpdatingBatchBar = true; }
+            finally { _isUpdatingBatchBar = false; }
+
+            foreach (var ep in _allEpisodes)
+                ep.IsSelected = true;
+            UpdateBatchActionBar();
+        }
+
+        private void SelectAllCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            DeselectAll();
+        }
+
+        private void BtnDeselectAll_Click(object sender, RoutedEventArgs e)
+        {
+            DeselectAll();
+            UpdateBatchActionBar();
+        }
+
+        private void DeselectAll()
+        {
+            foreach (var ep in _allEpisodes)
+                ep.IsSelected = false;
+            // تحديث واجهة المستخدم بإعادة ربط القوائم
+            var list = CardsView.ItemsSource as List<ActiveEpisodeDto>;
+            if (list != null)
+            {
+                CardsView.ItemsSource = null;
+                CardsView.ItemsSource = list;
+                TableView.ItemsSource = null;
+                TableView.ItemsSource = list;
+                CompactView.ItemsSource = null;
+                CompactView.ItemsSource = list;
+            }
+            UpdateBatchActionBar();
+        }
+
+        private async void BtnBatchExecuted_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = _allEpisodes.Where(ep => ep.IsSelected && ep.CanMarkExecuted).ToList();
+            if (selected.Count == 0) return;
+
+            var confirm = await MessageService.Current.ShowConfirmationAsync(
+                $"تنفيذ {selected.Count} حلقة؟", "تأكيد العملية المجمعة");
+            if (!confirm) return;
+
+            int success = 0, fail = 0;
+            foreach (var ep in selected)
+            {
+                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+                if (mainWindow != null) await mainWindow.ShowOverlay();
+                try
+                {
+                    var execService = _serviceProvider.GetRequiredService<IExecutionService>();
+                    var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session) { Owner = mainWindow };
+                    if (dialog.ShowDialog() == true) success++; else fail++;
+                }
+                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
+            }
+
+            await LoadDataAsync();
+            MessageService.Current.ShowSuccess($"تم تنفيذ {success} حلقات{(fail > 0 ? $"، فشل {fail}" : "")}.");
+        }
+
+        private async void BtnBatchPublished_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = _allEpisodes.Where(ep => ep.IsSelected && ep.CanMarkPublished).ToList();
+            if (selected.Count == 0) return;
+
+            var confirm = await MessageService.Current.ShowConfirmationAsync(
+                $"نشر {selected.Count} حلقة رقمياً؟", "تأكيد النشر الجماعي");
+            if (!confirm) return;
+
+            int success = 0, fail = 0;
+            foreach (var ep in selected)
+            {
+                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
+                if (mainWindow != null) await mainWindow.ShowOverlay();
+                try
+                {
+                    var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
+                    var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
+                    var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests) { Owner = mainWindow };
+                    if (dialog.ShowDialog() == true) success++; else fail++;
+                }
+                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
+            }
+
+            await LoadDataAsync();
+            MessageService.Current.ShowSuccess($"تم نشر {success} حلقات{(fail > 0 ? $"، فشل {fail}" : "")}.");
+        }
+
+        private async void BtnBatchCancel_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = _allEpisodes.Where(ep => ep.IsSelected && ep.CanCancel).ToList();
+            if (selected.Count == 0) return;
+
+            var reasonDialog = new ReasonInputDialog("إلغاء جماعي", "سبب الإلغاء (سيُطبّق على الجميع):");
+            if (reasonDialog.ShowDialog() != true) return;
+
+            int success = 0, fail = 0;
+            foreach (var ep in selected)
+            {
+                var res = await _episodeService.CancelEpisodeAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
+                if (res.IsSuccess) success++; else fail++;
+            }
+
+            await LoadDataAsync();
+            MessageService.Current.ShowSuccess(
+                $"تم إلغاء {success} حلقات{(fail > 0 ? $"، فشل {fail}" : "")}.");
+        }
+
+        private async void BtnBatchDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = _allEpisodes.Where(ep => ep.IsSelected).ToList();
+            if (selected.Count == 0) return;
+
+            var names = string.Join("، ", selected.Take(3).Select(ep => $"«{ep.EpisodeName}»"));
+            if (selected.Count > 3) names += $" و{selected.Count - 3} أخرى";
+
+            var confirm = await MessageService.Current.ShowConfirmationAsync(
+                $"حذف {selected.Count} حلقة؟\n{names}\n\nهذا الإجراء لا يمكن التراجع عنه.", "تأكيد الحذف الجماعي");
+            if (!confirm) return;
+
+            int success = 0, fail = 0;
+            foreach (var ep in selected)
+            {
+                var res = await _episodeService.DeleteEpisodeAsync(ep.EpisodeId, _session);
+                if (res.IsSuccess) success++; else fail++;
+            }
+
+            await LoadDataAsync();
+            MessageService.Current.ShowSuccess(
+                $"تم حذف {success} حلقات{(fail > 0 ? $"، فشل {fail}" : "")}.");
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -302,6 +616,7 @@ namespace Radio.Views.Episodes
                     _ => null
                 };
                 RebindAndUpdateStats();
+                SavePreferences();
             }
         }
 
@@ -323,6 +638,7 @@ namespace Radio.Views.Episodes
         {
             _activeProgramFilter = CmbProgramFilter.SelectedItem as string;
             RebindAndUpdateStats();
+            SavePreferences();
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -331,7 +647,10 @@ namespace Radio.Views.Episodes
         private void CmbSortBy_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_allEpisodes.Count > 0)
+            {
                 RebindAndUpdateStats();
+                SavePreferences();
+            }
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -348,6 +667,7 @@ namespace Radio.Views.Episodes
                     _ => EpisodeViewMode.Cards
                 };
                 ApplyViewMode();
+                SavePreferences();
             }
         }
 
@@ -356,6 +676,94 @@ namespace Radio.Views.Episodes
             CardsView.Visibility = _currentViewMode == EpisodeViewMode.Cards ? Visibility.Visible : Visibility.Collapsed;
             TableView.Visibility = _currentViewMode == EpisodeViewMode.Table ? Visibility.Visible : Visibility.Collapsed;
             CompactView.Visibility = _currentViewMode == EpisodeViewMode.Compact ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // حفظ واستعادة تفضيلات العرض
+        // ═══════════════════════════════════════════════════════════
+        private void RestorePreferences()
+        {
+            // نمط العرض
+            _currentViewMode = _prefs.ViewMode switch
+            {
+                "Table" => EpisodeViewMode.Table,
+                "Compact" => EpisodeViewMode.Compact,
+                _ => EpisodeViewMode.Cards
+            };
+            ViewCards.IsChecked = _currentViewMode == EpisodeViewMode.Cards;
+            ViewTable.IsChecked = _currentViewMode == EpisodeViewMode.Table;
+            ViewCompact.IsChecked = _currentViewMode == EpisodeViewMode.Compact;
+
+            // الترتيب
+            if (_prefs.SortIndex >= 0 && _prefs.SortIndex < SortOptions.Length)
+                CmbSortBy.SelectedIndex = _prefs.SortIndex;
+            else
+                CmbSortBy.SelectedIndex = 0;
+
+            // فلتر الحالة
+            _activeStatusFilter = _prefs.StatusFilter switch
+            {
+                "Planned" => EpisodeStatus.Planned,
+                "Executed" => EpisodeStatus.Executed,
+                "Published" => EpisodeStatus.Published,
+                "WebsitePublished" => EpisodeStatus.WebsitePublished,
+                "Cancelled" => EpisodeStatus.Cancelled,
+                _ => null
+            };
+            FilterAll.IsChecked = !_activeStatusFilter.HasValue;
+            if (_activeStatusFilter.HasValue)
+            {
+                var name = _activeStatusFilter.Value switch
+                {
+                    0 => nameof(FilterPlanned),
+                    1 => nameof(FilterExecuted),
+                    2 => nameof(FilterPublished),
+                    3 => nameof(FilterWebPublished),
+                    _ => nameof(FilterCancelled)
+                };
+                var rb = FindName(name) as RadioButton;
+                if (rb != null) rb.IsChecked = true;
+            }
+
+            // فلتر البرنامج
+            _activeProgramFilter = _prefs.ProgramFilter;
+
+            // فلتر التاريخ
+            _dateFrom = _prefs.DateFrom;
+            _dateTo = _prefs.DateTo;
+            _activeDatePreset = _prefs.DatePreset;
+            if (_dateFrom.HasValue) DpDateFrom.SelectedDate = _dateFrom;
+            if (_dateTo.HasValue) DpDateTo.SelectedDate = _dateTo;
+            UpdateDateFilterUI();
+        }
+
+        private void ApplySearchFromPrefs()
+        {
+            if (!string.IsNullOrWhiteSpace(_prefs.SearchText))
+            {
+                TxtSearch.Text = _prefs.SearchText;
+            }
+        }
+
+        private void SavePreferences()
+        {
+            _prefs.ViewMode = _currentViewMode.ToString();
+            _prefs.SortIndex = CmbSortBy.SelectedIndex;
+            _prefs.StatusFilter = _activeStatusFilter switch
+            {
+                EpisodeStatus.Planned => "Planned",
+                EpisodeStatus.Executed => "Executed",
+                EpisodeStatus.Published => "Published",
+                EpisodeStatus.WebsitePublished => "WebsitePublished",
+                EpisodeStatus.Cancelled => "Cancelled",
+                _ => null
+            };
+            _prefs.ProgramFilter = _activeProgramFilter;
+            _prefs.DateFrom = _dateFrom;
+            _prefs.DateTo = _dateTo;
+            _prefs.DatePreset = _activeDatePreset;
+            _prefs.SearchText = TxtSearch.Text?.Trim() ?? "";
+            _prefs.Save();
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -405,17 +813,21 @@ namespace Radio.Views.Episodes
 
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is ActiveEpisodeDto selectedEpisode)
+            if (sender is FrameworkElement elem && elem.DataContext is ActiveEpisodeDto selectedEpisode)
             {
                 if (await MessageService.Current.ShowConfirmationAsync($"حذف {selectedEpisode.EpisodeName}؟", "تأكيد"))
                 {
                     var res = await _episodeService.DeleteEpisodeAsync(selectedEpisode.EpisodeId, _session);
+                    
                     if (res.IsSuccess)
                     {
                         await LoadDataAsync();
                         MessageService.Current.ShowSuccess($"تم حذف الحلقة «{selectedEpisode.EpisodeName}» بنجاح.");
                     }
-                    else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل الحذف.");
+                    else
+                    {
+                        MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل الحذف.");
+                    }
                 }
             }
         }

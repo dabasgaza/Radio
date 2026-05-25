@@ -28,6 +28,7 @@ public interface IEpisodeService
     Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session);
     Task<Result> CancelEpisodeAsync(int episodeId, string reason, UserSession session);
     Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session);
+    Task<List<ConflictInfo>> GetConflictingEpisodesAsync(int programId, DateTime scheduledTime, int? excludeEpisodeId = null);
 }
 
 public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory, TelemetryClient telemetryClient) : IEpisodeService
@@ -43,6 +44,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
             context.Episodes
                 .AsNoTracking()
+                .Where(e => e.IsActive)
                 .AsSplitQuery()
                 .OrderBy(e => e.ScheduledExecutionTime)
                 .Select(e => new ActiveEpisodeDto
@@ -84,8 +86,8 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         EF.CompileAsyncQuery((BroadcastWorkflowDBContext context, int episodeId) =>
             context.Episodes
                 .AsNoTracking()
+                .Where(e => e.IsActive && e.EpisodeId == episodeId)
                 .AsSplitQuery()
-                .Where(e => e.EpisodeId == episodeId)
                 .Select(e => new ActiveEpisodeDto
                 {
                     EpisodeId = e.EpisodeId,
@@ -411,32 +413,54 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     /// </summary>
     public async Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
 
-        // ✅ استخدام FindAsync للحصول على الحلقة فقط (لا حاجة لجلب الأطفال بالكامل)
-        var episode = await context.Episodes.FindAsync(episodeId);
-        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
+            // ✅ استخدام IgnoreQueryFilters لضمان إيجاد السجل حتى لو كانت حالته غير مستقرة برمجياً
+            var episode = await context.Episodes
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
 
-        // ✅ حذف ناعم للأطفال عبر Bulk Operations حيثما أمكن
-        var guestChildren = await context.EpisodeGuests
-            .Where(g => g.EpisodeId == episodeId && g.IsActive)
-            .ToListAsync();
-        foreach (var g in guestChildren) g.IsActive = false;
+            if (episode == null) return Result.Fail("الحلقة غير موجودة.");
+            if (!episode.IsActive) return Result.Success(); // محذوفة بالفعل
 
-        var corrChildren = await context.EpisodeCorrespondents
-            .Where(c => c.EpisodeId == episodeId && c.IsActive)
-            .ToListAsync();
-        foreach (var c in corrChildren) c.IsActive = false;
+            // ✅ حذف ناعم للأطفال (الضيوف، المراسلين، الموظفين)
+            var guestChildren = await context.EpisodeGuests
+                .Where(g => g.EpisodeId == episodeId && g.IsActive)
+                .ToListAsync();
+            foreach (var g in guestChildren) g.IsActive = false;
 
-        var empChildren = await context.EpisodeEmployees
-            .Where(e => e.EpisodeId == episodeId && e.IsActive)
-            .ToListAsync();
-        foreach (var ee in empChildren) ee.IsActive = false;
+            var corrChildren = await context.EpisodeCorrespondents
+                .Where(c => c.EpisodeId == episodeId && c.IsActive)
+                .ToListAsync();
+            foreach (var c in corrChildren) c.IsActive = false;
 
-        episode.IsActive = false;
+            var empChildren = await context.EpisodeEmployees
+                .Where(e => e.EpisodeId == episodeId && e.IsActive)
+                .ToListAsync();
+            foreach (var ee in empChildren) ee.IsActive = false;
 
-        await context.SaveChangesAsync();
-        return Result.Success();
+            // ✅ تحديث حالة الحلقة الأساسية مع بيانات التدقيق
+            episode.IsActive = false;
+            episode.UpdatedAt = DateTime.UtcNow;
+            episode.UpdatedByUserId = session.UserId;
+
+            await context.SaveChangesAsync();
+
+            telemetryClient.TrackEvent("EpisodeDeleted", new Dictionary<string, string>
+            {
+                { "EpisodeId", episodeId.ToString() },
+                { "UserId", session.UserId.ToString() }
+            });
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            telemetryClient.TrackException(ex);
+            return Result.Fail($"خطأ أثناء الحذف: {ex.Message}");
+        }
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -521,4 +545,33 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 ep.EpisodeEmployees.Add(new EpisodeEmployee { EmployeeId = dto.EmployeeId });
         }
     }
+
+    // ═══════════════════════════════════════════════════════
+    // كشف تعارض المواعيد
+    // ═══════════════════════════════════════════════════════
+    public async Task<List<ConflictInfo>> GetConflictingEpisodesAsync(int programId, DateTime scheduledTime, int? excludeEpisodeId = null)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        var all = await context.Episodes
+            .AsNoTracking()
+            .Include(e => e.Program)
+            .Where(e => e.IsActive && e.StatusId != EpisodeStatus.Cancelled)
+            .ToListAsync();
+
+        return all
+            .Where(e =>
+                e.EpisodeId != (excludeEpisodeId ?? -1) &&
+                e.ScheduledExecutionTime.HasValue &&
+                Math.Abs((e.ScheduledExecutionTime.Value - scheduledTime).TotalHours) < 1)
+            .Select(e => new ConflictInfo(
+                e.EpisodeId,
+                e.EpisodeName ?? "",
+                e.Program?.ProgramName ?? "",
+                e.ScheduledExecutionTime!.Value,
+                e.ProgramId == programId ? ConflictLevel.High : ConflictLevel.Medium))
+            .ToList();
+    }
 }
+
+public record ConflictInfo(int EpisodeId, string EpisodeName, string ProgramName, DateTime ScheduledTime, ConflictLevel Level);
+public enum ConflictLevel { Medium, High }

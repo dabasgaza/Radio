@@ -2,7 +2,7 @@ using DataAccess.Services;
 
 namespace DataAccess.DTOs
 {
-    public record ActiveEpisodeDto
+    public class ActiveEpisodeDto
     {
         public int EpisodeId { get; init; }
         public int ProgramId { get; init; }
@@ -25,6 +25,7 @@ namespace DataAccess.DTOs
         public List<EpisodeCorrespondentDto> CorrespondentItems { get; init; } = [];
         public List<EpisodeEmployeeDto> EmployeeItems { get; init; } = [];
         public string? CancellationReason { get; set; }
+        public bool IsSelected { get; set; }
     }
 
     /// <summary>مراسل مضاف لحلقة بكامل بياناته القابلة للتحرير</summary>

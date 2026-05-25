@@ -1,18 +1,16 @@
 using DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Views.Correspondents;
+using Radio.Views.Employees;
 using Radio.Views.Episodes;
 using Radio.Views.Guests;
 using Radio.Views.Home;
 using Radio.Views.Programs;
-using Radio.Views.Employees;
 using Radio.Views.Reports;
+using Radio.Views.SocialPlatforms;
 using Radio.Views.StaffRoles;
 using Radio.Views.Users;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Controls;
-using Radio.Views.SocialPlatforms;
 
 namespace Radio.Services
 {

@@ -14,13 +14,7 @@
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
-    <materialDesign:Card
-        Margin="30"
-        materialDesign:ElevationAssist.Elevation="Dp8"
-        Background="{StaticResource SurfaceBrush}"
-        Effect="{StaticResource Shadow.Dialog}"
-        UniformCornerRadius="16">
-
+    <materialDesign:Card Style="{StaticResource Card.Form}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -28,8 +22,8 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!--  ═══════ 1. الهيدر ═══════  -->
-            <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
+            <!--  ═══════ 1. الهيدر الأساسي ═══════  -->
+            <materialDesign:ColorZone Style="{StaticResource Zone.Header.Dark}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -37,30 +31,39 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <materialDesign:PackIcon
-                        Width="32"
-                        Height="32"
-                        VerticalAlignment="Center"
-                        Foreground="{StaticResource TextOnPrimaryBrush}"
-                        Kind="CalendarEdit" />
+                    <Border
+                        Width="60"
+                        Height="60"
+                        Background="#30FFFFFF"
+                        CornerRadius="16">
+                        <materialDesign:PackIcon
+                            Width="32"
+                            Height="32"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="CalendarEdit" />
+                    </Border>
 
                     <StackPanel
                         Grid.Column="1"
-                        Margin="16,0,0,0"
+                        Margin="18,0,0,0"
                         VerticalAlignment="Center">
                         <TextBlock
                             x:Name="TxtTitle"
                             Style="{StaticResource Type.TitleLarge.OnColor}"
                             Text="جدولة حلقة إذاعية" />
                         <TextBlock
-                            Margin="0,4,0,0"
+                            Margin="0,6,0,0"
+                            Opacity="0.7"
                             Style="{StaticResource Type.BodyMedium.OnColor}"
                             Text="يرجى إدخال تفاصيل البرنامج ومواعيد البث والضيوف والمراسلين" />
                     </StackPanel>
 
-                    <!--  زر إغلاق النافذة  -->
                     <Button
                         Grid.Column="2"
+                        Width="44"
+                        Height="44"
                         Click="BtnClose_Click"
                         Foreground="White"
                         Style="{StaticResource MaterialDesignIconButton}">
@@ -69,40 +72,65 @@
                 </Grid>
             </materialDesign:ColorZone>
 
-            <!--  ═══════ 2. TabControl ═══════  -->
+            <!--  ═══════ 2. تبويبات أفقية (TabControl Underline) ═══════  -->
             <TabControl
                 Grid.Row="1"
-                materialDesign:ColorZoneAssist.Mode="PrimaryLight"
-                Style="{StaticResource Tab.Modern}">
+                Margin="24,20,24,0"
+                Style="{StaticResource Tab.Modern.Underline}">
 
-                <!--
-                    ══════════════════════════════════════════
-                    Tab 1: المعلومات الأساسية
-                    ══════════════════════════════════════════
-                -->
-                <TabItem Header="المعلومات الأساسية">
+                <!--  ── التبويب 1: المعلومات الأساسية ──  -->
+                <TabItem Style="{StaticResource TabItem.Underline}">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="18"
+                                Height="18"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource PrimaryMainBrush}"
+                                Kind="InformationOutline" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="المعلومات الأساسية" />
+                        </StackPanel>
+                    </TabItem.Header>
+
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="24">
-
-                            <!--  البرنامج  -->
-                            <ComboBox
-                                x:Name="CbPrograms"
+                        <StackPanel Margin="0,12,0,0">
+                            <!-- شريط لوني علوي -->
+                            <Border
+                                Height="3"
                                 Margin="0,0,0,16"
-                                materialDesign:HintAssist.Hint="البرنامج الإذاعي *"
-                                materialDesign:TextFieldAssist.LeadingIcon="Book"
-                                DisplayMemberPath="ProgramName"
-                                SelectedValuePath="ProgramId"
-                                Style="{StaticResource Input.ComboBox}" />
+                                Background="{StaticResource PrimaryMainBrush}"
+                                CornerRadius="2"
+                                HorizontalAlignment="Stretch" />
 
-                            <!--  عنوان الحلقة  -->
-                            <TextBox
-                                x:Name="TxtEpisodeName"
-                                Margin="0,0,0,16"
-                                materialDesign:HintAssist.Hint="عنوان الحلقة الرئيسي *"
-                                materialDesign:TextFieldAssist.LeadingIcon="PlaylistEdit"
-                                Style="{StaticResource Input.Text}" />
+                            <!-- برنامج + عنوان الحلقة — صف مزدوج -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <!--  التاريخ والوقت  -->
+                                <ComboBox
+                                    x:Name="CbPrograms"
+                                    materialDesign:HintAssist.Hint="البرنامج الإذاعي *"
+                                    materialDesign:TextFieldAssist.LeadingIcon="Book"
+                                    DisplayMemberPath="ProgramName"
+                                    SelectedValuePath="ProgramId"
+                                    SelectionChanged="CbPrograms_SelectionChanged"
+                                    Style="{StaticResource Input.ComboBox}" />
+
+                                <TextBox
+                                    x:Name="TxtEpisodeName"
+                                    Grid.Column="2"
+                                    materialDesign:HintAssist.Hint="عنوان الحلقة الرئيسي *"
+                                    materialDesign:TextFieldAssist.LeadingIcon="PlaylistEdit"
+                                    Style="{StaticResource Input.Text}" />
+                            </Grid>
+
+                            <!-- تاريخ البث + وقت الانطلاق — صف مزدوج -->
                             <Grid Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -114,6 +142,7 @@
                                     x:Name="DpDate"
                                     materialDesign:HintAssist.Hint="تاريخ البث *"
                                     materialDesign:TextFieldAssist.LeadingIcon="CalendarMonthOutline"
+                                    SelectedDateChanged="DpDate_SelectedDateChanged"
                                     Style="{StaticResource Input.DatePicker}" />
 
                                 <materialDesign:TimePicker
@@ -122,397 +151,631 @@
                                     materialDesign:HintAssist.Hint="وقت الانطلاق"
                                     materialDesign:TextFieldAssist.LeadingIcon="ClockOutline"
                                     Is24Hours="True"
+                                    SelectedTimeChanged="TpBroadcastTime_SelectedTimeChanged"
                                     Style="{StaticResource Input.TimePicker}" />
                             </Grid>
 
-                            <!--  ملاحظات  -->
+                            <!-- لوحة كشف التعارضات -->
+                            <Border
+                                x:Name="ConflictPanel"
+                                Margin="0,0,0,16"
+                                Padding="14,12"
+                                CornerRadius="10"
+                                Visibility="Collapsed">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
+                                        <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
+                                        <Setter Property="BorderThickness" Value="1" />
+                                    </Style>
+                                </Border.Style>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border
+                                        Width="32"
+                                        Height="32"
+                                        Background="{StaticResource WarningBrush}"
+                                        CornerRadius="8">
+                                        <materialDesign:PackIcon
+                                            Width="18"
+                                            Height="18"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Foreground="White"
+                                            Kind="AlertCircleOutline" />
+                                    </Border>
+                                    <StackPanel
+                                        Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center">
+                                        <TextBlock
+                                            x:Name="ConflictTitle"
+                                            FontSize="13"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource WarningBrush}"
+                                            Text="تعارض محتمل في المواعيد" />
+                                        <TextBlock
+                                            x:Name="ConflictMessage"
+                                            Margin="0,2,0,0"
+                                            FontSize="11"
+                                            Foreground="{StaticResource TextSecondaryBrush}"
+                                            Text="توجد حلقة أخرى في نفس الفترة الزمنية" />
+                                    </StackPanel>
+                                    <Button
+                                        x:Name="BtnConflictDetails"
+                                        Grid.Column="2"
+                                        Height="30"
+                                        Padding="12,0"
+                                        Click="BtnConflictDetails_Click"
+                                        FontSize="11"
+                                        Style="{StaticResource Btn.Primary}"
+                                        ToolTip="عرض تفاصيل التعارضات"
+                                        Visibility="Collapsed">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon
+                                                Width="14"
+                                                Height="14"
+                                                Kind="FormatListBulleted" />
+                                            <TextBlock
+                                                Margin="6,0,0,0"
+                                                Text="التفاصيل" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </Border>
+
+                            <!-- ملاحظات الإنتاج -->
                             <TextBox
                                 x:Name="TxtSpecialNotes"
                                 materialDesign:HintAssist.Hint="ملاحظات الإنتاج والتوجيهات الخاصة"
                                 materialDesign:TextFieldAssist.HasLeadingIcon="True"
                                 materialDesign:TextFieldAssist.LeadingIcon="MessageTextOutline"
                                 Style="{StaticResource Input.Text.Multiline}" />
-
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
 
-                <!--
-                    ══════════════════════════════════════════
-                    Tab 2: الضيوف
-                    ══════════════════════════════════════════
-                -->
-                <TabItem Header="الضيوف المشاركون">
-                    <Grid Margin="24,16,24,16">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                <!--  ── التبويب 2: الضيوف المشاركون ──  -->
+                <TabItem Style="{StaticResource TabItem.Underline}">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="18"
+                                Height="18"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource SecondaryMainBrush}"
+                                Kind="AccountGroupOutline" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="الضيوف" />
+                        </StackPanel>
+                    </TabItem.Header>
 
-                        <TextBlock
-                            Margin="0,0,0,10"
-                            FontWeight="SemiBold"
-                            Foreground="{StaticResource PrimaryMainBrush}"
-                            Text="الضيوف المشاركون في الحلقة" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+                            <!-- شريط لوني علوي -->
+                            <Border
+                                Height="3"
+                                Margin="0,0,0,20"
+                                Background="{StaticResource SecondaryMainBrush}"
+                                CornerRadius="2"
+                                HorizontalAlignment="Stretch" />
 
-                        <Border
-                            Grid.Row="1"
-                            Background="{StaticResource SurfaceBrush}"
-                            BorderBrush="{StaticResource BorderDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
+                            <!-- عنوان القسم + العداد -->
+                            <Border
+                                Margin="0,0,0,16"
+                                Padding="14,10"
+                                Background="{StaticResource SecondaryLightBrush}"
+                                CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource SecondaryMainBrush}"
+                                        Kind="AccountGroupOutline" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                        Text="الضيوف المشاركون" />
+                                    <Border
+                                        x:Name="GuestBadge"
+                                        Grid.Column="2"
+                                        Padding="10,4"
+                                        Background="{StaticResource SecondaryLightBrush}"
+                                        CornerRadius="12">
+                                        <TextBlock
+                                            x:Name="GuestCountText"
+                                            FontSize="11"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource SecondaryMainBrush}"
+                                            Text="0" />
+                                    </Border>
+                                </Grid>
+                            </Border>
 
-                                <!--  صف إدخال الضيف  -->
-                                <Border
-                                    Padding="12"
-                                    Background="{StaticResource PrimaryXLightBrush}"
-                                    CornerRadius="8,8,0,0">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="130" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
+                            <!-- شريط إضافة ضيف -->
+                            <Border
+                                Margin="0,0,0,16"
+                                Padding="16,14"
+                                Background="{StaticResource SurfaceVariantBrush}"
+                                CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="140" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                        <ComboBox
-                                            x:Name="CbAllGuests"
-                                            materialDesign:HintAssist.Hint="الضيف"
-                                            DisplayMemberPath="FullName"
-                                            SelectedValuePath="GuestId"
-                                            Style="{StaticResource Input.ComboBox}" />
+                                    <ComboBox
+                                        x:Name="CbAllGuests"
+                                        materialDesign:HintAssist.Hint="اختر ضيفاً"
+                                        DisplayMemberPath="FullName"
+                                        SelectedValuePath="GuestId"
+                                        Style="{StaticResource Input.ComboBox}" />
 
-                                        <TextBox
-                                            x:Name="TxtGuestTopic"
-                                            Grid.Column="2"
-                                            materialDesign:HintAssist.Hint="الموضوع"
-                                            Style="{StaticResource Input.Text}" />
+                                    <TextBox
+                                        x:Name="TxtGuestTopic"
+                                        Grid.Column="2"
+                                        materialDesign:HintAssist.Hint="موضوع المشاركة"
+                                        Style="{StaticResource Input.Text}" />
 
-                                        <materialDesign:TimePicker
-                                            x:Name="TpGuestHostingTime"
-                                            Grid.Column="4"
-                                            materialDesign:HintAssist.Hint="ساعة الاستضافة"
-                                            Is24Hours="True"
-                                            Style="{StaticResource Input.TimePicker}" />
+                                    <materialDesign:TimePicker
+                                        x:Name="TpGuestHostingTime"
+                                        Grid.Column="4"
+                                        materialDesign:HintAssist.Hint="ساعة الاستضافة"
+                                        Is24Hours="True"
+                                        Style="{StaticResource Input.TimePicker}" />
 
-                                        <Button
-                                            x:Name="BtnAddGuest"
-                                            Grid.Column="6"
-                                            Width="40"
-                                            Height="40"
-                                            Click="BtnAddGuest_Click"
-                                            Style="{StaticResource Btn.Primary}"
-                                            ToolTip="إضافة الضيف للقائمة">
-                                            <materialDesign:PackIcon Foreground="{StaticResource SurfaceBrush}" Kind="Plus" />
-                                        </Button>
-                                    </Grid>
-                                </Border>
+                                    <Button
+                                        x:Name="BtnAddGuest"
+                                        Grid.Column="6"
+                                        Width="44"
+                                        Height="44"
+                                        Click="BtnAddGuest_Click"
+                                        Style="{StaticResource Btn.Primary}"
+                                        ToolTip="إضافة الضيف للقائمة">
+                                        <materialDesign:PackIcon
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="White"
+                                            Kind="Plus" />
+                                    </Button>
+                                </Grid>
+                            </Border>
 
-                                <!--  جدول الضيوف  -->
-                                <DataGrid
-                                    x:Name="DgGuests"
-                                    Grid.Row="1"
-                                    CellStyle="{StaticResource DataGrid.Cell}"
-                                    ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
-                                    RowStyle="{StaticResource DataGrid.Row}"
-                                    Style="{StaticResource DataGrid.Main}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn
-                                            Width="*"
-                                            Binding="{Binding FullName}"
-                                            Header="الضيف"
-                                            IsReadOnly="True" />
-                                        <DataGridTextColumn
-                                            Width="*"
-                                            Binding="{Binding Topic}"
-                                            Header="الموضوع" />
-                                        <DataGridTextColumn
-                                            Width="130"
-                                            Binding="{Binding HostingTimeDisplay}"
-                                            Header="الساعة"
-                                            IsReadOnly="True" />
-                                        <DataGridTemplateColumn
-                                            Width="70"
-                                            CanUserResize="False"
-                                            CellStyle="{StaticResource DataGrid.Cell.Actions}">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button
-                                                        Padding="4"
-                                                        Click="BtnRemoveGuest_Click"
-                                                        Style="{StaticResource MaterialDesignIconButton}"
-                                                        ToolTip="إزالة الضيف">
-                                                        <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
-                                                    </Button>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </Border>
-                    </Grid>
+                            <!-- جدول الضيوف -->
+                            <DataGrid
+                                x:Name="DgGuests"
+                                CellStyle="{StaticResource DataGrid.Cell}"
+                                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                                RowStyle="{StaticResource DataGrid.Row}"
+                                Style="{StaticResource DataGrid.Main}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding FullName}"
+                                        Header="الضيف"
+                                        IsReadOnly="True" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Topic}"
+                                        Header="الموضوع" />
+                                    <DataGridTextColumn
+                                        Width="130"
+                                        Binding="{Binding HostingTimeDisplay}"
+                                        Header="الساعة"
+                                        IsReadOnly="True" />
+                                    <DataGridTemplateColumn
+                                        Width="70"
+                                        CanUserResize="False"
+                                        CellStyle="{StaticResource DataGrid.Cell.Actions}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Padding="4"
+                                                    Click="BtnRemoveGuest_Click"
+                                                    Style="{StaticResource MaterialDesignIconButton}"
+                                                    ToolTip="إزالة الضيف">
+                                                    <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </ScrollViewer>
                 </TabItem>
 
-                <!--
-                    ══════════════════════════════════════════
-                    Tab 3: المراسلون
-                    ══════════════════════════════════════════
-                -->
-                <TabItem Header="المراسلون الميدانيون">
-                    <Grid Margin="24,16,24,16">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                <!--  ── التبويب 3: المراسلون الميدانيون ──  -->
+                <TabItem Style="{StaticResource TabItem.Underline}">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="18"
+                                Height="18"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource WarningBrush}"
+                                Kind="MicrophoneOutline" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="المراسلون" />
+                        </StackPanel>
+                    </TabItem.Header>
 
-                        <TextBlock
-                            Margin="0,0,0,10"
-                            FontWeight="SemiBold"
-                            Foreground="{StaticResource PrimaryMainBrush}"
-                            Text="المراسلون الميدانيون المشاركون" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+                            <!-- شريط لوني علوي -->
+                            <Border
+                                Height="3"
+                                Margin="0,0,0,20"
+                                Background="{StaticResource WarningBrush}"
+                                CornerRadius="2"
+                                HorizontalAlignment="Stretch" />
 
-                        <Border
-                            Grid.Row="1"
-                            Background="{StaticResource SurfaceBrush}"
-                            BorderBrush="{StaticResource BorderDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
+                            <!-- عنوان القسم + العداد -->
+                            <Border
+                                Margin="0,0,0,16"
+                                Padding="14,10"
+                                Background="{StaticResource WarningLightBrush}"
+                                CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource WarningBrush}"
+                                        Kind="MicrophoneOutline" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                        Text="المراسلون الميدانيون" />
+                                    <Border
+                                        x:Name="CorrespondentBadge"
+                                        Grid.Column="2"
+                                        Padding="10,4"
+                                        Background="{StaticResource WarningLightBrush}"
+                                        CornerRadius="12">
+                                        <TextBlock
+                                            x:Name="CorrespondentCountText"
+                                            FontSize="11"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource WarningBrush}"
+                                            Text="0" />
+                                    </Border>
+                                </Grid>
+                            </Border>
 
-                                <!--  صف إدخال المراسل  -->
-                                <Border
-                                    Padding="12"
-                                    Background="{StaticResource PrimaryXLightBrush}"
-                                    CornerRadius="8,8,0,0">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="130" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
+                            <!-- شريط إضافة مراسل -->
+                            <Border
+                                Margin="0,0,0,16"
+                                Padding="16,14"
+                                Background="{StaticResource SurfaceVariantBrush}"
+                                CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="140" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                        <ComboBox
-                                            x:Name="CbAllCorrespondents"
-                                            materialDesign:HintAssist.Hint="المراسل"
-                                            DisplayMemberPath="FullName"
-                                            SelectedValuePath="CorrespondentId"
-                                            Style="{StaticResource Input.ComboBox}" />
+                                    <ComboBox
+                                        x:Name="CbAllCorrespondents"
+                                        materialDesign:HintAssist.Hint="اختر مراسلاً"
+                                        DisplayMemberPath="FullName"
+                                        SelectedValuePath="CorrespondentId"
+                                        Style="{StaticResource Input.ComboBox}" />
 
-                                        <TextBox
-                                            x:Name="TxtCorrespondentTopic"
-                                            Grid.Column="2"
-                                            materialDesign:HintAssist.Hint="موضوع التغطية"
-                                            Style="{StaticResource Input.Text}" />
+                                    <TextBox
+                                        x:Name="TxtCorrespondentTopic"
+                                        Grid.Column="2"
+                                        materialDesign:HintAssist.Hint="موضوع التغطية"
+                                        Style="{StaticResource Input.Text}" />
 
-                                        <materialDesign:TimePicker
-                                            x:Name="TpCorrespondentHostingTime"
-                                            Grid.Column="4"
-                                            materialDesign:HintAssist.Hint="وقت الدخول"
-                                            Is24Hours="True"
-                                            Style="{StaticResource Input.TimePicker}" />
+                                    <materialDesign:TimePicker
+                                        x:Name="TpCorrespondentHostingTime"
+                                        Grid.Column="4"
+                                        materialDesign:HintAssist.Hint="وقت الدخول"
+                                        Is24Hours="True"
+                                        Style="{StaticResource Input.TimePicker}" />
 
-                                        <Button
-                                            x:Name="BtnAddCorrespondent"
-                                            Grid.Column="6"
-                                            Width="40"
-                                            Height="40"
-                                            Click="BtnAddCorrespondent_Click"
-                                            Style="{StaticResource Btn.Primary}"
-                                            ToolTip="إضافة المراسل للقائمة">
-                                            <materialDesign:PackIcon Foreground="{StaticResource SurfaceBrush}" Kind="Plus" />
-                                        </Button>
-                                    </Grid>
-                                </Border>
+                                    <Button
+                                        x:Name="BtnAddCorrespondent"
+                                        Grid.Column="6"
+                                        Width="44"
+                                        Height="44"
+                                        Click="BtnAddCorrespondent_Click"
+                                        Style="{StaticResource Btn.Primary}"
+                                        ToolTip="إضافة المراسل للقائمة">
+                                        <materialDesign:PackIcon
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="White"
+                                            Kind="Plus" />
+                                    </Button>
+                                </Grid>
+                            </Border>
 
-                                <!--  جدول المراسلين  -->
-                                <DataGrid
-                                    x:Name="DgCorrespondents"
-                                    Grid.Row="1"
-                                    CellStyle="{StaticResource DataGrid.Cell}"
-                                    ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
-                                    RowStyle="{StaticResource DataGrid.Row}"
-                                    Style="{StaticResource DataGrid.Main}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn
-                                            Width="*"
-                                            Binding="{Binding FullName}"
-                                            Header="المراسل"
-                                            IsReadOnly="True" />
-                                        <DataGridTextColumn
-                                            Width="*"
-                                            Binding="{Binding Topic}"
-                                            Header="موضوع التغطية" />
-                                        <DataGridTextColumn
-                                            Width="130"
-                                            Binding="{Binding HostingTimeDisplay}"
-                                            Header="وقت الدخول"
-                                            IsReadOnly="True" />
-                                        <DataGridTemplateColumn
-                                            Width="70"
-                                            CanUserResize="False"
-                                            CellStyle="{StaticResource DataGrid.Cell.Actions}">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button
-                                                        Padding="4"
-                                                        Click="BtnRemoveCorrespondent_Click"
-                                                        Style="{StaticResource MaterialDesignIconButton}"
-                                                        ToolTip="إزالة المراسل">
-                                                        <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
-                                                    </Button>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </Border>
-                    </Grid>
+                            <!-- جدول المراسلين -->
+                            <DataGrid
+                                x:Name="DgCorrespondents"
+                                CellStyle="{StaticResource DataGrid.Cell}"
+                                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                                RowStyle="{StaticResource DataGrid.Row}"
+                                Style="{StaticResource DataGrid.Main}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding FullName}"
+                                        Header="المراسل"
+                                        IsReadOnly="True" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Topic}"
+                                        Header="موضوع التغطية" />
+                                    <DataGridTextColumn
+                                        Width="130"
+                                        Binding="{Binding HostingTimeDisplay}"
+                                        Header="وقت الدخول"
+                                        IsReadOnly="True" />
+                                    <DataGridTemplateColumn
+                                        Width="70"
+                                        CanUserResize="False"
+                                        CellStyle="{StaticResource DataGrid.Cell.Actions}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Padding="4"
+                                                    Click="BtnRemoveCorrespondent_Click"
+                                                    Style="{StaticResource MaterialDesignIconButton}"
+                                                    ToolTip="إزالة المراسل">
+                                                    <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </ScrollViewer>
                 </TabItem>
 
-                <!--
-                    ══════════════════════════════════════════
-                    Tab 4: طاقم التنفيذ
-                    ══════════════════════════════════════════
-                -->
-                <TabItem Header="طاقم التنفيذ">
-                    <Grid Margin="24,16,24,16">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                <!--  ── التبويب 4: طاقم التنفيذ ──  -->
+                <TabItem Style="{StaticResource TabItem.Underline}">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="18"
+                                Height="18"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource SuccessBrush}"
+                                Kind="Headset" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="طاقم التنفيذ" />
+                        </StackPanel>
+                    </TabItem.Header>
 
-                        <TextBlock
-                            Margin="0,0,0,10"
-                            FontWeight="SemiBold"
-                            Foreground="{StaticResource PrimaryMainBrush}"
-                            Text="طاقم التنفيذ (الاستوديو والإنتاج)" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+                            <!-- شريط لوني علوي -->
+                            <Border
+                                Height="3"
+                                Margin="0,0,0,20"
+                                Background="{StaticResource SuccessBrush}"
+                                CornerRadius="2"
+                                HorizontalAlignment="Stretch" />
 
-                        <Border
-                            Grid.Row="1"
-                            Background="{StaticResource SurfaceBrush}"
-                            BorderBrush="{StaticResource BorderDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
+                            <!-- عنوان القسم + العداد -->
+                            <Border
+                                Margin="0,0,0,16"
+                                Padding="14,10"
+                                Background="{StaticResource SuccessLightBrush}"
+                                CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource SuccessBrush}"
+                                        Kind="Headset" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                        Text="طاقم التنفيذ" />
+                                    <Border
+                                        x:Name="StaffBadge"
+                                        Grid.Column="2"
+                                        Padding="10,4"
+                                        Background="{StaticResource SuccessLightBrush}"
+                                        CornerRadius="12">
+                                        <TextBlock
+                                            x:Name="StaffCountText"
+                                            FontSize="11"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource SuccessBrush}"
+                                            Text="0" />
+                                    </Border>
+                                </Grid>
+                            </Border>
 
-                                <!--  صف إدخال الموظف  -->
-                                <Border
-                                    Padding="12"
-                                    Background="{StaticResource PrimaryXLightBrush}"
-                                    CornerRadius="8,8,0,0">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
+                            <!-- شريط إضافة موظف -->
+                            <Border
+                                Margin="0,0,0,16"
+                                Padding="16,14"
+                                Background="{StaticResource SurfaceVariantBrush}"
+                                CornerRadius="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                        <ComboBox
-                                            x:Name="CbAllEmployees"
-                                            materialDesign:HintAssist.Hint="اختر موظفاً (مخرج · مذيع · فني صوت)"
-                                            DisplayMemberPath="FullName"
-                                            Style="{StaticResource Input.ComboBox}" />
+                                    <ComboBox
+                                        x:Name="CbAllEmployees"
+                                        materialDesign:HintAssist.Hint="اختر موظفاً (مخرج · مذيع · فني صوت)"
+                                        DisplayMemberPath="FullName"
+                                        Style="{StaticResource Input.ComboBox}" />
 
-                                        <Button
-                                            x:Name="BtnAddEmployee"
-                                            Grid.Column="2"
-                                            Width="40"
-                                            Height="40"
-                                            Click="BtnAddEmployee_Click"
-                                            Style="{StaticResource Btn.Primary}"
-                                            ToolTip="إضافة للطاقم">
-                                            <materialDesign:PackIcon Foreground="{StaticResource SurfaceBrush}" Kind="Plus" />
-                                        </Button>
-                                    </Grid>
-                                </Border>
+                                    <Button
+                                        x:Name="BtnAddEmployee"
+                                        Grid.Column="2"
+                                        Width="44"
+                                        Height="44"
+                                        Click="BtnAddEmployee_Click"
+                                        Style="{StaticResource Btn.Primary}"
+                                        ToolTip="إضافة للطاقم">
+                                        <materialDesign:PackIcon
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="White"
+                                            Kind="Plus" />
+                                    </Button>
+                                </Grid>
+                            </Border>
 
-                                <!--  جدول الطاقم  -->
-                                <DataGrid
-                                    x:Name="DgEmployees"
-                                    Grid.Row="1"
-                                    CellStyle="{StaticResource DataGrid.Cell}"
-                                    ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
-                                    RowStyle="{StaticResource DataGrid.Row}"
-                                    Style="{StaticResource DataGrid.Main}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn
-                                            Width="*"
-                                            Binding="{Binding FullName}"
-                                            Header="الموظف"
-                                            IsReadOnly="True" />
-                                        <DataGridTextColumn
-                                            Width="200"
-                                            Binding="{Binding StaffRoleName}"
-                                            Header="الدور الوظيفي"
-                                            IsReadOnly="True" />
-                                        <DataGridTemplateColumn
-                                            Width="70"
-                                            CanUserResize="False"
-                                            CellStyle="{StaticResource DataGrid.Cell.Actions}">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button
-                                                        Padding="4"
-                                                        Click="BtnRemoveEmployee_Click"
-                                                        Style="{StaticResource MaterialDesignIconButton}"
-                                                        ToolTip="إزالة من الطاقم">
-                                                        <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
-                                                    </Button>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </Border>
-                    </Grid>
+                            <!-- جدول طاقم التنفيذ -->
+                            <DataGrid
+                                x:Name="DgEmployees"
+                                CellStyle="{StaticResource DataGrid.Cell}"
+                                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                                RowStyle="{StaticResource DataGrid.Row}"
+                                Style="{StaticResource DataGrid.Main}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding FullName}"
+                                        Header="الموظف"
+                                        IsReadOnly="True" />
+                                    <DataGridTextColumn
+                                        Width="200"
+                                        Binding="{Binding StaffRoleName}"
+                                        Header="الدور الوظيفي"
+                                        IsReadOnly="True" />
+                                    <DataGridTemplateColumn
+                                        Width="70"
+                                        CanUserResize="False"
+                                        CellStyle="{StaticResource DataGrid.Cell.Actions}">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Padding="4"
+                                                    Click="BtnRemoveEmployee_Click"
+                                                    Style="{StaticResource MaterialDesignIconButton}"
+                                                    ToolTip="إزالة من الطاقم">
+                                                    <materialDesign:PackIcon Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" Kind="CloseCircleOutline" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </ScrollViewer>
                 </TabItem>
-
             </TabControl>
 
             <!--  ═══════ 3. الذيل ═══════  -->
-            <Border Grid.Row="2" Style="{StaticResource Window.Footer}">
+            <Border Grid.Row="2" Style="{StaticResource Footer.Form}">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="16" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Button
+                    <!-- مؤشر الحفظ التلقائي -->
+                    <StackPanel
+                        x:Name="PnlAutoSave"
                         Grid.Column="0"
-                        Click="BtnCancel_Click"
-                        Content="تراجع"
-                        Style="{StaticResource Btn.Cancel}" />
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Visibility="Collapsed">
+                        <materialDesign:PackIcon
+                            Width="14"
+                            Height="14"
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource SuccessBrush}"
+                            Kind="CheckCircleOutline" />
+                        <TextBlock
+                            x:Name="TxtAutoSaveStatus"
+                            Margin="6,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="11"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            Text="تم الحفظ تلقائياً" />
+                    </StackPanel>
 
-                    <Button
-                        x:Name="BtnSave"
-                        Grid.Column="2"
-                        Click="BtnSave_Click"
-                        Content="حفظ بيانات الحلقة"
-                        Style="{StaticResource Btn.Primary}" />
+                    <!-- أزرار الإجراءات -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <Button
+                            Click="BtnCancel_Click"
+                            Content="تراجع"
+                            Style="{StaticResource Btn.Cancel}" />
+                        <Button
+                            x:Name="BtnSave"
+                            Margin="12,0,0,0"
+                            Click="BtnSave_Click"
+                            Style="{StaticResource Btn.Primary}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="16"
+                                    Height="16"
+                                    VerticalAlignment="Center"
+                                    Foreground="White"
+                                    Kind="ContentSaveOutline" />
+                                <TextBlock
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Foreground="White"
+                                    Text="حفظ بيانات الحلقة" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Grid>

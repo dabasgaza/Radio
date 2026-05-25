@@ -119,12 +119,15 @@
             CornerRadius="16">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" /> <!-- الصف الأساسي: بحث + تحكم -->
-                    <RowDefinition Height="Auto" /> <!-- لوحة الفلاتر المتقدمة (قابلة للطي) -->
-                    <RowDefinition Height="Auto" /> <!-- شريط الحالات والشرائح النشطة -->
+                    <RowDefinition Height="Auto" />
+                    <!--  الصف الأساسي: بحث + تحكم  -->
+                    <RowDefinition Height="Auto" />
+                    <!--  لوحة الفلاتر المتقدمة (قابلة للطي)  -->
+                    <RowDefinition Height="Auto" />
+                    <!--  شريط الحالات والشرائح النشطة  -->
                 </Grid.RowDefinitions>
 
-                <!-- 1. الصف الأساسي -->
+                <!--  1. الصف الأساسي  -->
                 <Border Padding="16,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -134,201 +137,520 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                    <!-- البحث السريع -->
-                    <TextBox
-                        x:Name="TxtSearch"
-                        Grid.Column="0"
-                        Margin="0,0,16,0"
-                        VerticalAlignment="Center"
-                        materialDesign:HintAssist.Hint="البحث عن حلقة، ضيف، أو ملاحظة..."
-                        materialDesign:TextFieldAssist.HasClearButton="True"
-                        Style="{StaticResource Input.Search}"
-                        TextChanged="TxtSearch_TextChanged" />
+                        <!--  البحث السريع  -->
+                        <TextBox
+                            x:Name="TxtSearch"
+                            Grid.Column="0"
+                            Margin="0,0,16,0"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Hint="البحث عن حلقة، ضيف، أو ملاحظة..."
+                            materialDesign:TextFieldAssist.HasClearButton="True"
+                            Style="{StaticResource Input.Search}"
+                            TextChanged="TxtSearch_TextChanged" />
 
-                    <!-- عداد النتائج الذكي -->
-                    <Border
-                        Grid.Column="1"
-                        Margin="0,0,12,0"
-                        Padding="12,6"
-                        VerticalAlignment="Center"
-                        Background="{StaticResource PrimaryXLightBrush}"
-                        CornerRadius="8">
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="ListBoxOutline" Width="16" Height="16" VerticalAlignment="Center" Foreground="{StaticResource PrimaryMainBrush}" />
-                            <TextBlock x:Name="TxtResultsCount" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="12" FontWeight="Bold" Foreground="{StaticResource PrimaryMainBrush}" Text="0 حلقة" />
-                        </StackPanel>
-                    </Border>
-
-                    <!-- تبديل أنماط العرض -->
-                    <Border
-                        Grid.Column="2"
-                        Margin="0,0,12,0"
-                        Padding="2"
-                        VerticalAlignment="Center"
-                        Background="{StaticResource SurfaceVariantBrush}"
-                        CornerRadius="8">
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton x:Name="ViewCards" Click="ViewMode_Click" GroupName="ViewMode" IsChecked="True" Style="{StaticResource Btn.Tab}" ToolTip="عرض البطاقات">
-                                <materialDesign:PackIcon Width="18" Height="18" Kind="ViewDashboardOutline" />
-                            </RadioButton>
-                            <RadioButton x:Name="ViewTable" Click="ViewMode_Click" GroupName="ViewMode" Style="{StaticResource Btn.Tab}" ToolTip="عرض الجدول">
-                                <materialDesign:PackIcon Width="18" Height="18" Kind="Table" />
-                            </RadioButton>
-                            <RadioButton x:Name="ViewCompact" Click="ViewMode_Click" GroupName="ViewMode" Style="{StaticResource Btn.Tab}" ToolTip="عرض مختصر">
-                                <materialDesign:PackIcon Width="18" Height="18" Kind="FormatListBulleted" />
-                            </RadioButton>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- زر الفلاتر المتقدمة (مع Badge) -->
-                    <Grid Grid.Column="3">
-                        <ToggleButton
-                            x:Name="BtnToggleAdvancedFilters"
-                            Height="40"
-                            Padding="12,0"
-                            Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}">
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Width="20" Height="20" VerticalAlignment="Center" Kind="FilterVariant" />
-                                <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" FontSize="13" FontWeight="Medium" Text="تصفية متقدمة" />
-                            </StackPanel>
-                        </ToggleButton>
-                        
-                        <!-- Badge: مؤشر الفلاتر النشطة -->
+                        <!--  عداد النتائج الذكي  -->
                         <Border
-                            x:Name="FilterBadge"
-                            Width="18"
-                            Height="18"
-                            Margin="0,-4,-4,0"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Background="{StaticResource ErrorBrush}"
-                            CornerRadius="9"
-                            Visibility="Collapsed">
-                            <TextBlock
-                                x:Name="TxtFilterCount"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontSize="10"
-                                FontWeight="Bold"
-                                Foreground="White"
-                                Text="1" />
+                            Grid.Column="1"
+                            Margin="0,0,12,0"
+                            Padding="12,6"
+                            VerticalAlignment="Center"
+                            Background="{StaticResource PrimaryXLightBrush}"
+                            CornerRadius="8">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="16"
+                                    Height="16"
+                                    VerticalAlignment="Center"
+                                    Foreground="{StaticResource PrimaryMainBrush}"
+                                    Kind="ListBoxOutline" />
+                                <TextBlock
+                                    x:Name="TxtResultsCount"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="12"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource PrimaryMainBrush}"
+                                    Text="0 حلقة" />
+                            </StackPanel>
                         </Border>
+
+                        <!--  تبديل أنماط العرض  -->
+                        <Border
+                            Grid.Column="2"
+                            Margin="0,0,12,0"
+                            Padding="2"
+                            VerticalAlignment="Center"
+                            Background="{StaticResource SurfaceVariantBrush}"
+                            CornerRadius="8">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton
+                                    x:Name="ViewCards"
+                                    Click="ViewMode_Click"
+                                    GroupName="ViewMode"
+                                    IsChecked="True"
+                                    Style="{StaticResource Btn.Tab}"
+                                    ToolTip="عرض البطاقات">
+                                    <materialDesign:PackIcon
+                                        Width="18"
+                                        Height="18"
+                                        Kind="ViewDashboardOutline" />
+                                </RadioButton>
+                                <RadioButton
+                                    x:Name="ViewTable"
+                                    Click="ViewMode_Click"
+                                    GroupName="ViewMode"
+                                    Style="{StaticResource Btn.Tab}"
+                                    ToolTip="عرض الجدول">
+                                    <materialDesign:PackIcon
+                                        Width="18"
+                                        Height="18"
+                                        Kind="Table" />
+                                </RadioButton>
+                                <RadioButton
+                                    x:Name="ViewCompact"
+                                    Click="ViewMode_Click"
+                                    GroupName="ViewMode"
+                                    Style="{StaticResource Btn.Tab}"
+                                    ToolTip="عرض مختصر">
+                                    <materialDesign:PackIcon
+                                        Width="18"
+                                        Height="18"
+                                        Kind="FormatListBulleted" />
+                                </RadioButton>
+                            </StackPanel>
+                        </Border>
+
+                        <!--  زر الفلاتر المتقدمة (مع Badge)  -->
+                        <Grid Grid.Column="3">
+                            <ToggleButton
+                                x:Name="BtnToggleAdvancedFilters"
+                                Height="40"
+                                Padding="12,0"
+                                Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        VerticalAlignment="Center"
+                                        Kind="FilterVariant" />
+                                    <TextBlock
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="تصفية متقدمة" />
+                                </StackPanel>
+                            </ToggleButton>
+
+                            <!--  Badge: مؤشر الفلاتر النشطة  -->
+                            <Border
+                                x:Name="FilterBadge"
+                                Width="18"
+                                Height="18"
+                                Margin="0,-4,-4,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Background="{StaticResource ErrorBrush}"
+                                CornerRadius="9"
+                                Visibility="Collapsed">
+                                <TextBlock
+                                    x:Name="TxtFilterCount"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="10"
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    Text="1" />
+                            </Border>
+                        </Grid>
                     </Grid>
-                </Grid>
                 </Border>
 
-                <!-- 2. لوحة الفلاتر المتقدمة (تظهر عند التفعيل) -->
+                <!--  2. لوحة الفلاتر المتقدمة (تظهر عند التفعيل)  -->
                 <Border
                     x:Name="PnlAdvancedFilters"
                     Grid.Row="1"
+                    Padding="24,16"
                     Background="{StaticResource SurfaceVariantBrush}"
                     BorderBrush="{StaticResource DividerBrush}"
                     BorderThickness="0,1"
-                    Padding="24,16"
                     Visibility="{Binding IsChecked, ElementName=BtnToggleAdvancedFilters, Converter={StaticResource BoolToVisConverter}}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <!--  الصف الأول: ترتيب + برنامج  -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                            <TextBlock Margin="0,0,0,8" Style="{StaticResource Type.Caption}" Text="الترتيب حسب" />
-                            <ComboBox x:Name="CmbSortBy" materialDesign:HintAssist.Hint="اختر معيار الترتيب" SelectionChanged="CmbSortBy_SelectionChanged" Style="{StaticResource MaterialDesignOutlinedComboBox}" />
-                        </StackPanel>
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock
+                                    Margin="0,0,0,8"
+                                    Style="{StaticResource Type.Caption}"
+                                    Text="الترتيب حسب" />
+                                <ComboBox
+                                    x:Name="CmbSortBy"
+                                    materialDesign:HintAssist.Hint="اختر معيار الترتيب"
+                                    SelectionChanged="CmbSortBy_SelectionChanged"
+                                    Style="{StaticResource MaterialDesignOutlinedComboBox}" />
+                            </StackPanel>
 
-                        <StackPanel Grid.Column="1" Margin="0,0,16,0">
-                            <TextBlock Margin="0,0,0,8" Style="{StaticResource Type.Caption}" Text="تصفية حسب البرنامج" />
-                            <ComboBox x:Name="CmbProgramFilter" materialDesign:HintAssist.Hint="كل البرامج" materialDesign:TextFieldAssist.HasClearButton="True" SelectionChanged="CmbProgramFilter_SelectionChanged" Style="{StaticResource MaterialDesignOutlinedComboBox}" />
-                        </StackPanel>
-                        
-                        <Button
-                            Grid.Column="2"
-                            VerticalAlignment="Bottom"
-                            Click="BtnResetFilters_Click"
-                            Content="إعادة تعيين"
-                            Style="{StaticResource Btn.Ghost}"
-                            Foreground="{StaticResource ErrorBrush}" />
-                    </Grid>
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock
+                                    Margin="0,0,0,8"
+                                    Style="{StaticResource Type.Caption}"
+                                    Text="تصفية حسب البرنامج" />
+                                <ComboBox
+                                    x:Name="CmbProgramFilter"
+                                    materialDesign:HintAssist.Hint="كل البرامج"
+                                    materialDesign:TextFieldAssist.HasClearButton="True"
+                                    SelectionChanged="CmbProgramFilter_SelectionChanged"
+                                    Style="{StaticResource MaterialDesignOutlinedComboBox}" />
+                            </StackPanel>
+
+                            <Button
+                                Grid.Column="2"
+                                VerticalAlignment="Bottom"
+                                Click="BtnResetFilters_Click"
+                                Content="إعادة تعيين"
+                                Foreground="{StaticResource ErrorBrush}"
+                                Style="{StaticResource Btn.Ghost}" />
+                        </Grid>
+
+                        <!--  الصف الثاني: فلتر نطاق التاريخ  -->
+                        <Border
+                            Margin="0,12,0,0"
+                            Padding="16,12"
+                            Background="{StaticResource SurfaceBrush}"
+                            CornerRadius="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    FontSize="13"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    Text="فلتر التاريخ:" />
+
+                                <Button
+                                    x:Name="BtnToday"
+                                    Grid.Column="1"
+                                    Height="32"
+                                    Margin="12,0,0,0"
+                                    Padding="12,0"
+                                    Click="QuickDateFilter_Click"
+                                    Content="اليوم"
+                                    FontSize="12"
+                                    Style="{StaticResource Btn.Ghost}" />
+
+                                <Button
+                                    x:Name="BtnThisWeek"
+                                    Grid.Column="2"
+                                    Height="32"
+                                    Margin="8,0,0,0"
+                                    Padding="12,0"
+                                    Click="QuickDateFilter_Click"
+                                    Content="هذا الأسبوع"
+                                    FontSize="12"
+                                    Style="{StaticResource Btn.Ghost}" />
+
+                                <Button
+                                    x:Name="BtnThisMonth"
+                                    Grid.Column="3"
+                                    Height="32"
+                                    Margin="8,0,0,0"
+                                    Padding="12,0"
+                                    Click="QuickDateFilter_Click"
+                                    Content="هذا الشهر"
+                                    FontSize="12"
+                                    Style="{StaticResource Btn.Ghost}" />
+
+                                <Border
+                                    Grid.Column="4"
+                                    Width="1"
+                                    Height="24"
+                                    Margin="12,0"
+                                    VerticalAlignment="Center"
+                                    Background="{StaticResource DividerBrush}" />
+
+                                <ToggleButton
+                                    x:Name="BtnCustomRange"
+                                    Grid.Column="5"
+                                    Height="32"
+                                    Padding="12,0"
+                                    Checked="BtnCustomRange_Checked"
+                                    Content="نطاق مخصّص"
+                                    FontSize="12"
+                                    Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
+                                    Unchecked="BtnCustomRange_Unchecked" />
+
+                                <StackPanel
+                                    x:Name="PnlDateRange"
+                                    Grid.Column="6"
+                                    Margin="8,0,0,0"
+                                    Orientation="Horizontal"
+                                    Visibility="Collapsed">
+                                    <DatePicker
+                                        x:Name="DpDateFrom"
+                                        Width="140"
+                                        materialDesign:HintAssist.Hint="من تاريخ"
+                                        SelectedDateChanged="DpDateFrom_SelectedDateChanged"
+                                        Style="{StaticResource Input.DatePicker}" />
+                                    <TextBlock
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource TextSecondaryBrush}"
+                                        Text="←" />
+                                    <DatePicker
+                                        x:Name="DpDateTo"
+                                        Width="140"
+                                        materialDesign:HintAssist.Hint="إلى تاريخ"
+                                        SelectedDateChanged="DpDateTo_SelectedDateChanged"
+                                        Style="{StaticResource Input.DatePicker}" />
+                                </StackPanel>
+
+                                <Button
+                                    x:Name="BtnClearDateFilter"
+                                    Grid.Column="7"
+                                    Width="28"
+                                    Height="28"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Click="BtnClearDateFilter_Click"
+                                    Style="{StaticResource MaterialDesignIconButton}"
+                                    ToolTip="مسح فلتر التاريخ"
+                                    Visibility="Collapsed">
+                                    <materialDesign:PackIcon
+                                        Width="16"
+                                        Height="16"
+                                        Foreground="{StaticResource ErrorBrush}"
+                                        Kind="CloseCircleOutline" />
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
                 </Border>
 
-                <!-- 3. شريط الحالات والشرائح النشطة -->
+                <!--  3. شريط الحالات والشرائح النشطة  -->
                 <Grid Grid.Row="2" Background="Transparent">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    
-                    <!-- تبويبات الحالة -->
+
+                    <!--  تبويبات الحالة  -->
                     <Border
                         Margin="16,0"
                         Background="Transparent"
                         BorderBrush="{StaticResource DividerBrush}"
                         BorderThickness="0,0,0,1">
-                        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" PanningMode="HorizontalOnly">
+                        <ScrollViewer
+                            HorizontalScrollBarVisibility="Hidden"
+                            PanningMode="HorizontalOnly"
+                            VerticalScrollBarVisibility="Disabled">
                             <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="FilterAll" MinWidth="80" Height="45" Click="StatusFilter_Click" GroupName="StatusFilter" IsChecked="True" Style="{StaticResource Btn.Tab}">
+                                <RadioButton
+                                    x:Name="FilterAll"
+                                    Height="45"
+                                    MinWidth="80"
+                                    Click="StatusFilter_Click"
+                                    GroupName="StatusFilter"
+                                    IsChecked="True"
+                                    Style="{StaticResource Btn.Tab}">
                                     <Grid>
                                         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                            <materialDesign:PackIcon Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" Kind="AllInclusive" />
-                                            <TextBlock VerticalAlignment="Center" FontSize="13" Text="الكل" />
+                                            <materialDesign:PackIcon
+                                                Width="16"
+                                                Height="16"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Center"
+                                                Kind="AllInclusive" />
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                FontSize="13"
+                                                Text="الكل" />
                                         </StackPanel>
-                                        <Border VerticalAlignment="Bottom" Height="3" Background="{StaticResource PrimaryMainBrush}" Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}"/>
+                                        <Border
+                                            Height="3"
+                                            VerticalAlignment="Bottom"
+                                            Background="{StaticResource PrimaryMainBrush}"
+                                            Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}" />
                                     </Grid>
                                 </RadioButton>
-                                <RadioButton x:Name="FilterPlanned" MinWidth="100" Height="45" Click="StatusFilter_Click" GroupName="StatusFilter" Style="{StaticResource Btn.Tab}">
+                                <RadioButton
+                                    x:Name="FilterPlanned"
+                                    Height="45"
+                                    MinWidth="100"
+                                    Click="StatusFilter_Click"
+                                    GroupName="StatusFilter"
+                                    Style="{StaticResource Btn.Tab}">
                                     <Grid>
                                         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                            <Border Width="10" Height="10" Margin="0,0,8,0" VerticalAlignment="Center" Background="{StaticResource WarningBrush}" CornerRadius="5" />
-                                            <TextBlock x:Name="ChipPlanned" VerticalAlignment="Center" FontSize="13" Text="مجدولة" />
+                                            <Border
+                                                Width="10"
+                                                Height="10"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Center"
+                                                Background="{StaticResource WarningBrush}"
+                                                CornerRadius="5" />
+                                            <TextBlock
+                                                x:Name="ChipPlanned"
+                                                VerticalAlignment="Center"
+                                                FontSize="13"
+                                                Text="مجدولة" />
                                         </StackPanel>
-                                        <Border VerticalAlignment="Bottom" Height="3" Background="{StaticResource WarningBrush}" Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}"/>
+                                        <Border
+                                            Height="3"
+                                            VerticalAlignment="Bottom"
+                                            Background="{StaticResource WarningBrush}"
+                                            Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}" />
                                     </Grid>
                                 </RadioButton>
-                                <RadioButton x:Name="FilterExecuted" MinWidth="100" Height="45" Click="StatusFilter_Click" GroupName="StatusFilter" Style="{StaticResource Btn.Tab}">
+                                <RadioButton
+                                    x:Name="FilterExecuted"
+                                    Height="45"
+                                    MinWidth="100"
+                                    Click="StatusFilter_Click"
+                                    GroupName="StatusFilter"
+                                    Style="{StaticResource Btn.Tab}">
                                     <Grid>
                                         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                            <Border Width="10" Height="10" Margin="0,0,8,0" VerticalAlignment="Center" Background="{StaticResource SecondaryMainBrush}" CornerRadius="5" />
-                                            <TextBlock x:Name="ChipExecuted" VerticalAlignment="Center" FontSize="13" Text="منفّذة" />
+                                            <Border
+                                                Width="10"
+                                                Height="10"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Center"
+                                                Background="{StaticResource SecondaryMainBrush}"
+                                                CornerRadius="5" />
+                                            <TextBlock
+                                                x:Name="ChipExecuted"
+                                                VerticalAlignment="Center"
+                                                FontSize="13"
+                                                Text="منفّذة" />
                                         </StackPanel>
-                                        <Border VerticalAlignment="Bottom" Height="3" Background="{StaticResource SecondaryMainBrush}" Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}"/>
+                                        <Border
+                                            Height="3"
+                                            VerticalAlignment="Bottom"
+                                            Background="{StaticResource SecondaryMainBrush}"
+                                            Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}" />
                                     </Grid>
                                 </RadioButton>
-                                <RadioButton x:Name="FilterPublished" MinWidth="100" Height="45" Click="StatusFilter_Click" GroupName="StatusFilter" Style="{StaticResource Btn.Tab}">
+                                <RadioButton
+                                    x:Name="FilterPublished"
+                                    Height="45"
+                                    MinWidth="100"
+                                    Click="StatusFilter_Click"
+                                    GroupName="StatusFilter"
+                                    Style="{StaticResource Btn.Tab}">
                                     <Grid>
                                         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                            <Border Width="10" Height="10" Margin="0,0,8,0" VerticalAlignment="Center" Background="{StaticResource SuccessBrush}" CornerRadius="5" />
-                                            <TextBlock x:Name="ChipPublished" VerticalAlignment="Center" FontSize="13" Text="منشورة" />
+                                            <Border
+                                                Width="10"
+                                                Height="10"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Center"
+                                                Background="{StaticResource SuccessBrush}"
+                                                CornerRadius="5" />
+                                            <TextBlock
+                                                x:Name="ChipPublished"
+                                                VerticalAlignment="Center"
+                                                FontSize="13"
+                                                Text="منشورة" />
                                         </StackPanel>
-                                        <Border VerticalAlignment="Bottom" Height="3" Background="{StaticResource SuccessBrush}" Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}"/>
+                                        <Border
+                                            Height="3"
+                                            VerticalAlignment="Bottom"
+                                            Background="{StaticResource SuccessBrush}"
+                                            Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}" />
                                     </Grid>
                                 </RadioButton>
-                                <RadioButton x:Name="FilterWebPublished" MinWidth="110" Height="45" Click="StatusFilter_Click" GroupName="StatusFilter" Style="{StaticResource Btn.Tab}">
+                                <RadioButton
+                                    x:Name="FilterWebPublished"
+                                    Height="45"
+                                    MinWidth="110"
+                                    Click="StatusFilter_Click"
+                                    GroupName="StatusFilter"
+                                    Style="{StaticResource Btn.Tab}">
                                     <Grid>
                                         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                            <materialDesign:PackIcon Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="#2196F3" Kind="Web" />
-                                            <TextBlock x:Name="ChipWebPublished" VerticalAlignment="Center" FontSize="13" Text="الموقع" />
+                                            <materialDesign:PackIcon
+                                                Width="16"
+                                                Height="16"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Center"
+                                                Foreground="#2196F3"
+                                                Kind="Web" />
+                                            <TextBlock
+                                                x:Name="ChipWebPublished"
+                                                VerticalAlignment="Center"
+                                                FontSize="13"
+                                                Text="الموقع" />
                                         </StackPanel>
-                                        <Border VerticalAlignment="Bottom" Height="3" Background="#2196F3" Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}"/>
+                                        <Border
+                                            Height="3"
+                                            VerticalAlignment="Bottom"
+                                            Background="#2196F3"
+                                            Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}" />
                                     </Grid>
                                 </RadioButton>
-                                <RadioButton x:Name="FilterCancelled" MinWidth="100" Height="45" Click="StatusFilter_Click" GroupName="StatusFilter" Style="{StaticResource Btn.Tab}">
+                                <RadioButton
+                                    x:Name="FilterCancelled"
+                                    Height="45"
+                                    MinWidth="100"
+                                    Click="StatusFilter_Click"
+                                    GroupName="StatusFilter"
+                                    Style="{StaticResource Btn.Tab}">
                                     <Grid>
                                         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                            <materialDesign:PackIcon Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="{StaticResource ErrorBrush}" Kind="CloseCircleOutline" />
-                                            <TextBlock x:Name="ChipCancelled" VerticalAlignment="Center" FontSize="13" Text="ملغاة" />
+                                            <materialDesign:PackIcon
+                                                Width="16"
+                                                Height="16"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Center"
+                                                Foreground="{StaticResource ErrorBrush}"
+                                                Kind="CloseCircleOutline" />
+                                            <TextBlock
+                                                x:Name="ChipCancelled"
+                                                VerticalAlignment="Center"
+                                                FontSize="13"
+                                                Text="ملغاة" />
                                         </StackPanel>
-                                        <Border VerticalAlignment="Bottom" Height="3" Background="{StaticResource ErrorBrush}" Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}"/>
+                                        <Border
+                                            Height="3"
+                                            VerticalAlignment="Bottom"
+                                            Background="{StaticResource ErrorBrush}"
+                                            Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}" />
                                     </Grid>
                                 </RadioButton>
                             </StackPanel>
                         </ScrollViewer>
                     </Border>
 
-                    <!-- منطقة الشرائح النشطة (Filter Chips) -->
-                    <StackPanel x:Name="PnlActiveChips" Grid.Row="1" Margin="16,8" Orientation="Horizontal" Visibility="Collapsed">
-                        <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12" Foreground="{StaticResource TextHintBrush}" Text="الفلاتر النشطة:" />
+                    <!--  منطقة الشرائح النشطة (Filter Chips)  -->
+                    <StackPanel
+                        x:Name="PnlActiveChips"
+                        Grid.Row="1"
+                        Margin="16,8"
+                        Orientation="Horizontal"
+                        Visibility="Collapsed">
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{StaticResource TextHintBrush}"
+                            Text="الفلاتر النشطة:" />
                         <ItemsControl x:Name="ItemsActiveChips">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -337,7 +659,11 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <materialDesign:Chip Content="{Binding Label}" IsDeletable="True" DeleteClick="Chip_DeleteClick" Margin="0,0,8,0" />
+                                    <materialDesign:Chip
+                                        Margin="0,0,8,0"
+                                        Content="{Binding Label}"
+                                        DeleteClick="Chip_DeleteClick"
+                                        IsDeletable="True" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -346,7 +672,7 @@
             </Grid>
         </Border>
 
-        <!--  ═══════ 4. منطقة المحتوى — ثلاثة أنماط عرض ═══════  -->
+        <!--  ═══════ 4. منطقة المحتوى — ثلاثة أنماط عرض + شريط العمليات المجمعة ═══════  -->
         <Grid Grid.Row="2" Margin="24,0,24,24">
 
             <!--
@@ -426,30 +752,36 @@
                                                 </StackPanel>
                                             </Button>
                                             <Button
-                                                Height="34"
                                                 Width="34"
+                                                Height="34"
                                                 Margin="4,0"
                                                 Padding="0"
+                                                AutomationProperties.Name="نشر رقمي"
                                                 Background="{StaticResource SuccessBrush}"
                                                 Click="BtnMarkPublished_Click"
                                                 Style="{StaticResource Btn.Primary}"
                                                 ToolTip="نشر رقمي"
-                                                AutomationProperties.Name="نشر رقمي"
                                                 Visibility="{Binding CanMarkPublished, Converter={StaticResource BoolToVisConverter}}">
-                                                <materialDesign:PackIcon Width="18" Height="18" Kind="CloudUploadOutline" />
+                                                <materialDesign:PackIcon
+                                                    Width="18"
+                                                    Height="18"
+                                                    Kind="CloudUploadOutline" />
                                             </Button>
                                             <Button
-                                                Height="34"
                                                 Width="34"
+                                                Height="34"
                                                 Margin="4,0"
                                                 Padding="0"
+                                                AutomationProperties.Name="نشر على الموقع"
                                                 Background="#2196F3"
                                                 Click="BtnToggleWebsitePublish_Click"
                                                 Style="{StaticResource Btn.Primary}"
                                                 ToolTip="نشر على الموقع"
-                                                AutomationProperties.Name="نشر على الموقع"
                                                 Visibility="{Binding CanToggleWebsitePublish, Converter={StaticResource BoolToVisConverter}}">
-                                                <materialDesign:PackIcon Width="18" Height="18" Kind="Web" />
+                                                <materialDesign:PackIcon
+                                                    Width="18"
+                                                    Height="18"
+                                                    Kind="Web" />
                                             </Button>
                                             <Border
                                                 Width="1"
@@ -638,6 +970,7 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Border
                                                 Padding="25,6"
@@ -703,6 +1036,19 @@
                                                     </StackPanel>
                                                 </Border>
                                             </StackPanel>
+                                            <!--  CheckBox التحديد المتعدد  -->
+                                            <CheckBox
+                                                Grid.Column="3"
+                                                Width="20"
+                                                Height="20"
+                                                Margin="8,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Checked="ItemCheckBox_CheckedChanged"
+                                                IsChecked="{Binding IsSelected}"
+                                                Style="{StaticResource MaterialDesignCheckBox}"
+                                                ToolTip="تحديد للإجراءات المجمعة"
+                                                Unchecked="ItemCheckBox_CheckedChanged" />
+
                                             <!--  Status Chip (Border based for better radius/gradients)  -->
                                             <Border
                                                 Grid.Column="2"
@@ -970,6 +1316,36 @@
                 Visibility="Collapsed">
 
                 <DataGrid.Columns>
+                    <!--  عمود التحديد المتعدد  -->
+                    <DataGridTemplateColumn
+                        Width="36"
+                        CanUserReorder="False"
+                        CanUserSort="False"
+                        HeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}">
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    x:Name="SelectAllCheckbox"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Checked="SelectAllCheckbox_Checked"
+                                    Style="{StaticResource MaterialDesignCheckBox}"
+                                    Unchecked="SelectAllCheckbox_Unchecked" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Checked="ItemCheckBox_CheckedChanged"
+                                    IsChecked="{Binding IsSelected}"
+                                    Style="{StaticResource MaterialDesignCheckBox}"
+                                    Unchecked="ItemCheckBox_CheckedChanged" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                     <!--  شريط الحالة  -->
                     <DataGridTemplateColumn
                         Width="12"
@@ -1148,7 +1524,11 @@
                         Header="الإجراءات">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel x:Name="ActionsPanel" VerticalAlignment="Center" Orientation="Horizontal" Visibility="Hidden">
+                                <StackPanel
+                                    x:Name="ActionsPanel"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Visibility="Hidden">
                                     <Button
                                         Height="28"
                                         Padding="10,0"
@@ -1392,6 +1772,8 @@
                             </Border.Style>
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="32" />
+                                    <!--  checkbox  -->
                                     <ColumnDefinition Width="8" />
                                     <!--  status dot  -->
                                     <ColumnDefinition Width="2*" />
@@ -1407,6 +1789,16 @@
                                     <ColumnDefinition Width="1.5*" />
                                     <!--  actions  -->
                                 </Grid.ColumnDefinitions>
+
+                                <!--  CheckBox التحديد المتعدد  -->
+                                <CheckBox
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Checked="ItemCheckBox_CheckedChanged"
+                                    IsChecked="{Binding IsSelected}"
+                                    Style="{StaticResource MaterialDesignCheckBox}"
+                                    Unchecked="ItemCheckBox_CheckedChanged" />
 
                                 <!--  نقطة الحالة  -->
                                 <Border
@@ -1749,20 +2141,187 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <!-- حالات التحميل والفراغ -->
-            <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="Transparent" Panel.ZIndex="10">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Value="0" IsIndeterminate="True" Width="48" Height="48" Foreground="{StaticResource PrimaryMainBrush}"/>
-                    <TextBlock Text="جاري جلب الحلقات..." Margin="0,16,0,0" FontSize="16" FontWeight="Medium" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+            <!--  شريط العمليات المجمعة (Batch Action Bar)  -->
+            <Border
+                x:Name="BatchActionBar"
+                Height="56"
+                Padding="16,0"
+                VerticalAlignment="Bottom"
+                Panel.ZIndex="20"
+                Background="{StaticResource PrimaryDarkBrush}"
+                CornerRadius="12,12,0,0"
+                Visibility="Collapsed">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="12" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            x:Name="TxtSelectedCount"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Text="0 محددة" />
+                        <Button
+                            Margin="12,0,0,0"
+                            Padding="8,2"
+                            VerticalAlignment="Center"
+                            Click="BtnDeselectAll_Click"
+                            Content="إلغاء التحديد"
+                            FontSize="11"
+                            Foreground="{StaticResource TextOnPrimaryBrush}"
+                            Style="{StaticResource MaterialDesignFlatButton}" />
+                    </StackPanel>
+
+                    <Button
+                        x:Name="BtnBatchExecuted"
+                        Grid.Column="2"
+                        Height="36"
+                        Margin="0,0,8,0"
+                        Padding="12,0"
+                        Click="BtnBatchExecuted_Click"
+                        FontSize="12"
+                        Style="{StaticResource Btn.Primary}"
+                        ToolTip="تنفيذ الحلقات المحددة"
+                        Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="16"
+                                Height="16"
+                                Kind="PlayCircleOutline" />
+                            <TextBlock Margin="6,0,0,0" Text="تنفيذ" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="BtnBatchPublished"
+                        Grid.Column="3"
+                        Height="36"
+                        Margin="0,0,8,0"
+                        Padding="12,0"
+                        Click="BtnBatchPublished_Click"
+                        FontSize="12"
+                        Style="{StaticResource Btn.Primary}"
+                        ToolTip="نشر رقمي"
+                        Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="16"
+                                Height="16"
+                                Kind="CloudUploadOutline" />
+                            <TextBlock Margin="6,0,0,0" Text="نشر" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="BtnBatchCancel"
+                        Grid.Column="5"
+                        Height="36"
+                        Margin="0,0,8,0"
+                        Padding="12,0"
+                        Click="BtnBatchCancel_Click"
+                        FontSize="12"
+                        Style="{StaticResource Btn.Primary}"
+                        ToolTip="إلغاء الحلقات المحددة"
+                        Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="16"
+                                Height="16"
+                                Kind="CloseCircleOutline" />
+                            <TextBlock Margin="6,0,0,0" Text="إلغاء" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="BtnBatchDelete"
+                        Grid.Column="8"
+                        Height="36"
+                        Margin="0,0,8,0"
+                        Padding="12,0"
+                        Click="BtnBatchDelete_Click"
+                        FontSize="12"
+                        Style="{StaticResource Btn.Primary}"
+                        ToolTip="حذف الحلقات المحددة"
+                        Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="16"
+                                Height="16"
+                                Kind="DeleteOutline" />
+                            <TextBlock Margin="6,0,0,0" Text="حذف" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!--  حالات التحميل والفراغ  -->
+            <Grid
+                x:Name="LoadingOverlay"
+                Panel.ZIndex="10"
+                Background="Transparent"
+                Visibility="Collapsed">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ProgressBar
+                        Width="48"
+                        Height="48"
+                        Foreground="{StaticResource PrimaryMainBrush}"
+                        IsIndeterminate="True"
+                        Style="{StaticResource MaterialDesignCircularProgressBar}"
+                        Value="0" />
+                    <TextBlock
+                        Margin="0,16,0,0"
+                        HorizontalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource TextSecondaryBrush}"
+                        Text="جاري جلب الحلقات..." />
                 </StackPanel>
             </Grid>
 
-            <Grid x:Name="EmptyStateOverlay" Visibility="Collapsed" Background="Transparent" Panel.ZIndex="10">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <materialDesign:PackIcon Kind="TextBoxSearchOutline" Width="80" Height="80" Foreground="{StaticResource DividerBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="لا توجد حلقات مطابقة" Margin="0,16,0,4" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="حاول تغيير الفلاتر أو كلمات البحث" Margin="0,0,0,16" FontSize="14" Foreground="{StaticResource TextHintBrush}" HorizontalAlignment="Center"/>
-                    <Button Content="جدولة حلقة جديدة" Style="{StaticResource Btn.Ghost}" Click="BtnAddEpisode_Click" HorizontalAlignment="Center"/>
+            <Grid
+                x:Name="EmptyStateOverlay"
+                Panel.ZIndex="10"
+                Background="Transparent"
+                Visibility="Collapsed">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <materialDesign:PackIcon
+                        Width="80"
+                        Height="80"
+                        HorizontalAlignment="Center"
+                        Foreground="{StaticResource DividerBrush}"
+                        Kind="TextBoxSearchOutline" />
+                    <TextBlock
+                        Margin="0,16,0,4"
+                        HorizontalAlignment="Center"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource TextSecondaryBrush}"
+                        Text="لا توجد حلقات مطابقة" />
+                    <TextBlock
+                        Margin="0,0,0,16"
+                        HorizontalAlignment="Center"
+                        FontSize="14"
+                        Foreground="{StaticResource TextHintBrush}"
+                        Text="حاول تغيير الفلاتر أو كلمات البحث" />
+                    <Button
+                        HorizontalAlignment="Center"
+                        Click="BtnAddEpisode_Click"
+                        Content="جدولة حلقة جديدة"
+                        Style="{StaticResource Btn.Ghost}" />
                 </StackPanel>
             </Grid>
 
