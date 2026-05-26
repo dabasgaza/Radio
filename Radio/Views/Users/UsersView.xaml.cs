@@ -2,6 +2,7 @@ using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -71,7 +72,10 @@ namespace Radio.Views.Users
                 var dialog = new UserFormDialog(null, _userService, _session);
                 dialog.Owner = mainWindow;
                 if (dialog.ShowDialog() == true)
+                {
+                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المستخدم"));
                     await LoadDataAsync();
+                }
             }
             finally
             {
@@ -95,7 +99,10 @@ namespace Radio.Views.Users
                 var dialog = new UserFormDialog(user, _userService, _session);
                 dialog.Owner = mainWindow;
                 if (dialog.ShowDialog() == true)
+                {
+                    MessageService.Current.ShowSuccess(Messages.Updated("المستخدم", user.FullName));
                     await LoadDataAsync();
+                }
             }
             finally
             {
@@ -125,8 +132,8 @@ namespace Radio.Views.Users
                 {
                     MessageService.Current.ShowSuccess(
                         newStatus
-                            ? $"تم تفعيل حساب المستخدم «{user.FullName}» بنجاح."
-                            : $"تم تعطيل حساب المستخدم «{user.FullName}» بنجاح.");
+                            ? Messages.ActionedWithName("تفعيل", "المستخدم", user.FullName)
+                            : Messages.ActionedWithName("تعطيل", "المستخدم", user.FullName));
                 }
                 else
                 {
@@ -181,7 +188,7 @@ namespace Radio.Views.Users
                     if (result.IsSuccess)
                     {
                         await LoadDataAsync();
-                        MessageService.Current.ShowSuccess($"تم حذف المستخدم «{user.FullName}» بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.Deleted("المستخدم", user.FullName));
                     }
                     else
                     {

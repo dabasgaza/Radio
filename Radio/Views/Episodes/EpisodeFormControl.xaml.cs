@@ -7,6 +7,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using MahApps.Metro.Controls;
+using Radio.Messaging;
 
 namespace Radio.Views.Episodes
 {
@@ -40,6 +41,8 @@ namespace Radio.Views.Episodes
             int? episodeId = null)
         {
             InitializeComponent();
+            Loaded += (_, _) => NotificationManager.RegisterHost(NotificationHost);
+            Unloaded += (_, _) => NotificationManager.RegisterHost(null!);
             _episodeService = episodeService;
             _programService = programService;
             _guestService = guestService;

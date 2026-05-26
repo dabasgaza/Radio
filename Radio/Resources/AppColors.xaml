@@ -17,69 +17,69 @@
         ═══════════════════════════════════════════════════════════
     -->
 
-    <!--  Primary — Indigo  -->
-    <Color x:Key="Primary900Color">#0D0D4F</Color>
-    <Color x:Key="Primary800Color">#1A237E</Color>
-    <Color x:Key="Primary700Color">#283593</Color>
-    <Color x:Key="Primary600Color">#303F9F</Color>
-    <Color x:Key="Primary500Color">#3F51B5</Color>
-    <Color x:Key="Primary400Color">#5C6BC0</Color>
-    <Color x:Key="Primary300Color">#7986CB</Color>
-    <Color x:Key="Primary200Color">#9FA8DA</Color>
-    <Color x:Key="Primary100Color">#C5CAE9</Color>
-    <Color x:Key="Primary50Color">#E8EAF6</Color>
+    <!--  Primary — Indigo (Modern Premium Indigo)  -->
+    <Color x:Key="Primary900Color">#1E1B4B</Color>
+    <Color x:Key="Primary800Color">#312E81</Color>
+    <Color x:Key="Primary700Color">#3730A3</Color>
+    <Color x:Key="Primary600Color">#4F46E5</Color>
+    <Color x:Key="Primary500Color">#6366F1</Color>
+    <Color x:Key="Primary400Color">#818CF8</Color>
+    <Color x:Key="Primary300Color">#A5B4FC</Color>
+    <Color x:Key="Primary200Color">#C7D2FE</Color>
+    <Color x:Key="Primary100Color">#E0E7FF</Color>
+    <Color x:Key="Primary50Color">#EEF2F6</Color>
 
-    <!--  Secondary — Light Blue  -->
-    <Color x:Key="Secondary700Color">#0277BD</Color>
-    <Color x:Key="Secondary500Color">#03A9F4</Color>
-    <Color x:Key="Secondary300Color">#4FC3F7</Color>
-    <Color x:Key="Secondary100Color">#B3E5FC</Color>
-    <Color x:Key="Secondary50Color">#E1F5FE</Color>
+    <!--  Secondary — Teal/Cyan (Modern Premium Secondary)  -->
+    <Color x:Key="Secondary700Color">#0F766E</Color>
+    <Color x:Key="Secondary500Color">#14B8A6</Color>
+    <Color x:Key="Secondary300Color">#5EEAD4</Color>
+    <Color x:Key="Secondary100Color">#CCFBF1</Color>
+    <Color x:Key="Secondary50Color">#F0FDFA</Color>
 
-    <!--  Neutral — Grey Scale  -->
-    <Color x:Key="Neutral900Color">#212121</Color>
-    <Color x:Key="Neutral800Color">#424242</Color>
-    <Color x:Key="Neutral700Color">#616161</Color>
-    <Color x:Key="Neutral600Color">#757575</Color>
-    <Color x:Key="Neutral400Color">#BDBDBD</Color>
-    <Color x:Key="Neutral300Color">#E0E0E0</Color>
-    <Color x:Key="Neutral200Color">#EEEEEE</Color>
-    <Color x:Key="Neutral100Color">#F5F5F5</Color>
-    <Color x:Key="Neutral50Color">#FAFAFA</Color>
+    <!--  Neutral — Grey Scale (Slate Grey)  -->
+    <Color x:Key="Neutral900Color">#0F172A</Color>
+    <Color x:Key="Neutral800Color">#1E293B</Color>
+    <Color x:Key="Neutral700Color">#334155</Color>
+    <Color x:Key="Neutral600Color">#475569</Color>
+    <Color x:Key="Neutral400Color">#94A3B8</Color>
+    <Color x:Key="Neutral300Color">#CBD5E1</Color>
+    <Color x:Key="Neutral200Color">#E2E8F0</Color>
+    <Color x:Key="Neutral100Color">#F1F5F9</Color>
+    <Color x:Key="Neutral50Color">#F8FAFC</Color>
 
     <!--  Surface / Background  -->
     <Color x:Key="SurfaceColor">#FFFFFF</Color>
-    <Color x:Key="SurfaceVariantColor">#F8F9FF</Color>
-    <Color x:Key="BackgroundColor">#F4F6FB</Color>
+    <Color x:Key="SurfaceVariantColor">#F1F5F9</Color>
+    <Color x:Key="BackgroundColor">#F8FAFC</Color>
 
     <!--
         ═══════════════════════════════════════════════════════════
-        2. SEMANTIC COLORS — ألوان الحالة والمعنى
+        2. SEMANTIC COLORS — ألوان الحالة والمعنى (MD3 Style)
         ═══════════════════════════════════════════════════════════
     -->
 
-    <!--  Success — Green  -->
-    <Color x:Key="SuccessColor">#2E7D32</Color>
-    <Color x:Key="SuccessLightColor">#E8F5E9</Color>
-    <Color x:Key="SuccessDarkColor">#1B5E20</Color>
+    <!--  Success — Emerald Green  -->
+    <Color x:Key="SuccessColor">#10B981</Color>
+    <Color x:Key="SuccessLightColor">#ECFDF5</Color>
+    <Color x:Key="SuccessDarkColor">#065F46</Color>
 
-    <!--  Warning — Amber  -->
-    <Color x:Key="WarningColor">#F57F17</Color>
-    <Color x:Key="WarningLightColor">#FFFDE7</Color>
-    <Color x:Key="WarningDarkColor">#E65100</Color>
+    <!--  Warning — Amber/Orange  -->
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="WarningLightColor">#FFFBEB</Color>
+    <Color x:Key="WarningDarkColor">#92400E</Color>
 
-    <!--  Error — Red  -->
-    <Color x:Key="ErrorColor">#C62828</Color>
-    <Color x:Key="ErrorLightColor">#FFEBEE</Color>
-    <Color x:Key="ErrorDarkColor">#B71C1C</Color>
+    <!--  Error — Rose Red  -->
+    <Color x:Key="ErrorColor">#EF4444</Color>
+    <Color x:Key="ErrorLightColor">#FEF2F2</Color>
+    <Color x:Key="ErrorDarkColor">#991B1B</Color>
 
-    <!--  Info — Blue  -->
-    <Color x:Key="InfoColor">#0277BD</Color>
-    <Color x:Key="InfoLightColor">#E1F5FE</Color>
+    <!--  Info — Sky Blue  -->
+    <Color x:Key="InfoColor">#0EA5E9</Color>
+    <Color x:Key="InfoLightColor">#F0F9FF</Color>
 
     <!--  On-Air — Live Broadcast Red  -->
-    <Color x:Key="OnAirColor">#D32F2F</Color>
-    <Color x:Key="OnAirGlowColor">#FF5252</Color>
+    <Color x:Key="OnAirColor">#F43F5E</Color>
+    <Color x:Key="OnAirGlowColor">#FDA4AF</Color>
 
     <!--
         ═══════════════════════════════════════════════════════════
@@ -119,8 +119,8 @@
     <SolidColorBrush x:Key="DividerBrush" Color="{StaticResource Neutral200Color}" />
 
     <!--  State Brushes  -->
-    <SolidColorBrush x:Key="HoverOverlayBrush" Color="#0F3F51B5" />
-    <SolidColorBrush x:Key="PressedOverlayBrush" Color="#1F3F51B5" />
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="#0F6366F1" />
+    <SolidColorBrush x:Key="PressedOverlayBrush" Color="#1F6366F1" />
     <SolidColorBrush x:Key="SelectedBrush" Color="{StaticResource Primary50Color}" />
     <SolidColorBrush x:Key="FocusRingBrush" Color="{StaticResource Primary400Color}" />
 
@@ -140,9 +140,9 @@
 
 
     <!--  Row State Brushes (للجداول)  -->
-    <SolidColorBrush x:Key="RowAlternateBrush" Color="#F4F6FB" />
+    <SolidColorBrush x:Key="RowAlternateBrush" Color="#F8FAFC" />
     <!--  خلفية صفوف متناوبة خفيفة جداً  -->
-    <SolidColorBrush x:Key="RowHoverBrush" Color="#E8EAF6" />
+    <SolidColorBrush x:Key="RowHoverBrush" Color="#EEF2F6" />
     <!--  خلفية عند تمرير الماوس (نفس Primary50 تقريباً)  -->
 
     <SolidColorBrush x:Key="Neutral50Brush" Color="{StaticResource Neutral50Color}" />
@@ -250,11 +250,11 @@
         ═══════════════════════════════════════════════════════════
     -->
 
-    <CornerRadius x:Key="RadiusSmall">4</CornerRadius>
-    <CornerRadius x:Key="RadiusMedium">8</CornerRadius>
-    <CornerRadius x:Key="RadiusLarge">12</CornerRadius>
-    <CornerRadius x:Key="RadiusXLarge">16</CornerRadius>
-    <CornerRadius x:Key="RadiusFull">24</CornerRadius>
+    <CornerRadius x:Key="RadiusSmall">8</CornerRadius>
+    <CornerRadius x:Key="RadiusMedium">12</CornerRadius>
+    <CornerRadius x:Key="RadiusLarge">16</CornerRadius>
+    <CornerRadius x:Key="RadiusXLarge">24</CornerRadius>
+    <CornerRadius x:Key="RadiusFull">32</CornerRadius>
 
     <Thickness x:Key="SpacingXSmall">4</Thickness>
     <Thickness x:Key="SpacingSmall">8</Thickness>

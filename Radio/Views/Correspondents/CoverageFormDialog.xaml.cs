@@ -123,11 +123,6 @@ namespace Radio.Views.Correspondents
 
                 if (result.IsSuccess)
                 {
-                    MessageService.Current.ShowSuccess(
-                        _existingCoverage is null
-                            ? "تمت إضافة التغطية الميدانية بنجاح."
-                            : "تم تعديل بيانات التغطية الميدانية بنجاح.");
-
                     DialogResult = true;
                 }
                 else

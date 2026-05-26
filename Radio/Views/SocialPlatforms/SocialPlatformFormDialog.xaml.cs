@@ -55,11 +55,6 @@ public partial class SocialPlatformFormDialog
 
             if (result.IsSuccess)
             {
-                MessageService.Current.ShowSuccess(
-                    _existingPlatform is null
-                        ? "تمت إضافة المنصة بنجاح."
-                        : "تم تحديث المنصة بنجاح.");
-
                 DialogResult = true;
             }
             else

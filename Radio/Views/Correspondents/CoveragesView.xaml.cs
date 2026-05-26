@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -72,7 +73,10 @@ namespace Radio.Views.Correspondents
                 _session);
 
             if (dialog.ShowDialog() == true)
+            {
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "التغطية الميدانية"));
                 await LoadDataAsync();
+            }
         }
 
         /// <summary>
@@ -90,7 +94,10 @@ namespace Radio.Views.Correspondents
                 _session, dto);
 
             if (dialog.ShowDialog() == true)
+            {
+                MessageService.Current.ShowSuccess(Messages.Updated("التغطية الميدانية", dto.Topic));
                 await LoadDataAsync();
+            }
         }
 
         /// <summary>
@@ -114,7 +121,7 @@ namespace Radio.Views.Correspondents
                 if (result.IsSuccess)
                 {
                     await LoadDataAsync();
-                    MessageService.Current.ShowSuccess($"تم حذف تغطية «{dto.CorrespondentName}» بنجاح.");
+                    MessageService.Current.ShowSuccess(Messages.Deleted("التغطية", dto.Topic));
                 }
                 else
                 {

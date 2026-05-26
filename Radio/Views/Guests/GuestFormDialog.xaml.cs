@@ -76,11 +76,6 @@ namespace Radio.Views.Guests
 
                 if (result.IsSuccess)
                 {
-                    MessageService.Current.ShowSuccess(
-                        _existingGuest is null
-                            ? "تمت إضافة الضيف بنجاح."
-                            : "تم تعديل بيانات الضيف بنجاح.");
-
                     DialogResult = true;
                 }
                 else
@@ -104,7 +99,6 @@ namespace Radio.Views.Guests
 
                         if (retryResult.IsSuccess)
                         {
-                            MessageService.Current.ShowSuccess("تم الحفظ بنجاح بعد حل تعارض البيانات.");
                             DialogResult = true;
                         }
                         else

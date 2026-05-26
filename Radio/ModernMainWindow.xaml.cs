@@ -54,8 +54,7 @@ namespace Radio
             _navigationService.ViewChanged += OnViewChanged;
 
             InitializeComponent();
-            
-            Loaded += (_, _) => NotificationManager.RegisterHost(NotificationHost);
+            NotificationManager.RegisterHost(NotificationHost);
 
             InitializeUI();
             InitializeOnAirWidget();

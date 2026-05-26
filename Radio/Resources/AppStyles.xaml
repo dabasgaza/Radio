@@ -42,7 +42,7 @@
         TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="4" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="12" />
         <Setter Property="Height" Value="40" />
     </Style>
 

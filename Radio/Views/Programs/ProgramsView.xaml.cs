@@ -2,6 +2,7 @@ using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
@@ -93,7 +94,10 @@ namespace Radio.Views.Programs
                 var view = new ProgramFormControl(null, _programService, _session);
                 var result = await DialogHost.Show(view);
                 if (result is true)
+                {
+                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "البرنامج"));
                     await LoadDataAsync();
+                }
             }
             catch (Exception)
             {
@@ -121,7 +125,10 @@ namespace Radio.Views.Programs
                 var view = new ProgramFormControl(prog, _programService, _session);
                 var result = await DialogHost.Show(view);
                 if (result is true)
+                {
+                    MessageService.Current.ShowSuccess(Messages.Updated("البرنامج", prog.ProgramName));
                     await LoadDataAsync();
+                }
             }
             catch (Exception)
             {
@@ -155,7 +162,7 @@ namespace Radio.Views.Programs
                 if (result.IsSuccess)
                 {
                     await LoadDataAsync();
-                    MessageService.Current.ShowSuccess($"تم حذف البرنامج «{prog.ProgramName}» بنجاح.");
+                    MessageService.Current.ShowSuccess(Messages.Deleted("البرنامج", prog.ProgramName));
                 }
                 else
                 {

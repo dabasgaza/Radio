@@ -2,6 +2,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Radio.Messaging;
 using Radio.Views.Publishing;
 using System.Windows;
 
@@ -187,7 +188,7 @@ namespace Radio.Views.Episodes
 
                 if (dialog.ShowDialog() == true)
                 {
-                    MessageService.Current.ShowSuccess("تم تعديل سجل التنفيذ بنجاح.");
+                    MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل سجل التنفيذ لـ", "الحلقة", _episodeName));
                     await LoadRecordsAsync();
                 }
             }
@@ -219,7 +220,7 @@ namespace Radio.Views.Episodes
 
                 if (dialog.ShowDialog() == true)
                 {
-                    MessageService.Current.ShowSuccess("تم تعديل بيانات النشر الرقمي بنجاح.");
+                    MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات النشر الرقمي لـ", "الحلقة", _episodeName));
                     await LoadRecordsAsync();
                 }
             }
@@ -250,7 +251,7 @@ namespace Radio.Views.Episodes
 
                 if (dialog.ShowDialog() == true)
                 {
-                    MessageService.Current.ShowSuccess("تم تعديل بيانات نشر الموقع بنجاح.");
+                    MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات نشر الموقع لـ", "الحلقة", _episodeName));
                     await LoadRecordsAsync();
                 }
             }

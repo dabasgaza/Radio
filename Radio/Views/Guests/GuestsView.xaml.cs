@@ -2,6 +2,7 @@ using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -96,7 +97,10 @@ namespace Radio.Views.Guests
                     Owner = mainWindow
                 };
                 if (dialog.ShowDialog() == true)
+                {
+                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الضيف"));
                     await LoadDataAsync();
+                }
             }
             finally
             {
@@ -123,7 +127,10 @@ namespace Radio.Views.Guests
                     Owner = mainWindow
                 };
                 if (dialog.ShowDialog() == true)
+                {
+                    MessageService.Current.ShowSuccess(Messages.Updated("الضيف", guest.FullName));
                     await LoadDataAsync();
+                }
             }
             finally
             {
@@ -153,7 +160,7 @@ namespace Radio.Views.Guests
                 if (result.IsSuccess)
                 {
                     await LoadDataAsync();
-                    MessageService.Current.ShowSuccess($"تم حذف الضيف «{guest.FullName}» بنجاح.");
+                    MessageService.Current.ShowSuccess(Messages.Deleted("الضيف", guest.FullName));
                 }
                 else
                 {

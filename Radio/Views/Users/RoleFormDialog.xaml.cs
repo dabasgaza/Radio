@@ -53,7 +53,6 @@ namespace Radio.Views.Users
                 if (result.IsSuccess)
                 {
                     IsSaved = true;
-                    MessageService.Current.ShowSuccess("تم حفظ الدور بنجاح");
                     Close();
                 }
                 else

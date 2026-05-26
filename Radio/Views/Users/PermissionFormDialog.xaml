@@ -11,10 +11,13 @@
     Style="{StaticResource Window.Dialog}"
     WindowStartupLocation="CenterOwner">
 
-    <materialDesign:Card Margin="25" UniformCornerRadius="24" 
-                         materialDesign:ElevationAssist.Elevation="Dp8"
-                         Effect="{StaticResource Shadow.Dialog}"
-                         BorderThickness="1" BorderBrush="{StaticResource DividerBrush}">
+    <materialDesign:Card
+        Margin="25"
+        materialDesign:ElevationAssist.Elevation="Dp8"
+        BorderBrush="{StaticResource DividerBrush}"
+        BorderThickness="1"
+        Effect="{StaticResource Shadow.Dialog}"
+        UniformCornerRadius="24">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -45,14 +48,18 @@
                             Text="إضافة صلاحية نظام جديدة" />
                     </StackPanel>
 
-                    <Button Grid.Column="1"
-                            Click="BtnCancel_Click"
-                            Padding="0"
-                            Width="32"
-                            Height="32"
-                            Style="{StaticResource MaterialDesignFlatButton}"
-                            Foreground="White">
-                        <materialDesign:PackIcon Kind="Close" Width="24" Height="24" />
+                    <Button
+                        Grid.Column="1"
+                        Width="32"
+                        Height="32"
+                        Padding="0"
+                        Click="BtnCancel_Click"
+                        Foreground="White"
+                        Style="{StaticResource MaterialDesignFlatButton}">
+                        <materialDesign:PackIcon
+                            Width="24"
+                            Height="24"
+                            Kind="Close" />
                     </Button>
                 </Grid>
             </Border>

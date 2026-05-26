@@ -2,6 +2,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Radio.Messaging;
 using Radio.Views.Publishing;
 using System.Windows;
 using System.Windows.Controls;
@@ -222,12 +223,14 @@ namespace Radio.Views.Episodes
 
             // إذا تم الحفظ بنجاح، نعيد تحميل البيانات
             if (dialog.ShowDialog() == true)
+            {
+                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل سجل التنفيذ لـ", "الحلقة", record.EpisodeName ?? ""));
                 await LoadDataAsync();
+            }
         }
 
         /// <summary>
         /// فتح نافذة تعديل سجل النشر الرقمي
-        /// يحتاج لاسترجاع قائمة الضيوف + سجلات النشر للحلقة ثم يفتح PublishingLogDialog
         /// </summary>
         private async Task OpenSocialEditDialog(PublishingRecordDto record, Window? ownerWindow)
         {
@@ -251,12 +254,14 @@ namespace Radio.Views.Episodes
             };
 
             if (dialog.ShowDialog() == true)
+            {
+                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات النشر الرقمي لـ", "الحلقة", record.EpisodeName ?? ""));
                 await LoadDataAsync();
+            }
         }
 
         /// <summary>
         /// فتح نافذة تعديل سجل نشر الموقع الإلكتروني
-        /// يحمل بيانات السجل من الخدمة ثم يفتح WebsitePublishDialog في وضع التعديل
         /// </summary>
         private async Task OpenWebsiteEditDialog(PublishingRecordDto record, Window? ownerWindow)
         {
@@ -275,7 +280,10 @@ namespace Radio.Views.Episodes
             };
 
             if (dialog.ShowDialog() == true)
+            {
+                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات نشر الموقع لـ", "الحلقة", record.EpisodeName ?? ""));
                 await LoadDataAsync();
+            }
         }
 
         // ═══════════════════════════════════════════

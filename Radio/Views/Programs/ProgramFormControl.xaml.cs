@@ -58,11 +58,6 @@ namespace Radio.Views.Programs
 
                 if (result.IsSuccess)
                 {
-                    MessageService.Current.ShowSuccess(
-                        _originalDto is null
-                            ? "تم إضافة البرنامج بنجاح."
-                            : "تم تعديل البرنامج بنجاح.");
-
                     // إغلاق الـ DialogHost مع إرجاع true للنافذة الأب
                     DialogHost.Close(null, true);
                 }

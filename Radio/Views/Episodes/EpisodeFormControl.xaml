@@ -97,15 +97,15 @@
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="0,12,0,0">
-                            <!-- شريط لوني علوي -->
+                            <!--  شريط لوني علوي  -->
                             <Border
                                 Height="3"
                                 Margin="0,0,0,16"
+                                HorizontalAlignment="Stretch"
                                 Background="{StaticResource PrimaryMainBrush}"
-                                CornerRadius="2"
-                                HorizontalAlignment="Stretch" />
+                                CornerRadius="2" />
 
-                            <!-- برنامج + عنوان الحلقة — صف مزدوج -->
+                            <!--  برنامج + عنوان الحلقة — صف مزدوج  -->
                             <Grid Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -130,7 +130,7 @@
                                     Style="{StaticResource Input.Text}" />
                             </Grid>
 
-                            <!-- تاريخ البث + وقت الانطلاق — صف مزدوج -->
+                            <!--  تاريخ البث + وقت الانطلاق — صف مزدوج  -->
                             <Grid Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -155,7 +155,7 @@
                                     Style="{StaticResource Input.TimePicker}" />
                             </Grid>
 
-                            <!-- لوحة كشف التعارضات -->
+                            <!--  لوحة كشف التعارضات  -->
                             <Border
                                 x:Name="ConflictPanel"
                                 Margin="0,0,0,16"
@@ -220,15 +220,13 @@
                                                 Width="14"
                                                 Height="14"
                                                 Kind="FormatListBulleted" />
-                                            <TextBlock
-                                                Margin="6,0,0,0"
-                                                Text="التفاصيل" />
+                                            <TextBlock Margin="6,0,0,0" Text="التفاصيل" />
                                         </StackPanel>
                                     </Button>
                                 </Grid>
                             </Border>
 
-                            <!-- ملاحظات الإنتاج -->
+                            <!--  ملاحظات الإنتاج  -->
                             <TextBox
                                 x:Name="TxtSpecialNotes"
                                 materialDesign:HintAssist.Hint="ملاحظات الإنتاج والتوجيهات الخاصة"
@@ -258,15 +256,15 @@
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="0,12,0,0">
-                            <!-- شريط لوني علوي -->
+                            <!--  شريط لوني علوي  -->
                             <Border
                                 Height="3"
                                 Margin="0,0,0,20"
+                                HorizontalAlignment="Stretch"
                                 Background="{StaticResource SecondaryMainBrush}"
-                                CornerRadius="2"
-                                HorizontalAlignment="Stretch" />
+                                CornerRadius="2" />
 
-                            <!-- عنوان القسم + العداد -->
+                            <!--  عنوان القسم + العداد  -->
                             <Border
                                 Margin="0,0,0,16"
                                 Padding="14,10"
@@ -308,7 +306,7 @@
                                 </Grid>
                             </Border>
 
-                            <!-- شريط إضافة ضيف -->
+                            <!--  شريط إضافة ضيف  -->
                             <Border
                                 Margin="0,0,0,16"
                                 Padding="16,14"
@@ -362,7 +360,7 @@
                                 </Grid>
                             </Border>
 
-                            <!-- جدول الضيوف -->
+                            <!--  جدول الضيوف  -->
                             <DataGrid
                                 x:Name="DgGuests"
                                 CellStyle="{StaticResource DataGrid.Cell}"
@@ -425,15 +423,15 @@
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="0,12,0,0">
-                            <!-- شريط لوني علوي -->
+                            <!--  شريط لوني علوي  -->
                             <Border
                                 Height="3"
                                 Margin="0,0,0,20"
+                                HorizontalAlignment="Stretch"
                                 Background="{StaticResource WarningBrush}"
-                                CornerRadius="2"
-                                HorizontalAlignment="Stretch" />
+                                CornerRadius="2" />
 
-                            <!-- عنوان القسم + العداد -->
+                            <!--  عنوان القسم + العداد  -->
                             <Border
                                 Margin="0,0,0,16"
                                 Padding="14,10"
@@ -475,7 +473,7 @@
                                 </Grid>
                             </Border>
 
-                            <!-- شريط إضافة مراسل -->
+                            <!--  شريط إضافة مراسل  -->
                             <Border
                                 Margin="0,0,0,16"
                                 Padding="16,14"
@@ -529,7 +527,7 @@
                                 </Grid>
                             </Border>
 
-                            <!-- جدول المراسلين -->
+                            <!--  جدول المراسلين  -->
                             <DataGrid
                                 x:Name="DgCorrespondents"
                                 CellStyle="{StaticResource DataGrid.Cell}"
@@ -592,15 +590,15 @@
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="0,12,0,0">
-                            <!-- شريط لوني علوي -->
+                            <!--  شريط لوني علوي  -->
                             <Border
                                 Height="3"
                                 Margin="0,0,0,20"
+                                HorizontalAlignment="Stretch"
                                 Background="{StaticResource SuccessBrush}"
-                                CornerRadius="2"
-                                HorizontalAlignment="Stretch" />
+                                CornerRadius="2" />
 
-                            <!-- عنوان القسم + العداد -->
+                            <!--  عنوان القسم + العداد  -->
                             <Border
                                 Margin="0,0,0,16"
                                 Padding="14,10"
@@ -642,7 +640,7 @@
                                 </Grid>
                             </Border>
 
-                            <!-- شريط إضافة موظف -->
+                            <!--  شريط إضافة موظف  -->
                             <Border
                                 Margin="0,0,0,16"
                                 Padding="16,14"
@@ -678,7 +676,7 @@
                                 </Grid>
                             </Border>
 
-                            <!-- جدول طاقم التنفيذ -->
+                            <!--  جدول طاقم التنفيذ  -->
                             <DataGrid
                                 x:Name="DgEmployees"
                                 CellStyle="{StaticResource DataGrid.Cell}"
@@ -728,7 +726,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- مؤشر الحفظ التلقائي -->
+                    <!--  مؤشر الحفظ التلقائي  -->
                     <StackPanel
                         x:Name="PnlAutoSave"
                         Grid.Column="0"
@@ -750,7 +748,7 @@
                             Text="تم الحفظ تلقائياً" />
                     </StackPanel>
 
-                    <!-- أزرار الإجراءات -->
+                    <!--  أزرار الإجراءات  -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
                         <Button
                             Click="BtnCancel_Click"
@@ -778,6 +776,15 @@
                     </StackPanel>
                 </Grid>
             </Border>
+
+            <!--  حاوية الإشعارات  -->
+            <StackPanel
+                x:Name="NotificationHost"
+                Grid.RowSpan="3"
+                Margin="0,0,0,20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Panel.ZIndex="999" />
         </Grid>
     </materialDesign:Card>
 </mah:MetroWindow>

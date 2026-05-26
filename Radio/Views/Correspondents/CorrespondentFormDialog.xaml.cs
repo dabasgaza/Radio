@@ -68,11 +68,6 @@ namespace Radio.Views.Correspondents
 
                 if (result.IsSuccess)
                 {
-                    MessageService.Current.ShowSuccess(
-                        _existing is null
-                            ? "تمت إضافة المراسل بنجاح."
-                            : "تم تعديل بيانات المراسل بنجاح.");
-
                     DialogResult = true;
                 }
                 else

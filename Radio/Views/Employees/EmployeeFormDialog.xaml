@@ -33,10 +33,11 @@
                         Kind="AccountBadge" />
 
                     <StackPanel Grid.Column="1" Margin="16,0">
-                        <TextBlock x:Name="TxtTitle" 
-                                   Text="إدارة الموظفين"
-                                   Style="{StaticResource Type.TitleLarge.OnColor}" />
-                        
+                        <TextBlock
+                            x:Name="TxtTitle"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
+                            Text="إدارة الموظفين" />
+
                         <TextBlock Style="{StaticResource Type.BodyMedium.OnColor}" Text="أدخل البيانات الأساسية للموظف" />
                     </StackPanel>
 

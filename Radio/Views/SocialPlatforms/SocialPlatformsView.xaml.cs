@@ -1,6 +1,7 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -61,6 +62,7 @@ public partial class SocialPlatformsView : UserControl
             };
             if (dialog.ShowDialog() == true)
             {
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المنصة"));
                 await LoadDataAsync();
             }
         }
@@ -85,6 +87,7 @@ public partial class SocialPlatformsView : UserControl
             };
             if (dialog.ShowDialog() == true)
             {
+                MessageService.Current.ShowSuccess(Messages.Updated("المنصة", dto.Name));
                 await LoadDataAsync();
             }
         }
@@ -108,7 +111,7 @@ public partial class SocialPlatformsView : UserControl
             if (response.IsSuccess)
             {
                 await LoadDataAsync();
-                MessageService.Current.ShowSuccess("تم حذف المنصة بنجاح.");
+                MessageService.Current.ShowSuccess(Messages.Deleted("المنصة", dto.Name));
             }
             else
             {

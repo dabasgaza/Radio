@@ -59,8 +59,6 @@ namespace Radio.Views.StaffRoles
 
                 if (result.IsSuccess)
                 {
-                    MessageService.Current.ShowSuccess(
-                        _roleId == 0 ? "تمت إضافة الدور بنجاح." : "تم تعديل الدور بنجاح.");
                     DialogResult = true;
                 }
                 else

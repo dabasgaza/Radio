@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -76,7 +77,10 @@ namespace Radio.Views.Correspondents
                     Owner = mainWindow
                 };
                 if (dialog.ShowDialog() == true)
+                {
+                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المراسل"));
                     await LoadDataAsync();
+                }
             }
             finally
             {
@@ -102,7 +106,10 @@ namespace Radio.Views.Correspondents
                     Owner = mainWindow
                 };
                 if (dialog.ShowDialog() == true)
+                {
+                    MessageService.Current.ShowSuccess(Messages.Updated("المراسل", cor.FullName));
                     await LoadDataAsync();
+                }
             }
             finally
             {
@@ -132,7 +139,7 @@ namespace Radio.Views.Correspondents
                 if (result.IsSuccess)
                 {
                     await LoadDataAsync();
-                    MessageService.Current.ShowSuccess($"تم حذف المراسل «{cor.FullName}» بنجاح.");
+                    MessageService.Current.ShowSuccess(Messages.Deleted("المراسل", cor.FullName));
                 }
                 else
                 {

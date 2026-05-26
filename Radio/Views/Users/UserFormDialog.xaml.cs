@@ -98,7 +98,6 @@ namespace Radio.Views.Users
                     result = await _userService.CreateUserAsync(dto, TxtPassword.Password, _session);
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess("تمت إضافة المستخدم بنجاح.");
                         DialogResult = true;
                     }
                     else
@@ -111,7 +110,6 @@ namespace Radio.Views.Users
                     result = await _userService.UpdateUserAsync(dto, TxtPassword.Password, _session);
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess("تم تعديل بيانات المستخدم بنجاح.");
                         DialogResult = true;
                     }
                     else

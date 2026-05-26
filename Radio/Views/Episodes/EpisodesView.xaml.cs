@@ -11,6 +11,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Radio.Messaging;
 using Radio.Views.Common;
 using Radio.Views.Publishing;
 using System.Windows;
@@ -524,7 +525,7 @@ namespace Radio.Views.Episodes
             }
 
             await LoadDataAsync();
-            MessageService.Current.ShowSuccess($"تم تنفيذ {success} حلقات{(fail > 0 ? $"، فشل {fail}" : "")}.");
+            MessageService.Current.ShowSuccess(Messages.BatchActioned("تنفيذ", success, fail));
         }
 
         private async void BtnBatchPublished_Click(object sender, RoutedEventArgs e)
@@ -552,7 +553,7 @@ namespace Radio.Views.Episodes
             }
 
             await LoadDataAsync();
-            MessageService.Current.ShowSuccess($"تم نشر {success} حلقات{(fail > 0 ? $"، فشل {fail}" : "")}.");
+            MessageService.Current.ShowSuccess(Messages.BatchActioned("نشر", success, fail));
         }
 
         private async void BtnBatchCancel_Click(object sender, RoutedEventArgs e)
@@ -571,8 +572,7 @@ namespace Radio.Views.Episodes
             }
 
             await LoadDataAsync();
-            MessageService.Current.ShowSuccess(
-                $"تم إلغاء {success} حلقات{(fail > 0 ? $"، فشل {fail}" : "")}.");
+            MessageService.Current.ShowSuccess(Messages.BatchActioned("إلغاء", success, fail));
         }
 
         private async void BtnBatchDelete_Click(object sender, RoutedEventArgs e)
@@ -595,8 +595,7 @@ namespace Radio.Views.Episodes
             }
 
             await LoadDataAsync();
-            MessageService.Current.ShowSuccess(
-                $"تم حذف {success} حلقات{(fail > 0 ? $"، فشل {fail}" : "")}.");
+            MessageService.Current.ShowSuccess(Messages.BatchActioned("حذف", success, fail));
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -804,7 +803,7 @@ namespace Radio.Views.Episodes
                     if (dialog.ShowDialog() == true)
                     {
                         await LoadDataAsync();
-                        MessageService.Current.ShowSuccess("تم تحديث بيانات الحلقة بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.Updated("بيانات الحلقة", ep.EpisodeName));
                     }
                 }
                 finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
@@ -822,7 +821,7 @@ namespace Radio.Views.Episodes
                     if (res.IsSuccess)
                     {
                         await LoadDataAsync();
-                        MessageService.Current.ShowSuccess($"تم حذف الحلقة «{selectedEpisode.EpisodeName}» بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.Deleted("الحلقة", selectedEpisode.EpisodeName));
                     }
                     else
                     {
@@ -844,7 +843,7 @@ namespace Radio.Views.Episodes
                     var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session) { Owner = mainWindow };
                     if (dialog.ShowDialog() == true)
                     {
-                        MessageService.Current.ShowSuccess("تم تسجيل تنفيذ الحلقة بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.ActionedWithName("تسجيل تنفيذ", "الحلقة", ep.EpisodeName));
                         await LoadDataAsync();
                     }
                 }
@@ -865,7 +864,7 @@ namespace Radio.Views.Episodes
                     var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests) { Owner = mainWindow };
                     if (dialog.ShowDialog() == true)
                     {
-                        MessageService.Current.ShowSuccess("تم تسجيل النشر الرقمي بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.ActionedWithName("تسجيل النشر الرقمي لـ", "الحلقة", ep.EpisodeName));
                         await LoadDataAsync();
                     }
                 }
@@ -885,7 +884,7 @@ namespace Radio.Views.Episodes
                     var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId) { Owner = mainWindow };
                     if (dialog.ShowDialog() == true)
                     {
-                        MessageService.Current.ShowSuccess("تم نشر الحلقة على الموقع بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.ActionedWithName("نشر", "الحلقة على الموقع", ep.EpisodeName));
                         await LoadDataAsync();
                     }
                 }
@@ -924,7 +923,7 @@ namespace Radio.Views.Episodes
                     if (res.IsSuccess)
                     {
                         await LoadDataAsync();
-                        MessageService.Current.ShowSuccess("تم التراجع عن الحالة بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.Reverted("الحلقة", ep.EpisodeName));
                     }
                     else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل التراجع.");
                 }
@@ -942,7 +941,7 @@ namespace Radio.Views.Episodes
                     if (res.IsSuccess)
                     {
                         await LoadDataAsync();
-                        MessageService.Current.ShowSuccess("تم إلغاء الحلقة بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.Cancelled("الحلقة", ep.EpisodeName));
                     }
                     else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل الإلغاء.");
                 }
@@ -960,7 +959,7 @@ namespace Radio.Views.Episodes
                     if (res.IsSuccess)
                     {
                         await LoadDataAsync();
-                        MessageService.Current.ShowSuccess("تم تحديث سبب الإلغاء بنجاح.");
+                        MessageService.Current.ShowSuccess(Messages.Updated("سبب إلغاء الحلقة", ep.EpisodeName));
                     }
                     else MessageService.Current.ShowWarning(res.ErrorMessage ?? "فشل تحديث السبب.");
                 }

@@ -59,8 +59,15 @@ namespace Radio.Messaging
                 if (foundHost != null) return foundHost;
             }
 
-            // 2. الرجوع للمسجل يدوياً إذا فشل البحث التلقائي
-            return _hostPanel;
+            // 2. الرجوع للمسجل يدوياً إذا فشل البحث التلقائي — مع التحقق من صلاحية اللوحة
+            if (_hostPanel != null)
+            {
+                var parentWindow = Window.GetWindow(_hostPanel);
+                if (parentWindow != null && parentWindow.IsLoaded)
+                    return _hostPanel;
+            }
+
+            return null;
         }
 
         private static T? FindVisualChild<T>(DependencyObject parent, string name) where T : FrameworkElement

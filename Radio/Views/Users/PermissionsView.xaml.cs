@@ -1,6 +1,7 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -43,6 +44,7 @@ namespace Radio.Views.Users
 
                 if (dialog.IsSaved)
                 {
+                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الصلاحية"));
                     await LoadDataAsync();
                 }
             }
@@ -67,6 +69,7 @@ namespace Radio.Views.Users
 
                     if (dialog.IsSaved)
                     {
+MessageService.Current.ShowSuccess(Messages.Updated("الصلاحية", dto.DisplayName));
                         await LoadDataAsync();
                     }
                 }
@@ -87,7 +90,7 @@ namespace Radio.Views.Users
                     var result = await _permissionService.DeletePermissionAsync(dto.PermissionId);
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess("تم حذف الصلاحية بنجاح");
+                        MessageService.Current.ShowSuccess(Messages.Deleted("الصلاحية", dto.DisplayName));
                         await LoadDataAsync();
                     }
                     else

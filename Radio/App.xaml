@@ -38,7 +38,7 @@
                     1. Material Design 2 Defaults — يجب أن يكون أولاً
                     ══════════════════════════════════════════════
                 -->
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════

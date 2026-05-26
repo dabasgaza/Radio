@@ -31,7 +31,7 @@
                             Kind="AccountGroup" />
                         <TextBlock
                             Margin="15,0"
-                            Style="{StaticResource Type.Headline.OnColor}"
+                            Style="{StaticResource Type.TitleLarge.OnColor}"
                             Text="منظومة إدارة الموظفين" />
                     </StackPanel>
                     <TextBlock

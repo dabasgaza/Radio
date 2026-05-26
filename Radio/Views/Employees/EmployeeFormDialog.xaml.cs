@@ -73,8 +73,6 @@ namespace Radio.Views.Employees
 
                 if (result.IsSuccess)
                 {
-                    MessageService.Current.ShowSuccess(
-                        _employeeId == 0 ? "تمت إضافة الموظف بنجاح." : "تم تعديل بيانات الموظف بنجاح.");
                     DialogResult = true;
                 }
                 else

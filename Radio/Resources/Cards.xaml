@@ -29,7 +29,7 @@
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="16" />
-        <Setter Property="UniformCornerRadius" Value="12" />
+        <Setter Property="UniformCornerRadius" Value="16" />
         <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp2" />
     </Style>
 
@@ -43,7 +43,7 @@
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="16" />
-        <Setter Property="UniformCornerRadius" Value="10" />
+        <Setter Property="UniformCornerRadius" Value="12" />
         <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
     </Style>
 
@@ -57,7 +57,7 @@
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="0" />
-        <Setter Property="UniformCornerRadius" Value="16" />
+        <Setter Property="UniformCornerRadius" Value="18" />
         <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp3" />
     </Style>
 
@@ -72,7 +72,7 @@
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="16,12" />
-        <Setter Property="UniformCornerRadius" Value="12" />
+        <Setter Property="UniformCornerRadius" Value="16" />
         <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
     </Style>
 
@@ -85,7 +85,7 @@
     <Style x:Key="Card.Form" TargetType="materialDesign:Card">
         <Setter Property="Margin" Value="30" />
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-        <Setter Property="UniformCornerRadius" Value="20" />
+        <Setter Property="UniformCornerRadius" Value="28" />
         <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp4" />
         <Setter Property="Effect" Value="{StaticResource Shadow.Dialog}" />
     </Style>
@@ -97,7 +97,7 @@
     -->
     <Style x:Key="Card.Info" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource InfoLightBrush}" />
-        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="CornerRadius" Value="12" />
         <Setter Property="Padding" Value="16,12" />
         <Setter Property="BorderBrush" Value="{StaticResource InfoBrush}" />
         <Setter Property="BorderThickness" Value="0.8" />
@@ -105,7 +105,7 @@
 
     <Style x:Key="Card.Warning" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
-        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="CornerRadius" Value="12" />
         <Setter Property="Padding" Value="16,12" />
         <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -113,7 +113,7 @@
 
     <Style x:Key="Card.Success" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
-        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="CornerRadius" Value="12" />
         <Setter Property="Padding" Value="16,12" />
         <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -121,7 +121,7 @@
 
     <Style x:Key="Card.Error" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
-        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="CornerRadius" Value="12" />
         <Setter Property="Padding" Value="16,12" />
         <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -135,28 +135,28 @@
     <Style x:Key="StatIcon.Primary" TargetType="Border">
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />
-        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
     </Style>
 
     <Style x:Key="StatIcon.Success" TargetType="Border">
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />
-        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
     </Style>
 
     <Style x:Key="StatIcon.Warning" TargetType="Border">
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />
-        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
     </Style>
 
     <Style x:Key="StatIcon.Info" TargetType="Border">
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />
-        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="Background" Value="{StaticResource InfoLightBrush}" />
     </Style>
 

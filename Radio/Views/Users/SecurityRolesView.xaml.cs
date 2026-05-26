@@ -39,6 +39,7 @@ namespace Radio.Views.Users
 
                 if (dialog.IsSaved)
                 {
+                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الدور"));
                     await LoadDataAsync();
                 }
             }
@@ -63,6 +64,7 @@ namespace Radio.Views.Users
 
                     if (dialog.IsSaved)
                     {
+MessageService.Current.ShowSuccess(Messages.Updated("الدور", dto.RoleName));
                         await LoadDataAsync();
                     }
                 }
@@ -83,7 +85,7 @@ namespace Radio.Views.Users
                     var result = await _userService.DeleteRoleAsync(dto.RoleId, _session);
                     if (result.IsSuccess)
                     {
-                        MessageService.Current.ShowSuccess("تم حذف الدور بنجاح");
+                        MessageService.Current.ShowSuccess(Messages.Deleted("الدور", dto.RoleName));
                         await LoadDataAsync();
                     }
                     else
