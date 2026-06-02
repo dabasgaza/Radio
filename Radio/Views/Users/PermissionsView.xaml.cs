@@ -84,8 +84,11 @@ MessageService.Current.ShowSuccess(Messages.Updated("الصلاحية", dto.Disp
         {
             if (sender is Button { DataContext: PermissionDto dto })
             {
-                if (MessageBox.Show($"هل أنت متأكد من حذف الصلاحية '{dto.DisplayName}'؟\nسيؤدي ذلك إلى إزالتها من كافة الأدوار المرتبطة بها.", 
-                    "تأكيد الحذف", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                var isConfirmed = await MessageService.Current.ShowConfirmationAsync(
+                    $"هل أنت متأكد من حذف الصلاحية '{dto.DisplayName}'؟\nسيؤدي ذلك إلى إزالتها من كافة الأدوار المرتبطة بها.",
+                    "تأكيد الحذف");
+
+                if (isConfirmed)
                 {
                     var result = await _permissionService.DeletePermissionAsync(dto.PermissionId);
                     if (result.IsSuccess)

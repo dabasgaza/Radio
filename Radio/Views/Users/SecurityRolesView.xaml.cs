@@ -79,8 +79,11 @@ MessageService.Current.ShowSuccess(Messages.Updated("الدور", dto.RoleName))
         {
             if (sender is Button { DataContext: RoleDto dto })
             {
-                if (MessageBox.Show($"هل أنت متأكد من حذف الدور '{dto.RoleName}'؟", 
-                    "تأكيد الحذف", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                var isConfirmed = await MessageService.Current.ShowConfirmationAsync(
+                    $"هل أنت متأكد من حذف الدور '{dto.RoleName}'؟",
+                    "تأكيد الحذف");
+
+                if (isConfirmed)
                 {
                     var result = await _userService.DeleteRoleAsync(dto.RoleId, _session);
                     if (result.IsSuccess)

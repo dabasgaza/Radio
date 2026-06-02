@@ -454,184 +454,25 @@
                                 </RadioButton>
                             </StackPanel>
 
-                            <!--  Administration Section  -->
-                            <Border
-                                x:Name="AdminHeader"
-                                Margin="0,12,0,4"
-                                Cursor="Hand"
-                                MouseLeftButtonDown="SectionHeader_Click"
-                                Tag="Admin">
-                                <Grid Margin="24,8">
-                                    <TextBlock
-                                        x:Name="AdminHeaderLabel"
-                                        FontWeight="Bold"
-                                        Foreground="{DynamicResource PrimaryMainBrush}"
-                                        Style="{StaticResource Type.Overline}"
-                                        Text="الإدارة" />
+                            <!--  Administration Section (Consolidated Admin Hub)  -->
+                            <Separator Margin="16,12" Opacity="0.3" />
+
+                            <RadioButton
+                                x:Name="MenuAdminHub"
+                                Click="NavRailItem_Click"
+                                Style="{StaticResource Modern.Nav.Item}"
+                                Tag="AdminHub">
+                                <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon
-                                        x:Name="AdminChevron"
-                                        Width="16"
-                                        Height="16"
-                                        HorizontalAlignment="Left"
-                                        Foreground="{DynamicResource TextDisabledBrush}"
-                                        Kind="ChevronDown" />
-                                </Grid>
-                            </Border>
-
-                            <StackPanel x:Name="AdminItems">
-                                <RadioButton
-                                    x:Name="MenuDatabase"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Database">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="Database" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="إدارة قاعدة البيانات" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuAuditLogs"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="AuditLogs">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="History" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="سجل العمليات والتدقيق" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuDiagnostics"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Diagnostics">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="MonitorDashboard" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="مراقبة النظام والأداء" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuUsers"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Users">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="AccountKeyOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="المستخدمين" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuEmployees"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Employees">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="AccountTieOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="الموظفين" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuStaffRoles"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="StaffRoles">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="BadgeAccountOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="أدوار الموظفين" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuSecurityRoles"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="SecurityRoles">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="ShieldAccount" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="تعريف أدوار المستخدمين" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuPermissionMatrix"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="PermissionMatrix">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="ShieldLockOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="مصفوفة الصلاحيات" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuPermissions"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Permissions">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="ShieldKeyOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="تعريف الصلاحيات" />
-                                    </StackPanel>
-                                </RadioButton>
-                            </StackPanel>
+                                        Width="22"
+                                        Height="22"
+                                        Kind="CogOutline" />
+                                    <TextBlock
+                                        Margin="16,0"
+                                        VerticalAlignment="Center"
+                                        Text="مركز الإدارة والتحكم" />
+                                </StackPanel>
+                            </RadioButton>
                         </StackPanel>
                     </ScrollViewer>
                 </Border>

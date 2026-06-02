@@ -59,7 +59,7 @@ namespace Radio.Services
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error creating view {viewName}: {ex}");
-                MessageBox.Show($"خطأ أثناء تحميل شاشة {viewName}: {ex.Message}\n{ex.InnerException?.Message}", "خطأ تنقل", MessageBoxButton.OK, MessageBoxImage.Error);
+                DataAccess.Services.Messaging.MessageService.Current.ShowError($"خطأ أثناء تحميل شاشة {viewName}: {ex.Message}\n{ex.InnerException?.Message}", "خطأ تنقل");
                 return null;
             }
         }
@@ -161,6 +161,9 @@ namespace Radio.Services
                 case "Diagnostics":
                     var diagService = _serviceProvider.GetRequiredService<ISystemDiagnosticsService>();
                     return new SystemDiagnosticsView(diagService, _session);
+
+                case "AdminHub":
+                    return new AdminHubView(_serviceProvider, _session);
 
                 default:
                     return null;

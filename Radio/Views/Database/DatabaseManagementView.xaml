@@ -39,7 +39,7 @@
                     <TextBlock
                         FontWeight="Bold"
                         Foreground="{DynamicResource PrimaryDarkBrush}"
-                        Style="{StaticResource Type.HeadlineSmall}"
+                        Style="{StaticResource Type.Headline}"
                         Text="إدارة قاعدة البيانات" />
                     <TextBlock
                         Margin="0,4,0,0"

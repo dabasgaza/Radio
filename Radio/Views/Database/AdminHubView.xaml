@@ -1,0 +1,188 @@
+<UserControl
+    x:Class="Radio.Views.Database.AdminHubView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    FlowDirection="RightToLeft"
+    mc:Ignorable="d">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border
+            Grid.Row="0"
+            Margin="0,0,0,16"
+            Padding="16"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource DividerBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource PrimaryDarkBrush}"
+                        Style="{StaticResource Type.Headline}"
+                        Text="مركز الإدارة والتحكم الموحد" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Style="{StaticResource Type.BodyMedium}"
+                        Text="إدارة الموظفين والكوادر، وضبط صلاحيات الوصول، وصيانة قاعدة البيانات ومراقبة الأداء العام." />
+                </StackPanel>
+
+                <materialDesign:PackIcon
+                    Grid.Column="1"
+                    Width="40"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource PrimaryMainBrush}"
+                    Kind="SettingsConfiguration" />
+            </Grid>
+        </Border>
+
+        <!-- Workspace Grid -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Inner Admin Navigation Sidebar -->
+            <Border
+                Grid.Column="0"
+                Margin="0,0,16,0"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource DividerBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="8">
+                
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Category 1: Staff & Security -->
+                        <TextBlock
+                            Text="الكوادر والصلاحيات"
+                            Margin="12,12,12,8"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource PrimaryMainBrush}"
+                            Style="{StaticResource Type.Overline}" />
+                        
+                        <ListBox x:Name="ListStaffSecurity" SelectionChanged="ListNavigation_SelectionChanged" Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
+                            <ListBoxItem Tag="Users">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="AccountKeyOutline" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="إدارة المستخدمين" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem Tag="Employees">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="AccountTieOutline" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="الموظفين" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem Tag="StaffRoles">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="BriefcaseOutline" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="المسميات الوظيفية" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem Tag="SecurityRoles">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="ShieldAccountOutline" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="الأدوار الأمنية" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem Tag="PermissionMatrix">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="Matrix" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="مصفوفة الصلاحيات" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem Tag="Permissions">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="LockOpenOutline" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="الصلاحيات العامة" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                        </ListBox>
+
+                        <Separator Margin="8,12" />
+
+                        <!-- Category 2: System & Maintenance -->
+                        <TextBlock
+                            Text="الصيانة والنظام"
+                            Margin="12,4,12,8"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource PrimaryMainBrush}"
+                            Style="{StaticResource Type.Overline}" />
+
+                        <ListBox x:Name="ListSystemMaintenance" SelectionChanged="ListNavigation_SelectionChanged" Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
+                            <ListBoxItem Tag="Database">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="Database" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="إدارة قاعدة البيانات" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem Tag="AuditLogs">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="History" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="سجل العمليات والتدقيق" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem Tag="Diagnostics">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="MonitorDashboard" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="مراقبة النظام والأداء" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                        </ListBox>
+
+                        <Separator Margin="8,12" />
+
+                        <!-- Category 3: Configuration -->
+                        <TextBlock
+                            Text="الإعدادات العامة"
+                            Margin="12,4,12,8"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource PrimaryMainBrush}"
+                            Style="{StaticResource Type.Overline}" />
+
+                        <ListBox x:Name="ListConfiguration" SelectionChanged="ListNavigation_SelectionChanged" Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
+                            <ListBoxItem Tag="SocialPlatforms">
+                                <StackPanel Orientation="Horizontal" Margin="4,2">
+                                    <materialDesign:PackIcon Kind="ShareVariantOutline" Width="20" Height="20" Margin="0,0,10,0" />
+                                    <TextBlock Text="المنصات الاجتماعية" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </ListBoxItem>
+                        </ListBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Content Area displaying the nested view -->
+            <Border
+                Grid.Column="1"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource DividerBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="16">
+                <ContentControl x:Name="AdminHubContentArea" />
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

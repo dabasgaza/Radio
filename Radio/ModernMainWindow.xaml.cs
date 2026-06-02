@@ -27,23 +27,14 @@ namespace Radio
             ["MenuCoverages"] = "Correspondents",
             ["MenuReports"] = "Reports",
             ["MenuPublishingRecords"] = "PublishingRecords",
-            ["MenuUsers"] = "Users",
-            ["MenuEmployees"] = "Employees",
-            ["MenuStaffRoles"] = "StaffRoles",
-            ["MenuSecurityRoles"] = "SecurityRoles",
-            ["MenuPermissionMatrix"] = "PermissionMatrix",
-            ["MenuPermissions"] = "Permissions",
             ["MenuSocialPlatforms"] = "SocialPlatforms",
-            ["MenuDatabase"] = "Database",
-            ["MenuAuditLogs"] = "AuditLogs",
-            ["MenuDiagnostics"] = "Diagnostics",
+            ["MenuAdminHub"] = "AdminHub",
         };
 
         private Dictionary<string, bool> _sectionStates = new()
         {
             ["Workflow"] = true,
-            ["Publishing"] = false,
-            ["Admin"] = false
+            ["Publishing"] = false
         };
 
         public async Task ShowOverlay() => await this.ShowOverlayAsync();
@@ -94,24 +85,13 @@ namespace Radio
             MenuReports.Visibility = canViewReports ? Visibility.Visible : Visibility.Collapsed;
 
             // Publishing Items
-            bool showPublishing = canViewReports || canManageStaff; // Adjust as needed
+            bool showPublishing = canViewReports || canManageStaff;
             PublishingHeader.Visibility = showPublishing ? Visibility.Visible : Visibility.Collapsed;
             PublishingItems.Visibility = showPublishing ? Visibility.Visible : Visibility.Collapsed;
 
-            // Admin Items
-            MenuDatabase.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
-            MenuAuditLogs.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
-            MenuDiagnostics.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
-            MenuUsers.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
-            MenuEmployees.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
-            MenuStaffRoles.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
-            MenuSecurityRoles.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
-            MenuPermissionMatrix.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
-            MenuPermissions.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
-            MenuSocialPlatforms.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
-
-            AdminHeaderLabel.Visibility = (canManageUsers || canManageStaff || _session.IsAdmin) ? Visibility.Visible : Visibility.Collapsed;
-            AdminItems.Visibility = AdminHeaderLabel.Visibility;
+            // Admin Hub (single consolidated button - internal permissions handled by AdminHubView)
+            bool showAdminHub = canManageUsers || canManageStaff || _session.IsAdmin;
+            MenuAdminHub.Visibility = showAdminHub ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public void NavigateToView(string viewName)
@@ -155,7 +135,6 @@ namespace Radio
             {
                 "Workflow" => WorkflowItems,
                 "Publishing" => PublishingItems,
-                "Admin" => AdminItems,
                 _ => null
             };
 
@@ -163,7 +142,6 @@ namespace Radio
             {
                 "Workflow" => WorkflowChevron,
                 "Publishing" => PublishingChevron,
-                "Admin" => AdminChevron,
                 _ => null
             };
 
