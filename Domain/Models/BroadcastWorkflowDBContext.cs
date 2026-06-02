@@ -37,6 +37,7 @@ public partial class BroadcastWorkflowDBContext : DbContext
     public virtual DbSet<User> Users => Set<User>();
     public virtual DbSet<Permission> Permissions => Set<Permission>();
     public virtual DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public virtual DbSet<DatabaseBackupLog> DatabaseBackupLogs => Set<DatabaseBackupLog>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -86,6 +87,7 @@ public partial class BroadcastWorkflowDBContext : DbContext
         ConfigureAuditRelationships<SocialMediaPublishingLogPlatform>(modelBuilder);
         ConfigureAuditRelationships<WebsitePublishingLog>(modelBuilder);
         ConfigureAuditRelationships<ExecutionLog>(modelBuilder);
+        ConfigureAuditRelationships<DatabaseBackupLog>(modelBuilder);
 
         OnModelCreatingPartial(modelBuilder);
     }

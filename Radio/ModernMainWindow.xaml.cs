@@ -34,6 +34,9 @@ namespace Radio
             ["MenuPermissionMatrix"] = "PermissionMatrix",
             ["MenuPermissions"] = "Permissions",
             ["MenuSocialPlatforms"] = "SocialPlatforms",
+            ["MenuDatabase"] = "Database",
+            ["MenuAuditLogs"] = "AuditLogs",
+            ["MenuDiagnostics"] = "Diagnostics",
         };
 
         private Dictionary<string, bool> _sectionStates = new()
@@ -96,6 +99,9 @@ namespace Radio
             PublishingItems.Visibility = showPublishing ? Visibility.Visible : Visibility.Collapsed;
 
             // Admin Items
+            MenuDatabase.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            MenuAuditLogs.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            MenuDiagnostics.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
             MenuUsers.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
             MenuEmployees.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
             MenuStaffRoles.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
@@ -104,7 +110,7 @@ namespace Radio
             MenuPermissions.Visibility = canManageUsers ? Visibility.Visible : Visibility.Collapsed;
             MenuSocialPlatforms.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
 
-            AdminHeaderLabel.Visibility = (canManageUsers || canManageStaff) ? Visibility.Visible : Visibility.Collapsed;
+            AdminHeaderLabel.Visibility = (canManageUsers || canManageStaff || _session.IsAdmin) ? Visibility.Visible : Visibility.Collapsed;
             AdminItems.Visibility = AdminHeaderLabel.Visibility;
         }
 

@@ -72,9 +72,9 @@ namespace Radio.Forms
                 mainWindow.Show();
                 Close();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageService.Current.ShowError("حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة لاحقاً.");
+                MessageService.Current.ShowError($"حدث خطأ أثناء الاتصال بالخادم: {ex.Message}");
             }
             finally
             {

@@ -10,6 +10,8 @@ using Radio.Views.Reports;
 using Radio.Views.SocialPlatforms;
 using Radio.Views.StaffRoles;
 using Radio.Views.Users;
+using Radio.Views.Database;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Radio.Services
@@ -54,8 +56,10 @@ namespace Radio.Services
                 }
                 return view;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error creating view {viewName}: {ex}");
+                MessageBox.Show($"خطأ أثناء تحميل شاشة {viewName}: {ex.Message}\n{ex.InnerException?.Message}", "خطأ تنقل", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
         }
@@ -145,6 +149,18 @@ namespace Radio.Services
                 case "Permissions":
                     var permService = _serviceProvider.GetRequiredService<IPermissionService>();
                     return new PermissionsView(permService);
+
+                case "Database":
+                    var dbMgmtService = _serviceProvider.GetRequiredService<IDatabaseManagementService>();
+                    return new DatabaseManagementView(dbMgmtService, _session);
+
+                case "AuditLogs":
+                    var auditLogService = _serviceProvider.GetRequiredService<IAuditLogService>();
+                    return new AuditLogsView(auditLogService, _session);
+
+                case "Diagnostics":
+                    var diagService = _serviceProvider.GetRequiredService<ISystemDiagnosticsService>();
+                    return new SystemDiagnosticsView(diagService, _session);
 
                 default:
                     return null;

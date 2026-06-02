@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Radio.Forms;
 using Radio.Messaging;
+using Serilog;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -25,15 +26,34 @@ namespace Radio
 
         public App()
         {
-            var builder = Host.CreateApplicationBuilder();
+            var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
+            {
+                ContentRootPath = AppContext.BaseDirectory
+            });
+
+            // Configure Serilog with Seq
+            var seqUrl = builder.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341";
+            var apiKey = builder.Configuration["Seq:ApiKey"] ?? "";
+            var slowQueryThreshold = builder.Configuration.GetValue<int>("Seq:SlowQueryThresholdMs", 100);
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.Seq(seqUrl, apiKey: string.IsNullOrEmpty(apiKey) ? null : apiKey)
+                .CreateLogger();
+
+            builder.Services.AddSerilog();
 
             // 1. Database Context Factory
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+            builder.Services.AddSingleton(sp => new DbQueryPerformanceInterceptor(slowQueryThreshold));
             builder.Services.AddDbContextFactory<BroadcastWorkflowDBContext>((sp, options) =>
             {
                 var interceptor = sp.GetRequiredService<AuditInterceptor>();
+                var perfInterceptor = sp.GetRequiredService<DbQueryPerformanceInterceptor>();
                 options.UseSqlServer(connectionString)
-                       .AddInterceptors(interceptor);
+                       .AddInterceptors(interceptor, perfInterceptor);
             });
 
             // 2. Infrastructure
@@ -43,7 +63,11 @@ namespace Radio
 
             // Application Insights
             var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
-            telemetryConfiguration.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+            var appInsightsConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+            if (!string.IsNullOrEmpty(appInsightsConnectionString))
+            {
+                telemetryConfiguration.ConnectionString = appInsightsConnectionString;
+            }
             builder.Services.AddSingleton(telemetryConfiguration);
             builder.Services.AddSingleton<TelemetryClient>();
 
@@ -62,6 +86,10 @@ namespace Radio
             builder.Services.AddTransient<IEmployeeService, EmployeeService>();
             builder.Services.AddTransient<IPlatformService, PlatformService>();
             builder.Services.AddTransient<IPermissionService, PermissionService>();
+            builder.Services.AddTransient<IDatabaseManagementService, DatabaseManagementService>();
+            builder.Services.AddTransient<IAuditLogService, AuditLogService>();
+            builder.Services.AddTransient<ISystemDiagnosticsService, SystemDiagnosticsService>();
+            builder.Services.AddHostedService<DatabaseBackupScheduler>();
 
             // 4. Caching
             builder.Services.AddMemoryCache();

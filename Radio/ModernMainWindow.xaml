@@ -480,6 +480,57 @@
 
                             <StackPanel x:Name="AdminItems">
                                 <RadioButton
+                                    x:Name="MenuDatabase"
+                                    Click="NavRailItem_Click"
+                                    Style="{StaticResource Modern.Nav.Item}"
+                                    Tag="Database">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon
+                                            Width="22"
+                                            Height="22"
+                                            Kind="Database" />
+                                        <TextBlock
+                                            Margin="16,0"
+                                            VerticalAlignment="Center"
+                                            Text="إدارة قاعدة البيانات" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton
+                                    x:Name="MenuAuditLogs"
+                                    Click="NavRailItem_Click"
+                                    Style="{StaticResource Modern.Nav.Item}"
+                                    Tag="AuditLogs">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon
+                                            Width="22"
+                                            Height="22"
+                                            Kind="History" />
+                                        <TextBlock
+                                            Margin="16,0"
+                                            VerticalAlignment="Center"
+                                            Text="سجل العمليات والتدقيق" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton
+                                    x:Name="MenuDiagnostics"
+                                    Click="NavRailItem_Click"
+                                    Style="{StaticResource Modern.Nav.Item}"
+                                    Tag="Diagnostics">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon
+                                            Width="22"
+                                            Height="22"
+                                            Kind="MonitorDashboard" />
+                                        <TextBlock
+                                            Margin="16,0"
+                                            VerticalAlignment="Center"
+                                            Text="مراقبة النظام والأداء" />
+                                    </StackPanel>
+                                </RadioButton>
+
+                                <RadioButton
                                     x:Name="MenuUsers"
                                     Click="NavRailItem_Click"
                                     Style="{StaticResource Modern.Nav.Item}"
