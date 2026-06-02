@@ -31,5 +31,9 @@ namespace DataAccess.Common
 
         // التقارير
         public const string ViewReports = "VIEW_REPORTS";
+
+        // النظام
+        public const string DatabaseManage = "DATABASE_MANAGE";
+        public const string ViewAuditLogs = "VIEW_AUDIT_LOGS";
     }
 }

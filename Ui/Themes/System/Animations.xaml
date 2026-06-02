@@ -1,0 +1,40 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        MD3 Motion System
+        Duration tokens + Easing functions + Component mappings
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── Base Duration Tokens ──  -->
+    <Duration x:Key="Duration.Short1">0:0:0.05</Duration>
+    <Duration x:Key="Duration.Short2">0:0:0.1</Duration>
+    <Duration x:Key="Duration.Medium1">0:0:0.15</Duration>
+    <Duration x:Key="Duration.Medium2">0:0:0.25</Duration>
+    <Duration x:Key="Duration.Long1">0:0:0.35</Duration>
+    <Duration x:Key="Duration.Long2">0:0:0.5</Duration>
+
+    <!--  ── Easing Functions ──  -->
+    <CubicEase x:Key="Ease.In" EasingMode="EaseIn" />
+    <CubicEase x:Key="Ease.Out" EasingMode="EaseOut" />
+    <CubicEase x:Key="Ease.InOut" EasingMode="EaseInOut" />
+    <CircleEase x:Key="Ease.CircleOut" EasingMode="EaseOut" />
+    <BackEase x:Key="Ease.BackOut" EasingMode="EaseOut" Amplitude="0.3" />
+    <ElasticEase x:Key="Ease.Elastic" EasingMode="EaseOut" Oscillations="1" Springiness="3" />
+
+    <!--  ── Component-Specific Durations ──  -->
+    <Duration x:Key="Duration.Hover">0:0:0.15</Duration>
+    <Duration x:Key="Duration.Focus">0:0:0.1</Duration>
+    <Duration x:Key="Duration.Press">0:0:0.05</Duration>
+    <Duration x:Key="Duration.Ripple">0:0:0.35</Duration>
+    <Duration x:Key="Duration.ThemeTransition">0:0:0.4</Duration>
+    <Duration x:Key="Duration.PageTransition">0:0:0.3</Duration>
+    <Duration x:Key="Duration.DialogEnter">0:0:0.25</Duration>
+    <Duration x:Key="Duration.DialogExit">0:0:0.2</Duration>
+    <Duration x:Key="Duration.SnackbarEnter">0:0:0.25</Duration>
+    <Duration x:Key="Duration.SnackbarExit">0:0:0.15</Duration>
+    <Duration x:Key="Duration.ProgressAnimation">0:0:1.5</Duration>
+
+</ResourceDictionary>

@@ -1,0 +1,84 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        MD3 Typography System
+        Complete type scale + font families + weights + tracking
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── Font Family Tokens ──  -->
+    <FontFamily x:Key="Font.Primary">Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Mono">Cascadia Code, Consolas</FontFamily>
+    <FontFamily x:Key="Font.Arabic">Segoe UI, Traditional Arabic</FontFamily>
+    <FontFamily x:Key="Font.Icon">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+    <!--  ── Font Weight Tokens ──  -->
+    <FontWeight x:Key="FontWeight.Thin">Thin</FontWeight>
+    <FontWeight x:Key="FontWeight.Light">Light</FontWeight>
+    <FontWeight x:Key="FontWeight.Regular">Normal</FontWeight>
+    <FontWeight x:Key="FontWeight.Medium">Medium</FontWeight>
+    <FontWeight x:Key="FontWeight.SemiBold">SemiBold</FontWeight>
+    <FontWeight x:Key="FontWeight.Bold">Bold</FontWeight>
+
+    <!--  ── Type Scale: Display ──  -->
+    <system:Double x:Key="Type.Display.Large">57</system:Double>
+    <system:Double x:Key="Type.Display.Medium">45</system:Double>
+    <system:Double x:Key="Type.Display.Small">36</system:Double>
+
+    <!--  ── Type Scale: Headline ──  -->
+    <system:Double x:Key="Type.Headline.Large">32</system:Double>
+    <system:Double x:Key="Type.Headline.Medium">28</system:Double>
+    <system:Double x:Key="Type.Headline.Small">24</system:Double>
+
+    <!--  ── Type Scale: Title ──  -->
+    <system:Double x:Key="Type.Title.Large">22</system:Double>
+    <system:Double x:Key="Type.Title.Medium">16</system:Double>
+    <system:Double x:Key="Type.Title.Small">14</system:Double>
+
+    <!--  ── Type Scale: Body ──  -->
+    <system:Double x:Key="Type.Body.Large">16</system:Double>
+    <system:Double x:Key="Type.Body.Medium">14</system:Double>
+    <system:Double x:Key="Type.Body.Small">12</system:Double>
+
+    <!--  ── Type Scale: Label ──  -->
+    <system:Double x:Key="Type.Label.Large">14</system:Double>
+    <system:Double x:Key="Type.Label.Medium">12</system:Double>
+    <system:Double x:Key="Type.Label.Small">11</system:Double>
+
+    <!--  ── Line Height Tokens ──  -->
+    <system:Double x:Key="LineHeight.Display.Large">64</system:Double>
+    <system:Double x:Key="LineHeight.Display.Medium">52</system:Double>
+    <system:Double x:Key="LineHeight.Display.Small">44</system:Double>
+    <system:Double x:Key="LineHeight.Headline.Large">40</system:Double>
+    <system:Double x:Key="LineHeight.Headline.Medium">36</system:Double>
+    <system:Double x:Key="LineHeight.Headline.Small">32</system:Double>
+    <system:Double x:Key="LineHeight.Title.Large">28</system:Double>
+    <system:Double x:Key="LineHeight.Title.Medium">24</system:Double>
+    <system:Double x:Key="LineHeight.Title.Small">20</system:Double>
+    <system:Double x:Key="LineHeight.Body.Large">24</system:Double>
+    <system:Double x:Key="LineHeight.Body.Medium">20</system:Double>
+    <system:Double x:Key="LineHeight.Body.Small">16</system:Double>
+    <system:Double x:Key="LineHeight.Label.Large">20</system:Double>
+    <system:Double x:Key="LineHeight.Label.Medium">16</system:Double>
+    <system:Double x:Key="LineHeight.Label.Small">16</system:Double>
+
+    <!--  ── Letter Spacing (Tracking) Tokens ──  -->
+    <system:Double x:Key="LetterSpacing.Display.Large">-0.25</system:Double>
+    <system:Double x:Key="LetterSpacing.Display.Medium">0</system:Double>
+    <system:Double x:Key="LetterSpacing.Display.Small">0</system:Double>
+    <system:Double x:Key="LetterSpacing.Headline.Large">0</system:Double>
+    <system:Double x:Key="LetterSpacing.Headline.Medium">0</system:Double>
+    <system:Double x:Key="LetterSpacing.Headline.Small">0</system:Double>
+    <system:Double x:Key="LetterSpacing.Title.Large">0</system:Double>
+    <system:Double x:Key="LetterSpacing.Title.Medium">0.15</system:Double>
+    <system:Double x:Key="LetterSpacing.Title.Small">0.1</system:Double>
+    <system:Double x:Key="LetterSpacing.Body.Large">0</system:Double>
+    <system:Double x:Key="LetterSpacing.Body.Medium">0.25</system:Double>
+    <system:Double x:Key="LetterSpacing.Body.Small">0.4</system:Double>
+    <system:Double x:Key="LetterSpacing.Label.Large">0</system:Double>
+    <system:Double x:Key="LetterSpacing.Label.Medium">0.5</system:Double>
+    <system:Double x:Key="LetterSpacing.Label.Small">0.5</system:Double>
+
+</ResourceDictionary>

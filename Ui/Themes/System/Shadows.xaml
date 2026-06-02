@@ -1,0 +1,51 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        MD3 Layered Shadow System
+        Each elevation has a primary + ambient shadow effect
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── Elevation 1: Subtle (Cards, Buttons) ──  -->
+    <DropShadowEffect x:Key="Shadow.Elevation1"
+                       Direction="270"
+                       ShadowDepth="1"
+                       BlurRadius="3"
+                       Opacity="0.3"
+                       Color="{DynamicResource Shadow}" />
+
+    <!--  ── Elevation 2: Light (Dropdowns, Menus) ──  -->
+    <DropShadowEffect x:Key="Shadow.Elevation2"
+                       Direction="270"
+                       ShadowDepth="3"
+                       BlurRadius="8"
+                       Opacity="0.3"
+                       Color="{DynamicResource Shadow}" />
+
+    <!--  ── Elevation 3: Medium (FAB, Dialogs) ──  -->
+    <DropShadowEffect x:Key="Shadow.Elevation3"
+                       Direction="270"
+                       ShadowDepth="6"
+                       BlurRadius="14"
+                       Opacity="0.25"
+                       Color="{DynamicResource Shadow}" />
+
+    <!--  ── Elevation 4: High (Nav Drawer, Snackbar) ──  -->
+    <DropShadowEffect x:Key="Shadow.Elevation4"
+                       Direction="270"
+                       ShadowDepth="8"
+                       BlurRadius="20"
+                       Opacity="0.25"
+                       Color="{DynamicResource Shadow}" />
+
+    <!--  ── Elevation 5: Highest (Modals, Pickers) ──  -->
+    <DropShadowEffect x:Key="Shadow.Elevation5"
+                       Direction="270"
+                       ShadowDepth="12"
+                       BlurRadius="28"
+                       Opacity="0.2"
+                       Color="{DynamicResource Shadow}" />
+
+</ResourceDictionary>

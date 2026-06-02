@@ -1,3 +1,4 @@
+using DataAccess.Common;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,8 +68,10 @@ namespace Radio.Forms
 
                 var session = result.Value!;
 
-                var reportsService = _serviceProvider.GetRequiredService<IReportsService>();
-                var mainWindow = new ModernMainWindow(session, _serviceProvider);
+                var sessionProvider = _serviceProvider.GetRequiredService<CurrentSessionProvider>();
+                sessionProvider.CurrentSession = session;
+
+                var mainWindow = _serviceProvider.GetRequiredService<ModernMainWindow>();
                 mainWindow.Show();
                 Close();
             }

@@ -2,6 +2,7 @@
     x:Class="Radio.ModernMainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ctrl="clr-namespace:Radio.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -23,61 +24,28 @@
 
     <Window.Resources>
         <ResourceDictionary>
-            <!--  Modern Side Navigation Item Style - Using System Brushes  -->
-            <Style x:Key="Modern.Nav.Item" TargetType="RadioButton">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Padding" Value="16,10" />
-                <Setter Property="Margin" Value="12,2" />
-                <Setter Property="Height" Value="44" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="RadioButton">
-                            <Border
-                                x:Name="ItemBorder"
-                                Padding="{TemplateBinding Padding}"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="22">
-                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource HoverOverlayBrush}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
-                                </Trigger>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource PrimaryXLightBrush}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
-                                    <Setter Property="FontWeight" Value="SemiBold" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
+            <ctrl:ResponsiveNavigationControl x:Key="NavControl" NavigationRequested="NavigationRequested" />
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <materialDesign:DialogHost Identifier="ModernRootDialog" OverlayBackground="{StaticResource OverlayScrimBrush}">
-            <Grid>
+            <Grid SizeChanged="Window_SizeChanged">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition x:Name="ColSidebar" Width="260" />
+                    <ColumnDefinition
+                        x:Name="ColSidebar"
+                        Width="Auto"
+                        MinWidth="64"
+                        MaxWidth="260" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!--
-                    ══════════════════════════════════════════════════════════════
-                    CUSTOM TITLE BAR & HEADER (System Styled)
-                    ══════════════════════════════════════════════════════════════
-                -->
                 <Border
                     Grid.Row="0"
                     Grid.Column="0"
@@ -87,7 +55,8 @@
                     Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource DividerBrush}"
                     BorderThickness="0,0,0,1"
-                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                    SnapsToDevicePixels="True">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -96,29 +65,28 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!--  Brand & Collapse  -->
                         <StackPanel
                             Grid.Column="0"
                             Margin="12,0"
                             Orientation="Horizontal">
                             <Button
-                                x:Name="BtnCollapseToggle"
+                                x:Name="BtnMenuToggle"
                                 Width="36"
                                 Height="36"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Click="BtnCollapseToggle_Click"
+                                Click="BtnMenuToggle_Click"
                                 Foreground="{DynamicResource TextSecondaryBrush}"
                                 Style="{StaticResource MaterialDesignFlatButton}">
                                 <materialDesign:PackIcon
-                                    x:Name="CollapseIcon"
+                                    x:Name="MenuIcon"
                                     Width="24"
                                     Height="24"
-                                    Kind="MenuOpen" />
+                                    Kind="Menu" />
                             </Button>
 
                             <StackPanel
-                                Margin="16,0"
+                                Margin="12,0,0,0"
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal">
                                 <materialDesign:PackIcon
@@ -127,6 +95,7 @@
                                     Foreground="{DynamicResource PrimaryMainBrush}"
                                     Kind="RadioTower" />
                                 <TextBlock
+                                    x:Name="AppTitle"
                                     Margin="8,0"
                                     VerticalAlignment="Center"
                                     FontWeight="Bold"
@@ -136,7 +105,25 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <!--  Breadcrumb Center  -->
+                        <Button
+                            x:Name="BtnGoBack"
+                            Grid.Column="1"
+                            Width="36"
+                            Height="36"
+                            Margin="4,0"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Click="BtnGoBack_Click"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            ToolTip="رجوع"
+                            Visibility="Collapsed">
+                            <materialDesign:PackIcon
+                                Width="20"
+                                Height="20"
+                                Kind="ArrowRight" />
+                        </Button>
+
                         <TextBlock
                             x:Name="BreadcrumbBar"
                             Grid.Column="2"
@@ -146,13 +133,11 @@
                             Foreground="{DynamicResource TextSecondaryBrush}"
                             Style="{StaticResource Type.Overline}" />
 
-                        <!--  Right Controls  -->
                         <StackPanel
                             Grid.Column="3"
                             Margin="0,0,12,0"
                             VerticalAlignment="Center"
                             Orientation="Horizontal">
-                            <!--  Notifications  -->
                             <Button
                                 Width="40"
                                 Height="40"
@@ -177,7 +162,6 @@
                                 Opacity="0.5"
                                 Style="{StaticResource MaterialDesignDarkSeparator}" />
 
-                            <!--  User Profile  -->
                             <Button
                                 x:Name="BtnUserProfile"
                                 Height="40"
@@ -217,7 +201,6 @@
                                 Opacity="0.5"
                                 Style="{StaticResource MaterialDesignDarkSeparator}" />
 
-                            <!--  Window Buttons  -->
                             <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                 <Button
                                     Width="46"
@@ -268,226 +251,16 @@
                     </Grid>
                 </Border>
 
-                <!--
-                    ══════════════════════════════════════════════════════════════
-                    SIDEBAR NAVIGATION (System Styled)
-                    ══════════════════════════════════════════════════════════════
-                -->
-                <Border
-                    x:Name="SidebarBorder"
+                <ctrl:ResponsiveNavigationControl
+                    x:Name="ResponsiveNav"
                     Grid.Row="1"
                     Grid.Column="0"
-                    Panel.ZIndex="5"
-                    Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource DividerBrush}"
-                    BorderThickness="0,0,1,0">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel x:Name="NavPanel" Margin="0,16">
+                    Mode="{Binding NavigationMode}"
+                    NavigationRequested="NavigationRequested" />
 
-                            <RadioButton
-                                x:Name="MenuHome"
-                                Click="NavRailItem_Click"
-                                IsChecked="True"
-                                Style="{StaticResource Modern.Nav.Item}"
-                                Tag="Home">
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Kind="ViewDashboardOutline" />
-                                    <TextBlock
-                                        Margin="16,0"
-                                        VerticalAlignment="Center"
-                                        Text="لوحة التحكم" />
-                                </StackPanel>
-                            </RadioButton>
-
-                            <!--  Workflow Section  -->
-                            <Border
-                                x:Name="WorkflowHeader"
-                                Margin="0,12,0,4"
-                                Cursor="Hand"
-                                MouseLeftButtonDown="SectionHeader_Click"
-                                Tag="Workflow">
-                                <Grid Margin="24,8">
-                                    <TextBlock
-                                        FontWeight="Bold"
-                                        Foreground="{DynamicResource PrimaryMainBrush}"
-                                        Style="{StaticResource Type.Overline}"
-                                        Text="سير العمل" />
-                                    <materialDesign:PackIcon
-                                        x:Name="WorkflowChevron"
-                                        Width="16"
-                                        Height="16"
-                                        HorizontalAlignment="Left"
-                                        Foreground="{DynamicResource TextDisabledBrush}"
-                                        Kind="ChevronDown" />
-                                </Grid>
-                            </Border>
-
-                            <StackPanel x:Name="WorkflowItems">
-                                <RadioButton
-                                    x:Name="MenuEpisodes"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Episodes">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="PlayCircleOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="الحلقات" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuGuests"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Guests">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="AccountVoice" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="الضيوف" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuCoverages"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Correspondents">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="MapMarkerRadiusOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="المراسلون" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuReports"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="Reports">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="FileChartOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="التقارير" />
-                                    </StackPanel>
-                                </RadioButton>
-                            </StackPanel>
-
-                            <!--  Publishing Section  -->
-                            <Border
-                                x:Name="PublishingHeader"
-                                Margin="0,12,0,4"
-                                Cursor="Hand"
-                                MouseLeftButtonDown="SectionHeader_Click"
-                                Tag="Publishing">
-                                <Grid Margin="24,8">
-                                    <TextBlock
-                                        FontWeight="Bold"
-                                        Foreground="{DynamicResource PrimaryMainBrush}"
-                                        Style="{StaticResource Type.Overline}"
-                                        Text="النشر الرقمي" />
-                                    <materialDesign:PackIcon
-                                        x:Name="PublishingChevron"
-                                        Width="16"
-                                        Height="16"
-                                        HorizontalAlignment="Left"
-                                        Foreground="{DynamicResource TextDisabledBrush}"
-                                        Kind="ChevronDown" />
-                                </Grid>
-                            </Border>
-
-                            <StackPanel x:Name="PublishingItems">
-                                <RadioButton
-                                    x:Name="MenuPublishingRecords"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="PublishingRecords">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="FileDocumentMultipleOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="سجلات النشر" />
-                                    </StackPanel>
-                                </RadioButton>
-
-                                <RadioButton
-                                    x:Name="MenuSocialPlatforms"
-                                    Click="NavRailItem_Click"
-                                    Style="{StaticResource Modern.Nav.Item}"
-                                    Tag="SocialPlatforms">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon
-                                            Width="22"
-                                            Height="22"
-                                            Kind="ShareVariantOutline" />
-                                        <TextBlock
-                                            Margin="16,0"
-                                            VerticalAlignment="Center"
-                                            Text="المنصات الاجتماعية" />
-                                    </StackPanel>
-                                </RadioButton>
-                            </StackPanel>
-
-                            <!--  Administration Section (Consolidated Admin Hub)  -->
-                            <Separator Margin="16,12" Opacity="0.3" />
-
-                            <RadioButton
-                                x:Name="MenuAdminHub"
-                                Click="NavRailItem_Click"
-                                Style="{StaticResource Modern.Nav.Item}"
-                                Tag="AdminHub">
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon
-                                        Width="22"
-                                        Height="22"
-                                        Kind="CogOutline" />
-                                    <TextBlock
-                                        Margin="16,0"
-                                        VerticalAlignment="Center"
-                                        Text="مركز الإدارة والتحكم" />
-                                </StackPanel>
-                            </RadioButton>
-                        </StackPanel>
-                    </ScrollViewer>
-                </Border>
-
-                <!--
-                    ══════════════════════════════════════════════════════════════
-                    MAIN CONTENT AREA
-                    ══════════════════════════════════════════════════════════════
-                -->
                 <Grid Grid.Row="1" Grid.Column="1">
                     <ContentControl x:Name="MainContentArea" Margin="24" />
 
-
-
-                    <!--  ON AIR Widget (System Styled)  -->
                     <Border
                         x:Name="OnAirWidget"
                         Width="280"
@@ -541,6 +314,11 @@
                     </Border>
                 </Grid>
 
+                <ctrl:BottomNavigationView
+                    x:Name="BottomNav"
+                    Grid.Row="2"
+                    Visibility="Collapsed" />
+
                 <Popup
                     x:Name="UserProfilePopup"
                     AllowsTransparency="True"
@@ -566,7 +344,6 @@
             </Grid>
         </materialDesign:DialogHost>
 
-        <!--  Notification Host (Topmost Layer)  -->
         <StackPanel
             x:Name="NotificationHost"
             Margin="0,0,0,20"

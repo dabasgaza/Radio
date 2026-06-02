@@ -187,48 +187,50 @@
                             <DataGridTemplateColumn Width="130" Header="الإجراء">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border
-                                            Padding="6,2"
-                                            CornerRadius="4"
-                                            HorizontalAlignment="Left">
+                                        <Border Padding="6,2" CornerRadius="4" HorizontalAlignment="Left" Background="Transparent">
                                             <Border.Style>
                                                 <Style TargetType="Border">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Action}" Value="ADDED">
                                                             <Setter Property="Background" Value="#E8F5E9" />
-                                                            <Setter Property="Child">
-                                                                <Setter.Value>
-                                                                    <TextBlock Foreground="#2E7D32" Text="إضافة" FontWeight="SemiBold"/>
-                                                                </Setter.Value>
-                                                            </Setter>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Action}" Value="MODIFIED">
                                                             <Setter Property="Background" Value="#E3F2FD" />
-                                                            <Setter Property="Child">
-                                                                <Setter.Value>
-                                                                    <TextBlock Foreground="#1565C0" Text="تعديل" FontWeight="SemiBold"/>
-                                                                </Setter.Value>
-                                                            </Setter>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Action}" Value="SOFT_DELETED">
                                                             <Setter Property="Background" Value="#FFF3E0" />
-                                                            <Setter Property="Child">
-                                                                <Setter.Value>
-                                                                    <TextBlock Foreground="#EF6C00" Text="حذف منطقي" FontWeight="SemiBold"/>
-                                                                </Setter.Value>
-                                                            </Setter>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Action}" Value="DELETED">
                                                             <Setter Property="Background" Value="#FFEBEE" />
-                                                            <Setter Property="Child">
-                                                                <Setter.Value>
-                                                                    <TextBlock Foreground="#C62828" Text="حذف نهائي" FontWeight="SemiBold"/>
-                                                                </Setter.Value>
-                                                            </Setter>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
+                                            <TextBlock>
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Action}" Value="ADDED">
+                                                                <Setter Property="Foreground" Value="#2E7D32" />
+                                                                <Setter Property="Text" Value="إضافة" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Action}" Value="MODIFIED">
+                                                                <Setter Property="Foreground" Value="#1565C0" />
+                                                                <Setter Property="Text" Value="تعديل" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Action}" Value="SOFT_DELETED">
+                                                                <Setter Property="Foreground" Value="#EF6C00" />
+                                                                <Setter Property="Text" Value="حذف منطقي" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Action}" Value="DELETED">
+                                                                <Setter Property="Foreground" Value="#C62828" />
+                                                                <Setter Property="Text" Value="حذف نهائي" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                         </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

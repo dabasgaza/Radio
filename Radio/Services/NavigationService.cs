@@ -1,3 +1,4 @@
+using DataAccess.Common;
 using DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Views.Correspondents;
@@ -5,7 +6,6 @@ using Radio.Views.Employees;
 using Radio.Views.Episodes;
 using Radio.Views.Guests;
 using Radio.Views.Home;
-using Radio.Views.Programs;
 using Radio.Views.Reports;
 using Radio.Views.SocialPlatforms;
 using Radio.Views.StaffRoles;
@@ -19,7 +19,7 @@ namespace Radio.Services
     public class NavigationService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly UserSession _session;
+        private readonly Dictionary<string, UserControl> _viewCache = new();
         private readonly Stack<string> _history = new();
         private const int MaxHistory = 10;
 
@@ -29,36 +29,34 @@ namespace Radio.Services
 
         public IReadOnlyCollection<string> History => _history.ToList().AsReadOnly();
 
-        public NavigationService(IServiceProvider serviceProvider, UserSession session)
+        public NavigationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _session = session;
         }
 
         public UserControl? NavigateTo(string viewName)
         {
-            _history.Push(viewName);
-            if (_history.Count > MaxHistory)
-            {
-                var temp = _history.Reverse().Take(MaxHistory).ToList();
-                _history.Clear();
-                for (int i = temp.Count - 1; i >= 0; i--)
-                    _history.Push(temp[i]);
-            }
-
             try
             {
-                var view = CreateView(viewName);
-                if (view != null)
+                var view = GetOrCreateView(viewName);
+                if (view == null) return null;
+
+                _history.Push(viewName);
+                if (_history.Count > MaxHistory)
                 {
-                    CurrentViewName = viewName;
-                    ViewChanged?.Invoke(viewName);
+                    var temp = _history.Reverse().Take(MaxHistory).ToList();
+                    _history.Clear();
+                    for (int i = temp.Count - 1; i >= 0; i--)
+                        _history.Push(temp[i]);
                 }
+
+                CurrentViewName = viewName;
+                ViewChanged?.Invoke(viewName);
                 return view;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error creating view {viewName}: {ex}");
+                System.Diagnostics.Debug.WriteLine($"Error navigating to {viewName}: {ex}");
                 DataAccess.Services.Messaging.MessageService.Current.ShowError($"خطأ أثناء تحميل شاشة {viewName}: {ex.Message}\n{ex.InnerException?.Message}", "خطأ تنقل");
                 return null;
             }
@@ -70,7 +68,13 @@ namespace Radio.Services
 
             _history.Pop();
             var previous = _history.Peek();
-            return NavigateTo(previous);
+
+            var view = GetOrCreateView(previous);
+            if (view == null) return null;
+
+            CurrentViewName = previous;
+            ViewChanged?.Invoke(previous);
+            return view;
         }
 
         public string? GetPreviousViewName()
@@ -82,10 +86,27 @@ namespace Radio.Services
             return previous;
         }
 
+        public bool CanGoBack => _history.Count > 1;
+
+        public void RefreshView(string viewName)
+        {
+            _viewCache.Remove(viewName);
+        }
+
+        private UserControl? GetOrCreateView(string viewName)
+        {
+            if (_viewCache.TryGetValue(viewName, out var cached))
+                return cached;
+
+            var view = CreateView(viewName);
+            if (view != null)
+                _viewCache[viewName] = view;
+
+            return view;
+        }
+
         private UserControl? CreateView(string viewName)
         {
-            var userService = _serviceProvider.GetRequiredService<IUserService>();
-
             switch (viewName)
             {
                 case "Home":
@@ -93,23 +114,24 @@ namespace Radio.Services
                     return new HomeView(homeReportService);
 
                 case "Users":
-                    return new UsersView(userService, _session);
+                    var userService = _serviceProvider.GetRequiredService<IUserService>();
+                    var session = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new UsersView(userService, session);
 
                 case "Employees":
                     var empService = _serviceProvider.GetRequiredService<IEmployeeService>();
-                    return new EmployeesView(empService, _session);
+                    var empSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new EmployeesView(empService, empSession);
 
                 case "SocialPlatforms":
                     var platformService = _serviceProvider.GetRequiredService<IPlatformService>();
-                    return new SocialPlatformsView(platformService, _session);
+                    var platSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new SocialPlatformsView(platformService, platSession);
 
                 case "StaffRoles":
                     var staffService = _serviceProvider.GetRequiredService<IEmployeeService>();
-                    return new StaffRolesView(staffService, _session);
-
-                case "Programs":
-                    var progService = _serviceProvider.GetRequiredService<IProgramService>();
-                    return new ProgramsView(progService, _session);
+                    var staffSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new StaffRolesView(staffService, staffSession);
 
                 case "Episodes":
                     var epService = _serviceProvider.GetRequiredService<IEpisodeService>();
@@ -117,19 +139,18 @@ namespace Radio.Services
                     var gService = _serviceProvider.GetRequiredService<IGuestService>();
                     var cService = _serviceProvider.GetRequiredService<ICorrespondentService>();
                     var epEmpService = _serviceProvider.GetRequiredService<IEmployeeService>();
-                    return new EpisodesView(epService, pService, _session, _serviceProvider, gService, cService, epEmpService);
+                    var epSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new EpisodesView(epService, pService, epSession, _serviceProvider, gService, cService, epEmpService);
 
                 case "Guests":
                     var guestService = _serviceProvider.GetRequiredService<IGuestService>();
-                    return new GuestsView(guestService, _session);
+                    var gstSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new GuestsView(guestService, gstSession);
 
                 case "Correspondents":
                     var corService = _serviceProvider.GetRequiredService<ICorrespondentService>();
-                    return new CorrespondentsView(corService, _session);
-
-                case "Coverage":
-                    var covService = _serviceProvider.GetRequiredService<ICoverageService>();
-                    return new CoverageView(covService, _session, _serviceProvider);
+                    var corSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new CorrespondentsView(corService, corSession);
 
                 case "Reports":
                     var reportService = _serviceProvider.GetRequiredService<IReportsService>();
@@ -138,13 +159,18 @@ namespace Radio.Services
                 case "PublishingRecords":
                     var pubRecService = _serviceProvider.GetRequiredService<IPublishingService>();
                     var execRecService = _serviceProvider.GetRequiredService<IExecutionService>();
-                    return new PublishingRecordsView(pubRecService, execRecService, _session, _serviceProvider);
+                    var pubSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new PublishingRecordsView(pubRecService, execRecService, pubSession, _serviceProvider);
 
                 case "PermissionMatrix":
-                    return new PermissionMatrixView(userService, _session);
+                    var pmUserService = _serviceProvider.GetRequiredService<IUserService>();
+                    var pmSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new PermissionMatrixView(pmUserService, pmSession);
 
                 case "SecurityRoles":
-                    return new SecurityRolesView(userService, _session);
+                    var srUserService = _serviceProvider.GetRequiredService<IUserService>();
+                    var srSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new SecurityRolesView(srUserService, srSession, this);
 
                 case "Permissions":
                     var permService = _serviceProvider.GetRequiredService<IPermissionService>();
@@ -152,18 +178,22 @@ namespace Radio.Services
 
                 case "Database":
                     var dbMgmtService = _serviceProvider.GetRequiredService<IDatabaseManagementService>();
-                    return new DatabaseManagementView(dbMgmtService, _session);
+                    var dbSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new DatabaseManagementView(dbMgmtService, dbSession);
 
                 case "AuditLogs":
                     var auditLogService = _serviceProvider.GetRequiredService<IAuditLogService>();
-                    return new AuditLogsView(auditLogService, _session);
+                    var alSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new AuditLogsView(auditLogService, alSession);
 
                 case "Diagnostics":
                     var diagService = _serviceProvider.GetRequiredService<ISystemDiagnosticsService>();
-                    return new SystemDiagnosticsView(diagService, _session);
+                    var diagSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new SystemDiagnosticsView(diagService, diagSession);
 
                 case "AdminHub":
-                    return new AdminHubView(_serviceProvider, _session);
+                    var ahSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new AdminHubView(_serviceProvider, ahSession, this);
 
                 default:
                     return null;

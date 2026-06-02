@@ -124,6 +124,14 @@
     <SolidColorBrush x:Key="SelectedBrush" Color="{StaticResource Primary50Color}" />
     <SolidColorBrush x:Key="FocusRingBrush" Color="{StaticResource Primary400Color}" />
 
+    <!--  MD3 Aliases for Navigation System  -->
+    <SolidColorBrush x:Key="PrimaryContainerBrush" Color="{StaticResource Primary50Color}" />
+    <SolidColorBrush x:Key="OnPrimaryContainerBrush" Color="{StaticResource Primary800Color}" />
+    <SolidColorBrush x:Key="OnSurfaceVariantBrush" Color="{StaticResource Neutral700Color}" />
+    <SolidColorBrush x:Key="SecondaryContainerBrush" Color="{StaticResource Secondary100Color}" />
+    <SolidColorBrush x:Key="OnSecondaryContainerBrush" Color="{StaticResource Secondary500Color}" />
+    <SolidColorBrush x:Key="SurfaceContainerBrush" Color="{StaticResource SurfaceColor}" />
+
     <!--  Semantic Brushes  -->
     <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
     <SolidColorBrush x:Key="SuccessLightBrush" Color="{StaticResource SuccessLightColor}" />

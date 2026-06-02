@@ -1,6 +1,11 @@
 using DataAccess.Common;
+using MaterialDesignThemes.Wpf;
+using Radio.Controls;
 using Radio.Messaging;
+using Radio.Models;
 using Radio.Services;
+using System;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,84 +19,76 @@ namespace Radio
     {
         private readonly NavigationService _navigationService;
         private readonly UserSession _session;
-        private readonly IServiceProvider _serviceProvider;
-        
+        private NavigationMode _navigationMode = NavigationMode.Expanded;
+
         private DateTime? _broadcastStartTime;
         private DispatcherTimer _onAirTimer;
 
-        private static readonly Dictionary<string, string> NavRouteMap = new()
+        public ModernMainWindow(NavigationService navigationService, CurrentSessionProvider sessionProvider)
         {
-            ["MenuHome"] = "Home",
-            ["MenuEpisodes"] = "Episodes",
-            ["MenuGuests"] = "Guests",
-            ["MenuCoverages"] = "Correspondents",
-            ["MenuReports"] = "Reports",
-            ["MenuPublishingRecords"] = "PublishingRecords",
-            ["MenuSocialPlatforms"] = "SocialPlatforms",
-            ["MenuAdminHub"] = "AdminHub",
-        };
-
-        private Dictionary<string, bool> _sectionStates = new()
-        {
-            ["Workflow"] = true,
-            ["Publishing"] = false
-        };
-
-        public async Task ShowOverlay() => await this.ShowOverlayAsync();
-        public async Task HideOverlay() => await this.HideOverlayAsync();
-
-        public ModernMainWindow(UserSession session, IServiceProvider serviceProvider)
-        {
-            _session = session;
-            _serviceProvider = serviceProvider;
-            _navigationService = new NavigationService(serviceProvider, session);
+            _navigationService = navigationService;
+            _session = sessionProvider.CurrentSession!;
             _navigationService.ViewChanged += OnViewChanged;
 
             InitializeComponent();
             NotificationManager.RegisterHost(NotificationHost);
 
+            InitializeNavigationItems();
             InitializeUI();
             InitializeOnAirWidget();
+        }
+
+        private ObservableCollection<NavigationItem>? _navItems;
+
+        private void InitializeNavigationItems()
+        {
+            _navItems = NavigationBuilder.CreateMainNavigation();
+            ResponsiveNav.NavigationItems = _navItems;
+            BottomNav.NavigationItems = NavigationBuilder.CreateBottomNavigation();
         }
 
         private void InitializeUI()
         {
             ApplyPermissionSecurity();
-            _navigationService.NavigateTo("Home");
+            var homeView = _navigationService.NavigateTo("Home");
+            if (homeView != null)
+                MainContentArea.Content = homeView;
         }
 
         private void OnViewChanged(string viewName)
         {
             UpdateBreadcrumb();
+            BtnGoBack.Visibility = _navigationService.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
+            ResponsiveNav.SetSelected(viewName);
+            BottomNav.SetSelected(viewName);
         }
 
         private void UpdateBreadcrumb()
         {
-            var path = string.Join(" / ", _navigationService.History.Reverse().Take(3));
+            var path = string.Join(" / ", _navigationService.History.Reverse());
             BreadcrumbBar.Text = path;
         }
 
         private void ApplyPermissionSecurity()
         {
-            bool canManageUsers = _session.HasPermission(AppPermissions.UserManage);
-            bool canManageStaff = _session.HasPermission(AppPermissions.StaffManage);
-            bool canViewReports = _session.HasPermission(AppPermissions.ViewReports);
-            bool canManageGuests = _session.HasPermission(AppPermissions.GuestManage);
-            bool canCoordinate = _session.HasPermission(AppPermissions.CoordinationManage);
+            if (_navItems == null) return;
 
-            // Workflow Items
-            MenuGuests.Visibility = canManageGuests ? Visibility.Visible : Visibility.Collapsed;
-            MenuCoverages.Visibility = canCoordinate ? Visibility.Visible : Visibility.Collapsed;
-            MenuReports.Visibility = canViewReports ? Visibility.Visible : Visibility.Collapsed;
+            foreach (var item in _navItems)
+            {
+                if (!string.IsNullOrEmpty(item.RequiredPermission))
+                {
+                    item.IsVisible = _session.HasPermission(item.RequiredPermission);
+                }
+            }
+        }
 
-            // Publishing Items
-            bool showPublishing = canViewReports || canManageStaff;
-            PublishingHeader.Visibility = showPublishing ? Visibility.Visible : Visibility.Collapsed;
-            PublishingItems.Visibility = showPublishing ? Visibility.Visible : Visibility.Collapsed;
-
-            // Admin Hub (single consolidated button - internal permissions handled by AdminHubView)
-            bool showAdminHub = canManageUsers || canManageStaff || _session.IsAdmin;
-            MenuAdminHub.Visibility = showAdminHub ? Visibility.Visible : Visibility.Collapsed;
+        private void NavigationRequested(string viewName)
+        {
+            NavigateToView(viewName);
+            if (_navigationMode == NavigationMode.Drawer)
+            {
+                ToggleDrawer(false);
+            }
         }
 
         public void NavigateToView(string viewName)
@@ -99,84 +96,90 @@ namespace Radio
             var view = _navigationService.NavigateTo(viewName);
             if (view != null)
             {
-                MainContentArea.Content = view;
-
-                // تحديث حالة الأزرار في القائمة الجانبية (اختياري ولكن يفضل للجمالية)
-                var buttonName = NavRouteMap.FirstOrDefault(x => x.Value == viewName).Key;
-                if (!string.IsNullOrEmpty(buttonName))
+                var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250))
                 {
-                    var button = this.FindName(buttonName) as RadioButton;
-                    if (button != null) button.IsChecked = true;
-                }
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                view.Opacity = 0;
+                MainContentArea.Content = view;
+                view.BeginAnimation(OpacityProperty, fadeIn);
             }
         }
 
-        private void NavRailItem_Click(object sender, RoutedEventArgs e)
+        private void BtnGoBack_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is RadioButton rb && NavRouteMap.TryGetValue(rb.Name, out var viewName))
+            var view = _navigationService.GoBack();
+            if (view != null)
             {
-                NavigateToView(viewName);
+                var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250))
+                {
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                view.Opacity = 0;
+                MainContentArea.Content = view;
+                view.BeginAnimation(OpacityProperty, fadeIn);
             }
         }
 
-        private void SectionHeader_Click(object sender, MouseButtonEventArgs e)
+        private void BtnMenuToggle_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Border header && header.Tag is string section)
+            if (_navigationMode == NavigationMode.Drawer)
             {
-                bool isExpanded = _sectionStates.ContainsKey(section) && _sectionStates[section];
-                _sectionStates[section] = !isExpanded;
-                UpdateSectionVisibility(section, !isExpanded);
+                ToggleDrawer(false);
+            }
+            else
+            {
+                ToggleDrawer(true);
             }
         }
 
-        private void UpdateSectionVisibility(string section, bool expand)
+        private bool _isDrawerOpen = false;
+        private void ToggleDrawer(bool open)
         {
-            var panel = section switch
-            {
-                "Workflow" => WorkflowItems,
-                "Publishing" => PublishingItems,
-                _ => null
-            };
-
-            var chevron = section switch
-            {
-                "Workflow" => WorkflowChevron,
-                "Publishing" => PublishingChevron,
-                _ => null
-            };
-
-            if (panel != null)
-            {
-                panel.Visibility = expand ? Visibility.Visible : Visibility.Collapsed;
-            }
-
-            if (chevron != null)
-            {
-                chevron.RenderTransform = new RotateTransform(expand ? 0 : 180);
-                chevron.RenderTransformOrigin = new Point(0.5, 0.5);
-            }
-        }
-
-        private void BtnCollapseToggle_Click(object sender, RoutedEventArgs e)
-        {
-            bool isCollapsed = ColSidebar.Width.Value == 0;
+            _isDrawerOpen = open;
+            MenuIcon.Kind = open ? PackIconKind.MenuOpen : PackIconKind.Menu;
             
-            DoubleAnimation animation = new DoubleAnimation
-            {
-                To = isCollapsed ? 260 : 0,
-                Duration = TimeSpan.FromMilliseconds(300),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-            };
+            ColSidebar.MinWidth = open ? 260 : 64;
+            ColSidebar.Width = new GridLength(open ? 260 : 64);
+            ColSidebar.MaxWidth = open ? 260 : 64;
+        }
 
-            // Using direct width change for simplicity in this example
-            ColSidebar.BeginAnimation(ColumnDefinition.WidthProperty, new GridLengthAnimation
-            {
-                From = isCollapsed ? new GridLength(0) : new GridLength(260),
-                To = isCollapsed ? new GridLength(260) : new GridLength(0),
-                Duration = TimeSpan.FromMilliseconds(300)
-            });
+        private void Window_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
+        {
+            var width = e.NewSize.Width;
+            NavigationMode newMode;
 
-            CollapseIcon.Kind = isCollapsed ? MaterialDesignThemes.Wpf.PackIconKind.MenuOpen : MaterialDesignThemes.Wpf.PackIconKind.Menu;
+            if (width < 768)
+                newMode = NavigationMode.Drawer;
+            else if (width < 1200)
+                newMode = NavigationMode.Collapsed;
+            else
+                newMode = NavigationMode.Expanded;
+
+            if (newMode != _navigationMode)
+            {
+                _navigationMode = newMode;
+                ColSidebar.MinWidth = newMode == NavigationMode.Drawer ? 0 : 
+                                    newMode == NavigationMode.Collapsed ? 64 : 260;
+                ColSidebar.MaxWidth = newMode == NavigationMode.Drawer ? 260 : 
+                                     newMode == NavigationMode.Collapsed ? 64 : 260;
+                ColSidebar.Width = new GridLength(
+                    newMode == NavigationMode.Drawer ? (double)ColSidebar.ActualWidth :
+                    newMode == NavigationMode.Collapsed ? 64 : 260);
+
+                if (newMode == NavigationMode.Drawer)
+                {
+                    BottomNav.Visibility = Visibility.Visible;
+                    AppTitle.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    BottomNav.Visibility = Visibility.Collapsed;
+                    AppTitle.Visibility = Visibility.Visible;
+                }
+
+                ResponsiveNav.Mode = newMode;
+            }
         }
 
         private void InitializeOnAirWidget()
@@ -190,7 +193,6 @@ namespace Radio
                 }
             };
 
-            // Simple pulse animation
             var pulse = new DoubleAnimation(1.0, 0.4, new Duration(TimeSpan.FromSeconds(1)))
             {
                 AutoReverse = true,
@@ -199,7 +201,6 @@ namespace Radio
             LivePulse.BeginAnimation(OpacityProperty, pulse);
         }
 
-        // Methods to start/stop broadcast (can be called from child views or services)
         public void StartBroadcast(string programName)
         {
             _broadcastStartTime = DateTime.Now;
@@ -225,7 +226,9 @@ namespace Radio
             Application.Current.Shutdown();
         }
 
-        // Custom Window Controls
+        public async Task ShowOverlay() => await this.ShowOverlayAsync();
+        public async Task HideOverlay() => await this.HideOverlayAsync();
+
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
@@ -248,12 +251,12 @@ namespace Radio
             if (this.WindowState == WindowState.Maximized)
             {
                 this.WindowState = WindowState.Normal;
-                MaximizeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.WindowMaximize;
+                MaximizeIcon.Kind = PackIconKind.WindowMaximize;
             }
             else
             {
                 this.WindowState = WindowState.Maximized;
-                MaximizeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.WindowRestore;
+                MaximizeIcon.Kind = PackIconKind.WindowRestore;
             }
         }
 
@@ -261,27 +264,5 @@ namespace Radio
         {
             this.Close();
         }
-    }
-
-    // Helper class for GridLength animation (since WPF doesn't support it natively)
-    public class GridLengthAnimation : AnimationTimeline
-    {
-        public override Type TargetPropertyType => typeof(GridLength);
-        public GridLength From { get; set; }
-        public GridLength To { get; set; }
-
-        public override object GetCurrentValue(object defaultOriginValue, object defaultDestinationValue, AnimationClock animationClock)
-        {
-            double fromVal = From.Value;
-            double toVal = To.Value;
-
-            if (fromVal > toVal)
-            {
-                return new GridLength((1 - animationClock.CurrentProgress.Value) * (fromVal - toVal) + toVal, From.GridUnitType);
-            }
-            return new GridLength(animationClock.CurrentProgress.Value * (toVal - fromVal) + fromVal, From.GridUnitType);
-        }
-
-        protected override Freezable CreateInstanceCore() => new GridLengthAnimation();
     }
 }

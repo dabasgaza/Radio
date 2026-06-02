@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        Top App Bar Styles — Material Design 3
+        Naming: TopAppBar.{Variant}
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── TopAppBar.Small — Standard app bar ──  -->
+    <Style x:Key="TopAppBar.Small" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Setter Property="Height" Value="64" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="Effect" Value="{DynamicResource Shadow.Elevation1}" />
+    </Style>
+
+    <!--  ── TopAppBar.Medium — Medium with larger title area ──  -->
+    <Style x:Key="TopAppBar.Medium" TargetType="Border" BasedOn="{StaticResource TopAppBar.Small}">
+        <Setter Property="Height" Value="112" />
+        <Setter Property="Padding" Value="16,20" />
+    </Style>
+
+    <!--  ── TopAppBar.Large — Large with prominent title ──  -->
+    <Style x:Key="TopAppBar.Large" TargetType="Border" BasedOn="{StaticResource TopAppBar.Small}">
+        <Setter Property="Height" Value="176" />
+        <Setter Property="Padding" Value="16,36,16,16" />
+    </Style>
+
+    <!--  ── TopAppBar.ActionBtn — Action icon button ──  -->
+    <Style x:Key="TopAppBar.ActionBtn" TargetType="Button" BasedOn="{StaticResource Btn.Icon}">
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+    </Style>
+
+    <!--  ── TopAppBar.Title — Title text block ──  -->
+    <Style x:Key="TopAppBar.Title" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceBrush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Type.Title.Large}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Primary}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!--  ── TopAppBar.Subtitle ──  -->
+    <Style x:Key="TopAppBar.Subtitle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Type.Body.Medium}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Primary}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+</ResourceDictionary>

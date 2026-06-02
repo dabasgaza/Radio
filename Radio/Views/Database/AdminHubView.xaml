@@ -5,184 +5,155 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ctrl="clr-namespace:Radio.Controls"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
     FlowDirection="RightToLeft"
     mc:Ignorable="d">
 
-    <Grid Margin="16">
+    <UserControl.Resources>
+        <Style x:Key="AdminChip.Horizontal" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+            <Setter Property="Padding" Value="14,7" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border
+                            x:Name="ChipBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="18">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ChipBorder" Property="Background" Value="{DynamicResource HoverOverlayBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ChipBorder" Property="Background" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AdminChip.Vertical" TargetType="RadioButton" BasedOn="{StaticResource AdminChip.Horizontal}">
+            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="Padding" Value="16,12" />
+        </Style>
+
+        <Style x:Key="AdminHub.CategoryLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,8,0,4" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Header -->
         <Border
             Grid.Row="0"
-            Margin="0,0,0,16"
-            Padding="16"
+            Margin="0,0,0,12"
+            Padding="20,14"
             Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource DividerBrush}"
             BorderThickness="1"
             CornerRadius="8">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel>
-                    <TextBlock
-                        FontWeight="Bold"
-                        Foreground="{DynamicResource PrimaryDarkBrush}"
-                        Style="{StaticResource Type.Headline}"
-                        Text="مركز الإدارة والتحكم الموحد" />
-                    <TextBlock
-                        Margin="0,4,0,0"
-                        Foreground="{DynamicResource TextSecondaryBrush}"
-                        Style="{StaticResource Type.BodyMedium}"
-                        Text="إدارة الموظفين والكوادر، وضبط صلاحيات الوصول، وصيانة قاعدة البيانات ومراقبة الأداء العام." />
-                </StackPanel>
-
-                <materialDesign:PackIcon
-                    Grid.Column="1"
+                <Border
+                    Grid.Column="0"
                     Width="40"
                     Height="40"
-                    VerticalAlignment="Center"
-                    Foreground="{DynamicResource PrimaryMainBrush}"
-                    Kind="SettingsConfiguration" />
+                    Margin="0,0,14,0"
+                    Background="{DynamicResource PrimaryXLightBrush}"
+                    CornerRadius="10">
+                    <materialDesign:PackIcon
+                        Width="22"
+                        Height="22"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource PrimaryMainBrush}"
+                        Kind="CogOutline" />
+                </Border>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource TextPrimaryBrush}"
+                        Text="مركز الإدارة والتحكم" />
+                    <TextBlock
+                        Margin="0,2,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource TextDisabledBrush}"
+                        Text="إدارة الكوادر والصلاحيات وصيانة النظام" />
+                </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Workspace Grid -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="260" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <Border
+            x:Name="HorizontalNav"
+            Grid.Row="1"
+            Margin="0,0,0,12"
+            Padding="16,10"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource DividerBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="ChipPanel" Orientation="Horizontal" />
+            </ScrollViewer>
+        </Border>
 
-            <!-- Inner Admin Navigation Sidebar -->
-            <Border
-                Grid.Column="0"
-                Margin="0,0,16,0"
-                Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource DividerBrush}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="8">
-                
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <!-- Category 1: Staff & Security -->
-                        <TextBlock
-                            Text="الكوادر والصلاحيات"
-                            Margin="12,12,12,8"
-                            FontWeight="Bold"
-                            Foreground="{DynamicResource PrimaryMainBrush}"
-                            Style="{StaticResource Type.Overline}" />
-                        
-                        <ListBox x:Name="ListStaffSecurity" SelectionChanged="ListNavigation_SelectionChanged" Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
-                            <ListBoxItem Tag="Users">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="AccountKeyOutline" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="إدارة المستخدمين" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem Tag="Employees">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="AccountTieOutline" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="الموظفين" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem Tag="StaffRoles">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="BriefcaseOutline" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="المسميات الوظيفية" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem Tag="SecurityRoles">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="ShieldAccountOutline" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="الأدوار الأمنية" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem Tag="PermissionMatrix">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="Matrix" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="مصفوفة الصلاحيات" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem Tag="Permissions">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="LockOpenOutline" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="الصلاحيات العامة" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                        </ListBox>
+        <Border
+            x:Name="VerticalNav"
+            Grid.Row="1"
+            Margin="0,0,12,0"
+            Padding="8"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource DividerBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Visibility="Collapsed">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="VerticalChipPanel" />
+            </ScrollViewer>
+        </Border>
 
-                        <Separator Margin="8,12" />
-
-                        <!-- Category 2: System & Maintenance -->
-                        <TextBlock
-                            Text="الصيانة والنظام"
-                            Margin="12,4,12,8"
-                            FontWeight="Bold"
-                            Foreground="{DynamicResource PrimaryMainBrush}"
-                            Style="{StaticResource Type.Overline}" />
-
-                        <ListBox x:Name="ListSystemMaintenance" SelectionChanged="ListNavigation_SelectionChanged" Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
-                            <ListBoxItem Tag="Database">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="Database" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="إدارة قاعدة البيانات" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem Tag="AuditLogs">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="History" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="سجل العمليات والتدقيق" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem Tag="Diagnostics">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="MonitorDashboard" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="مراقبة النظام والأداء" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                        </ListBox>
-
-                        <Separator Margin="8,12" />
-
-                        <!-- Category 3: Configuration -->
-                        <TextBlock
-                            Text="الإعدادات العامة"
-                            Margin="12,4,12,8"
-                            FontWeight="Bold"
-                            Foreground="{DynamicResource PrimaryMainBrush}"
-                            Style="{StaticResource Type.Overline}" />
-
-                        <ListBox x:Name="ListConfiguration" SelectionChanged="ListNavigation_SelectionChanged" Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
-                            <ListBoxItem Tag="SocialPlatforms">
-                                <StackPanel Orientation="Horizontal" Margin="4,2">
-                                    <materialDesign:PackIcon Kind="ShareVariantOutline" Width="20" Height="20" Margin="0,0,10,0" />
-                                    <TextBlock Text="المنصات الاجتماعية" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </ListBoxItem>
-                        </ListBox>
-                    </StackPanel>
-                </ScrollViewer>
-            </Border>
-
-            <!-- Content Area displaying the nested view -->
-            <Border
-                Grid.Column="1"
-                Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource DividerBrush}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="16">
-                <ContentControl x:Name="AdminHubContentArea" />
-            </Border>
-        </Grid>
+        <Border
+            Grid.Row="1"
+            Grid.Column="1"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource DividerBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="16">
+            <ContentControl x:Name="AdminHubContentArea" />
+        </Border>
     </Grid>
 </UserControl>

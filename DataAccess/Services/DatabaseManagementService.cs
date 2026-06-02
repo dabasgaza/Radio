@@ -329,6 +329,10 @@ namespace DataAccess.Services
                     .ToListAsync();
                 return Result<List<DatabaseBackupLog>>.Success(list);
             }
+            catch (Exception ex) when (ex is Microsoft.Data.SqlClient.SqlException || ex is InvalidOperationException)
+            {
+                return Result<List<DatabaseBackupLog>>.Fail("جدول سجل النسخ الاحتياطي (DatabaseBackupLogs) غير موجود أو لم يُنشأ بعد. الرجاء الضغط على زر \"تهيئة قاعدة البيانات\" أولاً.");
+            }
             catch (Exception ex)
             {
                 return Result<List<DatabaseBackupLog>>.Fail($"حدث خطأ أثناء جلب سجل النسخ الاحتياطي: {ex.Message}");

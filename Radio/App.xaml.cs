@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Radio.Forms;
 using Radio.Messaging;
+using Radio.Services;
 using Serilog;
 using System.Windows;
 using System.Windows.Threading;
@@ -95,6 +96,7 @@ namespace Radio
             builder.Services.AddMemoryCache();
 
             // 5. UI
+            builder.Services.AddSingleton<NavigationService>();
             builder.Services.AddTransient<LoginWindow>();
             builder.Services.AddTransient<ModernMainWindow>();
 

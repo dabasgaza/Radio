@@ -2,6 +2,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -11,12 +12,14 @@ namespace Radio.Views.Users
     {
         private readonly IUserService _userService;
         private readonly UserSession _session;
+        private readonly NavigationService _navigationService;
 
-        public SecurityRolesView(IUserService userService, UserSession session)
+        public SecurityRolesView(IUserService userService, UserSession session, NavigationService navigationService)
         {
             InitializeComponent();
             _userService = userService;
             _session = session;
+            _navigationService = navigationService;
             Loaded += async (_, _) => await LoadDataAsync();
         }
 
@@ -101,14 +104,9 @@ MessageService.Current.ShowSuccess(Messages.Updated("الدور", dto.RoleName))
 
         private void BtnManagePermissions_Click(object sender, RoutedEventArgs e)
         {
-            // هذا الزر سينقلك لمصفوفة الصلاحيات
-            // في تطبيقنا، المصفوفة تعرض كل الأدوار، ولكن يمكننا تحسينها مستقبلاً لتركز على دور واحد
             if (sender is Button { DataContext: RoleDto dto })
             {
-                 // سنقوم بمجرد فتح شاشة مصفوفة الصلاحيات
-                 // (يمكن تطوير NavigationService لاحقاً ليدعم تمرير Parameters)
-                 var modernWindow = Window.GetWindow(this) as ModernMainWindow;
-                 modernWindow?.NavigateToView("PermissionMatrix");
+                _navigationService.NavigateTo("PermissionMatrix");
             }
         }
     }

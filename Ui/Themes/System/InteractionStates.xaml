@@ -1,0 +1,32 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        MD3 Interaction State System
+        State layer opacities + container transforms + disabled tokens
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── State Layer Opacities (MD3 Standard) ──  -->
+    <system:Double x:Key="State.Hover">0.08</system:Double>
+    <system:Double x:Key="State.Focus">0.10</system:Double>
+    <system:Double x:Key="State.Pressed">0.12</system:Double>
+    <system:Double x:Key="State.Dragged">0.16</system:Double>
+
+    <!--  ── Container Transformations ──  -->
+    <system:Double x:Key="State.ScaleNormal">1.0</system:Double>
+    <system:Double x:Key="State.ScalePressed">0.97</system:Double>
+    <system:Double x:Key="State.ScaleHover">1.02</system:Double>
+    <system:Double x:Key="State.ScaleActive">1.05</system:Double>
+
+    <!--  ── Disabled Opacities ──  -->
+    <system:Double x:Key="State.DisabledOpacity">0.38</system:Double>
+    <system:Double x:Key="State.DisabledOpacityContainer">0.12</system:Double>
+    <system:Double x:Key="State.DisabledOpacitySurface">0.04</system:Double>
+
+    <!--  ── Focus Ring ──  -->
+    <Thickness x:Key="State.FocusRingThickness">2</Thickness>
+    <system:Double x:Key="State.FocusRingOffset">2</system:Double>
+
+</ResourceDictionary>

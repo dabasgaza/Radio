@@ -378,3 +378,4 @@ FodyWeavers.xsd
 # NUL device file (Windows reserved name)
 nul
 /.github
+ProjectCode_Collection.txt

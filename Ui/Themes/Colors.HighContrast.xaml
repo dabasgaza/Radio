@@ -1,0 +1,107 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        High Contrast Mode — WCAG AAA Compliant
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── Primary ──  -->
+    <Color x:Key="Primary">#0000CC</Color>
+    <Color x:Key="OnPrimary">#FFFFFF</Color>
+    <Color x:Key="PrimaryContainer">#0000CC</Color>
+    <Color x:Key="OnPrimaryContainer">#FFFFFF</Color>
+
+    <!--  ── Secondary ──  -->
+    <Color x:Key="Secondary">#000000</Color>
+    <Color x:Key="OnSecondary">#FFFFFF</Color>
+    <Color x:Key="SecondaryContainer">#000000</Color>
+    <Color x:Key="OnSecondaryContainer">#FFFFFF</Color>
+
+    <!--  ── Tertiary ──  -->
+    <Color x:Key="Tertiary">#663300</Color>
+    <Color x:Key="OnTertiary">#FFFFFF</Color>
+    <Color x:Key="TertiaryContainer">#663300</Color>
+    <Color x:Key="OnTertiaryContainer">#FFFFFF</Color>
+
+    <!--  ── Error ──  -->
+    <Color x:Key="Error">#CC0000</Color>
+    <Color x:Key="OnError">#FFFFFF</Color>
+    <Color x:Key="ErrorContainer">#CC0000</Color>
+    <Color x:Key="OnErrorContainer">#FFFFFF</Color>
+
+    <!--  ── Surface ──  -->
+    <Color x:Key="Surface">#FFFFFF</Color>
+    <Color x:Key="OnSurface">#000000</Color>
+    <Color x:Key="SurfaceVariant">#FFFFFF</Color>
+    <Color x:Key="OnSurfaceVariant">#000000</Color>
+
+    <!--  ── Surface Containers ──  -->
+    <Color x:Key="SurfaceContainerLowest">#FFFFFF</Color>
+    <Color x:Key="SurfaceContainerLow">#F0F0F0</Color>
+    <Color x:Key="SurfaceContainer">#E0E0E0</Color>
+    <Color x:Key="SurfaceContainerHigh">#D0D0D0</Color>
+    <Color x:Key="SurfaceContainerHighest">#C0C0C0</Color>
+
+    <!--  ── Background / Foreground ──  -->
+    <Color x:Key="Background">#FFFFFF</Color>
+    <Color x:Key="OnBackground">#000000</Color>
+
+    <!--  ── Outline ──  -->
+    <Color x:Key="Outline">#000000</Color>
+    <Color x:Key="OutlineVariant">#666666</Color>
+
+    <!--  ── Inverse ──  -->
+    <Color x:Key="InverseSurface">#000000</Color>
+    <Color x:Key="InverseOnSurface">#FFFFFF</Color>
+    <Color x:Key="InversePrimary">#0000FF</Color>
+
+    <!--  ── Scrim / Shadow ──  -->
+    <Color x:Key="Scrim">#000000</Color>
+    <Color x:Key="Shadow">#000000</Color>
+
+    <!--  ── Brushes ──  -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource Primary}" />
+    <SolidColorBrush x:Key="OnPrimaryBrush" Color="{DynamicResource OnPrimary}" />
+    <SolidColorBrush x:Key="PrimaryContainerBrush" Color="{DynamicResource PrimaryContainer}" />
+    <SolidColorBrush x:Key="OnPrimaryContainerBrush" Color="{DynamicResource OnPrimaryContainer}" />
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{DynamicResource Secondary}" />
+    <SolidColorBrush x:Key="OnSecondaryBrush" Color="{DynamicResource OnSecondary}" />
+    <SolidColorBrush x:Key="SecondaryContainerBrush" Color="{DynamicResource SecondaryContainer}" />
+    <SolidColorBrush x:Key="OnSecondaryContainerBrush" Color="{DynamicResource OnSecondaryContainer}" />
+    <SolidColorBrush x:Key="TertiaryBrush" Color="{DynamicResource Tertiary}" />
+    <SolidColorBrush x:Key="OnTertiaryBrush" Color="{DynamicResource OnTertiary}" />
+    <SolidColorBrush x:Key="TertiaryContainerBrush" Color="{DynamicResource TertiaryContainer}" />
+    <SolidColorBrush x:Key="OnTertiaryContainerBrush" Color="{DynamicResource OnTertiaryContainer}" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="{DynamicResource Error}" />
+    <SolidColorBrush x:Key="OnErrorBrush" Color="{DynamicResource OnError}" />
+    <SolidColorBrush x:Key="ErrorContainerBrush" Color="{DynamicResource ErrorContainer}" />
+    <SolidColorBrush x:Key="OnErrorContainerBrush" Color="{DynamicResource OnErrorContainer}" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{DynamicResource Surface}" />
+    <SolidColorBrush x:Key="OnSurfaceBrush" Color="{DynamicResource OnSurface}" />
+    <SolidColorBrush x:Key="SurfaceVariantBrush" Color="{DynamicResource SurfaceVariant}" />
+    <SolidColorBrush x:Key="OnSurfaceVariantBrush" Color="{DynamicResource OnSurfaceVariant}" />
+    <SolidColorBrush x:Key="SurfaceContainerLowestBrush" Color="{DynamicResource SurfaceContainerLowest}" />
+    <SolidColorBrush x:Key="SurfaceContainerLowBrush" Color="{DynamicResource SurfaceContainerLow}" />
+    <SolidColorBrush x:Key="SurfaceContainerBrush" Color="{DynamicResource SurfaceContainer}" />
+    <SolidColorBrush x:Key="SurfaceContainerHighBrush" Color="{DynamicResource SurfaceContainerHigh}" />
+    <SolidColorBrush x:Key="SurfaceContainerHighestBrush" Color="{DynamicResource SurfaceContainerHighest}" />
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{DynamicResource Background}" />
+    <SolidColorBrush x:Key="OnBackgroundBrush" Color="{DynamicResource OnBackground}" />
+    <SolidColorBrush x:Key="OutlineBrush" Color="{DynamicResource Outline}" />
+    <SolidColorBrush x:Key="OutlineVariantBrush" Color="{DynamicResource OutlineVariant}" />
+    <SolidColorBrush x:Key="InverseSurfaceBrush" Color="{DynamicResource InverseSurface}" />
+    <SolidColorBrush x:Key="InverseOnSurfaceBrush" Color="{DynamicResource InverseOnSurface}" />
+    <SolidColorBrush x:Key="InversePrimaryBrush" Color="{DynamicResource InversePrimary}" />
+    <SolidColorBrush x:Key="ScrimBrush" Color="{DynamicResource Scrim}" />
+    <SolidColorBrush x:Key="ShadowBrush" Color="{DynamicResource Shadow}" />
+
+    <!--  ── Interaction Overlays ──  -->
+    <SolidColorBrush x:Key="RippleBrush" Color="#330000CC" />
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="#1A000000" />
+    <SolidColorBrush x:Key="FocusOverlayBrush" Color="#330000CC" />
+    <SolidColorBrush x:Key="PressedOverlayBrush" Color="#33000000" />
+    <SolidColorBrush x:Key="DraggedOverlayBrush" Color="#26000000" />
+
+</ResourceDictionary>

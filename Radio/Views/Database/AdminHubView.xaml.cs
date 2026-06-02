@@ -1,6 +1,9 @@
 using DataAccess.Common;
 using DataAccess.Services;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.DependencyInjection;
+using Radio.Models;
+using Radio.Services;
 using Radio.Views.Employees;
 using Radio.Views.SocialPlatforms;
 using Radio.Views.StaffRoles;
@@ -16,31 +19,71 @@ namespace Radio.Views.Database
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserSession _session;
+        private readonly NavigationService _navigationService;
         private readonly Dictionary<string, UserControl> _cachedViews = new();
-        private bool _isUpdatingSelection = false;
+        private readonly List<RadioButton> _chips = new();
 
-        public AdminHubView(IServiceProvider serviceProvider, UserSession session)
+        public AdminHubView(IServiceProvider serviceProvider, UserSession session, NavigationService navigationService)
         {
             InitializeComponent();
             _serviceProvider = serviceProvider;
             _session = session;
+            _navigationService = navigationService;
 
             Loaded += AdminHubView_Loaded;
         }
 
         private void AdminHubView_Loaded(object sender, RoutedEventArgs e)
         {
+            BuildNavigation();
             ApplyPermissions();
-            
-            // Navigate to default view (Users or whatever is visible first)
-            if (ListStaffSecurity.Items.Count > 0 && ListStaffSecurity.Visibility == Visibility.Visible)
+            SelectDefaultChip();
+        }
+
+        private void BuildNavigation()
+        {
+            var navItems = NavigationBuilder.CreateAdminNavigation();
+            foreach (var item in navItems)
             {
-                ListStaffSecurity.SelectedIndex = 0;
+                var chip = CreateChip(item);
+                _chips.Add(chip);
+                ChipPanel.Children.Add(chip);
+                VerticalChipPanel.Children.Add(CreateChip(item, true));
             }
-            else if (ListSystemMaintenance.Items.Count > 0 && ListSystemMaintenance.Visibility == Visibility.Visible)
+        }
+
+        private RadioButton CreateChip(NavigationItem item, bool isVertical = false)
+        {
+            var stackPanel = new StackPanel
             {
-                ListSystemMaintenance.SelectedIndex = 0;
-            }
+                Orientation = Orientation.Horizontal
+            };
+
+            var icon = new PackIcon
+            {
+                Width = isVertical ? 20 : 16,
+                Height = isVertical ? 20 : 16,
+                Margin = new Thickness(0, 0, isVertical ? 10 : 6, 0),
+                Kind = item.Icon
+            };
+
+            var textBlock = new TextBlock
+            {
+                Text = item.Label,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            stackPanel.Children.Add(icon);
+            stackPanel.Children.Add(textBlock);
+
+            var radioButton = new RadioButton
+            {
+                Tag = item.Route,
+                Content = stackPanel,
+                Style = (Style)FindResource(isVertical ? "AdminChip.Vertical" : "AdminChip.Horizontal")
+            };
+            radioButton.Checked += Chip_Click;
+            return radioButton;
         }
 
         private void ApplyPermissions()
@@ -48,27 +91,46 @@ namespace Radio.Views.Database
             bool canManageUsers = _session.HasPermission(AppPermissions.UserManage);
             bool canManageStaff = _session.HasPermission(AppPermissions.StaffManage);
 
-            // Hide/Show ListBox items or entire ListBoxes based on permission
-            ListStaffSecurity.Visibility = (canManageUsers || canManageStaff) ? Visibility.Visible : Visibility.Collapsed;
-            ListSystemMaintenance.Visibility = _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
-            ListConfiguration.Visibility = canManageStaff ? Visibility.Visible : Visibility.Collapsed;
+            foreach (var chip in _chips)
+            {
+                var route = chip.Tag?.ToString();
+                chip.Visibility = GetItemVisibility(route, canManageUsers, canManageStaff);
+            }
         }
 
-        private void ListNavigation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private Visibility GetItemVisibility(string? route, bool canManageUsers, bool canManageStaff)
         {
-            if (_isUpdatingSelection) return;
-
-            if (sender is ListBox listBox && listBox.SelectedItem is ListBoxItem item && item.Tag is string viewName)
+            return route switch
             {
-                _isUpdatingSelection = true;
+                "Users" or "SecurityRoles" or "PermissionMatrix" or "Permissions" =>
+                    canManageUsers ? Visibility.Visible : Visibility.Collapsed,
+                "Employees" or "StaffRoles" =>
+                    canManageStaff ? Visibility.Visible : Visibility.Collapsed,
+                "Database" or "AuditLogs" or "Diagnostics" =>
+                    _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed,
+                "SocialPlatforms" =>
+                    canManageStaff ? Visibility.Visible : Visibility.Collapsed,
+                _ => Visibility.Visible
+            };
+        }
 
-                // Deselect other list boxes
-                if (listBox != ListStaffSecurity) ListStaffSecurity.SelectedItem = null;
-                if (listBox != ListSystemMaintenance) ListSystemMaintenance.SelectedItem = null;
-                if (listBox != ListConfiguration) ListConfiguration.SelectedItem = null;
+        private void SelectDefaultChip()
+        {
+            foreach (var chip in _chips)
+            {
+                if (chip.Visibility == Visibility.Visible)
+                {
+                    chip.IsChecked = true;
+                    NavigateToSubView(chip.Tag as string ?? "");
+                    break;
+                }
+            }
+        }
 
-                _isUpdatingSelection = false;
-
+        private void Chip_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is RadioButton chip && chip.Tag is string viewName)
+            {
                 NavigateToSubView(viewName);
             }
         }
@@ -81,6 +143,7 @@ namespace Radio.Views.Database
                 if (view != null)
                 {
                     AdminHubContentArea.Content = view;
+                    _navigationService.NavigateTo(viewName);
                 }
             }
             catch (Exception ex)
@@ -102,7 +165,7 @@ namespace Radio.Views.Database
                 "Employees" => new EmployeesView(_serviceProvider.GetRequiredService<IEmployeeService>(), _session),
                 "SocialPlatforms" => new SocialPlatformsView(_serviceProvider.GetRequiredService<IPlatformService>(), _session),
                 "StaffRoles" => new StaffRolesView(_serviceProvider.GetRequiredService<IEmployeeService>(), _session),
-                "SecurityRoles" => new SecurityRolesView(_serviceProvider.GetRequiredService<IUserService>(), _session),
+                "SecurityRoles" => new SecurityRolesView(_serviceProvider.GetRequiredService<IUserService>(), _session, _navigationService),
                 "PermissionMatrix" => new PermissionMatrixView(_serviceProvider.GetRequiredService<IUserService>(), _session),
                 "Permissions" => new PermissionsView(_serviceProvider.GetRequiredService<IPermissionService>()),
                 "Database" => new DatabaseManagementView(_serviceProvider.GetRequiredService<IDatabaseManagementService>(), _session),
@@ -113,6 +176,13 @@ namespace Radio.Views.Database
 
             _cachedViews[name] = view;
             return view;
+        }
+
+        public void UpdateLayoutForScreenSize(double screenWidth)
+        {
+            bool useVertical = screenWidth < 1024;
+            HorizontalNav.Visibility = useVertical ? Visibility.Collapsed : Visibility.Visible;
+            VerticalNav.Visibility = useVertical ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

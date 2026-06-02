@@ -1,0 +1,59 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        Transition / Animation Helper Styles
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!-- Default page transition storyboard (fade) -->
+    <Storyboard x:Key="Transition.FadeIn">
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                         From="0"
+                         To="1"
+                         Duration="{DynamicResource Duration.PageTransition}"
+                         EasingFunction="{StaticResource Ease.Out}" />
+    </Storyboard>
+
+    <Storyboard x:Key="Transition.FadeOut">
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                         From="1"
+                         To="0"
+                         Duration="{StaticResource Duration.Medium1}"
+                         EasingFunction="{StaticResource Ease.In}" />
+    </Storyboard>
+
+    <!-- Slide up transition (for dialogs/snackbars) -->
+    <Storyboard x:Key="Transition.SlideUp">
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.Y"
+                         From="20"
+                         To="0"
+                         Duration="{StaticResource Duration.Medium2}"
+                         EasingFunction="{StaticResource Ease.Out}" />
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                         From="0"
+                         To="1"
+                         Duration="{StaticResource Duration.Medium2}" />
+    </Storyboard>
+
+    <!-- Scale up transition (for FAB/dropdowns) -->
+    <Storyboard x:Key="Transition.ScaleUp">
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                         From="0.8"
+                         To="1"
+                         Duration="{StaticResource Duration.Medium1}"
+                         EasingFunction="{StaticResource Ease.BackOut}" />
+        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                         From="0.8"
+                         To="1"
+                         Duration="{StaticResource Duration.Medium1}"
+                         EasingFunction="{StaticResource Ease.BackOut}" />
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                         From="0"
+                         To="1"
+                         Duration="{StaticResource Duration.Medium1}" />
+    </Storyboard>
+
+</ResourceDictionary>

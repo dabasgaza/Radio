@@ -1,0 +1,32 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        MD3 Elevation System
+        Levels 0–5 with named usage tokens
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── Base Levels ──  -->
+    <system:Double x:Key="Elevation.None">0</system:Double>
+    <system:Double x:Key="Elevation.Level1">1</system:Double>
+    <system:Double x:Key="Elevation.Level2">3</system:Double>
+    <system:Double x:Key="Elevation.Level3">6</system:Double>
+    <system:Double x:Key="Elevation.Level4">8</system:Double>
+    <system:Double x:Key="Elevation.Level5">12</system:Double>
+
+    <!--  ── Usage Tokens (Component-Specific) ──  -->
+    <system:Double x:Key="Elevation.Card">3</system:Double>
+    <system:Double x:Key="Elevation.Dialog">6</system:Double>
+    <system:Double x:Key="Elevation.FAB">6</system:Double>
+    <system:Double x:Key="Elevation.NavDrawer">8</system:Double>
+    <system:Double x:Key="Elevation.Snackbar">8</system:Double>
+    <system:Double x:Key="Elevation.BottomNav">8</system:Double>
+    <system:Double x:Key="Elevation.TopAppBar">4</system:Double>
+    <system:Double x:Key="Elevation.Dropdown">2</system:Double>
+    <system:Double x:Key="Elevation.Tooltip">4</system:Double>
+    <system:Double x:Key="Elevation.Menu">8</system:Double>
+    <system:Double x:Key="Elevation.Popover">4</system:Double>
+
+</ResourceDictionary>

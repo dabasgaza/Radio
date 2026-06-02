@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        FlowDirection System for RTL/LTR Support
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <FlowDirection x:Key="FlowDirection.Global">LeftToRight</FlowDirection>
+
+    <!-- Components that need reverse direction in RTL mode -->
+    <HorizontalAlignment x:Key="Align.Start">Left</HorizontalAlignment>
+    <HorizontalAlignment x:Key="Align.End">Right</HorizontalAlignment>
+
+</ResourceDictionary>

@@ -39,7 +39,13 @@ namespace Radio.Views.Database
         private async void DatabaseManagementView_Loaded(object sender, RoutedEventArgs e)
         {
             LoadConfig();
+            await InitializeBackupLogsAsync();
             await LoadHistoryAsync();
+        }
+
+        private async Task InitializeBackupLogsAsync()
+        {
+            var result = await _dbService.InitializeDatabaseAsync();
         }
 
         private void LoadConfig()

@@ -1,0 +1,92 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        Floating Action Button Styles — Material Design 3
+        Naming: FAB.{Variant}
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── FAB.Primary — Standard FAB ──  -->
+    <Style x:Key="FAB.Primary" TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
+        <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryBrush}" />
+        <Setter Property="Width" Value="56" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="md:ButtonAssist.CornerRadius" Value="16" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Effect" Value="{DynamicResource Shadow.Elevation3}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{DynamicResource State.DisabledOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  ── FAB.Small — Small FAB ──  -->
+    <Style x:Key="FAB.Small" TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
+        <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryBrush}" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="md:ButtonAssist.CornerRadius" Value="12" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Effect" Value="{DynamicResource Shadow.Elevation2}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{DynamicResource State.DisabledOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  ── FAB.Extended — Extended FAB with label ──  -->
+    <Style x:Key="FAB.Extended" TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
+        <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryBrush}" />
+        <Setter Property="Height" Value="48" />
+        <Setter Property="Padding" Value="20,0,24,0" />
+        <Setter Property="md:ButtonAssist.CornerRadius" Value="24" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Effect" Value="{DynamicResource Shadow.Elevation3}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{DynamicResource State.DisabledOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  ── FAB.Secondary — Tonal FAB ──  -->
+    <Style x:Key="FAB.Secondary" TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
+        <Setter Property="Background" Value="{DynamicResource SecondaryContainerBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainerBrush}" />
+        <Setter Property="Width" Value="56" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="md:ButtonAssist.CornerRadius" Value="16" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Effect" Value="{DynamicResource Shadow.Elevation3}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{DynamicResource State.DisabledOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  ── FAB.Surface — Surface FAB ──  -->
+    <Style x:Key="FAB.Surface" TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionButton}">
+        <Setter Property="Background" Value="{DynamicResource SurfaceContainerHighBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
+        <Setter Property="Width" Value="56" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="md:ButtonAssist.CornerRadius" Value="16" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Effect" Value="{DynamicResource Shadow.Elevation3}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{DynamicResource State.DisabledOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

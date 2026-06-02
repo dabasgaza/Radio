@@ -1,0 +1,51 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        Search Bar Styles — Material Design 3
+        Naming: SearchBar.{Variant}
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── SearchBar.Container — Full search bar container ──  -->
+    <Style x:Key="SearchBar.Container" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceContainerHighBrush}" />
+        <Setter Property="CornerRadius" Value="28" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="Effect" Value="{DynamicResource Shadow.Elevation2}" />
+        <Setter Property="Padding" Value="16,0" />
+    </Style>
+
+    <!--  ── SearchBar.Input — Text input inside search bar ──  -->
+    <Style x:Key="SearchBar.Input" TargetType="TextBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceBrush}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Primary}" />
+        <Setter Property="Padding" Value="48,0,16,0" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CaretBrush" Value="{DynamicResource PrimaryBrush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource PrimaryContainerBrush}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!--  ── SearchBar.IconContainer — Icon wrapper ──  -->
+    <Style x:Key="SearchBar.IconContainer" TargetType="Border">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!--  ── SearchBar.ClearBtn — Clear button ──  -->
+    <Style x:Key="SearchBar.ClearBtn" TargetType="Button" BasedOn="{StaticResource Btn.Icon}">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+    </Style>
+
+</ResourceDictionary>

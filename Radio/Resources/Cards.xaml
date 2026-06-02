@@ -25,11 +25,11 @@
         الاستخدام: الغالبية العظمى من البطاقات في الواجهة
         ═══════════════════════════════════════════════════════════
     -->
-    <Style x:Key="Card.Default" TargetType="materialDesign:Card">
+    <Style x:Key="Card.Default" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="16" />
-        <Setter Property="UniformCornerRadius" Value="16" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp2" />
     </Style>
 

@@ -1,0 +1,62 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════
+        Icon Styles — Material Design 3
+        Naming: Ico.{Variant}
+        ═══════════════════════════════════════════════════════════════
+    -->
+
+    <!--  ── Ico.Default — Standard icon size ──  -->
+    <Style x:Key="Ico.Default" TargetType="md:PackIcon">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+    </Style>
+
+    <!--  ── Ico.Primary — Primary colored icon ──  -->
+    <Style x:Key="Ico.Primary" TargetType="md:PackIcon">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
+    </Style>
+
+    <!--  ── Ico.Error — Error colored icon ──  -->
+    <Style x:Key="Ico.Error" TargetType="md:PackIcon">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
+    </Style>
+
+    <!--  ── Ico.Small — Small icon (16px) ──  -->
+    <Style x:Key="Ico.Small" TargetType="md:PackIcon">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+    </Style>
+
+    <!--  ── Ico.Large — Large icon (32px) ──  -->
+    <Style x:Key="Ico.Large" TargetType="md:PackIcon">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+    </Style>
+
+    <!--  ── Ico.Light — Light/low emphasis icon ──  -->
+    <Style x:Key="Ico.Light" TargetType="md:PackIcon">
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceBrush}" />
+        <Setter Property="Opacity" Value="0.6" />
+    </Style>
+
+    <!--  ── Ico.Menu — Menu/sidebar icon ──  -->
+    <Style x:Key="Ico.Menu" TargetType="md:PackIcon">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceBrush}" />
+    </Style>
+
+</ResourceDictionary>
