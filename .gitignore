@@ -373,6 +373,7 @@ FodyWeavers.xsd
 .gemini/
 ..kilocode/skills/
 .github/
+.kiro/
 
 
 # NUL device file (Windows reserved name)
