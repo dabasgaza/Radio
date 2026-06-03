@@ -13,9 +13,9 @@
 
         <!--  MD3 Navigation Rail Item — Expanded (icon + label inline)  -->
         <Style x:Key="NavRail.Item" TargetType="RadioButton">
-            <Setter Property="Height" Value="44" />
-            <Setter Property="Margin" Value="6,1" />
-            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Margin" Value="6,2" />
+            <Setter Property="Padding" Value="16,0" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
             <Setter Property="BorderThickness" Value="0" />
@@ -29,7 +29,7 @@
                             Height="{TemplateBinding Height}"
                             Padding="{TemplateBinding Padding}"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="28"
+                            CornerRadius="24"
                             SnapsToDevicePixels="True">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -47,8 +47,8 @@
                                     Grid.Column="1"
                                     Margin="12,0,0,0"
                                     VerticalAlignment="Center"
-                                    FontSize="13"
-                                    FontWeight="Normal"
+                                    FontSize="{DynamicResource FontSize.Label}"
+                                    FontWeight="Medium"
                                     Foreground="{TemplateBinding Foreground}"
                                     Text="{TemplateBinding Tag}" />
                             </Grid>
@@ -73,9 +73,9 @@
 
         <!--  MD3 Navigation Rail Item — Collapsed (icon only)  -->
         <Style x:Key="NavRail.Item.Collapsed" TargetType="RadioButton">
-            <Setter Property="Width" Value="52" />
-            <Setter Property="Height" Value="44" />
-            <Setter Property="Margin" Value="6,1" />
+            <Setter Property="Width" Value="56" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Margin" Value="6,2" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
@@ -88,7 +88,7 @@
                             Width="{TemplateBinding Width}"
                             Height="{TemplateBinding Height}"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="28">
+                            CornerRadius="24">
                             <ContentPresenter
                                 x:Name="IconHost"
                                 Width="24"
@@ -117,14 +117,14 @@
             x:Key="NavRail.SubItem"
             BasedOn="{StaticResource NavRail.Item}"
             TargetType="RadioButton">
-            <Setter Property="Height" Value="40" />
+            <Setter Property="Height" Value="44" />
             <Setter Property="Padding" Value="32,0" />
-            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         </Style>
 
         <!--  MD3 Section Header Label  -->
         <Style x:Key="SectionHeader" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSize.Micro}" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
             <Setter Property="Margin" Value="16,12,0,4" />

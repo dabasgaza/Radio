@@ -29,7 +29,7 @@
     <Style x:Key="DataGrid.ColumnHeader" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="16,0" />
@@ -128,7 +128,7 @@
         <Setter Property="Padding" Value="16,0" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
 
         <!--  Template مخصص يزيل focus rectangle المزعج  -->
         <Setter Property="Template">
@@ -170,7 +170,7 @@
         x:Key="DataGrid.Cell.First"
         BasedOn="{StaticResource DataGrid.Cell}"
         TargetType="DataGridCell">
-        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Button}" />
         <Setter Property="FontWeight" Value="Medium" />
 
         <Style.Triggers>
@@ -299,7 +299,7 @@
         <Setter Property="CanUserResizeRows" Value="False" />
 
         <!--  المظهر  -->
-        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Button}" />
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="GridLinesVisibility" Value="Horizontal" />
         <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource DividerBrush}" />

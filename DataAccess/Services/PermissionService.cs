@@ -3,85 +3,47 @@ using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataAccess.Services
+namespace DataAccess.Services;
+
+/// <summary>
+/// خدمة قراءة الصلاحيات فقط.
+/// الصلاحيات تُعرَّف في AppPermissions وتُزامَن تلقائياً مع DB عبر DbSeeder — لا يمكن إنشاؤها أو حذفها يدوياً.
+/// </summary>
+public interface IPermissionService
 {
-    public class PermissionService : IPermissionService
+    Task<Result<List<PermissionDto>>> GetAllPermissionsAsync();
+    Task<Result<PermissionDto>> GetPermissionByIdAsync(int id);
+}
+
+public class PermissionService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IPermissionService
+{
+    public async Task<Result<List<PermissionDto>>> GetAllPermissionsAsync()
     {
-        private readonly IDbContextFactory<BroadcastWorkflowDBContext> _contextFactory;
+        await using var context = await contextFactory.CreateDbContextAsync();
 
-        public PermissionService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory)
-        {
-            _contextFactory = contextFactory;
-        }
+        var permissions = await context.Permissions
+            .AsNoTracking()
+            .OrderBy(p => p.Module)
+            .ThenBy(p => p.DisplayName)
+            .Select(p => new PermissionDto(p.PermissionId, p.SystemName, p.DisplayName, p.Module))
+            .ToListAsync();
 
-        public async Task<Result<List<PermissionDto>>> GetAllPermissionsAsync()
-        {
-            using var context = _contextFactory.CreateDbContext();
-            var permissions = await context.Permissions
-                .Select(p => new PermissionDto(p.PermissionId, p.SystemName, p.DisplayName, p.Module))
-                .ToListAsync();
+        return Result<List<PermissionDto>>.Success(permissions);
+    }
 
-            return Result<List<PermissionDto>>.Success(permissions);
-        }
+    public async Task<Result<PermissionDto>> GetPermissionByIdAsync(int id)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
 
-        public async Task<Result<PermissionDto>> GetPermissionByIdAsync(int id)
-        {
-            using var context = _contextFactory.CreateDbContext();
-            var p = await context.Permissions.FindAsync(id);
-            if (p == null) return Result<PermissionDto>.Fail("الصلاحية غير موجودة");
+        var p = await context.Permissions
+            .AsNoTracking()
+            .Where(x => x.PermissionId == id)
+            .Select(x => new PermissionDto(x.PermissionId, x.SystemName, x.DisplayName, x.Module))
+            .FirstOrDefaultAsync();
 
-            return Result<PermissionDto>.Success(new PermissionDto(p.PermissionId, p.SystemName, p.DisplayName, p.Module));
-        }
+        if (p is null)
+            return Result<PermissionDto>.Fail("الصلاحية غير موجودة.");
 
-        public async Task<Result<int>> CreatePermissionAsync(PermissionUpsertDto dto)
-        {
-            using var context = _contextFactory.CreateDbContext();
-            
-            if (await context.Permissions.AnyAsync(p => p.SystemName == dto.SystemName))
-                return Result<int>.Fail("الاسم البرمجي للصلاحية موجود مسبقاً");
-
-            var permission = new Permission
-            {
-                SystemName = dto.SystemName,
-                DisplayName = dto.DisplayName,
-                Module = dto.Module
-            };
-
-            context.Permissions.Add(permission);
-            await context.SaveChangesAsync();
-
-            return Result<int>.Success(permission.PermissionId);
-        }
-
-        public async Task<Result> UpdatePermissionAsync(int id, PermissionUpsertDto dto)
-        {
-            using var context = _contextFactory.CreateDbContext();
-            var p = await context.Permissions.FindAsync(id);
-            if (p == null) return Result.Fail("الصلاحية غير موجودة");
-
-            if (await context.Permissions.AnyAsync(x => x.SystemName == dto.SystemName && x.PermissionId != id))
-                return Result.Fail("الاسم البرمجي للصلاحية موجود مسبقاً");
-
-            p.SystemName = dto.SystemName;
-            p.DisplayName = dto.DisplayName;
-            p.Module = dto.Module;
-
-            await context.SaveChangesAsync();
-            return Result.Success();
-        }
-
-        public async Task<Result> DeletePermissionAsync(int id)
-        {
-            using var context = _contextFactory.CreateDbContext();
-            var p = await context.Permissions.FindAsync(id);
-            if (p == null) return Result.Fail("الصلاحية غير موجودة");
-
-            if (await context.RolePermissions.AnyAsync(rp => rp.PermissionId == id))
-                return Result.Fail("لا يمكن حذف الصلاحية لأنها مرتبطة بأدوار حالية. قم بإلغاء الربط أولاً.");
-
-            context.Permissions.Remove(p);
-            await context.SaveChangesAsync();
-            return Result.Success();
-        }
+        return Result<PermissionDto>.Success(p);
     }
 }

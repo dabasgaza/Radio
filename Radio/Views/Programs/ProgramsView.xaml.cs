@@ -92,16 +92,17 @@ namespace Radio.Views.Programs
             try
             {
                 var view = new ProgramFormControl(null, _programService, _session);
-                var result = await DialogHost.Show(view);
+                var result = await DialogHost.Show(view, "ModernRootDialog");
                 if (result is true)
                 {
                     MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "البرنامج"));
                     await LoadDataAsync();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة إضافة البرنامج.");
+                Serilog.Log.Error(ex, "Error opening ProgramFormControl for creation");
+                MessageService.Current.ShowError($"حدث خطأ غير متوقع أثناء فتح نافذة إضافة البرنامج: {ex.Message}\n{ex.InnerException?.Message}");
             }
             finally
             {
@@ -123,16 +124,17 @@ namespace Radio.Views.Programs
             try
             {
                 var view = new ProgramFormControl(prog, _programService, _session);
-                var result = await DialogHost.Show(view);
+                var result = await DialogHost.Show(view, "ModernRootDialog");
                 if (result is true)
                 {
                     MessageService.Current.ShowSuccess(Messages.Updated("البرنامج", prog.ProgramName));
                     await LoadDataAsync();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء فتح نافذة تعديل البرنامج.");
+                Serilog.Log.Error(ex, "Error opening ProgramFormControl for editing");
+                MessageService.Current.ShowError($"حدث خطأ غير متوقع أثناء فتح نافذة تعديل البرنامج: {ex.Message}\n{ex.InnerException?.Message}");
             }
             finally
             {

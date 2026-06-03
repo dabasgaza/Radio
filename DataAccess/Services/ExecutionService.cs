@@ -36,7 +36,6 @@ public class ExecutionService(IDbContextFactory<BroadcastWorkflowDBContext> cont
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
-        using var transaction = await context.Database.BeginTransactionAsync();
 
         try
         {
@@ -64,12 +63,10 @@ public class ExecutionService(IDbContextFactory<BroadcastWorkflowDBContext> cont
             // ❌ تم إزالة UpdatedAt و UpdatedByUserId (الـ Interceptor سيتولى الأمر تلقائياً)
 
             await context.SaveChangesAsync();
-            await transaction.CommitAsync();
             return Result.Success();
         }
         catch
         {
-            await transaction.RollbackAsync();
             // ✨ رمي الاستثناء الأصلي كما هو للحفاظ على الـ Stack Trace (بدون تغليف)
             throw;
         }

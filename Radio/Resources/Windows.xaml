@@ -35,8 +35,8 @@
         <Setter Property="WindowTitleBrush" Value="{StaticResource PrimaryDarkBrush}" />
         <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="ShowTitleBar" Value="False" />
         <Setter Property="OverlayBrush" Value="{StaticResource OverlayScrimBrush}" />
         <Setter Property="OverlayOpacity" Value="1.0" />
@@ -61,8 +61,8 @@
         <Setter Property="ShowMaxRestoreButton" Value="False" />
         <Setter Property="ShowMinButton" Value="False" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
 
@@ -83,8 +83,8 @@
         <Setter Property="ShowTitleBar" Value="False" />
         <Setter Property="ResizeMode" Value="NoResize" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
 
@@ -99,8 +99,8 @@
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
@@ -117,7 +117,7 @@
         x:Key="CenterCellAligned"
         BasedOn="{StaticResource MaterialDesignDataGridCell}"
         TargetType="{x:Type DataGridCell}">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Label}" />
         <Setter Property="TextBlock.TextAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Padding" Value="0" />
@@ -137,7 +137,7 @@
         x:Key="LeftCellAligned"
         BasedOn="{StaticResource MaterialDesignDataGridCell}"
         TargetType="{x:Type DataGridCell}">
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Field}" />
         <Setter Property="TextBlock.TextAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Padding" Value="10,0,0,0" />
@@ -218,8 +218,8 @@
         <Setter Property="Width" Value="450" />
         <!--  التوجيه والخط  -->
         <Setter Property="FlowDirection" Value="RightToLeft" />
-        <Setter Property="TextElement.FontFamily" Value="{StaticResource AppFontFamily}" />
-        <Setter Property="TextElement.FontSize" Value="15" />
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="TextElement.FontSize" Value="{DynamicResource FontSize.Dialog}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
 

@@ -30,7 +30,7 @@
         <Setter Property="FlowDirection" Value="RightToLeft" />
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Field}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
 
@@ -80,7 +80,7 @@
 
         <Setter Property="Height" Value="44" />
         <Setter Property="Padding" Value="10,6" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
 
@@ -122,7 +122,7 @@
 
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Field}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
 
@@ -167,7 +167,7 @@
 
         <Setter Property="Height" Value="44" />
         <Setter Property="Padding" Value="10,6" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
 

@@ -1,0 +1,245 @@
+﻿<!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                         AppFonts.xaml                                   ║
+    ║          نظام الخطوط والأحجام المركزي — Typography System              ║
+    ║                                                                          ║
+    ║  تعريف الخطوط والأحجام في مكان واحد مركزي لتسهيل الصيانة والتطور       ║
+    ║  المصدر: Material Design 3 Typography Scale                             ║
+    ║                                                                          ║
+    ║  الخطوط الأساسية:                                                       ║
+    ║   • Primary:   Tajawal (أولوية للعربية)                                 ║
+    ║   • Secondary: Cairo (بديل للعربية)                                      ║
+    ║   • Fallback:  Segoe UI (تراجع للإنجليزية)                             ║
+    ║                                                                          ║
+    ║  أحجام الخطوط المعيارية (dp):                                          ║
+    ║   • Display  : 36sp   (Light)      للشاشات الرئيسية والترحيب           ║
+    ║   • Headline : 26sp   (Regular)    لعناوين الأقسام                      ║
+    ║   • Title    : 18-14sp (Medium)    لعناوين النوافذ والبطاقات           ║
+    ║   • Label    : 14sp   (Medium)     لنصوص الأزرار والعلامات             ║
+    ║   • Body     : 16/14sp (Regular)   للنصوص الاعتيادية                   ║
+    ║   • Caption  : 12sp   (Regular)    للنصوص التوضيحية والتواريخ         ║
+    ║   • Overline : 11sp   (Medium)     لرؤوس الجداول والتصنيفات            ║
+    ║                                                                          ║
+    ║  التحكم المركزي:                                                        ║
+    ║   • نوع الخط: عدّل Font.Primary أو Font.Default                         ║
+    ║   • حجم الحقول/النوافذ: عدّل FontSize.Input                            ║
+    ║   • مقياس النصوص: عدّل FontSize.Display … FontSize.Caption             ║
+    ║   • من الواجهة: أزرار أ+/أ− في الشريط العلوي (FontScaleService)         ║
+    ║                                                                          ║
+    ║  الاستخدام في XAML:                                                    ║
+    ║   <TextBlock FontFamily="{StaticResource Font.Primary}"                 ║
+    ║              FontSize="{StaticResource FontSize.BodyMedium}"            ║
+    ║              Text="نص عربي" />                                          ║
+    ║                                                                          ║
+    ║  التبعيات: لا توجد (يمكن أن يكون أول ملف موارد يتم تحميله)              ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        SECTION 1: FONT FAMILY — نوع الخط
+        ═══════════════════════════════════════════════════════════════════════
+    -->
+
+    <!--
+        الخط الأساسي للنصوص العربية (Tajawal)
+        يُستخدم لـ: جميع النصوص العربية الاعتيادية
+    -->
+    <FontFamily x:Key="Font.Primary">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-Regular.ttf#Tajawal</FontFamily>
+
+    <!--
+        الخط الثانوي للنصوص العربية (Cairo) — بديل عند الحاجة
+        يُستخدم لـ: عناوين بارزة، نصوص مهمة
+    -->
+    <FontFamily x:Key="Font.Secondary">pack://application:,,,/Radio;component/Resources/Cairo/Cairo-Regular.ttf#Cairo</FontFamily>
+
+    <!--
+        الخط الاحتياطي (System Font) — للنصوص الإنجليزية والرموز
+        يُستخدم لـ: fallback، الأرقام، الرموز، النصوص الإنجليزية
+    -->
+    <FontFamily x:Key="Font.Fallback">Segoe UI, Tajawal</FontFamily>
+
+    <!--  خط ثابت العرض — سجلات النظام والكود  -->
+    <FontFamily x:Key="Font.Monospace">Consolas, Courier New</FontFamily>
+
+    <!--
+        الخط المركب الرئيسي — الاستخدام الأكثر شيوعاً
+        ترجيح تسلسل الخطوط: Tajawal (الأولى) ثم Cairo (البديل) ثم Segoe UI (التراجع)
+    -->
+    <FontFamily x:Key="Font.Default">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-Regular.ttf#Tajawal, pack://application:,,,/Radio;component/Resources/Cairo/Cairo-Regular.ttf#Cairo, Segoe UI</FontFamily>
+
+    <!--
+        تنويعات الخطوط للأوزان المختلفة
+    -->
+    <FontFamily x:Key="Font.Light">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-Light.ttf#Tajawal</FontFamily>
+    <FontFamily x:Key="Font.Regular">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-Regular.ttf#Tajawal</FontFamily>
+    <FontFamily x:Key="Font.Medium">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-Medium.ttf#Tajawal</FontFamily>
+    <FontFamily x:Key="Font.SemiBold">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-SemiBold.ttf#Tajawal</FontFamily>
+    <FontFamily x:Key="Font.Bold">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-Bold.ttf#Tajawal</FontFamily>
+    <FontFamily x:Key="Font.ExtraBold">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-ExtraBold.ttf#Tajawal</FontFamily>
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        SECTION 2: FONT SIZE — حجم الخط
+        ═══════════════════════════════════════════════════════════════════════
+    -->
+
+    <!--
+        DISPLAY — أكبر حجم للعناوين الكبرى جداً
+        يُستخدم لـ: شاشات الترحيب، العناوين الضخمة
+    -->
+    <sys:Double x:Key="FontSize.Display">36</sys:Double>
+
+    <!--
+        HEADLINE — عنوان القسم الرئيسي
+        يُستخدم لـ: رؤوس الأقسام، العناوين المهمة
+    -->
+    <sys:Double x:Key="FontSize.Headline">26</sys:Double>
+
+    <!--
+        TITLE LARGE — عنوان النافذة والـ Dialog
+        يُستخدم لـ: عناوين النوافذ، رؤوس الحوارات
+    -->
+    <sys:Double x:Key="FontSize.TitleLarge">18</sys:Double>
+
+    <!--
+        TITLE MEDIUM — عناوين البطاقات والإحصائيات
+        يُستخدم لـ: عناوين البطاقات، رؤوس الأقسام الفرعية
+    -->
+    <sys:Double x:Key="FontSize.TitleMedium">14</sys:Double>
+
+    <!--
+        TITLE SMALL — عناوين الأقسام الفرعية
+        يُستخدم لـ: عناوين فرعية، رؤوس الجداول
+    -->
+    <sys:Double x:Key="FontSize.TitleSmall">13</sys:Double>
+
+    <!--
+        BODY LARGE — النص الاعتيادي الكبير
+        يُستخدم لـ: النصوص الرئيسية، الفقرات الطويلة
+    -->
+    <sys:Double x:Key="FontSize.BodyLarge">16</sys:Double>
+
+    <!--
+        BODY MEDIUM — النص الاعتيادي المتوسط
+        يُستخدم لـ: محتوى النصوص، الوصف، الشرح
+    -->
+    <sys:Double x:Key="FontSize.BodyMedium">14</sys:Double>
+
+    <!--
+        BODY SMALL — النص الاعتيادي الصغير
+        يُستخدم لـ: نصوص ثانوية، معلومات إضافية
+    -->
+    <sys:Double x:Key="FontSize.BodySmall">12</sys:Double>
+
+    <!--
+        LABEL — نص الأزرار والعلامات
+        يُستخدم لـ: نصوص الأزرار، التسميات، العلامات
+    -->
+    <sys:Double x:Key="FontSize.Label">14</sys:Double>
+
+    <!--
+        CAPTION — النصوص التوضيحية والملاحظات الصغيرة
+        يُستخدم لـ: التاريخ، الوقت، الملاحظات، التفاصيل الثانوية
+    -->
+    <sys:Double x:Key="FontSize.Caption">12</sys:Double>
+
+    <!--
+        OVERLINE — تصنيفات الأقسام والرؤوس الصغيرة
+        يُستخدم لـ: رؤوس الجداول، التصنيفات، التسميات العلوية
+    -->
+    <sys:Double x:Key="FontSize.Overline">11</sys:Double>
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        SECTION 2b: SEMANTIC SIZES — أحجام العناصر (غيّر هنا لتحديث فئة كاملة)
+        ═══════════════════════════════════════════════════════════════════════
+    -->
+    <sys:Double x:Key="FontSize.Input">13</sys:Double>
+    <sys:Double x:Key="FontSize.Field">15</sys:Double>
+    <sys:Double x:Key="FontSize.Dialog">15</sys:Double>
+    <sys:Double x:Key="FontSize.Button">12</sys:Double>
+    <sys:Double x:Key="FontSize.DataGrid">11</sys:Double>
+    <sys:Double x:Key="FontSize.Numeric.Large">22</sys:Double>
+    <sys:Double x:Key="FontSize.Numeric.Medium">16</sys:Double>
+    <sys:Double x:Key="FontSize.Clock">14</sys:Double>
+    <sys:Double x:Key="FontSize.Section">10</sys:Double>
+    <sys:Double x:Key="FontSize.Nav">10.5</sys:Double>
+    <sys:Double x:Key="FontSize.NavCompact">8.5</sys:Double>
+    <sys:Double x:Key="FontSize.NavLabel">12.5</sys:Double>
+    <sys:Double x:Key="FontSize.Micro">10</sys:Double>
+    <sys:Double x:Key="FontSize.Tiny">9</sys:Double>
+    <sys:Double x:Key="FontSize.Brand">28</sys:Double>
+    <sys:Double x:Key="FontSize.MessageTitle">20</sys:Double>
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        SECTION 2c: LEGACY ALIASES — للتوافق مع الكود القديم (لا تُعدّل مباشرة)
+        غيّر القيمة في المفتاح الموازي أعلاه ثم طابق الرقم هنا عند الحاجة.
+        ═══════════════════════════════════════════════════════════════════════
+    -->
+    <sys:Double x:Key="FontSizeBody">12</sys:Double>
+    <sys:Double x:Key="FontSizeInput">13</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">18</sys:Double>
+    <sys:Double x:Key="FontSizeHeadline">26</sys:Double>
+    <sys:Double x:Key="FontSizeCaption">10</sys:Double>
+
+    <!--
+        الخط الافتراضي للتطبيق — غيّر Font.Primary لتبديل نوع الخط على مستوى النظام
+    -->
+    <FontFamily x:Key="AppFontFamily">pack://application:,,,/Radio;component/Resources/Tajawal/Tajawal-Regular.ttf#Tajawal, pack://application:,,,/Radio;component/Resources/Cairo/Cairo-Regular.ttf#Cairo, Segoe UI</FontFamily>
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        SECTION 3: FONT WEIGHT — وزن الخط
+        ═══════════════════════════════════════════════════════════════════════
+    -->
+
+    <!--
+        أوزان الخط القياسية
+    -->
+    <FontWeight x:Key="FontWeight.Light">Light</FontWeight>
+    <FontWeight x:Key="FontWeight.Regular">Regular</FontWeight>
+    <FontWeight x:Key="FontWeight.Medium">Medium</FontWeight>
+    <FontWeight x:Key="FontWeight.SemiBold">SemiBold</FontWeight>
+    <FontWeight x:Key="FontWeight.Bold">Bold</FontWeight>
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        SECTION 4: LINE HEIGHT — ارتفاع السطر
+        ═══════════════════════════════════════════════════════════════════════
+    -->
+
+    <!--
+        ارتفاعات السطور حسب حجم الخط
+    -->
+    <sys:Double x:Key="LineHeight.Display">52</sys:Double>
+    <sys:Double x:Key="LineHeight.Headline">40</sys:Double>
+    <sys:Double x:Key="LineHeight.TitleLarge">28</sys:Double>
+    <sys:Double x:Key="LineHeight.TitleMedium">24</sys:Double>
+    <sys:Double x:Key="LineHeight.TitleSmall">20</sys:Double>
+    <sys:Double x:Key="LineHeight.BodyLarge">24</sys:Double>
+    <sys:Double x:Key="LineHeight.BodyMedium">20</sys:Double>
+    <sys:Double x:Key="LineHeight.BodySmall">16</sys:Double>
+    <sys:Double x:Key="LineHeight.Label">20</sys:Double>
+    <sys:Double x:Key="LineHeight.Caption">16</sys:Double>
+    <sys:Double x:Key="LineHeight.Overline">16</sys:Double>
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        SECTION 5: LETTER SPACING — تباعد الأحرف
+        ═══════════════════════════════════════════════════════════════════════
+    -->
+
+    <!--
+        تباعد الأحرف (يُستخدم للعناوين والتصنيفات)
+    -->
+    <sys:Double x:Key="LetterSpacing.Default">0</sys:Double>
+    <sys:Double x:Key="LetterSpacing.Wide">1.25</sys:Double>
+    <sys:Double x:Key="LetterSpacing.Wider">1.5</sys:Double>
+
+</ResourceDictionary>

@@ -148,16 +148,6 @@ namespace Radio.Views.Correspondents
             ApplyFilters();
         }
 
-        private void DpFromDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFilters();
-        }
-
-        private void DpToDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFilters();
-        }
-
         /// <summary>
         /// مسح جميع الفلاتر وإعادة عرض البيانات كاملة.
         /// </summary>

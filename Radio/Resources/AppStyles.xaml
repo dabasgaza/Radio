@@ -6,31 +6,37 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
 
-    <!--  ═══════════ Global Font Settings ═══════════  -->
+    <!--  ═══════════ Global Font Settings — AppFonts.xaml ═══════════  -->
     <Style TargetType="{x:Type TextBlock}">
-        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
     </Style>
     <Style TargetType="{x:Type Control}">
-        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
     </Style>
 
     <!--  ═══════════ Typography ═══════════  -->
     <Style x:Key="HeadlineLarge" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource FontSizeHeadline}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Primary}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Headline}" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
     <Style x:Key="TitleLarge" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Primary}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.TitleLarge}" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
     <Style x:Key="BodyMedium" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Primary}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.BodySmall}" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
     <Style x:Key="DataGridTextStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Primary}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.BodySmall}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
@@ -61,7 +67,8 @@
         BasedOn="{StaticResource MaterialDesignOutlinedComboBox}"
         TargetType="ComboBox">
 
-        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
@@ -89,7 +96,8 @@
         BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}"
         TargetType="DatePicker">
 
-        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
@@ -119,7 +127,7 @@
         BasedOn="{StaticResource MaterialDesignFlatButton}"
         TargetType="Button">
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Label}" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Height" Value="40" />
         <Setter Property="Cursor" Value="Hand" />
@@ -139,7 +147,8 @@
         x:Key="BroadcastTextBox"
         BasedOn="{StaticResource MaterialDesignFilledTextBox}"
         TargetType="TextBox">
-        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.HasOutlinedTextField" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
@@ -150,113 +159,6 @@
         <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
     </Style>
 
-    <!--  ═══════════ DataGrid (النسخة النهائية المدمجة) ═══════════  -->
-
-    <!--<Style
-        x:Key="BroadcastProDataGrid"
-        BasedOn="{StaticResource MaterialDesignDataGrid}"
-        TargetType="{x:Type DataGrid}">
-
-        <Setter Property="AlternationCount" Value="2" />
-        <Setter Property="MinRowHeight" Value="50" />
-        <Setter Property="IsReadOnly" Value="True" />
-        <Setter Property="AutoGenerateColumns" Value="False" />
-        <Setter Property="HeadersVisibility" Value="Column" />
-        <Setter Property="SelectionMode" Value="Single" />
-        <Setter Property="SelectionUnit" Value="FullRow" />
-
-        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
-        <Setter Property="GridLinesVisibility" Value="None" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="materialDesign:DataGridAssist.CellPadding" Value="16,12" />
-        <Setter Property="materialDesign:DataGridAssist.CornerRadius" Value="8" />
-
-    -->
-    <!--  Column Header - Light Theme فقط  -->
-    <!--
-        <Setter Property="ColumnHeaderStyle">
-            <Setter.Value>
-                <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                    <Setter Property="Background" Value="#C5CAE9" />
-                    <Setter Property="Foreground" Value="White" />
-                    <Setter Property="FontWeight" Value="SemiBold" />
-                    <Setter Property="FontSize" Value="12" />
-                    <Setter Property="Padding" Value="16,12" />
-                    <Setter Property="Height" Value="48" />
-                    <Setter Property="SeparatorVisibility" Value="Collapsed" />
-                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                </Style>
-            </Setter.Value>
-        </Setter>
-
-    -->
-    <!--  Row Style  -->
-    <!--
-        <Setter Property="RowStyle">
-            <Setter.Value>
-                <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="SnapsToDevicePixels" Value="True" />
-
-                    <Style.Triggers>
-                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                            <Setter Property="Background" Value="#0A3F51B5" />
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="#293F51B5" />
-                            <Setter Property="BorderThickness" Value="4,0,0,0" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
-                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#143F51B5" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.5" />
-                            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Setter.Value>
-        </Setter>
-
-    -->
-    <!--  Cell Style  -->
-    <!--
-        <Setter Property="CellStyle">
-            <Setter.Value>
-                <Style TargetType="DataGridCell">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="BorderThickness" Value="0" />
-                    <Setter Property="Padding" Value="16,12" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="DataGridCell">
-                                <Border
-                                    Padding="{TemplateBinding Padding}"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}">
-                                    <ContentPresenter VerticalAlignment="Center" />
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Setter.Value>
-        </Setter>
-
-        <Setter Property="materialDesign:ScrollViewerAssist.IgnorePadding" Value="True" />
-
-    </Style>-->
 
     <!--  ═══════════ Card ═══════════  -->
     <Style x:Key="BroadcastCard" TargetType="materialDesign:Card">

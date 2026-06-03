@@ -91,10 +91,9 @@ namespace DataAccess.Services
         {
             using var context = await contextFactory.CreateDbContextAsync();
 
-            // ✨ إرجاع DTOs مع الـ Include للضيف
+            // ✅ إزالة Include غير الضروري — Select يجلب العلاقة تلقائياً عبر SQL JOIN
             return await context.CorrespondentCoverages
                 .AsNoTracking()
-                .Include(c => c.Guest)
                 .Where(c => c.CorrespondentId == correspondentId)
                 .Select(c => new CorrespondentCoverageDto
                 {

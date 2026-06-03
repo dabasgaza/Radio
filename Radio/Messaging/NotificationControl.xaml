@@ -62,14 +62,14 @@
                     VerticalAlignment="Center">
                     <TextBlock
                         x:Name="TxtTitle"
-                        FontSize="13.5"
+                        FontSize="{DynamicResource FontSize.Input}"
                         FontWeight="SemiBold"
                         TextTrimming="CharacterEllipsis" />
                     <TextBlock
                         x:Name="TxtMessage"
                         MaxWidth="310"
                         Margin="0,3,0,0"
-                        FontSize="12.5"
+                        FontSize="{DynamicResource FontSize.NavLabel}"
                         LineHeight="18"
                         Opacity="0.85"
                         TextWrapping="Wrap" />

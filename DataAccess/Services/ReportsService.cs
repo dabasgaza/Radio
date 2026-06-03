@@ -149,9 +149,15 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var lastGuestIds = grouped.Select(x => x.LastEpisodeGuestId).ToList();
         var lastDetails = await context.EpisodeGuests
             .AsNoTracking()
-            .Include(eg => eg.Guest)
-            .Include(eg => eg.Episode)
             .Where(eg => lastGuestIds.Contains(eg.EpisodeGuestId))
+            .Select(eg => new
+            {
+                eg.EpisodeGuestId,
+                GuestFullName = eg.Guest != null ? eg.Guest.FullName : null,
+                GuestOrganization = eg.Guest != null ? eg.Guest.Organization : null,
+                eg.Topic,
+                EpisodeScheduledTime = eg.Episode != null ? eg.Episode.ScheduledExecutionTime : (DateTime?)null
+            })
             .ToDictionaryAsync(eg => eg.EpisodeGuestId);
 
         return grouped.Select((x, i) =>
@@ -160,11 +166,11 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             return new TopGuestDto(
                 i + 1,
                 x.GuestId,
-                last?.Guest?.FullName ?? "غير معروف",
-                last?.Guest?.Organization,
+                last?.GuestFullName ?? "غير معروف",
+                last?.GuestOrganization,
                 x.AppearanceCount,
                 last?.Topic,
-                last?.Episode?.ScheduledExecutionTime
+                last?.EpisodeScheduledTime
             );
         }).ToList();
     }
@@ -173,13 +179,20 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // جلب الحلقات الملغاة — نتجاوز الـ soft-delete filter باستخدام IgnoreQueryFilters
+        // ✅ Select مباشر بدلاً من Include لتجنب جلب كل أعمدة Program
         var episodes = await context.Episodes
             .AsNoTracking()
             .IgnoreQueryFilters()
-            .Include(e => e.Program)
             .Where(e => e.StatusId == EpisodeStatus.Cancelled)
             .OrderByDescending(e => e.UpdatedAt)
+            .Select(e => new
+            {
+                e.EpisodeId,
+                e.EpisodeName,
+                ProgramName = e.Program != null ? e.Program.ProgramName : null,
+                e.ScheduledExecutionTime,
+                e.UpdatedAt
+            })
             .ToListAsync();
 
         if (episodes.Count == 0)
@@ -220,7 +233,7 @@ public class ReportsService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             return new CancelledEpisodeDto(
                 e.EpisodeId,
                 e.EpisodeName,
-                e.Program?.ProgramName ?? "—",
+                e.ProgramName ?? "—",
                 e.ScheduledExecutionTime,
                 log?.Reason ?? "لم يتم تحديد سبب",
                 cancelledBy,

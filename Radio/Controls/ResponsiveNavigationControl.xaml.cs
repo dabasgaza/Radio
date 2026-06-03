@@ -1,5 +1,6 @@
 using MaterialDesignThemes.Wpf;
 using Radio.Models;
+using Radio.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,18 @@ namespace Radio.Controls
         {
             InitializeComponent();
             Loaded += OnLoaded;
+            FontScaleService.ScaleChanged += OnFontScaleChanged;
+        }
+
+        private void OnFontScaleChanged(double _)
+        {
+            if (!_isInitialized || NavigationItems == null)
+                return;
+
+            var selected = _buttons.FirstOrDefault(kvp => kvp.Value.IsChecked == true).Key;
+            BuildNavigation(NavigationItems);
+            if (!string.IsNullOrEmpty(selected))
+                SetSelected(selected);
         }
 
         public IEnumerable<NavigationItem>? NavigationItems
@@ -174,7 +187,9 @@ namespace Radio.Controls
                 Text = item.Label,
                 Margin = isSubItem ? new Thickness(16, 0, 0, 0) : new Thickness(12, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center,
-                FontSize = isSubItem ? 12 : 13,
+                FontSize = isSubItem
+                    ? FontScaleService.GetScaled("FontSize.Button")
+                    : FontScaleService.GetScaled("FontSize.Input"),
                 Foreground = FindResource("OnSurfaceVariantBrush") as Brush
             });
 

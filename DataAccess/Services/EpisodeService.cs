@@ -214,23 +214,60 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         using var context = await contextFactory.CreateDbContextAsync();
 
+        // ── التحقق من صحة البرنامج ──
+        var programExists = await context.Programs.AnyAsync(p => p.ProgramId == dto.ProgramId && p.IsActive);
+        if (!programExists) return Result<int>.Fail("البرنامج المحدد غير موجود أو غير نشط.");
+
+        // ── التحقق من صحة الضيوف ──
+        if (dto.Guests?.Count > 0)
+        {
+            var guestIds = dto.Guests.Select(g => g.GuestId).ToList();
+            var existingCount = await context.Guests.CountAsync(g => guestIds.Contains(g.GuestId) && g.IsActive);
+            if (existingCount != guestIds.Distinct().Count())
+            {
+                return Result<int>.Fail("بعض الضيوف المحددين غير موجودين أو تم حذفهم.");
+            }
+        }
+
+        // ── التحقق من صحة المراسلين ──
+        if (dto.Correspondents?.Count > 0)
+        {
+            var corrIds = dto.Correspondents.Select(c => c.CorrespondentId).ToList();
+            var existingCount = await context.Correspondents.CountAsync(c => corrIds.Contains(c.CorrespondentId) && c.IsActive);
+            if (existingCount != corrIds.Distinct().Count())
+            {
+                return Result<int>.Fail("بعض المراسلين المحددين غير موجودين أو تم حذفهم.");
+            }
+        }
+
+        // ── التحقق من صحة الموظفين ──
+        if (dto.Employees?.Count > 0)
+        {
+            var empIds = dto.Employees.Select(ee => ee.EmployeeId).ToList();
+            var existingCount = await context.Employees.CountAsync(e => empIds.Contains(e.EmployeeId) && e.IsActive);
+            if (existingCount != empIds.Distinct().Count())
+            {
+                return Result<int>.Fail("بعض الموظفين المحددين غير موجودين في النظام. قد يكون تم حذفهم أو أنك تستخدم مسودة قديمة.");
+            }
+        }
+
         var episode = new Episode
         {
-            ProgramId              = dto.ProgramId,
-            EpisodeName            = dto.EpisodeName,
+            ProgramId = dto.ProgramId,
+            EpisodeName = dto.EpisodeName,
             ScheduledExecutionTime = dto.ScheduledDateTime,   // دمج التاريخ + الوقت
-            StatusId               = EpisodeStatus.Planned,
-            SpecialNotes           = dto.SpecialNotes
+            StatusId = EpisodeStatus.Planned,
+            SpecialNotes = dto.SpecialNotes
         };
 
         if (dto.Guests?.Count > 0)
             foreach (var g in dto.Guests)
                 episode.EpisodeGuests.Add(new EpisodeGuest
                 {
-                    GuestId     = g.GuestId,
-                    Topic       = g.Topic,
+                    GuestId = g.GuestId,
+                    Topic = g.Topic,
                     HostingTime = g.HostingTime,
-                    ClipNotes   = g.ClipNotes
+                    ClipNotes = g.ClipNotes
                 });
 
         if (dto.Correspondents?.Count > 0)
@@ -238,8 +275,8 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 episode.EpisodeCorrespondents.Add(new EpisodeCorrespondent
                 {
                     CorrespondentId = c.CorrespondentId,
-                    Topic           = c.Topic,
-                    HostingTime     = c.HostingTime
+                    Topic = c.Topic,
+                    HostingTime = c.HostingTime
                 });
 
         if (dto.Employees?.Count > 0)
@@ -258,6 +295,43 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         using var context = await contextFactory.CreateDbContextAsync();
 
+        // ── التحقق من صحة البرنامج ──
+        var programExists = await context.Programs.AnyAsync(p => p.ProgramId == dto.ProgramId && p.IsActive);
+        if (!programExists) return Result.Fail("البرنامج المحدد غير موجود أو غير نشط.");
+
+        // ── التحقق من صحة الضيوف ──
+        if (dto.Guests?.Count > 0)
+        {
+            var guestIds = dto.Guests.Select(g => g.GuestId).ToList();
+            var existingCount = await context.Guests.CountAsync(g => guestIds.Contains(g.GuestId) && g.IsActive);
+            if (existingCount != guestIds.Distinct().Count())
+            {
+                return Result.Fail("بعض الضيوف المحددين غير موجودين أو تم حذفهم.");
+            }
+        }
+
+        // ── التحقق من صحة المراسلين ──
+        if (dto.Correspondents?.Count > 0)
+        {
+            var corrIds = dto.Correspondents.Select(c => c.CorrespondentId).ToList();
+            var existingCount = await context.Correspondents.CountAsync(c => corrIds.Contains(c.CorrespondentId) && c.IsActive);
+            if (existingCount != corrIds.Distinct().Count())
+            {
+                return Result.Fail("بعض المراسلين المحددين غير موجودين أو تم حذفهم.");
+            }
+        }
+
+        // ── التحقق من صحة الموظفين ──
+        if (dto.Employees?.Count > 0)
+        {
+            var empIds = dto.Employees.Select(ee => ee.EmployeeId).ToList();
+            var existingCount = await context.Employees.CountAsync(e => empIds.Contains(e.EmployeeId) && e.IsActive);
+            if (existingCount != empIds.Distinct().Count())
+            {
+                return Result.Fail("بعض الموظفين المحددين غير موجودين في النظام. قد يكون تم حذفهم أو أنك تستخدم مسودة قديمة.");
+            }
+        }
+
         var episode = await context.Episodes
             .Include(e => e.EpisodeGuests)
             .Include(e => e.EpisodeCorrespondents)
@@ -266,10 +340,10 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
-        episode.ProgramId              = dto.ProgramId;
-        episode.EpisodeName            = dto.EpisodeName;
+        episode.ProgramId = dto.ProgramId;
+        episode.EpisodeName = dto.EpisodeName;
         episode.ScheduledExecutionTime = dto.ScheduledDateTime;   // دمج التاريخ + الوقت
-        episode.SpecialNotes           = dto.SpecialNotes;
+        episode.SpecialNotes = dto.SpecialNotes;
 
         SyncGuests(episode.EpisodeGuests.ToList(), dto.Guests ?? [], episode);
         SyncCorrespondents(episode.EpisodeCorrespondents.ToList(), dto.Correspondents ?? [], episode);
@@ -295,24 +369,6 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
         await context.SaveChangesAsync();
         return Result.Success();
-    }
-
-    /// <summary>
-    /// استرجاع الحلقة مع الأطفال — يُستخدم في RevertEpisodeStatusAsync و DeleteEpisodeAsync
-    /// لتجنب استعلام FindAsync المكرر
-    /// </summary>
-    private async Task<Episode?> GetEpisodeWithChildrenAsync(BroadcastWorkflowDBContext context, int episodeId, bool includeChildren = true)
-    {
-        if (includeChildren)
-        {
-            return await context.Episodes
-                .Include(e => e.EpisodeGuests)
-                .Include(e => e.EpisodeCorrespondents)
-                .Include(e => e.EpisodeEmployees)
-                .FirstOrDefaultAsync(e => e.EpisodeId == episodeId);
-        }
-
-        return await context.Episodes.FindAsync(episodeId);
     }
 
     public async Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session)
@@ -386,10 +442,10 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         {
             context.WebsitePublishingLogs.Add(new WebsitePublishingLog
             {
-                EpisodeId        = episodeId,
-                PublishedByUserId= session.UserId,
-                PublishedAt      = DateTime.UtcNow,
-                MediaType        = MediaType.Audio
+                EpisodeId = episodeId,
+                PublishedByUserId = session.UserId,
+                PublishedAt = DateTime.UtcNow,
+                MediaType = MediaType.Audio
             });
             episode.StatusId = EpisodeStatus.WebsitePublished;
         }
@@ -481,20 +537,20 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             if (dto.EpisodeGuestId != 0 && existingById.TryGetValue(dto.EpisodeGuestId, out var ex))
             {
                 // تحديث سجل موجود
-                ex.GuestId     = dto.GuestId;
-                ex.Topic       = dto.Topic;
+                ex.GuestId = dto.GuestId;
+                ex.Topic = dto.Topic;
                 ex.HostingTime = dto.HostingTime;
-                ex.ClipNotes   = dto.ClipNotes;
+                ex.ClipNotes = dto.ClipNotes;
             }
             else
             {
                 // إضافة سجل جديد
                 ep.EpisodeGuests.Add(new EpisodeGuest
                 {
-                    GuestId     = dto.GuestId,
-                    Topic       = dto.Topic,
+                    GuestId = dto.GuestId,
+                    Topic = dto.Topic,
                     HostingTime = dto.HostingTime,
-                    ClipNotes   = dto.ClipNotes
+                    ClipNotes = dto.ClipNotes
                 });
             }
         }
@@ -513,16 +569,16 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             if (dto.Id != 0 && existingById.TryGetValue(dto.Id, out var ex))
             {
                 ex.CorrespondentId = dto.CorrespondentId;
-                ex.Topic           = dto.Topic;
-                ex.HostingTime     = dto.HostingTime;
+                ex.Topic = dto.Topic;
+                ex.HostingTime = dto.HostingTime;
             }
             else
             {
                 ep.EpisodeCorrespondents.Add(new EpisodeCorrespondent
                 {
                     CorrespondentId = dto.CorrespondentId,
-                    Topic           = dto.Topic,
-                    HostingTime     = dto.HostingTime
+                    Topic = dto.Topic,
+                    HostingTime = dto.HostingTime
                 });
             }
         }
@@ -552,24 +608,26 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     public async Task<List<ConflictInfo>> GetConflictingEpisodesAsync(int programId, DateTime scheduledTime, int? excludeEpisodeId = null)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        var all = await context.Episodes
-            .AsNoTracking()
-            .Include(e => e.Program)
-            .Where(e => e.IsActive && e.StatusId != EpisodeStatus.Cancelled)
-            .ToListAsync();
 
-        return all
-            .Where(e =>
-                e.EpisodeId != (excludeEpisodeId ?? -1) &&
-                e.ScheduledExecutionTime.HasValue &&
-                Math.Abs((e.ScheduledExecutionTime.Value - scheduledTime).TotalHours) < 1)
+        // ✅ الفلترة بنافذة ساعة في SQL بدلاً من جلب الكل وفلترة في الذاكرة
+        var windowStart = scheduledTime.AddHours(-1);
+        var windowEnd = scheduledTime.AddHours(1);
+
+        return await context.Episodes
+            .AsNoTracking()
+            .Where(e => e.IsActive
+                     && e.StatusId != EpisodeStatus.Cancelled
+                     && e.EpisodeId != (excludeEpisodeId ?? -1)
+                     && e.ScheduledExecutionTime.HasValue
+                     && e.ScheduledExecutionTime.Value > windowStart
+                     && e.ScheduledExecutionTime.Value < windowEnd)
             .Select(e => new ConflictInfo(
                 e.EpisodeId,
                 e.EpisodeName ?? "",
-                e.Program?.ProgramName ?? "",
+                e.Program != null ? e.Program.ProgramName : "",
                 e.ScheduledExecutionTime!.Value,
                 e.ProgramId == programId ? ConflictLevel.High : ConflictLevel.Medium))
-            .ToList();
+            .ToListAsync();
     }
 }
 

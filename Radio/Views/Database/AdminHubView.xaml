@@ -2,22 +2,22 @@
     x:Class="Radio.Views.Database.AdminHubView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ctrl="clr-namespace:Radio.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ctrl="clr-namespace:Radio.Controls"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
     FlowDirection="RightToLeft"
+    Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
     <UserControl.Resources>
         <Style x:Key="AdminChip.Horizontal" TargetType="RadioButton">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
-            <Setter Property="Padding" Value="14,7" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceContainerHighestBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="16,8" />
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -30,7 +30,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="18">
+                            CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -40,7 +40,6 @@
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="ChipBorder" Property="Background" Value="{DynamicResource PrimaryMainBrush}" />
-                                <Setter TargetName="ChipBorder" Property="BorderBrush" Value="{DynamicResource PrimaryMainBrush}" />
                                 <Setter Property="Foreground" Value="White" />
                                 <Setter Property="FontWeight" Value="SemiBold" />
                             </Trigger>
@@ -50,7 +49,10 @@
             </Setter>
         </Style>
 
-        <Style x:Key="AdminChip.Vertical" TargetType="RadioButton" BasedOn="{StaticResource AdminChip.Horizontal}">
+        <Style
+            x:Key="AdminChip.Vertical"
+            BasedOn="{StaticResource AdminChip.Horizontal}"
+            TargetType="RadioButton">
             <Setter Property="Margin" Value="0,2" />
             <Setter Property="Padding" Value="16,12" />
         </Style>
@@ -58,27 +60,31 @@
         <Style x:Key="AdminHub.CategoryLabel" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSize.Overline}" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,8,0,4" />
         </Style>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <Border
+        <materialDesign:Card
             Grid.Row="0"
-            Margin="0,0,0,12"
-            Padding="20,14"
+            Grid.ColumnSpan="2"
+            Margin="0,0,0,16"
+            Padding="24"
+            materialDesign:ElevationAssist.Elevation="Dp1"
             Background="{DynamicResource SurfaceBrush}"
-            BorderBrush="{DynamicResource DividerBrush}"
-            BorderThickness="1"
-            CornerRadius="8">
+            UniformCornerRadius="16">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -87,14 +93,14 @@
 
                 <Border
                     Grid.Column="0"
-                    Width="40"
-                    Height="40"
-                    Margin="0,0,14,0"
+                    Width="48"
+                    Height="48"
+                    Margin="0,0,16,0"
                     Background="{DynamicResource PrimaryXLightBrush}"
-                    CornerRadius="10">
+                    CornerRadius="12">
                     <materialDesign:PackIcon
-                        Width="22"
-                        Height="22"
+                        Width="28"
+                        Height="28"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Foreground="{DynamicResource PrimaryMainBrush}"
@@ -103,57 +109,53 @@
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <TextBlock
-                        FontSize="16"
-                        FontWeight="Bold"
-                        Foreground="{DynamicResource TextPrimaryBrush}"
+                        Style="{StaticResource Type.Headline}"
                         Text="مركز الإدارة والتحكم" />
                     <TextBlock
-                        Margin="0,2,0,0"
-                        FontSize="12"
-                        Foreground="{DynamicResource TextDisabledBrush}"
+                        Margin="0,4,0,0"
+                        Style="{StaticResource Type.BodyMedium.Secondary}"
                         Text="إدارة الكوادر والصلاحيات وصيانة النظام" />
                 </StackPanel>
             </Grid>
-        </Border>
+        </materialDesign:Card>
 
-        <Border
+        <materialDesign:Card
             x:Name="HorizontalNav"
             Grid.Row="1"
-            Margin="0,0,0,12"
-            Padding="16,10"
+            Grid.ColumnSpan="2"
+            Margin="0,0,0,16"
+            Padding="16,12"
+            materialDesign:ElevationAssist.Elevation="Dp1"
             Background="{DynamicResource SurfaceBrush}"
-            BorderBrush="{DynamicResource DividerBrush}"
-            BorderThickness="1"
-            CornerRadius="8">
+            UniformCornerRadius="12">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                 <StackPanel x:Name="ChipPanel" Orientation="Horizontal" />
             </ScrollViewer>
-        </Border>
+        </materialDesign:Card>
 
-        <Border
+        <materialDesign:Card
             x:Name="VerticalNav"
-            Grid.Row="1"
-            Margin="0,0,12,0"
-            Padding="8"
+            Grid.Row="2"
+            Grid.Column="0"
+            Margin="0,0,16,0"
+            Padding="12"
+            materialDesign:ElevationAssist.Elevation="Dp1"
             Background="{DynamicResource SurfaceBrush}"
-            BorderBrush="{DynamicResource DividerBrush}"
-            BorderThickness="1"
-            CornerRadius="8"
+            UniformCornerRadius="12"
             Visibility="Collapsed">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel x:Name="VerticalChipPanel" />
             </ScrollViewer>
-        </Border>
+        </materialDesign:Card>
 
-        <Border
-            Grid.Row="1"
+        <materialDesign:Card
+            Grid.Row="2"
             Grid.Column="1"
+            Padding="16"
+            materialDesign:ElevationAssist.Elevation="Dp1"
             Background="{DynamicResource SurfaceBrush}"
-            BorderBrush="{DynamicResource DividerBrush}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16">
+            UniformCornerRadius="16">
             <ContentControl x:Name="AdminHubContentArea" />
-        </Border>
+        </materialDesign:Card>
     </Grid>
 </UserControl>

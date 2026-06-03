@@ -1,5 +1,6 @@
 using DataAccess.Services.Messaging;
 using MaterialDesignThemes.Wpf;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -43,7 +44,7 @@ public class WpfMessageService : IMessageService
             view.Children.Add(new TextBlock
             {
                 Text = title,
-                FontSize = 20,
+                FontSize = FontScaleService.GetScaled("FontSize.MessageTitle"),
                 FontWeight = FontWeights.Bold,
                 Margin = new Thickness(0, 0, 0, 15),
                 Foreground = titleBrush
@@ -53,7 +54,7 @@ public class WpfMessageService : IMessageService
             {
                 Text = message,
                 TextWrapping = TextWrapping.Wrap,
-                FontSize = 16,
+                FontSize = FontScaleService.GetScaled("FontSize.BodyLarge"),
                 Margin = new Thickness(0, 0, 0, 25),
                 Foreground = bodyBrush
             });

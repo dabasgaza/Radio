@@ -27,57 +27,48 @@ namespace DataAccess.Services
             try
             {
                 using var context = await _dbContextFactory.CreateDbContextAsync();
-                
-                var query = from log in context.AuditLogs
-                            join user in context.Users on log.UserId equals user.UserId into userJoin
-                            from u in userJoin.DefaultIfEmpty()
-                            select new AuditLogDto
-                            {
-                                AuditLogId = log.AuditLogId,
-                                TableName = log.TableName,
-                                RecordId = log.RecordId,
-                                Action = log.Action,
-                                OldValues = log.OldValues,
-                                NewValues = log.NewValues,
-                                Reason = log.Reason,
-                                UserId = log.UserId,
-                                Username = u != null ? u.Username : "غير معروف",
-                                UserFullName = u != null ? u.FullName : "غير معروف",
-                                ChangedAt = log.ChangedAt
-                            };
 
-                // Apply filters
+                // ✅ AsNoTracking + بناء الاستعلام ديناميكياً قبل التنفيذ
+                var logsQuery = context.AuditLogs.AsNoTracking().AsQueryable();
+
                 if (!string.IsNullOrEmpty(tableName))
-                {
-                    query = query.Where(x => x.TableName == tableName);
-                }
+                    logsQuery = logsQuery.Where(x => x.TableName == tableName);
 
                 if (userId.HasValue)
-                {
-                    query = query.Where(x => x.UserId == userId.Value);
-                }
+                    logsQuery = logsQuery.Where(x => x.UserId == userId.Value);
 
                 if (!string.IsNullOrEmpty(action))
-                {
-                    query = query.Where(x => x.Action == action);
-                }
+                    logsQuery = logsQuery.Where(x => x.Action == action);
 
                 if (fromDate.HasValue)
-                {
-                    query = query.Where(x => x.ChangedAt >= fromDate.Value);
-                }
+                    logsQuery = logsQuery.Where(x => x.ChangedAt >= fromDate.Value);
 
                 if (toDate.HasValue)
                 {
-                    // To include the entire 'to' day, set to end of day
                     var endOfDay = toDate.Value.Date.AddDays(1).AddTicks(-1);
-                    query = query.Where(x => x.ChangedAt <= endOfDay);
+                    logsQuery = logsQuery.Where(x => x.ChangedAt <= endOfDay);
                 }
 
-                var list = await query
-                    .OrderByDescending(x => x.ChangedAt)
-                    .Take(500) // Limit to prevent performance issues
-                    .ToListAsync();
+                // ✅ Left join مع Users — الفلترة تطبّقت أولاً فيُقلّل حجم الـ join
+                var list = await (from log in logsQuery.OrderByDescending(x => x.ChangedAt).Take(500)
+                                  join u in context.Users.AsNoTracking()
+                                      on log.UserId equals u.UserId into userJoin
+                                  from u in userJoin.DefaultIfEmpty()
+                                  select new AuditLogDto
+                                  {
+                                      AuditLogId   = log.AuditLogId,
+                                      TableName    = log.TableName,
+                                      RecordId     = log.RecordId,
+                                      Action       = log.Action,
+                                      OldValues    = log.OldValues,
+                                      NewValues    = log.NewValues,
+                                      Reason       = log.Reason,
+                                      UserId       = log.UserId,
+                                      Username     = u != null ? u.Username   : "غير معروف",
+                                      UserFullName = u != null ? u.FullName   : "غير معروف",
+                                      ChangedAt    = log.ChangedAt
+                                  })
+                                 .ToListAsync();
 
                 return Result<List<AuditLogDto>>.Success(list);
             }
@@ -92,9 +83,12 @@ namespace DataAccess.Services
             try
             {
                 using var context = await _dbContextFactory.CreateDbContextAsync();
+                // ✅ Select الحقول المطلوبة فقط بدلاً من جلب الكيان كاملاً
                 var users = await context.Users
                     .AsNoTracking()
-                    .OrderBy(x => x.FullName)
+                    .Where(u => u.IsActive)
+                    .OrderBy(u => u.FullName)
+                    .Select(u => new User { UserId = u.UserId, FullName = u.FullName, Username = u.Username })
                     .ToListAsync();
                 return Result<List<User>>.Success(users);
             }

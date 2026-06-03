@@ -167,7 +167,7 @@
                                     x:Name="TxtResultsCount"
                                     Margin="8,0,0,0"
                                     VerticalAlignment="Center"
-                                    FontSize="12"
+                                    FontSize="{DynamicResource FontSize.Button}"
                                     FontWeight="Bold"
                                     Foreground="{StaticResource PrimaryMainBrush}"
                                     Text="0 حلقة" />
@@ -236,7 +236,7 @@
                                     <TextBlock
                                         Margin="8,0,0,0"
                                         VerticalAlignment="Center"
-                                        FontSize="13"
+                                        FontSize="{DynamicResource FontSize.Input}"
                                         FontWeight="Medium"
                                         Text="تصفية متقدمة" />
                                 </StackPanel>
@@ -257,7 +257,7 @@
                                     x:Name="TxtFilterCount"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    FontSize="10"
+                                    FontSize="{DynamicResource FontSize.Micro}"
                                     FontWeight="Bold"
                                     Foreground="White"
                                     Text="1" />
@@ -339,7 +339,7 @@
                                 <TextBlock
                                     Grid.Column="0"
                                     VerticalAlignment="Center"
-                                    FontSize="13"
+                                    FontSize="{DynamicResource FontSize.Input}"
                                     FontWeight="SemiBold"
                                     Foreground="{StaticResource TextPrimaryBrush}"
                                     Text="فلتر التاريخ:" />
@@ -352,7 +352,7 @@
                                     Padding="12,0"
                                     Click="QuickDateFilter_Click"
                                     Content="اليوم"
-                                    FontSize="12"
+                                    FontSize="{DynamicResource FontSize.Button}"
                                     Style="{StaticResource Btn.Ghost}" />
 
                                 <Button
@@ -363,7 +363,7 @@
                                     Padding="12,0"
                                     Click="QuickDateFilter_Click"
                                     Content="هذا الأسبوع"
-                                    FontSize="12"
+                                    FontSize="{DynamicResource FontSize.Button}"
                                     Style="{StaticResource Btn.Ghost}" />
 
                                 <Button
@@ -374,7 +374,7 @@
                                     Padding="12,0"
                                     Click="QuickDateFilter_Click"
                                     Content="هذا الشهر"
-                                    FontSize="12"
+                                    FontSize="{DynamicResource FontSize.Button}"
                                     Style="{StaticResource Btn.Ghost}" />
 
                                 <Border
@@ -392,7 +392,7 @@
                                     Padding="12,0"
                                     Checked="BtnCustomRange_Checked"
                                     Content="نطاق مخصّص"
-                                    FontSize="12"
+                                    FontSize="{DynamicResource FontSize.Button}"
                                     Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
                                     Unchecked="BtnCustomRange_Unchecked" />
 
@@ -479,7 +479,7 @@
                                                 Kind="AllInclusive" />
                                             <TextBlock
                                                 VerticalAlignment="Center"
-                                                FontSize="13"
+                                                FontSize="{DynamicResource FontSize.Input}"
                                                 Text="الكل" />
                                         </StackPanel>
                                         <Border
@@ -508,7 +508,7 @@
                                             <TextBlock
                                                 x:Name="ChipPlanned"
                                                 VerticalAlignment="Center"
-                                                FontSize="13"
+                                                FontSize="{DynamicResource FontSize.Input}"
                                                 Text="مجدولة" />
                                         </StackPanel>
                                         <Border
@@ -537,7 +537,7 @@
                                             <TextBlock
                                                 x:Name="ChipExecuted"
                                                 VerticalAlignment="Center"
-                                                FontSize="13"
+                                                FontSize="{DynamicResource FontSize.Input}"
                                                 Text="منفّذة" />
                                         </StackPanel>
                                         <Border
@@ -566,7 +566,7 @@
                                             <TextBlock
                                                 x:Name="ChipPublished"
                                                 VerticalAlignment="Center"
-                                                FontSize="13"
+                                                FontSize="{DynamicResource FontSize.Input}"
                                                 Text="منشورة" />
                                         </StackPanel>
                                         <Border
@@ -595,7 +595,7 @@
                                             <TextBlock
                                                 x:Name="ChipWebPublished"
                                                 VerticalAlignment="Center"
-                                                FontSize="13"
+                                                FontSize="{DynamicResource FontSize.Input}"
                                                 Text="الموقع" />
                                         </StackPanel>
                                         <Border
@@ -624,7 +624,7 @@
                                             <TextBlock
                                                 x:Name="ChipCancelled"
                                                 VerticalAlignment="Center"
-                                                FontSize="13"
+                                                FontSize="{DynamicResource FontSize.Input}"
                                                 Text="ملغاة" />
                                         </StackPanel>
                                         <Border
@@ -648,7 +648,7 @@
                         <TextBlock
                             Margin="0,0,8,0"
                             VerticalAlignment="Center"
-                            FontSize="12"
+                            FontSize="{DynamicResource FontSize.Button}"
                             Foreground="{StaticResource TextHintBrush}"
                             Text="الفلاتر النشطة:" />
                         <ItemsControl x:Name="ItemsActiveChips">
@@ -802,7 +802,7 @@
                                                     <TextBlock
                                                         Margin="0,4,0,12"
                                                         HorizontalAlignment="Center"
-                                                        FontSize="12"
+                                                        FontSize="{DynamicResource FontSize.Button}"
                                                         FontWeight="Bold"
                                                         Foreground="{StaticResource PrimaryMainBrush}"
                                                         Text="خيارات الحلقة" />
@@ -1407,7 +1407,7 @@
                                         Background="{StaticResource SurfaceVariantBrush}"
                                         CornerRadius="4">
                                         <TextBlock
-                                            FontSize="11"
+                                            FontSize="{DynamicResource FontSize.Overline}"
                                             Foreground="{StaticResource TextSecondaryBrush}"
                                             Text="{Binding ScheduledExecutionTime, StringFormat='hh:mm tt'}" />
                                     </Border>
@@ -1482,7 +1482,7 @@
                                         <TextBlock
                                             Grid.Column="1"
                                             VerticalAlignment="Center"
-                                            FontSize="11"
+                                            FontSize="{DynamicResource FontSize.Overline}"
                                             FontWeight="Medium"
                                             Foreground="White"
                                             Text="{Binding StatusText}" />
@@ -1534,7 +1534,7 @@
                                         Padding="10,0"
                                         Background="{StaticResource HeaderGradientBrush}"
                                         Click="BtnMarkExecuted_Click"
-                                        FontSize="12"
+                                        FontSize="{DynamicResource FontSize.Button}"
                                         Style="{StaticResource Btn.Primary}"
                                         ToolTip="تنفيذ"
                                         Visibility="{Binding CanMarkExecuted, Converter={StaticResource BoolToVisConverter}}">
@@ -1554,7 +1554,7 @@
                                         Padding="10,0"
                                         Background="{StaticResource SuccessBrush}"
                                         Click="BtnMarkPublished_Click"
-                                        FontSize="12"
+                                        FontSize="{DynamicResource FontSize.Button}"
                                         Style="{StaticResource Btn.Primary}"
                                         ToolTip="نشر رقمي"
                                         Visibility="{Binding CanMarkPublished, Converter={StaticResource BoolToVisConverter}}">
@@ -1570,7 +1570,7 @@
                                         Padding="10,0"
                                         Background="{StaticResource InfoGradientBrush}"
                                         Click="BtnToggleWebsitePublish_Click"
-                                        FontSize="12"
+                                        FontSize="{DynamicResource FontSize.Button}"
                                         Style="{StaticResource Btn.Primary}"
                                         ToolTip="نشر موقع"
                                         Visibility="{Binding CanToggleWebsitePublish, Converter={StaticResource BoolToVisConverter}}">
@@ -1593,7 +1593,7 @@
                                             <TextBlock
                                                 Margin="0,4,0,12"
                                                 HorizontalAlignment="Center"
-                                                FontSize="12"
+                                                FontSize="{DynamicResource FontSize.Button}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource PrimaryMainBrush}"
                                                 Text="خيارات الحلقة" />
@@ -1925,7 +1925,7 @@
                                         <TextBlock
                                             Grid.Column="1"
                                             VerticalAlignment="Center"
-                                            FontSize="11"
+                                            FontSize="{DynamicResource FontSize.Overline}"
                                             FontWeight="Medium"
                                             Foreground="White"
                                             Text="{Binding StatusText}" />
@@ -1947,7 +1947,7 @@
                                         Kind="AccountGroupOutline" />
                                     <TextBlock
                                         VerticalAlignment="Center"
-                                        FontSize="12"
+                                        FontSize="{DynamicResource FontSize.Button}"
                                         Foreground="{StaticResource TextSecondaryBrush}"
                                         Text="{Binding GuestItems.Count}" />
                                 </StackPanel>
@@ -1963,7 +1963,7 @@
                                         Padding="8,0"
                                         Background="{StaticResource HeaderGradientBrush}"
                                         Click="BtnMarkExecuted_Click"
-                                        FontSize="11"
+                                        FontSize="{DynamicResource FontSize.Overline}"
                                         Style="{StaticResource Btn.Primary}"
                                         ToolTip="تنفيذ"
                                         Visibility="{Binding CanMarkExecuted, Converter={StaticResource BoolToVisConverter}}">
@@ -1978,7 +1978,7 @@
                                         Padding="8,0"
                                         Background="{StaticResource SuccessBrush}"
                                         Click="BtnMarkPublished_Click"
-                                        FontSize="11"
+                                        FontSize="{DynamicResource FontSize.Overline}"
                                         Style="{StaticResource Btn.Primary}"
                                         ToolTip="نشر رقمي"
                                         Visibility="{Binding CanMarkPublished, Converter={StaticResource BoolToVisConverter}}">
@@ -1993,7 +1993,7 @@
                                         Padding="8,0"
                                         Background="{StaticResource InfoGradientBrush}"
                                         Click="BtnToggleWebsitePublish_Click"
-                                        FontSize="11"
+                                        FontSize="{DynamicResource FontSize.Overline}"
                                         Style="{StaticResource Btn.Primary}"
                                         ToolTip="نشر موقع"
                                         Visibility="{Binding CanToggleWebsitePublish, Converter={StaticResource BoolToVisConverter}}">
@@ -2015,7 +2015,7 @@
                                             <TextBlock
                                                 Margin="0,4,0,12"
                                                 HorizontalAlignment="Center"
-                                                FontSize="12"
+                                                FontSize="{DynamicResource FontSize.Button}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource PrimaryMainBrush}"
                                                 Text="خيارات الحلقة" />
@@ -2171,7 +2171,7 @@
                         <TextBlock
                             x:Name="TxtSelectedCount"
                             VerticalAlignment="Center"
-                            FontSize="14"
+                            FontSize="{DynamicResource FontSize.Label}"
                             FontWeight="Bold"
                             Foreground="White"
                             Text="0 محددة" />
@@ -2181,7 +2181,7 @@
                             VerticalAlignment="Center"
                             Click="BtnDeselectAll_Click"
                             Content="إلغاء التحديد"
-                            FontSize="11"
+                            FontSize="{DynamicResource FontSize.Overline}"
                             Foreground="{StaticResource TextOnPrimaryBrush}"
                             Style="{StaticResource MaterialDesignFlatButton}" />
                     </StackPanel>
@@ -2193,7 +2193,7 @@
                         Margin="0,0,8,0"
                         Padding="12,0"
                         Click="BtnBatchExecuted_Click"
-                        FontSize="12"
+                        FontSize="{DynamicResource FontSize.Button}"
                         Style="{StaticResource Btn.Primary}"
                         ToolTip="تنفيذ الحلقات المحددة"
                         Visibility="Collapsed">
@@ -2213,7 +2213,7 @@
                         Margin="0,0,8,0"
                         Padding="12,0"
                         Click="BtnBatchPublished_Click"
-                        FontSize="12"
+                        FontSize="{DynamicResource FontSize.Button}"
                         Style="{StaticResource Btn.Primary}"
                         ToolTip="نشر رقمي"
                         Visibility="Collapsed">
@@ -2233,7 +2233,7 @@
                         Margin="0,0,8,0"
                         Padding="12,0"
                         Click="BtnBatchCancel_Click"
-                        FontSize="12"
+                        FontSize="{DynamicResource FontSize.Button}"
                         Style="{StaticResource Btn.Primary}"
                         ToolTip="إلغاء الحلقات المحددة"
                         Visibility="Collapsed">
@@ -2253,7 +2253,7 @@
                         Margin="0,0,8,0"
                         Padding="12,0"
                         Click="BtnBatchDelete_Click"
-                        FontSize="12"
+                        FontSize="{DynamicResource FontSize.Button}"
                         Style="{StaticResource Btn.Primary}"
                         ToolTip="حذف الحلقات المحددة"
                         Visibility="Collapsed">
@@ -2285,7 +2285,7 @@
                     <TextBlock
                         Margin="0,16,0,0"
                         HorizontalAlignment="Center"
-                        FontSize="16"
+                        FontSize="{DynamicResource FontSize.BodyLarge}"
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondaryBrush}"
                         Text="جاري جلب الحلقات..." />
@@ -2307,14 +2307,14 @@
                     <TextBlock
                         Margin="0,16,0,4"
                         HorizontalAlignment="Center"
-                        FontSize="18"
+                        FontSize="{DynamicResource FontSize.TitleLarge}"
                         FontWeight="Bold"
                         Foreground="{StaticResource TextSecondaryBrush}"
                         Text="لا توجد حلقات مطابقة" />
                     <TextBlock
                         Margin="0,0,0,16"
                         HorizontalAlignment="Center"
-                        FontSize="14"
+                        FontSize="{DynamicResource FontSize.Label}"
                         Foreground="{StaticResource TextHintBrush}"
                         Text="حاول تغيير الفلاتر أو كلمات البحث" />
                     <Button

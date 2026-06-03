@@ -14,7 +14,9 @@
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
-    <materialDesign:Card Style="{StaticResource Card.Form}">
+    <materialDesign:Card
+        Style="{StaticResource Card.Form}"
+        TextElement.FontFamily="{StaticResource Font.Default}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -194,14 +196,14 @@
                                         VerticalAlignment="Center">
                                         <TextBlock
                                             x:Name="ConflictTitle"
-                                            FontSize="13"
+                                            FontSize="{DynamicResource FontSize.Input}"
                                             FontWeight="SemiBold"
                                             Foreground="{StaticResource WarningBrush}"
                                             Text="تعارض محتمل في المواعيد" />
                                         <TextBlock
                                             x:Name="ConflictMessage"
                                             Margin="0,2,0,0"
-                                            FontSize="11"
+                                            FontSize="{DynamicResource FontSize.Overline}"
                                             Foreground="{StaticResource TextSecondaryBrush}"
                                             Text="توجد حلقة أخرى في نفس الفترة الزمنية" />
                                     </StackPanel>
@@ -211,7 +213,7 @@
                                         Height="30"
                                         Padding="12,0"
                                         Click="BtnConflictDetails_Click"
-                                        FontSize="11"
+                                        FontSize="{DynamicResource FontSize.Overline}"
                                         Style="{StaticResource Btn.Primary}"
                                         ToolTip="عرض تفاصيل التعارضات"
                                         Visibility="Collapsed">
@@ -286,7 +288,7 @@
                                         Grid.Column="1"
                                         Margin="12,0,0,0"
                                         VerticalAlignment="Center"
-                                        FontSize="14"
+                                        FontSize="{DynamicResource FontSize.Label}"
                                         FontWeight="SemiBold"
                                         Foreground="{StaticResource TextPrimaryBrush}"
                                         Text="الضيوف المشاركون" />
@@ -298,7 +300,7 @@
                                         CornerRadius="12">
                                         <TextBlock
                                             x:Name="GuestCountText"
-                                            FontSize="11"
+                                            FontSize="{DynamicResource FontSize.Overline}"
                                             FontWeight="SemiBold"
                                             Foreground="{StaticResource SecondaryMainBrush}"
                                             Text="0" />
@@ -453,7 +455,7 @@
                                         Grid.Column="1"
                                         Margin="12,0,0,0"
                                         VerticalAlignment="Center"
-                                        FontSize="14"
+                                        FontSize="{DynamicResource FontSize.Label}"
                                         FontWeight="SemiBold"
                                         Foreground="{StaticResource TextPrimaryBrush}"
                                         Text="المراسلون الميدانيون" />
@@ -465,7 +467,7 @@
                                         CornerRadius="12">
                                         <TextBlock
                                             x:Name="CorrespondentCountText"
-                                            FontSize="11"
+                                            FontSize="{DynamicResource FontSize.Overline}"
                                             FontWeight="SemiBold"
                                             Foreground="{StaticResource WarningBrush}"
                                             Text="0" />
@@ -620,7 +622,7 @@
                                         Grid.Column="1"
                                         Margin="12,0,0,0"
                                         VerticalAlignment="Center"
-                                        FontSize="14"
+                                        FontSize="{DynamicResource FontSize.Label}"
                                         FontWeight="SemiBold"
                                         Foreground="{StaticResource TextPrimaryBrush}"
                                         Text="طاقم التنفيذ" />
@@ -632,7 +634,7 @@
                                         CornerRadius="12">
                                         <TextBlock
                                             x:Name="StaffCountText"
-                                            FontSize="11"
+                                            FontSize="{DynamicResource FontSize.Overline}"
                                             FontWeight="SemiBold"
                                             Foreground="{StaticResource SuccessBrush}"
                                             Text="0" />
@@ -743,7 +745,7 @@
                             x:Name="TxtAutoSaveStatus"
                             Margin="6,0,0,0"
                             VerticalAlignment="Center"
-                            FontSize="11"
+                            FontSize="{DynamicResource FontSize.Overline}"
                             Foreground="{StaticResource TextSecondaryBrush}"
                             Text="تم الحفظ تلقائياً" />
                     </StackPanel>

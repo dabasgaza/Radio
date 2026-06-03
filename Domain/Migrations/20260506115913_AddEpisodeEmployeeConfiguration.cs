@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,21 +11,33 @@ namespace Domain.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_EpisodeEmployees_Employees_EmployeeId",
-                table: "EpisodeEmployees");
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_EpisodeEmployees_Employees_EmployeeId' AND parent_object_id = OBJECT_ID('EpisodeEmployees'))
+                BEGIN
+                    ALTER TABLE [EpisodeEmployees] DROP CONSTRAINT [FK_EpisodeEmployees_Employees_EmployeeId];
+                END
+            ");
 
-            migrationBuilder.DropForeignKey(
-                name: "FK_EpisodeEmployees_StaffRoles_StaffRoleId",
-                table: "EpisodeEmployees");
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_EpisodeEmployees_StaffRoles_StaffRoleId' AND parent_object_id = OBJECT_ID('EpisodeEmployees'))
+                BEGIN
+                    ALTER TABLE [EpisodeEmployees] DROP CONSTRAINT [FK_EpisodeEmployees_StaffRoles_StaffRoleId];
+                END
+            ");
 
-            migrationBuilder.DropIndex(
-                name: "IX_EpisodeEmployees_StaffRoleId",
-                table: "EpisodeEmployees");
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_EpisodeEmployees_StaffRoleId' AND object_id = OBJECT_ID('EpisodeEmployees'))
+                BEGIN
+                    DROP INDEX [IX_EpisodeEmployees_StaffRoleId] ON [EpisodeEmployees];
+                END
+            ");
 
-            migrationBuilder.DropColumn(
-                name: "StaffRoleId",
-                table: "EpisodeEmployees");
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT * FROM sys.columns WHERE name = 'StaffRoleId' AND object_id = OBJECT_ID('EpisodeEmployees'))
+                BEGIN
+                    ALTER TABLE [EpisodeEmployees] DROP COLUMN [StaffRoleId];
+                END
+            ");
 
             migrationBuilder.AlterColumn<bool>(
                 name: "IsActive",

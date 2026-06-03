@@ -1,21 +1,24 @@
+namespace DataAccess.Common;
+
+/// <summary>
+/// بيانات الجلسة النشطة للمستخدم — تُملأ عند تسجيل الدخول وتُحدَّث عند تغيير الصلاحيات
+/// </summary>
 public class UserSession
 {
     public int UserId { get; set; }
     public string Username { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string RoleName { get; set; } = string.Empty;
-    public List<string> Permissions { get; set; } = new();
 
-    // 👈 التعديلات الجديدة
-    public bool IsAdmin => RoleName == "Admin";
-    public bool IsCoordination => RoleName == "التنسيق";
-    public bool IsProduction => RoleName == "الإنتاج";
-    public bool IsPublishing => RoleName == "النشر الرقمي";
+    /// <summary>
+    /// قائمة أسماء الصلاحيات الممنوحة للمستخدم عبر دوره (محمّلة عند تسجيل الدخول)
+    /// </summary>
+    public List<string> Permissions { get; set; } = [];
 
-    // التحقق من الصلاحية: الأدمن يمر دائماً، وغيره يمر إذا ملك الصلاحية
-    // ✅ الحل الجذري: الأدمن يملك كل الصلاحيات دائماً
+    /// <summary>
+    /// يتحقق إن كان المستخدم يملك صلاحية معيّنة.
+    /// المستخدم ذو دور "Admin" يملك جميع الصلاحيات تلقائياً.
+    /// </summary>
     public bool HasPermission(string permissionName)
-    {
-        return RoleName == "Admin" || Permissions.Contains(permissionName);
-    }
+        => RoleName == "Admin" || Permissions.Contains(permissionName);
 }

@@ -184,7 +184,7 @@
                                             Height="24"
                                             Background="{DynamicResource PrimaryXLightBrush}"
                                             Content="{Binding StatusDisplayName}"
-                                            FontSize="9"
+                                            FontSize="{DynamicResource FontSize.Tiny}"
                                             Foreground="{DynamicResource PrimaryMainBrush}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

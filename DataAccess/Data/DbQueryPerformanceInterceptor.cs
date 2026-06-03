@@ -51,6 +51,18 @@ namespace DataAccess.Data
             return base.ScalarExecutedAsync(command, eventData, result, cancellationToken);
         }
 
+        public override void CommandFailed(DbCommand command, CommandErrorEventData eventData)
+        {
+            Log.Error(eventData.Exception, "SQL Command Failed: {Sql}", command.CommandText);
+            base.CommandFailed(command, eventData);
+        }
+
+        public override Task CommandFailedAsync(DbCommand command, CommandErrorEventData eventData, CancellationToken cancellationToken = default)
+        {
+            Log.Error(eventData.Exception, "SQL Command Failed: {Sql}", command.CommandText);
+            return base.CommandFailedAsync(command, eventData, cancellationToken);
+        }
+
         private void LogQuery(DbCommand command, CommandExecutedEventData eventData)
         {
             var durationMs = eventData.Duration.TotalMilliseconds;

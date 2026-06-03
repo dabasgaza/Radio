@@ -84,6 +84,14 @@ namespace Radio.Models
                 new NavigationItem { IsSectionHeader = true, Label = "سير العمل" },
                 new NavigationItem
                 {
+                    Label = "البرامج",
+                    Icon = PackIconKind.TelevisionGuide,
+                    ActiveIcon = PackIconKind.TelevisionGuide,
+                    Route = "Programs",
+                    RequiredPermission = AppPermissions.ProgramManage
+                },
+                new NavigationItem
+                {
                     Label = "الحلقات",
                     Icon = PackIconKind.PlayCircleOutline,
                     ActiveIcon = PackIconKind.PlayCircle,
@@ -113,6 +121,30 @@ namespace Radio.Models
                     ActiveIcon = PackIconKind.FileChart,
                     Route = "Reports",
                     RequiredPermission = AppPermissions.ViewReports
+                },
+                new NavigationItem
+                {
+                    Label = "تغطيات المراسلين",
+                    Icon = PackIconKind.MapMarkerMultipleOutline,
+                    ActiveIcon = PackIconKind.MapMarkerMultiple,
+                    Route = "Coverages",
+                    RequiredPermission = AppPermissions.CoordinationManage
+                },
+                new NavigationItem
+                {
+                    Label = "سجلات النشر",
+                    Icon = PackIconKind.FileDocumentMultiple,
+                    ActiveIcon = PackIconKind.FileDocumentMultiple,
+                    Route = "PublishingRecords",
+                    RequiredPermission = AppPermissions.EpisodePublish
+                },
+                new NavigationItem
+                {
+                    Label = "منصات التواصل",
+                    Icon = PackIconKind.ShareVariantOutline,
+                    ActiveIcon = PackIconKind.ShareVariant,
+                    Route = "SocialPlatforms",
+                    RequiredPermission = AppPermissions.StaffManage
                 },
                 new NavigationItem { IsSeparator = true },
                 new NavigationItem
@@ -269,21 +301,24 @@ namespace Radio.Models
                     Label = "الحلقات",
                     Icon = PackIconKind.PlayCircleOutline,
                     ActiveIcon = PackIconKind.PlayCircle,
-                    Route = "Episodes"
+                    Route = "Episodes",
+                    RequiredPermission = AppPermissions.EpisodeManage
                 },
                 new NavigationItem
                 {
                     Label = "النشر",
                     Icon = PackIconKind.FileDocumentMultiple,
                     ActiveIcon = PackIconKind.FileDocumentMultiple,
-                    Route = "PublishingRecords"
+                    Route = "PublishingRecords",
+                    RequiredPermission = AppPermissions.EpisodePublish
                 },
                 new NavigationItem
                 {
                     Label = "النظام",
                     Icon = PackIconKind.CogOutline,
                     ActiveIcon = PackIconKind.Cog,
-                    Route = "AdminHub"
+                    Route = "AdminHub",
+                    RequiredPermission = AppPermissions.UserManage
                 }
             };
         }

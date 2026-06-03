@@ -93,7 +93,7 @@
                                 <TextBlock
                                     Margin="0,28,0,0"
                                     HorizontalAlignment="Center"
-                                    FontSize="28"
+                                    FontSize="{DynamicResource FontSize.Brand}"
                                     FontWeight="Black"
                                     Style="{StaticResource Type.TitleLarge.OnColor}"
                                     Text="إذاعة صوت القدس" />
@@ -150,7 +150,7 @@
                         <StackPanel Margin="64,0" VerticalAlignment="Center">
                             <TextBlock
                                 HorizontalAlignment="Center"
-                                FontSize="32"
+                                FontSize="{DynamicResource FontSize.Display}"
                                 Foreground="{StaticResource PrimaryDarkBrush}"
                                 Style="{StaticResource Type.TitleLarge}"
                                 Text="تسجيل الدخول" />
@@ -171,7 +171,7 @@
                                 materialDesign:TextFieldAssist.HasLeadingIcon="True"
                                 materialDesign:TextFieldAssist.LeadingIcon="AccountCircle"
                                 materialDesign:TextFieldAssist.LeadingIconSize="22"
-                                FontSize="16"
+                                FontSize="{DynamicResource FontSize.BodyLarge}"
                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
                                 Text="admin" />
 
@@ -184,7 +184,7 @@
                                 materialDesign:TextFieldAssist.HasLeadingIcon="True"
                                 materialDesign:TextFieldAssist.LeadingIcon="Lock"
                                 materialDesign:TextFieldAssist.LeadingIconSize="22"
-                                FontSize="16"
+                                FontSize="{DynamicResource FontSize.BodyLarge}"
                                 Password="Admin@123"
                                 Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
 
@@ -207,7 +207,7 @@
                                             Kind="Login" />
                                         <TextBlock
                                             VerticalAlignment="Center"
-                                            FontSize="18"
+                                            FontSize="{DynamicResource FontSize.TitleLarge}"
                                             FontWeight="Bold"
                                             Text="تأكيد الدخول" />
                                     </StackPanel>

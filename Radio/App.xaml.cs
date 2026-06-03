@@ -41,6 +41,7 @@ namespace Radio
                 .MinimumLevel.Information()
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.File("logs/radio.log", rollingInterval: RollingInterval.Day)
                 .WriteTo.Seq(seqUrl, apiKey: string.IsNullOrEmpty(apiKey) ? null : apiKey)
                 .CreateLogger();
 
@@ -53,7 +54,7 @@ namespace Radio
             {
                 var interceptor = sp.GetRequiredService<AuditInterceptor>();
                 var perfInterceptor = sp.GetRequiredService<DbQueryPerformanceInterceptor>();
-                options.UseSqlServer(connectionString)
+                options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure())
                        .AddInterceptors(interceptor, perfInterceptor);
             });
 
@@ -116,7 +117,7 @@ namespace Radio
             }
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             var customCulture = new System.Globalization.CultureInfo("en-US");
             customCulture.DateTimeFormat.ShortDatePattern = "dd-MM-yyyy";
@@ -131,6 +132,31 @@ namespace Radio
                     System.Windows.Markup.XmlLanguage.GetLanguage("en-US")));
 
             base.OnStartup(e);
+
+            FontScaleService.Initialize();
+
+            try
+            {
+                var dbFactory = ServiceProvider.GetRequiredService<IDbContextFactory<BroadcastWorkflowDBContext>>();
+
+                using (var context = await dbFactory.CreateDbContextAsync())
+                {
+                    await context.Database.MigrateAsync();
+                }
+
+                await DataAccess.Seeding.DbSeeder.SeedAsync(dbFactory);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "فشل تهيئة قاعدة البيانات.");
+                MessageBox.Show(
+                    $"تعذر إنشاء قاعدة البيانات أو تهيئتها. يرجى التحقق من اتصال SQL Server.\n\n{ex.Message}",
+                    "خطأ في قاعدة البيانات",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                Current.Shutdown();
+                return;
+            }
 
             var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
             loginWindow.Show();

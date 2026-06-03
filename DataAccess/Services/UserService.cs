@@ -20,7 +20,9 @@ namespace DataAccess.Services
         Task<Result> DeleteUserAsync(int userId, UserSession session);
     }
 
-    public class UserService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IUserService
+    public class UserService(
+        IDbContextFactory<BroadcastWorkflowDBContext> contextFactory,
+        CurrentSessionProvider sessionProvider) : IUserService
     {
         #region إدارة المستخدمين
 
@@ -194,9 +196,10 @@ namespace DataAccess.Services
             if (await context.Users.AnyAsync(u => u.RoleId == roleId))
                 return Result.Fail("لا يمكن حذف الدور لأنه مرتبط بمستخدمين حاليين");
 
-            // حذف الصلاحيات المرتبطة أولاً
-            var perms = await context.RolePermissions.Where(rp => rp.RoleId == roleId).ToListAsync();
-            context.RolePermissions.RemoveRange(perms);
+            // ✅ ExecuteDeleteAsync بدلاً من تحميل السجلات ثم حذفها
+            await context.RolePermissions
+                .Where(rp => rp.RoleId == roleId)
+                .ExecuteDeleteAsync();
 
             context.Roles.Remove(role);
             await context.SaveChangesAsync();
@@ -207,24 +210,19 @@ namespace DataAccess.Services
         {
             await using var context = await contextFactory.CreateDbContextAsync();
 
-            var allPermissions = await context.Permissions
+            // ✅ استعلام واحد يجلب الصلاحيات مع IsAssigned بدلاً من استعلامين منفصلين
+            return await context.Permissions
                 .AsNoTracking()
                 .OrderBy(p => p.Module)
+                .Select(p => new PermissionViewModel
+                {
+                    PermissionId = p.PermissionId,
+                    DisplayName = p.DisplayName,
+                    Module = p.Module,
+                    IsAssigned = context.RolePermissions
+                        .Any(rp => rp.RoleId == roleId && rp.PermissionId == p.PermissionId)
+                })
                 .ToListAsync();
-
-            var assignedIds = await context.RolePermissions
-                .AsNoTracking()
-                .Where(rp => rp.RoleId == roleId)
-                .Select(rp => rp.PermissionId)
-                .ToListAsync();
-
-            return allPermissions.Select(p => new PermissionViewModel
-            {
-                PermissionId = p.PermissionId,
-                DisplayName = p.DisplayName,
-                Module = p.Module,
-                IsAssigned = assignedIds.Contains(p.PermissionId)
-            }).ToList();
         }
 
         public async Task<Result> UpdateRolePermissionsAsync(int roleId, List<int> selectedPermissionIds, UserSession session)
@@ -255,6 +253,9 @@ namespace DataAccess.Services
 
                 await context.SaveChangesAsync();
             }
+
+            // تحديث الصلاحيات فورياً للمستخدم الحالي في الجلسة النشطة
+            await sessionProvider.RefreshPermissionsAsync();
 
             return Result.Success();
         }

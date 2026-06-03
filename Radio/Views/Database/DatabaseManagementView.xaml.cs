@@ -8,7 +8,6 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -60,7 +59,7 @@ namespace Radio.Views.Database
                 {
                     ChkEnabled.IsChecked = backupNode["Enabled"]?.GetValue<bool>() ?? false;
                     ChkCloudSync.IsChecked = backupNode["CloudSync"]?.GetValue<bool>() ?? false;
-                    
+
                     var interval = backupNode["IntervalHours"]?.GetValue<double>() ?? 24;
                     foreach (ComboBoxItem item in ComboInterval.Items)
                     {
@@ -98,7 +97,7 @@ namespace Radio.Views.Database
 
                 var jsonText = File.ReadAllText(_configPath);
                 var root = JsonNode.Parse(jsonText) as JsonObject ?? new JsonObject();
-                
+
                 var backupNode = root["DatabaseBackup"] as JsonObject;
                 if (backupNode == null)
                 {
@@ -150,12 +149,12 @@ namespace Radio.Views.Database
             try
             {
                 NotificationManager.Show(NotificationType.Info, "جاري العمل", "بدء عملية النسخ الاحتياطي الفوري...");
-                
+
                 var result = await Task.Run(() => _dbService.BackupDatabaseAsync());
                 if (result.IsSuccess)
                 {
                     NotificationManager.Show(NotificationType.Success, "نجاح", $"تم إنشاء النسخة الاحتياطية بنجاح في: {result.Value}");
-                    
+
                     if (ChkCloudSync.IsChecked == true && result.Value != null)
                     {
                         var cloudResult = await Task.Run(() => _dbService.CloudSyncBackupAsync(result.Value));
@@ -199,7 +198,7 @@ namespace Radio.Views.Database
                     {
                         NotificationManager.Show(NotificationType.Info, "جاري العمل", "بدء عملية استعادة قاعدة البيانات...");
                         var result = await Task.Run(() => _dbService.RestoreDatabaseAsync(openFileDialog.FileName));
-                        
+
                         if (result.IsSuccess)
                         {
                             NotificationManager.Show(NotificationType.Success, "نجاح", "تمت استعادة قاعدة البيانات بالكامل بنجاح!");
@@ -230,7 +229,7 @@ namespace Radio.Views.Database
                 try
                 {
                     NotificationManager.Show(NotificationType.Info, "جاري العمل", "جاري تهيئة قاعدة البيانات...");
-                    var result = await Task.Run(() => _dbService.InitializeDatabaseAsync());
+                    var result = await Task.Run(() => _dbService.ResetDatabaseAsync());
 
                     if (result.IsSuccess)
                     {

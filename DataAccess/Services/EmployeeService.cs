@@ -39,8 +39,8 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
     public async Task<Result<int>> CreateAsync(EmployeeDto dto, UserSession session)
     {
-        if (!session.HasPermission(AppPermissions.StaffManage))
-            return Result<int>.Fail("ليس لديك صلاحية إدارة الموظفين");
+        var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
+        if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 
@@ -61,8 +61,8 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
     public async Task<Result> UpdateAsync(EmployeeDto dto, UserSession session)
     {
-        if (!session.HasPermission(AppPermissions.StaffManage))
-            return Result.Fail("ليس لديك صلاحية إدارة الموظفين");
+        var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 
@@ -81,8 +81,8 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
     public async Task<Result> SoftDeleteAsync(int employeeId, UserSession session)
     {
-        if (!session.HasPermission(AppPermissions.StaffManage))
-            return Result.Fail("ليس لديك صلاحية إدارة الموظفين");
+        var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 
@@ -101,15 +101,18 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
+        // ✅ إضافة AsNoTracking لاستعلام القراءة
         return await context.StaffRoles
+            .AsNoTracking()
+            .Where(r => r.IsActive)
             .Select(r => new StaffRoleDto(r.StaffRoleId, r.RoleName))
             .ToListAsync();
     }
 
     public async Task<Result<int>> CreateRoleAsync(StaffRoleDto dto, UserSession session)
     {
-        if (!session.HasPermission(AppPermissions.StaffManage))
-            return Result<int>.Fail("ليس لديك صلاحية إدارة الأدوار الوظيفية");
+        var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
+        if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 
@@ -128,8 +131,8 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
     public async Task<Result> UpdateRoleAsync(StaffRoleDto dto, UserSession session)
     {
-        if (!session.HasPermission(AppPermissions.StaffManage))
-            return Result.Fail("ليس لديك صلاحية إدارة الأدوار الوظيفية");
+        var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 
@@ -146,8 +149,8 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
     public async Task<Result> SoftDeleteRoleAsync(int roleId, UserSession session)
     {
-        if (!session.HasPermission(AppPermissions.StaffManage))
-            return Result.Fail("ليس لديك صلاحية إدارة الأدوار الوظيفية");
+        var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
+        if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
 

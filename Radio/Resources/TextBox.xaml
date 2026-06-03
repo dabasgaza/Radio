@@ -37,7 +37,7 @@
         <!--  الأبعاد والحشوة  -->
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
 
@@ -103,7 +103,7 @@
         TargetType="TextBox">
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Button}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="CaretBrush" Value="{StaticResource PrimaryMainBrush}" />
@@ -140,7 +140,7 @@
 
         <Setter Property="Height" Value="52" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />

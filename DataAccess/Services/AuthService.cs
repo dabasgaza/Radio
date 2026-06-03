@@ -17,37 +17,46 @@ public class AuthService(IDbContextFactory<BroadcastWorkflowDBContext> contextFa
     {
         await using var context = await contextFactory.CreateDbContextAsync();
 
-        var user = await context.Users
+        // ✅ Select مباشر لجلب الحقول المطلوبة فقط بدلاً من Include ثلاثي عميق
+        var userProjection = await context.Users
             .AsNoTracking()
-            .Include(u => u.Role)
-                .ThenInclude(r => r.RolePermissions)
-                    .ThenInclude(rp => rp.Permission)
-            .FirstOrDefaultAsync(u => u.Username == username && u.IsActive);
+            .Where(u => u.Username == username && u.IsActive)
+            .Select(u => new
+            {
+                u.UserId,
+                u.Username,
+                u.FullName,
+                u.PasswordHash,
+                u.IsActive,
+                RoleName = u.Role != null ? u.Role.RoleName : null,
+                Permissions = u.Role != null
+                    ? u.Role.RolePermissions
+                        .Select(rp => rp.Permission.SystemName)
+                        .ToList()
+                    : new List<string>()
+            })
+            .FirstOrDefaultAsync();
 
-        var hashToVerify = user?.PasswordHash ?? DummyHash;
+        var hashToVerify = userProjection?.PasswordHash ?? DummyHash;
 
-        if (user is null || !BCrypt.Net.BCrypt.Verify(password, hashToVerify))
+        if (userProjection is null || !BCrypt.Net.BCrypt.Verify(password, hashToVerify))
             return Result<UserSession>.Fail("اسم المستخدم أو كلمة المرور غير صحيحة.");
 
-        if (!user.IsActive)
+        if (!userProjection.IsActive)
             return Result<UserSession>.Fail("حسابك معطل. يرجى التواصل مع مسؤول النظام.");
-
-        var permissions = user.Role?.RolePermissions
-            .Select(rp => rp.Permission.SystemName)
-            .ToList() ?? [];
 
         await using var writeContext = await contextFactory.CreateDbContextAsync();
         await writeContext.Users
-            .Where(u => u.UserId == user.UserId)
+            .Where(u => u.UserId == userProjection.UserId)
             .ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginAt, DateTime.UtcNow));
 
         return Result<UserSession>.Success(new UserSession
         {
-            UserId = user.UserId,
-            Username = user.Username,
-            FullName = user.FullName,
-            RoleName = user.Role?.RoleName ?? "Unknown",
-            Permissions = permissions
+            UserId      = userProjection.UserId,
+            Username    = userProjection.Username,
+            FullName    = userProjection.FullName,
+            RoleName    = userProjection.RoleName ?? "Unknown",
+            Permissions = userProjection.Permissions
         });
     }
 }

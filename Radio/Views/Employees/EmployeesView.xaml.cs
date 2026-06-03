@@ -23,6 +23,10 @@ namespace Radio.Views.Employees
             _employeeService = employeeService;
             _session = session;
 
+            BtnAdd.Visibility = _session.HasPermission(AppPermissions.StaffManage)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
             Loaded += async (_, _) => await LoadDataAsync();
         }
 

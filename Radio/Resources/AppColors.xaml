@@ -270,18 +270,6 @@
     <Thickness x:Key="SpacingLarge">24</Thickness>
     <Thickness x:Key="SpacingXLarge">32</Thickness>
 
-    <!--  FontSize Tokens  -->
-    <sys:Double x:Key="FontSizeCaption">10</sys:Double>
-    <sys:Double x:Key="FontSizeBody">12</sys:Double>
-    <sys:Double x:Key="FontSizeInput">13</sys:Double>
-    <sys:Double x:Key="FontSizeTitle">18</sys:Double>
-    <sys:Double x:Key="FontSizeHeadline">26</sys:Double>
-
-    <!--
-        ═══════════════════════════════════════════════════════════
-        7. TYPOGRAPHY — الخطوط المعتمدة
-        ═══════════════════════════════════════════════════════════
-    -->
-    <FontFamily x:Key="AppFontFamily">pack://application:,,,/Radio;component/Resources/Cairo/Cairo-Regular.ttf#Cairo</FontFamily>
+    <!--  الخطوط والأحجام: Resources/AppFonts.xaml  -->
 
 </ResourceDictionary>

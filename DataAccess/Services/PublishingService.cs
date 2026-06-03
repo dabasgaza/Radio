@@ -66,7 +66,6 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
-        using var transaction = await context.Database.BeginTransactionAsync();
 
         try
         {
@@ -93,12 +92,10 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
             episode.StatusId = EpisodeStatus.Published;
 
             await context.SaveChangesAsync();
-            await transaction.CommitAsync();
             return Result.Success();
         }
         catch
         {
-            await transaction.RollbackAsync();
             throw;
         }
     }
@@ -109,7 +106,6 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
-        using var transaction = await context.Database.BeginTransactionAsync();
 
         try
         {
@@ -123,8 +119,7 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
 
             var now = DateTime.UtcNow;
 
-            // 2. إنشاء سجلات النشر لكل ضيف
-            var logs = new List<SocialMediaPublishingLog>();
+            // 2. إنشاء سجلات النشر لكل ضيف وإضافة منصات النشر المرافقة
             foreach (var g in guestLogs)
             {
                 var log = new SocialMediaPublishingLog
@@ -136,7 +131,16 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
                     ClipDuration = g.Duration,
                     PublishedAt = now
                 };
-                logs.Add(log);
+
+                foreach (var p in g.Platforms)
+                {
+                    log.Platforms.Add(new SocialMediaPublishingLogPlatform
+                    {
+                        SocialMediaPlatformId = p.PlatformId,
+                        Url = p.Url
+                    });
+                }
+
                 context.SocialMediaPublishingLogs.Add(log);
 
                 // 4. تحديث ClipStatus للضيف
@@ -147,34 +151,14 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
                 }
             }
 
-            // حفظ السجلات للحصول على IDs
-            await context.SaveChangesAsync();
-
-            // 3. إنشاء روابط المنصات لكل سجل
-            foreach (var (log, g) in logs.Zip(guestLogs, (l, g) => (l, g)))
-            {
-                foreach (var p in g.Platforms)
-                {
-                    var platformLink = new SocialMediaPublishingLogPlatform
-                    {
-                        SocialMediaPublishingLogId = log.SocialMediaPublishingLogId,
-                        SocialMediaPlatformId = p.PlatformId,
-                        Url = p.Url
-                    };
-                    context.SocialMediaPublishingLogPlatforms.Add(platformLink);
-                }
-            }
-
             // 5. تحديث حالة الحلقة
             episode.StatusId = EpisodeStatus.Published;
 
             await context.SaveChangesAsync();
-            await transaction.CommitAsync();
             return Result.Success();
         }
         catch
         {
-            await transaction.RollbackAsync();
             throw;
         }
     }
@@ -269,14 +253,13 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         using var context = await contextFactory.CreateDbContextAsync();
         try
         {
-            // التحقق من وجود الحلقة
+            // ✅ التحقق من وجود الحلقة أولاً قبل الوصول إلى خصائصها
             var episode = await context.Episodes.FindAsync(dto.EpisodeId);
+            if (episode == null) return Result<int>.Fail("الحلقة غير موجودة");
 
-            // التحقق من أن حالة الحلقة تسمح بنشر الموقع (منفذة أو منشورة اجتماعياً على الأقل)
+            // التحقق من أن حالة الحلقة تسمح بنشر الموقع
             if (episode.StatusId < EpisodeStatus.Executed)
                 return Result<int>.Fail("يجب تنفيذ الحلقة أولاً قبل نشرها على الموقع.");
-
-            if (episode == null) return Result<int>.Fail("الحلقة غير موجودة");
 
             var log = new WebsitePublishingLog
             {
@@ -292,10 +275,10 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
             };
 
             context.WebsitePublishingLogs.Add(log);
-            
+
             // تحديث حالة الحلقة إلى WebsitePublished
             episode.StatusId = EpisodeStatus.WebsitePublished;
-            
+
             await context.SaveChangesAsync();
             return Result<int>.Success(log.WebsitePublishingLogId);
         }
@@ -315,33 +298,39 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
     /// </summary>
     public async Task<SocialMediaPublishingLogDto?> GetSocialPublishingLogAsync(int episodeGuestId)
     {
-        // لا نحتاج صلاحية خاصة — مجرد قراءة
         using var context = await contextFactory.CreateDbContextAsync();
 
-                var log = await context.SocialMediaPublishingLogs
+        // ✅ Select مباشر بدلاً من Include + تحويل في الذاكرة
+        var log = await context.SocialMediaPublishingLogs
             .AsNoTracking()
-            .AsSplitQuery()
-            .Include(l => l.Platforms)
             .Where(l => l.EpisodeGuestId == episodeGuestId && l.IsActive)
-            .OrderByDescending(l => l.PublishedAt)  // أحدث سجل أولاً
+            .OrderByDescending(l => l.PublishedAt)
+            .Select(l => new
+            {
+                l.SocialMediaPublishingLogId,
+                l.EpisodeGuestId,
+                l.ClipTitle,
+                l.ClipDuration,
+                l.MediaType,
+                Platforms = l.Platforms
+                    .Where(p => p.IsActive)
+                    .Select(p => new PlatformPublishDto(
+                        p.SocialMediaPlatformId,
+                        p.SocialMediaPlatform.Name,
+                        p.Url))
+                    .ToList()
+            })
             .FirstOrDefaultAsync();
 
         if (log is null) return null;
 
-        // تحويل الكيان إلى DTO مع المنصات والروابط
         return new SocialMediaPublishingLogDto(
             log.SocialMediaPublishingLogId,
             log.EpisodeGuestId,
             log.ClipTitle,
             log.ClipDuration,
             log.MediaType,
-            log.Platforms
-                .Where(p => p.IsActive)
-                .Select(p => new PlatformPublishDto(
-                    p.SocialMediaPlatformId,
-                    p.SocialMediaPlatform.Name,
-                    p.Url))
-                .ToList());
+            log.Platforms);
     }
 
     /// <summary>
@@ -352,31 +341,25 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // البحث عن سجلات النشر الرقمي المرتبطة بضيوف الحلقة
-                var logs = await context.SocialMediaPublishingLogs
+        // ✅ Select مباشر بدلاً من Include ثلاثي + تحويل في الذاكرة
+        return await context.SocialMediaPublishingLogs
             .AsNoTracking()
-            .AsSplitQuery()
-            .Include(l => l.Platforms)
-                .ThenInclude(p => p.SocialMediaPlatform)
-            .Include(l => l.EpisodeGuest)
             .Where(l => l.EpisodeGuest.EpisodeId == episodeId && l.IsActive)
             .OrderByDescending(l => l.PublishedAt)
+            .Select(l => new SocialMediaPublishingLogDto(
+                l.SocialMediaPublishingLogId,
+                l.EpisodeGuestId,
+                l.ClipTitle,
+                l.ClipDuration,
+                l.MediaType,
+                l.Platforms
+                    .Where(p => p.IsActive)
+                    .Select(p => new PlatformPublishDto(
+                        p.SocialMediaPlatformId,
+                        p.SocialMediaPlatform.Name,
+                        p.Url))
+                    .ToList()))
             .ToListAsync();
-
-        // تحويل كل كيان إلى DTO
-        return logs.Select(log => new SocialMediaPublishingLogDto(
-            log.SocialMediaPublishingLogId,
-            log.EpisodeGuestId,
-            log.ClipTitle,
-            log.ClipDuration,
-            log.MediaType,
-            log.Platforms
-                .Where(p => p.IsActive)
-                .Select(p => new PlatformPublishDto(
-                    p.SocialMediaPlatformId,
-                    p.SocialMediaPlatform.Name,
-                    p.Url))
-                .ToList())).ToList();
     }
 
     /// <summary>
@@ -390,7 +373,6 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
         using var context = await contextFactory.CreateDbContextAsync();
-        using var transaction = await context.Database.BeginTransactionAsync();
 
         try
         {
@@ -427,12 +409,10 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
             }
 
             await context.SaveChangesAsync();
-            await transaction.CommitAsync();
             return Result.Success();
         }
         catch
         {
-            await transaction.RollbackAsync();
             throw;
         }
     }

@@ -6,17 +6,18 @@
     ║  ترتيب التحميل (مهم جداً — لا تغيّر الترتيب):                          ║
     ║   1. Material Design 2 Defaults                                          ║
     ║   2. BundledTheme (Indigo + LightBlue + Light)                          ║
-    ║   3. AppColors.xaml       ← Design Tokens + Brushes                     ║
-    ║   4. Windows.xaml         ← ستايلات النوافذ والـ UserControl           ║
-    ║   5. TextBlock.xaml       ← Typography Scale                            ║
-    ║   6. Buttons.xaml         ← جميع أنواع الأزرار                         ║
-    ║   7. TextBox.xaml         ← حقول النصوص والبحث وكلمة المرور           ║
-    ║   8. ComboBox.xaml        ← قوائم الاختيار                             ║
-    ║   9. ListBox.xaml         ← قوائم العرض والـ Chips                     ║
-    ║   10. DateTimePicker.xaml ← منتقيات التاريخ والوقت                    ║
-    ║   11. DataGrid.xaml       ← جداول البيانات                             ║
-    ║   12. Cards.xaml          ← بطاقات العرض والتغليف                      ║
-    ║   13. ColorZone.xaml      ← ترويسات النوافذ والـ Header               ║
+    ║   3. AppFonts.xaml        ← نظام الخطوط والأحجام المركزي               ║
+    ║   4. AppColors.xaml       ← Design Tokens + Brushes                     ║
+    ║   5. Windows.xaml         ← ستايلات النوافذ والـ UserControl           ║
+    ║   6. TextBlock.xaml       ← Typography Scale                            ║
+    ║   7. Buttons.xaml         ← جميع أنواع الأزرار                         ║
+    ║   8. TextBox.xaml         ← حقول النصوص والبحث وكلمة المرور           ║
+    ║   9. ComboBox.xaml        ← قوائم الاختيار                             ║
+    ║   10. ListBox.xaml        ← قوائم العرض والـ Chips                     ║
+    ║   11. DateTimePicker.xaml ← منتقيات التاريخ والوقت                    ║
+    ║   12. DataGrid.xaml       ← جداول البيانات                             ║
+    ║   13. Cards.xaml          ← بطاقات العرض والتغليف                      ║
+    ║   14. ColorZone.xaml      ← ترويسات النوافذ والـ Header               ║
     ╚══════════════════════════════════════════════════════════════════════════╝
 -->
 <Application
@@ -53,7 +54,15 @@
 
                 <!--
                     ══════════════════════════════════════════════
-                    3. Design Tokens — الأساس الذي تعتمد عليه كل الملفات
+                    3. Fonts & Typography System
+                    نظام الخطوط والأحجام المركزي
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/AppFonts.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
+                    4. Design Tokens — الأساس الذي تعتمد عليه كل الملفات
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/AppColors.xaml" />
@@ -61,70 +70,70 @@
 
                 <!--
                     ══════════════════════════════════════════════
-                    4. Windows & UserControl Styles
+                    5. Windows & UserControl Styles
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/Windows.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    5. Typography
+                    6. Typography
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/TextBlock.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    6. Buttons
+                    7. Buttons
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/Buttons.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    7. Text Inputs
+                    8. Text Inputs
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/TextBox.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    8. ComboBox
+                    9. ComboBox
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/ComboBox.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    9. ListBox + Chips
+                    10. ListBox + Chips
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/ListBox.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    10. Date & Time Pickers
+                    11. Date & Time Pickers
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/DateTimePicker.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    11. DataGrid — يعتمد على AppColors لذا يأتي بعده
+                    12. DataGrid — يعتمد على AppColors لذا يأتي بعده
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/DataGrid.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    12. Cards
+                    13. Cards
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/Cards.xaml" />
 
                 <!--
                     ══════════════════════════════════════════════
-                    13. ColorZone & Header Zones
+                    14. ColorZone & Header Zones
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/ColorZone.xaml" />
@@ -132,7 +141,7 @@
 
                 <!--
                     ══════════════════════════════════════════════
-                    14. TabControl
+                    15. TabControl
                     ══════════════════════════════════════════════
                 -->
                 <ResourceDictionary Source="Resources/TabControl.xaml" />

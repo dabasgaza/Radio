@@ -8,6 +8,7 @@
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
     FlowDirection="RightToLeft"
+    Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -23,13 +24,13 @@
             </Grid.RowDefinitions>
 
             <!--  Header Card with Gradient  -->
-            <Border
+            <materialDesign:Card
                 Grid.Row="0"
-                Margin="0,0,0,20"
-                Padding="{StaticResource SpacingLarge}"
+                Margin="0,0,0,24"
+                Padding="32"
                 materialDesign:ElevationAssist.Elevation="Dp2"
                 Background="{DynamicResource HeaderGradientBrush}"
-                CornerRadius="{StaticResource RadiusLarge}">
+                UniformCornerRadius="16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -60,14 +61,13 @@
 
                             <StackPanel Grid.Column="1">
                                 <TextBlock
-                                    FontSize="{StaticResource FontSizeTitle}"
-                                    FontWeight="Bold"
                                     Foreground="White"
+                                    Style="{StaticResource Type.Headline}"
                                     Text="إدارة قاعدة البيانات" />
                                 <TextBlock
-                                    Margin="0,4,0,0"
-                                    FontSize="{StaticResource FontSizeBody}"
+                                    Margin="0,8,0,0"
                                     Foreground="#DDDDDD"
+                                    Style="{StaticResource Type.BodyMedium.Secondary}"
                                     Text="أدوات إدارة قاعدة البيانات: النسخ الاحتياطي، الاستعادة، وجدولة العمليات التلقائية." />
                             </StackPanel>
                         </Grid>
@@ -90,7 +90,7 @@
                             Kind="DatabaseCog" />
                     </Border>
                 </Grid>
-            </Border>
+            </materialDesign:Card>
 
             <!--  Two-column: Quick Actions + Settings  -->
             <Grid Grid.Row="1" Margin="0,0,0,20">
@@ -101,7 +101,11 @@
                 </Grid.ColumnDefinitions>
 
                 <!--  Quick Actions Card  -->
-                <Border Grid.Column="0" Style="{StaticResource Card.Default}">
+                <materialDesign:Card
+                    Grid.Column="0"
+                    Padding="24"
+                    materialDesign:ElevationAssist.Elevation="Dp1"
+                    UniformCornerRadius="16">
                     <StackPanel>
                         <Grid Margin="0,0,0,16">
                             <Grid.ColumnDefinitions>
@@ -119,11 +123,10 @@
                             </Border>
                             <TextBlock
                                 Grid.Column="1"
-                                Margin="8,0,0,0"
+                                Margin="12,0,0,0"
                                 VerticalAlignment="Center"
-                                FontSize="{StaticResource FontSizeInput}"
-                                FontWeight="Bold"
                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                Style="{StaticResource Type.TitleMedium}"
                                 Text="العمليات الفورية" />
                         </Grid>
 
@@ -133,14 +136,17 @@
                             Margin="0,0,0,10"
                             HorizontalAlignment="Stretch"
                             Click="BtnQuickBackup_Click"
-                            Style="{StaticResource MaterialDesignRaisedButton}">
+                            Style="{StaticResource Btn.Primary}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
                                     Width="18"
                                     Height="18"
                                     Margin="0,0,8,0"
                                     Kind="DatabasePlus" />
-                                <TextBlock FontSize="{StaticResource FontSizeInput}" Text="نسخ احتياطي فوري" />
+                                <TextBlock
+                                    Foreground="White"
+                                    Style="{StaticResource Type.BodyMedium}"
+                                    Text="نسخ احتياطي فوري" />
                             </StackPanel>
                         </Button>
 
@@ -150,14 +156,14 @@
                             Margin="0,0,0,10"
                             HorizontalAlignment="Stretch"
                             Click="BtnChooseAndRestore_Click"
-                            Style="{StaticResource MaterialDesignOutlinedButton}">
+                            Style="{StaticResource Btn.AddNew}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
                                     Width="18"
                                     Height="18"
                                     Margin="0,0,8,0"
                                     Kind="DatabaseRefresh" />
-                                <TextBlock FontSize="{StaticResource FontSizeInput}" Text="استعادة من ملف..." />
+                                <TextBlock Style="{StaticResource Type.BodyMedium}" Text="استعادة من ملف..." />
                             </StackPanel>
                         </Button>
 
@@ -170,10 +176,8 @@
                             x:Name="BtnInitializeDb"
                             Height="40"
                             HorizontalAlignment="Stretch"
-                            Background="{DynamicResource ErrorBrush}"
-                            BorderBrush="{DynamicResource ErrorBrush}"
                             Click="BtnInitializeDb_Click"
-                            Style="{StaticResource MaterialDesignFlatButton}">
+                            Style="{StaticResource Btn.Danger}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
                                     Width="18"
@@ -182,16 +186,20 @@
                                     Foreground="White"
                                     Kind="AlertOctagon" />
                                 <TextBlock
-                                    FontSize="{StaticResource FontSizeInput}"
                                     Foreground="White"
+                                    Style="{StaticResource Type.BodyMedium}"
                                     Text="تهيئة قاعدة البيانات" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
-                </Border>
+                </materialDesign:Card>
 
                 <!--  Settings Card  -->
-                <Border Grid.Column="2" Style="{StaticResource Card.Default}">
+                <materialDesign:Card
+                    Grid.Column="2"
+                    Padding="24"
+                    materialDesign:ElevationAssist.Elevation="Dp1"
+                    UniformCornerRadius="16">
                     <StackPanel>
                         <Grid Margin="0,0,0,16">
                             <Grid.ColumnDefinitions>
@@ -209,11 +217,10 @@
                             </Border>
                             <TextBlock
                                 Grid.Column="1"
-                                Margin="8,0,0,0"
+                                Margin="12,0,0,0"
                                 VerticalAlignment="Center"
-                                FontSize="{StaticResource FontSizeInput}"
-                                FontWeight="Bold"
                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                Style="{StaticResource Type.TitleMedium}"
                                 Text="إعدادات الجدولة والنسخ التلقائي" />
                         </Grid>
 
@@ -229,14 +236,14 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <TextBlock
-                                        FontSize="{StaticResource FontSizeInput}"
                                         FontWeight="SemiBold"
                                         Foreground="{DynamicResource TextPrimaryBrush}"
-                                        Text="النسخ الاحتياطي التلقائي" />
+                                        Style="{StaticResource Type.BodyMedium}"
+                                        Text="الالنسخ الاحتياطي التلقائي" />
                                     <TextBlock
                                         Margin="0,2,0,0"
-                                        FontSize="{StaticResource FontSizeCaption}"
                                         Foreground="{DynamicResource TextSecondaryBrush}"
+                                        Style="{StaticResource Type.Caption}"
                                         Text="تشغيل نسخ احتياطي دوري تلقائي" />
                                 </StackPanel>
                                 <ToggleButton
@@ -260,14 +267,14 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <TextBlock
-                                        FontSize="{StaticResource FontSizeInput}"
                                         FontWeight="SemiBold"
                                         Foreground="{DynamicResource TextPrimaryBrush}"
+                                        Style="{StaticResource Type.BodyMedium}"
                                         Text="المزامنة السحابية" />
                                     <TextBlock
                                         Margin="0,2,0,0"
-                                        FontSize="{StaticResource FontSizeCaption}"
                                         Foreground="{DynamicResource TextSecondaryBrush}"
+                                        Style="{StaticResource Type.Caption}"
                                         Text="رفع النسخ الاحتياطية إلى السحابة تلقائياً" />
                                 </StackPanel>
                                 <ToggleButton
@@ -287,14 +294,14 @@
 
                             <StackPanel>
                                 <TextBlock
-                                    Margin="0,0,0,6"
-                                    FontSize="{StaticResource FontSizeBody}"
+                                    Margin="0,0,0,8"
                                     Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Style="{StaticResource Type.BodyMedium.Secondary}"
                                     Text="دورية النسخ (ساعات)" />
                                 <ComboBox
                                     x:Name="ComboInterval"
                                     Padding="{StaticResource SpacingSmall}"
-                                    FontSize="{StaticResource FontSizeInput}"
+                                    FontSize="{DynamicResource FontSize.Input}"
                                     SelectedIndex="1">
                                     <ComboBoxItem Content="كل 6 ساعات" Tag="6" />
                                     <ComboBoxItem Content="يومي (24 ساعة)" Tag="24" />
@@ -304,15 +311,15 @@
 
                             <StackPanel Grid.Column="2">
                                 <TextBlock
-                                    Margin="0,0,0,6"
-                                    FontSize="{StaticResource FontSizeBody}"
+                                    Margin="0,0,0,8"
                                     Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Style="{StaticResource Type.BodyMedium.Secondary}"
                                     Text="الاحتفاظ (أيام)" />
                                 <TextBox
                                     x:Name="TxtRetentionDays"
                                     Padding="{StaticResource SpacingSmall}"
                                     materialDesign:HintAssist.Hint="مثال: 30"
-                                    FontSize="{StaticResource FontSizeInput}"
+                                    Style="{StaticResource BroadcastTextBox}"
                                     Text="30" />
                             </StackPanel>
                         </Grid>
@@ -322,22 +329,25 @@
                             Height="40"
                             HorizontalAlignment="Stretch"
                             Click="BtnSaveConfig_Click"
-                            Style="{StaticResource MaterialDesignRaisedSecondaryButton}">
+                            Style="{StaticResource Btn.Secondary}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
                                     Width="18"
                                     Height="18"
                                     Margin="0,0,8,0"
                                     Kind="ContentSave" />
-                                <TextBlock FontSize="{StaticResource FontSizeInput}" Text="حفظ الإعدادات" />
+                                <TextBlock Style="{StaticResource Type.BodyMedium}" Text="حفظ الإعدادات" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
-                </Border>
+                </materialDesign:Card>
             </Grid>
 
             <!--  History DataGrid Card  -->
-            <Border Grid.Row="2" Style="{StaticResource Card.Default}">
+            <materialDesign:Card
+                Grid.Row="2"
+                materialDesign:ElevationAssist.Elevation="Dp1"
+                UniformCornerRadius="16">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -348,6 +358,7 @@
                     <Border
                         Grid.Row="0"
                         Padding="24,18"
+                        Style="{StaticResource Card.Info}"
                         BorderBrush="{DynamicResource DividerBrush}"
                         BorderThickness="0,0,0,1">
                         <Grid>
@@ -376,11 +387,10 @@
                                 </Border>
                                 <TextBlock
                                     Grid.Column="1"
-                                    Margin="8,0,0,0"
+                                    Margin="12,0,0,0"
                                     VerticalAlignment="Center"
-                                    FontSize="{StaticResource FontSizeInput}"
-                                    FontWeight="Bold"
                                     Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Style="{StaticResource Type.TitleMedium}"
                                     Text="سجل عمليات النسخ الاحتياطي" />
                             </Grid>
 
@@ -395,9 +405,9 @@
                                     <materialDesign:PackIcon
                                         Width="16"
                                         Height="16"
-                                        Margin="0,0,6,0"
+                                        Margin="0,0,8,0"
                                         Kind="Refresh" />
-                                    <TextBlock FontSize="{StaticResource FontSizeBody}" Text="تحديث" />
+                                    <TextBlock Style="{StaticResource Type.BodyMedium}" Text="تحديث" />
                                 </StackPanel>
                             </Button>
                         </Grid>
@@ -407,31 +417,9 @@
                     <DataGrid
                         x:Name="GridHistory"
                         Grid.Row="1"
-                        materialDesign:DataGridAssist.CellPadding="12,8,12,8"
-                        materialDesign:DataGridAssist.ColumnHeaderPadding="12,10,12,10"
-                        AlternatingRowBackground="{DynamicResource RowAlternateBrush}"
-                        AutoGenerateColumns="False"
-                        BorderThickness="0"
-                        CanUserAddRows="False"
-                        IsReadOnly="True"
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                        SelectionMode="Single"
-                        SelectionUnit="FullRow">
-                        <DataGrid.Resources>
-                            <Style BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}" TargetType="DataGridColumnHeader">
-                                <Setter Property="FontWeight" Value="SemiBold" />
-                                <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="BorderThickness" Value="0" />
-                            </Style>
-                            <Style BasedOn="{StaticResource MaterialDesignDataGridCell}" TargetType="DataGridCell">
-                                <Setter Property="FontSize" Value="{StaticResource FontSizeInput}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-                                <Setter Property="VerticalAlignment" Value="Center" />
-                                <Setter Property="BorderThickness" Value="0" />
-                            </Style>
-                        </DataGrid.Resources>
+                        ItemsSource="{Binding}"
+                        Style="{StaticResource DataGrid.Main}">
+                        <!--  Using shared DataGrid.Main style, no need for inline DataGrid.Resources  -->
                         <DataGrid.Columns>
                             <DataGridTextColumn
                                 Width="150"
@@ -448,7 +436,11 @@
                                 Binding="{Binding FileSize, Converter={StaticResource FileSizeConverter}}"
                                 Header="الحجم" />
 
-                            <DataGridTemplateColumn Width="110" Header="الحالة">
+                            <DataGridTemplateColumn
+                                Width="110"
+                                CellStyle="{StaticResource DataGrid.Cell.Center}"
+                                Header="الحالة"
+                                HeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border
@@ -492,12 +484,9 @@
                                                         </Style>
                                                     </materialDesign:PackIcon.Style>
                                                 </materialDesign:PackIcon>
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    FontSize="{StaticResource FontSizeBody}"
-                                                    FontWeight="SemiBold">
+                                                <TextBlock Grid.Column="1" FontWeight="SemiBold">
                                                     <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
+                                                        <Style BasedOn="{StaticResource Type.BodyMedium}" TargetType="TextBlock">
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding Status}" Value="Success">
                                                                     <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
@@ -522,7 +511,11 @@
                                 Binding="{Binding BackupPath}"
                                 Header="المسار المحلي" />
 
-                            <DataGridTemplateColumn Width="200" Header="العمليات">
+                            <DataGridTemplateColumn
+                                Width="240"
+                                CellStyle="{StaticResource DataGrid.Cell.Actions}"
+                                Header="العمليات"
+                                HeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Margin="0,2,0,2" Orientation="Horizontal">
@@ -535,11 +528,11 @@
                                                 ToolTip="استعادة قاعدة البيانات إلى هذه النسخة">
                                                 <StackPanel Orientation="Horizontal">
                                                     <materialDesign:PackIcon
-                                                        Width="14"
-                                                        Height="14"
-                                                        Margin="0,0,6,0"
+                                                        Width="16"
+                                                        Height="16"
+                                                        Margin="0,0,8,0"
                                                         Kind="Restore" />
-                                                    <TextBlock FontSize="{StaticResource FontSizeBody}" Text="استعادة" />
+                                                    <TextBlock Style="{StaticResource Type.BodyMedium}" Text="استعادة" />
                                                 </StackPanel>
                                             </Button>
                                             <Button
@@ -550,11 +543,11 @@
                                                 ToolTip="مزامنة النسخة المحلية إلى السحابة">
                                                 <StackPanel Orientation="Horizontal">
                                                     <materialDesign:PackIcon
-                                                        Width="14"
-                                                        Height="14"
-                                                        Margin="0,0,6,0"
+                                                        Width="16"
+                                                        Height="16"
+                                                        Margin="0,0,8,0"
                                                         Kind="CloudUpload" />
-                                                    <TextBlock FontSize="{StaticResource FontSizeBody}" Text="مزامنة سحابية" />
+                                                    <TextBlock Style="{StaticResource Type.BodyMedium}" Text="مزامنة سحابية" />
                                                 </StackPanel>
                                             </Button>
                                         </StackPanel>
@@ -564,7 +557,7 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
-            </Border>
+            </materialDesign:Card>
         </Grid>
     </Grid>
 </UserControl>

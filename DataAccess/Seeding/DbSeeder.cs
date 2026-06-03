@@ -5,325 +5,282 @@ using Microsoft.EntityFrameworkCore;
 namespace DataAccess.Seeding;
 
 /// <summary>
-/// فئة مسؤولة عن إنشاء البيانات الأساسية عند أول تشغيل للنظام
-/// تُستدعى من App.xaml.cs بعد التحقق من وجود Migration حديث
+/// المصدر الوحيد للبيانات الابتدائية في النظام.
+/// يُستدعى عند كل تشغيل للتطبيق وهو idempotent تماماً — آمن للتشغيل المتكرر.
 /// </summary>
 public static class DbSeeder
 {
-    /// <summary>
-    /// نقطة الدخول الرئيسية — تفحص إن كانت الجداول فارغة ثم تملأها
-    /// </summary>
     public static async Task SeedAsync(IDbContextFactory<BroadcastWorkflowDBContext> dbFactory)
     {
         await using var context = await dbFactory.CreateDbContextAsync();
 
-        // نقوم بإنشاء البيانات فقط إن لم تكن موجودة مسبقاً
         await SeedEpisodeStatusesAsync(context);
-        await SeedPermissionsAsync(context);
+        await SeedPermissionsAsync(context);   // يجب أن يسبق SeedRolesAsync
         await SeedRolesAsync(context);
         await SeedRolePermissionsAsync(context);
         await SeedAdminUserAsync(context);
         await SeedSocialMediaPlatformsAsync(context);
         await SeedStaffRolesAsync(context);
-
-        await context.SaveChangesAsync();
     }
 
-    #region EpisodeStatuses
+    // ═══════════════════════════════════════════
+    // حالات الحلقات
+    // ═══════════════════════════════════════════
 
     private static async Task SeedEpisodeStatusesAsync(BroadcastWorkflowDBContext context)
     {
-        var existingStatuses = await context.Set<EpisodeStatus>().Select(s => s.StatusId).ToListAsync();
+        var existing = await context.Set<EpisodeStatus>().Select(s => s.StatusId).ToListAsync();
 
         var statuses = new List<EpisodeStatus>
         {
-            new() { StatusId = 0, StatusName = "Planned",   DisplayName = "مخطط لها",  SortOrder = 0 },
-            new() { StatusId = 1, StatusName = "Executed",  DisplayName = "تم تنفيذها", SortOrder = 1 },
-            new() { StatusId = 2, StatusName = "Published", DisplayName = "تم نشرها",  SortOrder = 2 },
-            new() { StatusId = 3, StatusName = "WebsitePublished", DisplayName = "منشورة على الموقع", SortOrder = 3 },
-            new() { StatusId = 4, StatusName = "Cancelled", DisplayName = "ملغاة", SortOrder = 4 },
+            new() { StatusId = 0, StatusName = "Planned",          DisplayName = "مخطط لها",           SortOrder = 0 },
+            new() { StatusId = 1, StatusName = "Executed",         DisplayName = "تم تنفيذها",          SortOrder = 1 },
+            new() { StatusId = 2, StatusName = "Published",        DisplayName = "تم نشرها",            SortOrder = 2 },
+            new() { StatusId = 3, StatusName = "WebsitePublished", DisplayName = "منشورة على الموقع",   SortOrder = 3 },
+            new() { StatusId = 4, StatusName = "Cancelled",        DisplayName = "ملغاة",               SortOrder = 4 },
         };
 
-        var missingStatuses = statuses.Where(s => !existingStatuses.Contains(s.StatusId)).ToList();
-
-        if (missingStatuses.Any())
+        var missing = statuses.Where(s => !existing.Contains(s.StatusId)).ToList();
+        if (missing.Count > 0)
         {
-            context.Set<EpisodeStatus>().AddRange(missingStatuses);
+            context.Set<EpisodeStatus>().AddRange(missing);
             await context.SaveChangesAsync();
         }
     }
 
-    #endregion
-
-    #region Permissions
+    // ═══════════════════════════════════════════
+    // الصلاحيات — يتزامن تلقائياً مع AppPermissions
+    // ═══════════════════════════════════════════
 
     private static async Task SeedPermissionsAsync(BroadcastWorkflowDBContext context)
     {
-        if (await context.Set<Permission>().AnyAsync())
-            return;
+        var fields = typeof(AppPermissions).GetFields(
+            System.Reflection.BindingFlags.Public |
+            System.Reflection.BindingFlags.Static |
+            System.Reflection.BindingFlags.FlattenHierarchy);
 
-        var now = DateTime.UtcNow;
+        var dbPermissions = await context.Set<Permission>().ToDictionaryAsync(p => p.SystemName);
+        var toInsert = new List<Permission>();
+        bool anyChange = false;
 
-        var permissions = new List<Permission>
+        foreach (var field in fields)
         {
-            // المستخدمين
-            new() { SystemName = AppPermissions.UserManage,      DisplayName = "إدارة المستخدمين",   Module = "المستخدمين" },
+            if (!field.IsLiteral || field.IsInitOnly || field.FieldType != typeof(string))
+                continue;
 
-            // البرامج
-            new() { SystemName = AppPermissions.ProgramManage,   DisplayName = "إدارة البرامج",     Module = "البرامج" },
+            var systemName  = (string)field.GetValue(null)!;
+            var attr        = (PermissionInfoAttribute?)Attribute.GetCustomAttribute(field, typeof(PermissionInfoAttribute));
+            var displayName = attr?.DisplayName ?? systemName;
+            var module      = attr?.Module ?? "عام";
 
-            // الحلقات
-            new() { SystemName = AppPermissions.EpisodeManage,     DisplayName = "إدارة الحلقات",     Module = "الحلقات" },
-            new() { SystemName = AppPermissions.EpisodeExecute,    DisplayName = "تنفيذ الحلقات",     Module = "الحلقات" },
-            new() { SystemName = AppPermissions.EpisodePublish,    DisplayName = "نشر الحلقات",       Module = "الحلقات" },
-            new() { SystemName = AppPermissions.EpisodeWebPublish, DisplayName = "نشر على الموقع",    Module = "الحلقات" },
-            new() { SystemName = AppPermissions.EpisodeEdit,       DisplayName = "تعديل الحلقات",     Module = "الحلقات" },
-            new() { SystemName = AppPermissions.EpisodeDelete,     DisplayName = "حذف الحلقات",       Module = "الحلقات" },
-            new() { SystemName = AppPermissions.EpisodeRevert,     DisplayName = "تراجع عن تنفيذ/نشر", Module = "الحلقات" },
+            if (dbPermissions.TryGetValue(systemName, out var existing))
+            {
+                // تحديث الاسم الظاهر أو القسم إن تغيّرا في الكود
+                if (existing.DisplayName != displayName || existing.Module != module)
+                {
+                    existing.DisplayName = displayName;
+                    existing.Module      = module;
+                    anyChange = true;
+                }
+            }
+            else
+            {
+                toInsert.Add(new Permission { SystemName = systemName, DisplayName = displayName, Module = module });
+                anyChange = true;
+            }
+        }
 
-            // الضيوف
-            new() { SystemName = AppPermissions.GuestManage,      DisplayName = "إدارة الضيوف",      Module = "الضيوف" },
+        if (toInsert.Count > 0)
+            context.Set<Permission>().AddRange(toInsert);
 
-            // المراسلين
-            new() { SystemName = AppPermissions.CoordinationManage, DisplayName = "إدارة المراسلين",   Module = "المراسلين" },
+        if (anyChange)
+        {
+            await context.SaveChangesAsync();
 
-            // التقارير
-            new() { SystemName = AppPermissions.ViewReports,      DisplayName = "عرض التقارير",      Module = "التقارير" },
+            // إسناد الصلاحيات الجديدة تلقائياً للـ Admin
+            var adminRole = await context.Set<Role>().FirstOrDefaultAsync(r => r.RoleName == "Admin");
+            if (adminRole != null)
+            {
+                var allPermIds = await context.Set<Permission>().Select(p => p.PermissionId).ToListAsync();
+                var assigned   = await context.Set<RolePermission>()
+                    .Where(rp => rp.RoleId == adminRole.RoleId)
+                    .Select(rp => rp.PermissionId)
+                    .ToHashSetAsync();
 
-            // طاقم العمل
-            new() { SystemName = AppPermissions.StaffManage, DisplayName = "إدارة طاقم العمل", Module = "طاقم العمل" },
-        };
+                var newLinks = allPermIds
+                    .Where(id => !assigned.Contains(id))
+                    .Select(id => new RolePermission { RoleId = adminRole.RoleId, PermissionId = id })
+                    .ToList();
 
-        context.Set<Permission>().AddRange(permissions);
-        await context.SaveChangesAsync();
+                if (newLinks.Count > 0)
+                {
+                    context.Set<RolePermission>().AddRange(newLinks);
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
     }
 
-    #endregion
-
-    #region Roles
+    // ═══════════════════════════════════════════
+    // الأدوار الافتراضية
+    // ═══════════════════════════════════════════
 
     private static async Task SeedRolesAsync(BroadcastWorkflowDBContext context)
     {
-        if (await context.Set<Role>().AnyAsync())
-            return;
+        // نتحقق بالاسم وليس بالـ ID لتجنب تعارض الـ RowVersion seed
+        var existingNames = await context.Set<Role>()
+            .IgnoreQueryFilters()
+            .Select(r => r.RoleName)
+            .ToHashSetAsync();
 
         var now = DateTime.UtcNow;
 
-        var roles = new List<Role>
+        var roles = new[]
         {
-            new()
-            {
-                RoleName = "Admin",
-                RoleDescription = "مدير النظام — صلاحيات كاملة",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now,
-                RowVersion = Array.Empty<byte>(),
-            },
-            new()
-            {
-                RoleName = "Producer",
-                RoleDescription = "منتج البرامج — إدارة البرامج والحلقات والضيوف",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now,
-                RowVersion = Array.Empty<byte>(),
-            },
-            new()
-            {
-                RoleName = "WebPublisher",
-                RoleDescription = "ناشر الموقع — نشر الحلقات على الموقع فقط",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now,
-                RowVersion = Array.Empty<byte>(),
-            },
-            new()
-            {
-                RoleName = "Reporter",
-                RoleDescription = "مراسل — عرض التقارير وإدارة التغطيات",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now,
-                RowVersion = Array.Empty<byte>(),
-            },
+            new Role { RoleName = "Admin",        RoleDescription = "مسؤول النظام — صلاحيات كاملة",                    IsActive = true, CreatedAt = now, UpdatedAt = now },
+            new Role { RoleName = "Producer",     RoleDescription = "منتج البرامج — إدارة البرامج والحلقات والضيوف",   IsActive = true, CreatedAt = now, UpdatedAt = now },
+            new Role { RoleName = "WebPublisher", RoleDescription = "ناشر الموقع — نشر الحلقات على الموقع فقط",        IsActive = true, CreatedAt = now, UpdatedAt = now },
+            new Role { RoleName = "Reporter",     RoleDescription = "مراسل — عرض التقارير وإدارة التغطيات",            IsActive = true, CreatedAt = now, UpdatedAt = now },
         };
 
-        context.Set<Role>().AddRange(roles);
-        await context.SaveChangesAsync();
+        var missing = roles.Where(r => !existingNames.Contains(r.RoleName)).ToList();
+        if (missing.Count > 0)
+        {
+            context.Set<Role>().AddRange(missing);
+            await context.SaveChangesAsync();
+        }
     }
 
-    #endregion
-
-    #region RolePermissions
+    // ═══════════════════════════════════════════
+    // صلاحيات الأدوار الافتراضية
+    // ═══════════════════════════════════════════
 
     private static async Task SeedRolePermissionsAsync(BroadcastWorkflowDBContext context)
     {
+        // نُشغّل هذا فقط إن لم يكن هناك أي ربط بعد
         if (await context.Set<RolePermission>().AnyAsync())
             return;
 
-        // نجلب الأدوار بالاسم والأذونات بالـ SystemName
         var roles = await context.Set<Role>()
+            .IgnoreQueryFilters()
             .ToDictionaryAsync(r => r.RoleName);
 
-        var permissions = await context.Set<Permission>()
+        var perms = await context.Set<Permission>()
             .ToDictionaryAsync(p => p.SystemName);
 
-        if (roles.Count == 0 || permissions.Count == 0)
+        if (roles.Count == 0 || perms.Count == 0)
             return;
 
-        var rolePermissions = new List<RolePermission>();
+        var links = new List<RolePermission>();
 
-        // ===== مدير النظام: كل الصلاحيات =====
-        var adminId = roles["Admin"].RoleId;
-        foreach (var perm in permissions.Values)
+        void Assign(string roleName, params string[] permNames)
         {
-            rolePermissions.Add(new RolePermission { RoleId = adminId, PermissionId = perm.PermissionId });
+            if (!roles.TryGetValue(roleName, out var role)) return;
+            foreach (var name in permNames)
+                if (perms.TryGetValue(name, out var perm))
+                    links.Add(new RolePermission { RoleId = role.RoleId, PermissionId = perm.PermissionId });
         }
 
-        // ===== منتج البرامج =====
-        var producerId = roles["Producer"].RoleId;
-        var producerPerms = new[]
-        {
+        // Admin: كل الصلاحيات
+        if (roles.TryGetValue("Admin", out var admin))
+            foreach (var perm in perms.Values)
+                links.Add(new RolePermission { RoleId = admin.RoleId, PermissionId = perm.PermissionId });
+
+        // منتج البرامج
+        Assign("Producer",
             AppPermissions.ProgramManage,
             AppPermissions.EpisodeManage,
             AppPermissions.EpisodeExecute,
             AppPermissions.EpisodePublish,
             AppPermissions.EpisodeEdit,
             AppPermissions.EpisodeDelete,
+            AppPermissions.EpisodeRevert,
             AppPermissions.GuestManage,
             AppPermissions.CoordinationManage,
+            AppPermissions.StaffManage,
+            AppPermissions.ViewReports);
+
+        // ناشر الموقع
+        Assign("WebPublisher",
+            AppPermissions.EpisodeWebPublish,
+            AppPermissions.ViewReports);
+
+        // مراسل
+        Assign("Reporter",
             AppPermissions.ViewReports,
-                        AppPermissions.StaffManage,
-                    };
-        foreach (var permName in producerPerms)
-        {
-            if (permissions.TryGetValue(permName, out var perm))
-                rolePermissions.Add(new RolePermission { RoleId = producerId, PermissionId = perm.PermissionId });
-        }
+            AppPermissions.CoordinationManage);
 
-        // ===== ناشر الموقع =====
-        var webPubId = roles["WebPublisher"].RoleId;
-        if (permissions.TryGetValue(AppPermissions.EpisodeWebPublish, out var webPubPerm))
+        if (links.Count > 0)
         {
-            rolePermissions.Add(new RolePermission { RoleId = webPubId, PermissionId = webPubPerm.PermissionId });
+            context.Set<RolePermission>().AddRange(links);
+            await context.SaveChangesAsync();
         }
-
-        // ===== مراسل =====
-        var reporterId = roles["Reporter"].RoleId;
-        var reporterPerms = new[]
-        {
-            AppPermissions.ViewReports,
-            AppPermissions.CoordinationManage,
-        };
-        foreach (var permName in reporterPerms)
-        {
-            if (permissions.TryGetValue(permName, out var perm))
-                rolePermissions.Add(new RolePermission { RoleId = reporterId, PermissionId = perm.PermissionId });
-        }
-
-        context.Set<RolePermission>().AddRange(rolePermissions);
-        await context.SaveChangesAsync();
     }
 
-    #endregion
-
-    #region AdminUser
+    // ═══════════════════════════════════════════
+    // مستخدم Admin الافتراضي
+    // ═══════════════════════════════════════════
 
     private static async Task SeedAdminUserAsync(BroadcastWorkflowDBContext context)
     {
-        // لا ننشئ المستخدم إن كان موجود مسبقاً
         if (await context.Set<User>().AnyAsync())
             return;
 
         var adminRole = await context.Set<Role>()
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(r => r.RoleName == "Admin");
 
         if (adminRole == null)
             return;
 
         var now = DateTime.UtcNow;
-
-        // ⚠️ استبدل هذا الهاش بكلمة المرور الفعلية المشفرة
-        // هذا الهاش يمثل كلمة المرور: Admin@123
-        // استخدم نفس طريقة التشفير في AuthService لتوليد الهاش
-        var defaultPasswordHash = HashPassword("Admin@123");
-
-        var adminUser = new User
+        context.Set<User>().Add(new User
         {
-            Username = "admin",
-            PasswordHash = defaultPasswordHash,
-            FullName = "مدير النظام",
+            Username     = "admin",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+            FullName     = "مسؤول النظام",
             EmailAddress = "admin@broadcast.pro",
-            PhoneNumber = "",
-            RoleId = adminRole.RoleId,
-            LastLoginAt = null,
-            CreatedAt = now,
-            UpdatedAt = now,
-            RowVersion = Array.Empty<byte>(),
-        };
+            PhoneNumber  = "",
+            RoleId       = adminRole.RoleId,
+            IsActive     = true,
+            CreatedAt    = now,
+            UpdatedAt    = now,
+        });
 
-        context.Set<User>().Add(adminUser);
         await context.SaveChangesAsync();
     }
 
-    /// <summary>
-    /// طريقة التشفير — يجب أن تتطابق مع الطريقة المستخدمة في AuthService
-    /// إن كنت تستخدم BCrypt أو أي مكتبة أخرى، عدّل هذه الدالة
-    /// </summary>
-    private static string HashPassword(string plainPassword)
-    {
-        // ⚠️ عدّل هذا السطر حسب طريقة التشفير في مشروعك
-        // مثال BCrypt:
-        // return BCrypt.Net.BCrypt.HashPassword(plainPassword);
-
-        // كحل مؤقت، نخزن كلمة المرور مشفرة بـ SHA256 (ليست الآمنة للإنتاج)
-        using var sha = System.Security.Cryptography.SHA256.Create();
-        var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(plainPassword));
-        return Convert.ToBase64String(bytes);
-    }
-
-    #endregion
-
-    #region SocialMediaPlatforms
+    // ═══════════════════════════════════════════
+    // منصات السوشيال ميديا
+    // ═══════════════════════════════════════════
 
     private static async Task SeedSocialMediaPlatformsAsync(BroadcastWorkflowDBContext context)
     {
         if (await context.Set<SocialMediaPlatform>().AnyAsync())
             return;
 
-        var platforms = new List<SocialMediaPlatform>
-        {
-            new() { Name = "Facebook",  Icon = "Facebook" },
-            new() { Name = "Twitter",   Icon = "Twitter" },
-            new() { Name = "TikTok",    Icon = "MusicNote" }, 
-            new() { Name = "YouTube",   Icon = "Youtube" },
-            new() { Name = "Instagram", Icon = "Instagram" },
-        };
-
-        context.Set<SocialMediaPlatform>().AddRange(platforms);
+        context.Set<SocialMediaPlatform>().AddRange(
+            new SocialMediaPlatform { Name = "Facebook",  Icon = "Facebook"   },
+            new SocialMediaPlatform { Name = "Twitter",   Icon = "Twitter"    },
+            new SocialMediaPlatform { Name = "TikTok",    Icon = "MusicNote"  },
+            new SocialMediaPlatform { Name = "YouTube",   Icon = "Youtube"    },
+            new SocialMediaPlatform { Name = "Instagram", Icon = "Instagram"  });
     }
 
-    #endregion
-
-    #region StaffRoles
+    // ═══════════════════════════════════════════
+    // المسميات الوظيفية
+    // ═══════════════════════════════════════════
 
     private static async Task SeedStaffRolesAsync(BroadcastWorkflowDBContext context)
     {
         if (await context.Set<StaffRole>().AnyAsync())
             return;
 
-        var roles = new List<StaffRole>
-        {
-            new() { RoleName = "مذيع" },
-            new() { RoleName = "منفذ" },
-            new() { RoleName = "مهندس صوت" },
-            new() { RoleName = "مخرج" },
-            new() { RoleName = "مصور" },
-        };
-
-        context.Set<StaffRole>().AddRange(roles);
+        context.Set<StaffRole>().AddRange(
+            new StaffRole { RoleName = "مذيع"        },
+            new StaffRole { RoleName = "منفذ"        },
+            new StaffRole { RoleName = "مهندس صوت"   },
+            new StaffRole { RoleName = "مخرج"        },
+            new StaffRole { RoleName = "مصور"        });
     }
-
-    #endregion
 }

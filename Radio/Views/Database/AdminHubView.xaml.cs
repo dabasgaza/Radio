@@ -90,15 +90,16 @@ namespace Radio.Views.Database
         {
             bool canManageUsers = _session.HasPermission(AppPermissions.UserManage);
             bool canManageStaff = _session.HasPermission(AppPermissions.StaffManage);
+            bool canManageDatabase = _session.HasPermission(AppPermissions.DatabaseManage);
 
             foreach (var chip in _chips)
             {
                 var route = chip.Tag?.ToString();
-                chip.Visibility = GetItemVisibility(route, canManageUsers, canManageStaff);
+                chip.Visibility = GetItemVisibility(route, canManageUsers, canManageStaff, canManageDatabase);
             }
         }
 
-        private Visibility GetItemVisibility(string? route, bool canManageUsers, bool canManageStaff)
+        private Visibility GetItemVisibility(string? route, bool canManageUsers, bool canManageStaff, bool canManageDatabase)
         {
             return route switch
             {
@@ -107,7 +108,7 @@ namespace Radio.Views.Database
                 "Employees" or "StaffRoles" =>
                     canManageStaff ? Visibility.Visible : Visibility.Collapsed,
                 "Database" or "AuditLogs" or "Diagnostics" =>
-                    _session.IsAdmin ? Visibility.Visible : Visibility.Collapsed,
+                    canManageDatabase ? Visibility.Visible : Visibility.Collapsed,
                 "SocialPlatforms" =>
                     canManageStaff ? Visibility.Visible : Visibility.Collapsed,
                 _ => Visibility.Visible

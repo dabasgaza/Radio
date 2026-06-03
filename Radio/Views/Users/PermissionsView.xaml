@@ -13,45 +13,24 @@
 
         <!--  Header  -->
         <materialDesign:ColorZone Style="{StaticResource Zone.Header.Primary}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon
-                            Width="35"
-                            Height="35"
-                            VerticalAlignment="Center"
-                            Foreground="White"
-                            Kind="ShieldKeyOutline" />
-                        <TextBlock
-                            Margin="15,0"
-                            Style="{StaticResource Type.TitleLarge.OnColor}"
-                            Text="قاموس صلاحيات النظام" />
-                    </StackPanel>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon
+                        Width="35"
+                        Height="35"
+                        VerticalAlignment="Center"
+                        Foreground="White"
+                        Kind="ShieldKeyOutline" />
                     <TextBlock
-                        Margin="50,5,0,0"
-                        Style="{StaticResource Type.BodyMedium.OnColor}"
-                        Text="تعريف الصلاحيات البرمجية وربطها بالوحدات الوظيفية للنظام" />
+                        Margin="15,0"
+                        Style="{StaticResource Type.TitleLarge.OnColor}"
+                        Text="صلاحيات النظام" />
                 </StackPanel>
-
-                <Button
-                    x:Name="BtnAddPermission"
-                    Grid.Column="1"
-                    Click="BtnAddPermission_Click"
-                    Style="{StaticResource Btn.AddNew}">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon VerticalAlignment="Center" Kind="Plus" />
-                        <TextBlock
-                            Margin="10,0,0,0"
-                            VerticalAlignment="Center"
-                            Text="إضافة صلاحية جديدة" />
-                    </StackPanel>
-                </Button>
-            </Grid>
+                <TextBlock
+                    Margin="50,5,0,0"
+                    Style="{StaticResource Type.BodyMedium.OnColor}"
+                    Text="الصلاحيات تُعرَّف في كود النظام وتُزامَن تلقائياً عند كل تشغيل — للقراءة فقط" />
+            </StackPanel>
         </materialDesign:ColorZone>
 
         <!--  Content  -->
@@ -62,6 +41,7 @@
                     Margin="0"
                     CellStyle="{StaticResource DataGrid.Cell}"
                     ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
+                    IsReadOnly="True"
                     RowStyle="{StaticResource DataGrid.Row}"
                     Style="{StaticResource DataGrid.Main}">
                     <DataGrid.Columns>
@@ -88,7 +68,7 @@
                                         <TextBlock
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            FontSize="11"
+                                            FontSize="{DynamicResource FontSize.Overline}"
                                             FontWeight="Bold"
                                             Foreground="{StaticResource SecondaryMainBrush}"
                                             Text="{Binding Module}" />
@@ -111,35 +91,6 @@
                             Binding="{Binding DisplayName}"
                             CellStyle="{StaticResource DataGrid.Cell.Left}"
                             Header="الاسم المعروض" />
-
-                        <!--  الإجراءات  -->
-                        <DataGridTemplateColumn
-                            Width="120"
-                            CellStyle="{StaticResource DataGrid.Cell.Actions}"
-                            Header="الإجراءات"
-                            HeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                        <Button Click="BtnEdit_Click" Style="{StaticResource Btn.Icon.Edit}">
-                                            <materialDesign:PackIcon
-                                                Width="18"
-                                                Height="18"
-                                                Kind="Pencil" />
-                                        </Button>
-                                        <Button
-                                            Margin="12,0,0,0"
-                                            Click="BtnDelete_Click"
-                                            Style="{StaticResource Btn.Icon.Delete}">
-                                            <materialDesign:PackIcon
-                                                Width="18"
-                                                Height="18"
-                                                Kind="Delete" />
-                                        </Button>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </materialDesign:Card>

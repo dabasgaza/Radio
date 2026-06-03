@@ -41,12 +41,16 @@
                 </StackPanel>
 
                 <Button
+                    x:Name="BtnAdd"
                     Grid.Column="1"
                     Click="BtnAdd_Click"
                     Style="{StaticResource Btn.AddNew}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon VerticalAlignment="Center" Kind="Plus" />
-                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="موظف جديد" />
+                        <TextBlock
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="موظف جديد" />
                     </StackPanel>
                 </Button>
             </Grid>

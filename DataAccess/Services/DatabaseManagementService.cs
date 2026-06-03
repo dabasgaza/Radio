@@ -4,9 +4,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -28,7 +25,7 @@ namespace DataAccess.Services
 
         private string GetConnectionString()
         {
-            return _configuration.GetConnectionString("DefaultConnection") 
+            return _configuration.GetConnectionString("DefaultConnection")
                 ?? "Server=.;Database=BroadcastWorkflowDB;Trusted_Connection=True;TrustServerCertificate=True;";
         }
 
@@ -44,14 +41,14 @@ namespace DataAccess.Services
             {
                 var connectionString = GetConnectionString();
                 var dbName = GetDatabaseName(connectionString);
-                
+
                 // Determine folder path
                 var backupFolder = customBackupFolder;
                 if (string.IsNullOrEmpty(backupFolder))
                 {
                     backupFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups");
                 }
-                
+
                 if (!Directory.Exists(backupFolder))
                 {
                     Directory.CreateDirectory(backupFolder);
@@ -70,7 +67,7 @@ namespace DataAccess.Services
                         BACKUP DATABASE [{dbName}] 
                         TO DISK = @BackupPath 
                         WITH FORMAT, INIT, NAME = @BackupName";
-                    
+
                     try
                     {
                         // Try with compression first
@@ -141,7 +138,7 @@ namespace DataAccess.Services
                         ALTER DATABASE [{dbName}] 
                         SET SINGLE_USER 
                         WITH ROLLBACK IMMEDIATE;";
-                    
+
                     using (var cmd = new SqlCommand(setSingleUserQuery, connection))
                     {
                         await cmd.ExecuteNonQueryAsync();
@@ -152,7 +149,7 @@ namespace DataAccess.Services
                         RESTORE DATABASE [{dbName}] 
                         FROM DISK = @BackupPath 
                         WITH REPLACE;";
-                    
+
                     using (var cmd = new SqlCommand(restoreQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@BackupPath", backupFilePath);
@@ -164,7 +161,7 @@ namespace DataAccess.Services
                     string setMultiUserQuery = $@"
                         ALTER DATABASE [{dbName}] 
                         SET MULTI_USER;";
-                    
+
                     using (var cmd = new SqlCommand(setMultiUserQuery, connection))
                     {
                         await cmd.ExecuteNonQueryAsync();
@@ -201,120 +198,51 @@ namespace DataAccess.Services
             try
             {
                 using var context = await _dbContextFactory.CreateDbContextAsync();
-                
-                // التحقق مما إذا كانت قاعدة البيانات موجودة ومتاحة للاتصال
-                bool dbExists = false;
-                try
-                {
-                    dbExists = await context.Database.CanConnectAsync();
-                }
-                catch
-                {
-                    // في حال عدم الوجود، سيفشل الاتصال ونعتبر قاعدة البيانات غير موجودة
-                    dbExists = false;
-                }
+                await context.Database.MigrateAsync();
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail($"حدث خطأ أثناء فحص/تهيئة قاعدة البيانات: {ex.Message}");
+            }
+        }
 
-                if (!dbExists)
-                {
-                    // إنشاء قاعدة البيانات بالكامل وتطبيق جميع الهجرات (Migrations) من الصفر
-                    await context.Database.MigrateAsync();
-                    return Result.Success();
-                }
+        public async Task<Result> ResetDatabaseAsync()
+        {
+            try
+            {
+                var connectionString = GetConnectionString();
+                var dbName = GetDatabaseName(connectionString);
+                var masterBuilder = new SqlConnectionStringBuilder(connectionString) { InitialCatalog = "master" };
 
-                // إذا كانت قاعدة البيانات موجودة، نحاول تطبيق أي هجرات جديدة معلقة
-                try
+                // 1. إسقاط قاعدة البيانات بأمان بعد قطع كل الاتصالات النشطة
+                using (var connection = new SqlConnection(masterBuilder.ConnectionString))
                 {
-                    await context.Database.MigrateAsync();
-                }
-                catch (SqlException ex) when (ex.Message.Contains("already an object named"))
-                {
-                    // The database already has the tables. Let's make sure the DatabaseBackupLogs table is created.
-                    using (var connection = new SqlConnection(GetConnectionString()))
+                    await connection.OpenAsync();
+                    string dropDbQuery = $@"
+                        IF EXISTS (SELECT name FROM sys.databases WHERE name = N'{dbName}')
+                        BEGIN
+                            ALTER DATABASE [{dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                            DROP DATABASE [{dbName}];
+                        END";
+                    using (var cmd = new SqlCommand(dropDbQuery, connection))
                     {
-                        await connection.OpenAsync();
-                        
-                        // Check if DatabaseBackupLogs table exists
-                        string checkTableQuery = "SELECT OBJECT_ID(N'[dbo].[DatabaseBackupLogs]', N'U')";
-                        object? tableId = null;
-                        using (var cmd = new SqlCommand(checkTableQuery, connection))
-                        {
-                            tableId = await cmd.ExecuteScalarAsync();
-                        }
-
-                        if (tableId == null || tableId == DBNull.Value)
-                        {
-                            // Create the DatabaseBackupLogs table
-                            string createTableQuery = @"
-                                CREATE TABLE [DatabaseBackupLogs] (
-                                    [DatabaseBackupLogId] int NOT NULL IDENTITY,
-                                    [BackupPath] nvarchar(500) NOT NULL,
-                                    [BackupType] nvarchar(50) NOT NULL,
-                                    [FileSize] bigint NOT NULL,
-                                    [Status] nvarchar(50) NOT NULL,
-                                    [ErrorMessage] nvarchar(2000) NULL,
-                                    [CloudUrl] nvarchar(1000) NULL,
-                                    [IsActive] bit NOT NULL DEFAULT CAST(1 AS bit),
-                                    [CreatedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
-                                    [UpdatedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
-                                    [CreatedByUserId] int NULL,
-                                    [UpdatedByUserId] int NULL,
-                                    [RowVersion] rowversion NOT NULL,
-                                    CONSTRAINT [PK_DatabaseBackupLogs] PRIMARY KEY ([DatabaseBackupLogId]),
-                                    CONSTRAINT [FK_DatabaseBackupLogs_Users_CreatedByUserId] FOREIGN KEY ([CreatedByUserId]) REFERENCES [Users] ([UserId]) ON DELETE NO ACTION,
-                                    CONSTRAINT [FK_DatabaseBackupLogs_Users_UpdatedByUserId] FOREIGN KEY ([UpdatedByUserId]) REFERENCES [Users] ([UserId]) ON DELETE NO ACTION
-                                );
-                                CREATE INDEX [IX_DatabaseBackupLogs_CreatedAt] ON [DatabaseBackupLogs] ([CreatedAt]);";
-                            
-                            using (var cmd = new SqlCommand(createTableQuery, connection))
-                            {
-                                await cmd.ExecuteNonQueryAsync();
-                            }
-                        }
-
-                        // Ensure we register this migration as done in __EFMigrationsHistory
-                        string checkMigrationQuery = "SELECT COUNT(*) FROM [__EFMigrationsHistory] WHERE [MigrationId] = '20260602111641_AddDatabaseBackupLog'";
-                        int migrationExists = 0;
-                        using (var cmd = new SqlCommand(checkMigrationQuery, connection))
-                        {
-                            try
-                            {
-                                migrationExists = (int)(await cmd.ExecuteScalarAsync() ?? 0);
-                            }
-                            catch
-                            {
-                                // If __EFMigrationsHistory doesn't exist, create it and register
-                                string createHistoryTable = @"
-                                    IF OBJECT_ID(N'[dbo].[__EFMigrationsHistory]', N'U') IS NULL
-                                    BEGIN
-                                        CREATE TABLE [__EFMigrationsHistory] (
-                                            [MigrationId] nvarchar(150) NOT NULL,
-                                            [ProductVersion] nvarchar(32) NOT NULL,
-                                            CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-                                        );
-                                    END";
-                                using (var cmdCreate = new SqlCommand(createHistoryTable, connection))
-                                {
-                                    await cmdCreate.ExecuteNonQueryAsync();
-                                }
-                            }
-                        }
-
-                        if (migrationExists == 0)
-                        {
-                            string insertMigrationQuery = "INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES ('20260602111641_AddDatabaseBackupLog', '10.0.8')";
-                            using (var cmd = new SqlCommand(insertMigrationQuery, connection))
-                            {
-                                await cmd.ExecuteNonQueryAsync();
-                            }
-                        }
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
+
+                // 2. إنشاء قاعدة البيانات وتطبيق جميع الهجرات من الصفر
+                using var context = await _dbContextFactory.CreateDbContextAsync();
+                await context.Database.MigrateAsync();
+
+                // 3. ملء قاعدة البيانات بالبيانات الأولية والصلاحيات
+                await Seeding.DbSeeder.SeedAsync(_dbContextFactory);
 
                 return Result.Success();
             }
             catch (Exception ex)
             {
-                return Result.Fail($"حدث خطأ أثناء تهيئة قاعدة البيانات: {ex.Message}");
+                return Result.Fail($"حدث خطأ أثناء إعادة تعيين قاعدة البيانات: {ex.Message}");
             }
         }
 
@@ -349,7 +277,7 @@ namespace DataAccess.Services
                 }
 
                 var fileName = Path.GetFileName(localBackupPath);
-                
+
                 // Define a simulated Cloud backup folder for demo/local infrastructure purposes
                 var cloudFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups", "CloudSimulation");
                 if (!Directory.Exists(cloudFolder))
@@ -400,7 +328,7 @@ namespace DataAccess.Services
             {
                 var cutoffDate = DateTime.UtcNow.AddDays(-retentionDays);
                 using var context = await _dbContextFactory.CreateDbContextAsync();
-                
+
                 // Get logs older than cutoff
                 var oldLogs = await context.DatabaseBackupLogs
                     .Where(x => x.CreatedAt < cutoffDate && x.Status == "Success")
@@ -415,7 +343,7 @@ namespace DataAccess.Services
                         {
                             File.Delete(log.BackupPath);
                         }
-                        
+
                         // Also delete simulated cloud copy
                         var cloudSimPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups", "CloudSimulation", Path.GetFileName(log.BackupPath));
                         if (File.Exists(cloudSimPath))

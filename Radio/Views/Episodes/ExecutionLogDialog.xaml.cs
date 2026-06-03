@@ -1,9 +1,9 @@
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Radio.Messaging;
 
 
 namespace Radio.Views.Episodes
@@ -161,11 +161,6 @@ namespace Radio.Views.Episodes
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
             Close();
-        }
-
-        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            DragMove();
         }
 
     }

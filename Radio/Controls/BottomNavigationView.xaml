@@ -39,7 +39,7 @@
                                     x:Name="Label"
                                     Margin="0,2,0,0"
                                     HorizontalAlignment="Center"
-                                    FontSize="10"
+                                    FontSize="{DynamicResource FontSize.Micro}"
                                     FontWeight="Medium"
                                     Text="{TemplateBinding Tag}"
                                     TextWrapping="Wrap" />

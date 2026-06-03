@@ -39,6 +39,7 @@
                 </StackPanel>
 
                 <Button
+                    x:Name="BtnAdd"
                     Grid.Column="1"
                     Click="BtnAdd_Click"
                     Style="{StaticResource Btn.AddNew}">

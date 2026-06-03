@@ -22,12 +22,6 @@
     WindowStyle="None"
     mc:Ignorable="d">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ctrl:ResponsiveNavigationControl x:Key="NavControl" NavigationRequested="NavigationRequested" />
-        </ResourceDictionary>
-    </Window.Resources>
-
     <Grid>
         <materialDesign:DialogHost Identifier="ModernRootDialog" OverlayBackground="{StaticResource OverlayScrimBrush}">
             <Grid SizeChanged="Window_SizeChanged">
@@ -162,6 +156,64 @@
                                 Opacity="0.5"
                                 Style="{StaticResource MaterialDesignDarkSeparator}" />
 
+                            <Border
+                                Margin="4,0"
+                                Padding="2"
+                                VerticalAlignment="Center"
+                                Background="{DynamicResource MaterialDesignPaper}"
+                                BorderBrush="{DynamicResource DividerBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                ToolTip="حجم خط النظام — يُطبَّق على كل الشاشات">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button
+                                        x:Name="BtnZoomOut"
+                                        Width="32"
+                                        Height="32"
+                                        Padding="0"
+                                        Click="BtnZoomOut_Click"
+                                        Foreground="{DynamicResource TextPrimaryBrush}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        ToolTip="تصغير الخط (Ctrl+-)">
+                                        <TextBlock
+                                            FontSize="{DynamicResource FontSize.Label}"
+                                            FontWeight="SemiBold"
+                                            Text="-A" />
+                                    </Button>
+
+                                    <Button
+                                        x:Name="BtnZoomReset"
+                                        Height="32"
+                                        MinWidth="44"
+                                        Padding="8,0"
+                                        Click="BtnZoomReset_Click"
+                                        Foreground="{DynamicResource PrimaryMainBrush}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        ToolTip="إعادة الحجم الافتراضي">
+                                        <TextBlock
+                                            x:Name="ZoomPercentageText"
+                                            FontSize="{DynamicResource FontSize.Caption}"
+                                            FontWeight="Bold"
+                                            Text="100%" />
+                                    </Button>
+
+                                    <Button
+                                        x:Name="BtnZoomIn"
+                                        Width="32"
+                                        Height="32"
+                                        Padding="0"
+                                        Click="BtnZoomIn_Click"
+                                        Foreground="{DynamicResource TextPrimaryBrush}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        ToolTip="تكبير الخط (Ctrl++)">
+                                        <TextBlock
+                                            FontSize="{DynamicResource FontSize.Label}"
+                                            FontWeight="SemiBold"
+                                            Text="+A" />
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+
                             <Button
                                 x:Name="BtnUserProfile"
                                 Height="40"
@@ -254,9 +306,7 @@
                 <ctrl:ResponsiveNavigationControl
                     x:Name="ResponsiveNav"
                     Grid.Row="1"
-                    Grid.Column="0"
-                    Mode="{Binding NavigationMode}"
-                    NavigationRequested="NavigationRequested" />
+                    Grid.Column="0" />
 
                 <Grid Grid.Row="1" Grid.Column="1">
                     <ContentControl x:Name="MainContentArea" Margin="24" />
@@ -283,7 +333,7 @@
                                     Fill="{DynamicResource OnAirBrush}" />
                                 <TextBlock
                                     Margin="8,0"
-                                    FontSize="12"
+                                    FontSize="{DynamicResource FontSize.Button}"
                                     FontWeight="Bold"
                                     Foreground="{DynamicResource OnAirBrush}"
                                     Text="مباشر الآن" />
@@ -292,13 +342,13 @@
                             <TextBlock
                                 x:Name="OnAirElapsedTime"
                                 Margin="0,8"
-                                FontSize="36"
+                                FontSize="{DynamicResource FontSize.Display}"
                                 FontWeight="Bold"
                                 Foreground="{DynamicResource TextPrimaryBrush}"
                                 Text="00:00:00" />
                             <TextBlock
                                 x:Name="OnAirProgramName"
-                                FontSize="14"
+                                FontSize="{DynamicResource FontSize.Label}"
                                 Foreground="{DynamicResource TextSecondaryBrush}"
                                 Text="اسم البرنامج الحالي" />
 

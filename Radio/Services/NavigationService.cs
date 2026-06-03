@@ -6,6 +6,7 @@ using Radio.Views.Employees;
 using Radio.Views.Episodes;
 using Radio.Views.Guests;
 using Radio.Views.Home;
+using Radio.Views.Programs;
 using Radio.Views.Reports;
 using Radio.Views.SocialPlatforms;
 using Radio.Views.StaffRoles;
@@ -19,9 +20,32 @@ namespace Radio.Services
     public class NavigationService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly UserSession _session;
         private readonly Dictionary<string, UserControl> _viewCache = new();
         private readonly Stack<string> _history = new();
         private const int MaxHistory = 10;
+
+        private static readonly Dictionary<string, string> RoutePermissions = new()
+        {
+            ["Users"] = AppPermissions.UserManage,
+            ["SecurityRoles"] = AppPermissions.UserManage,
+            ["PermissionMatrix"] = AppPermissions.UserManage,
+            ["Permissions"] = AppPermissions.UserManage,
+            ["Programs"] = AppPermissions.ProgramManage,
+            ["Employees"] = AppPermissions.StaffManage,
+            ["StaffRoles"] = AppPermissions.StaffManage,
+            ["SocialPlatforms"] = AppPermissions.StaffManage,
+            ["Episodes"] = AppPermissions.EpisodeManage,
+            ["Guests"] = AppPermissions.GuestManage,
+            ["Correspondents"] = AppPermissions.CoordinationManage,
+            ["Coverages"] = AppPermissions.CoordinationManage,
+            ["Reports"] = AppPermissions.ViewReports,
+            ["PublishingRecords"] = AppPermissions.EpisodePublish,
+            ["Database"] = AppPermissions.DatabaseManage,
+            ["AuditLogs"] = AppPermissions.ViewAuditLogs,
+            ["Diagnostics"] = AppPermissions.DatabaseManage,
+            ["AdminHub"] = AppPermissions.UserManage,
+        };
 
         public string? CurrentViewName { get; private set; }
 
@@ -32,6 +56,7 @@ namespace Radio.Services
         public NavigationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
+            _session = serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
         }
 
         public UserControl? NavigateTo(string viewName)
@@ -95,6 +120,16 @@ namespace Radio.Services
 
         private UserControl? GetOrCreateView(string viewName)
         {
+            if (RoutePermissions.TryGetValue(viewName, out var permission))
+            {
+                if (!_session.HasPermission(permission))
+                {
+                    DataAccess.Services.Messaging.MessageService.Current.ShowWarning(
+                        $"عذراً، لا تملك صلاحية الوصول إلى هذه الشاشة.");
+                    return null;
+                }
+            }
+
             if (_viewCache.TryGetValue(viewName, out var cached))
                 return cached;
 
@@ -112,6 +147,11 @@ namespace Radio.Services
                 case "Home":
                     var homeReportService = _serviceProvider.GetRequiredService<IReportsService>();
                     return new HomeView(homeReportService);
+
+                case "Programs":
+                    var programService = _serviceProvider.GetRequiredService<IProgramService>();
+                    var progSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new ProgramsView(programService, progSession);
 
                 case "Users":
                     var userService = _serviceProvider.GetRequiredService<IUserService>();
@@ -151,6 +191,11 @@ namespace Radio.Services
                     var corService = _serviceProvider.GetRequiredService<ICorrespondentService>();
                     var corSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
                     return new CorrespondentsView(corService, corSession);
+
+                case "Coverages":
+                    var covService = _serviceProvider.GetRequiredService<ICoverageService>();
+                    var covSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>().CurrentSession!;
+                    return new CoverageView(covService, covSession, _serviceProvider);
 
                 case "Reports":
                     var reportService = _serviceProvider.GetRequiredService<IReportsService>();
