@@ -46,7 +46,7 @@ namespace Radio.Views.Correspondents
                 _allCorrespondents = correspondents.ToList();
 
                 TxtTotal.Text = $"{_allCorrespondents.Count}";
-
+                TxtActive.Text = $"{_allCorrespondents.Count(c => !string.IsNullOrWhiteSpace(c.AssignedLocations))}";
             }
             catch (InvalidOperationException ex)
             {

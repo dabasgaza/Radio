@@ -1,190 +1,176 @@
-<div align="center">
+# 📡 Radio Broadcast Workflow System — Ultimate Guide & Source of Truth
 
-# 📻 Radio: Broadcast Workflow System (بث برو)
-### *Next-Generation Radio Management Infrastructure*
-
-[![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![WPF](https://img.shields.io/badge/WPF-Desktop-0078D7?logo=windows&logoColor=white)](https://github.com/dotnet/wpf)
-[![EF Core](https://img.shields.io/badge/EF_Core-10.0-68217A?logo=dotnet&logoColor=white)](https://learn.microsoft.com/ef/core)
-[![Architecture](https://img.shields.io/badge/Pattern-Result_+_Service_Layer-F4800D)](#)
-[![UI](https://img.shields.io/badge/UI-Material_Design-757575?logo=materialdesign)](#)
-
-**نظام مكتبي متطور لإدارة دورة حياة المحتوى الإذاعي، يجمع بين كفاءة الأداء وجمالية التصميم.**  
-*A high-performance, aesthetically pleasing broadcast management system designed for modern radio stations.*
-
-![Project Mockup](docs/assets/mockup.png)
-
-</div>
+This document serves as the **Single Source of Truth** for both human developers and AI Agents. It consolidates all system architecture, database constraints, coding standards, UI guidelines, and workflows into a single file.
 
 ---
 
-## 📑 فهرس المحتويات | Table of Contents
-1. [نظرة عامة | Overview](#-overview--نظرة-عامة)
-2. [الفلسفة المعمارية | Architectural Philosophy](#-architectural-philosophy--الفلسفة-المعمارية-هام-جداً)
-3. [هيكل المشروع التفصيلي | Project Structure](#-project-structure--هيكل-المشروع-التفصيلي)
-4. [مخطط الكيانات | Entity Relationship Diagram](#-entity-relationship-diagram--مخطط-الكيانات-والعلاقات)
-5. [سير العمل العملياتي | Operational Workflow](#-detailed-operational-workflow--تفاصيل-سير العمل-اليومي)
-6. [الأمان والتدقيق المتقدم | Advanced Security & Audit](#-advanced-security--audit--الأمان-والتدقيق-المتقدم)
-7. [بوابة الذكاء الاصطناعي | AI Intelligence Portal](#-ai-intelligence-portal-context-for-llms)
-8. [المميزات والتقنيات | Features & Tech Stack](#-key-features--المميزات-الرئيسية)
-9. [التشغيل السريع | Getting Started](#-getting-started--البدء-بالتطوير)
+## 1. Project Overview & Structure
+
+The Radio Broadcast Workflow System is a desktop application built with **.NET 10 / WPF** designed to manage the scheduling, execution, and digital publishing of radio episodes.
+
+### Project Architecture Layers
+*   **Domain**: Contains EF Core models, configurations (Fluent API), DB contexts, and migrations.
+*   **DataAccess**: Business logic (Services), Data Transfer Objects (DTOs), validation, permissions, and auditing.
+*   **Radio (UI)**: WPF Views, resources, style dictionaries, and dependency injection startup.
 
 ---
 
-## 🌟 Overview | نظرة عامة
+## 2. Core Architectural & Coding Rules (Non-Negotiable)
 
-**Radio (بث برو)** هو منصة رقمية متكاملة مبنية بأحدث تقنيات مايكروسوفت لخدمة المؤسسات الإذاعية. يتولى النظام إدارة كل تفاصيل العمل الإذاعي: جدولة الحلقات، إدارة الضيوف والمراسلين، أرشفة البث، والنشر الرقمي التلقائي، مع نظام رقابة وتدقيق صارم يضمن سلامة البيانات.
-
----
-
-## 🏗️ Architectural Philosophy | الفلسفة المعمارية (هام جداً)
-
-### 🚫 We Do NOT Use MVVM | نحن لا نستخدم نمط MVVM
-على عكس التطبيقات المكتبية التقليدية التي تعتمد بشكل مكثف على نمط (Model-View-ViewModel)، يعتمد هذا المشروع عن قصد على معمارية **"Pragmatic Code-Behind + Service Layer"**.
-- **السبب (The Why):** تم التخلي عن MVVM للتخلص من التعقيد الزائد (Boilerplate) المرتبط بـ ViewModels و `INotifyPropertyChanged` في الشاشات التي تعتمد في الغالب على عمليات CRUD المباشرة.
-- **كيفية العمل (The How):** يتم التعامل مع أحداث الواجهة في الـ Code-Behind وتفويض المنطق فوراً لطبقة الخدمات (Service Layer) التي تعيد نتائج من نوع `Result`.
+1.  **Result Pattern**: Every service method must return `Result` or `Result<T>` from `DataAccess/Common/Result.cs`. Do not throw business exceptions; return descriptive failures.
+2.  **BaseEntity Foundation**: All entity models representing database tables (except pure join tables and static lists) must inherit from `BaseEntity` (defining `IsActive`, `CreatedAt`, `CreatedByUserId`, etc.).
+3.  **Soft Delete Only**: Physical deletion of records is forbidden. Set `IsActive = false`. Global query filters in `BroadcastWorkflowDBContext` automatically filter active records.
+4.  **Auto-Auditing**: Timestamps (`CreatedAt`, `UpdatedAt`) and user IDs (`CreatedByUserId`, `UpdatedByUserId`) are handled automatically by `AuditInterceptor`. Do not update these fields manually in service code.
+5.  **Thread Safety & DbContextFactory**: Do not inject `DbContext` directly. Always use `IDbContextFactory<BroadcastWorkflowDBContext>` and create a new context instance inside each service operation (`using var context = await contextFactory.CreateDbContextAsync()`).
+6.  **No InverseProperty on User**: Minimize navigation properties pointing back to `User` in other entities to avoid EF Core circular relationship conflicts.
+7.  **Service Registration**: Register all new services in `Radio/App.xaml.cs` using `AddTransient` (unless singleton is explicitly needed).
+8.  **UI/Service Separation**: WPF views retrieve services from the DI container (`ServiceProvider`) and keep logic strictly inside services.
 
 ---
 
-## 📂 Project Structure | هيكل المشروع التفصيلي
+## 3. Database Schema & State Machine
 
-يعتمد المشروع هيكلية طبقات مفصلة تضمن تنظيم الكود وسهولة صيانته:
-
-```text
-Radio.slnx (Solution)
-├── 📂 Domain/                     # طبقة البيانات والكيانات الأساسية
-│   ├── 📂 Models/                 # تعريف الكيانات البرمجية (Entities) مثل Episode, User, Guest
-│   │   └── BaseEntity.cs          # الكيان الأساسي الذي يحمل بيانات التدقيق (Auditing)
-│   ├── 📂 Configurations/         # إعدادات العلاقات و Fluent API (كل كيان له ملف مستقل)
-│   ├── 📂 Metadata/               # توصيف إضافي للبيانات وسمات التحقق
-│   ├── 📂 Migrations/             # سجل تهجير وتحديثات قاعدة البيانات (Code-First)
-│   └── BroadcastWorkflowDBContext.cs # سياق قاعدة البيانات والتهيئة المركزية
-│
-├── 📂 DataAccess/                 # طبقة منطق الأعمال والوصول للبيانات
-│   ├── 📂 Services/               # الخدمات المركزية (مثل EpisodeService) - تحتوي على الـ Logic
-│   ├── 📂 Common/                 # الأدوات المشتركة (Result Pattern, AppPermissions, UserSession)
-│   ├── 📂 Data/                   # معترضات البيانات (AuditInterceptor) المسؤولة عن التدقيق التلقائي
-│   ├── 📂 DTOs/                   # كائنات نقل البيانات (Data Transfer Objects) بين الطبقات
-│   ├── 📂 Validation/             # خطوط فحص البيانات (Validation Pipeline) لضمان سلامة المدخلات
-│   └── 📂 Seeding/                # بيانات التشغيل الأولي (Admin + الصلاحيات الافتراضية)
-│
-└── 📂 Radio/                      # طبقة العرض (WPF Presentation Layer)
-    ├── 📂 Views/                  # الواجهات الرئيسية والمتحكمات (UserControls)
-    ├── 📂 Forms/                  # النوافذ المنبثقة وصناديق الحوار (Dialogs)
-    ├── 📂 Resources/              # القواميس والمصادر (Material Design, Colors, Icons, Styles)
-    │   ├── Brushes.xaml           # تعريف الألوان والفرش
-    │   └── ControlStyles.xaml     # تخصيص مظهر الأدوات
-    ├── 📂 Converter/              # محولات البيانات المستخدمة في Binding (Visibility, Boolean, etc.)
-    ├── 📂 Messaging/              # نظام الرسائل والتنبيهات الداخلي
-    ├── 📂 Services/               # خدمات واجهة المستخدم (مثل MessageService, NavigationService)
-    ├── MainWindow.xaml            # النافذة الرئيسية للتطبيق
-    ├── appsettings.json           # إعدادات الاتصال بقاعدة البيانات
-    └── App.xaml.cs                # نقطة البداية، تسجيل الـ DI، وتهيئة تطبيق WPF
-```
-
----
-
-## 📊 Entity Relationship Diagram | مخطط الكيانات والعلاقات
-
+### 📊 Entity Relationships (ERD)
 ```mermaid
 erDiagram
-    PROGRAM ||--o{ EPISODE : "يتضمن"
-    EPISODE ||--o{ EPISODE_GUEST : "يستضيف"
-    EPISODE ||--o{ EPISODE_CORRESPONDENT : "يشرك"
-    EPISODE ||--o{ EPISODE_EMPLOYEE : "ينفذ بواسطة"
-    EPISODE ||--o{ EXECUTION_LOG : "يوثق في"
-    EPISODE ||--o{ WEBSITE_PUBLISHING_LOG : "ينشر في"
+    PROGRAM ||--o{ EPISODE : "contains"
+    EPISODE ||--o{ EPISODE_GUEST : "has"
+    EPISODE ||--o{ EPISODE_CORRESPONDENT : "has"
+    EPISODE ||--o{ EPISODE_EMPLOYEE : "has"
+    EPISODE ||--o{ EXECUTION_LOG : "recorded_at"
+    EPISODE ||--o{ WEBSITE_PUBLISHING_LOG : "published_at"
     
-    EPISODE_STATUS ||--o{ EPISODE : "يحدد حالة"
+    EPISODE_STATUS ||--o{ EPISODE : "defines"
     
-    GUEST ||--o{ EPISODE_GUEST : "يشارك في"
-    CORRESPONDENT ||--o{ EPISODE_CORRESPONDENT : "يغطي"
-    EMPLOYEE ||--o{ EPISODE_EMPLOYEE : "يعمل على"
-    STAFF_ROLE ||--o{ EMPLOYEE : "يحدد دور"
+    GUEST ||--o{ EPISODE_GUEST : "participates"
+    CORRESPONDENT ||--o{ EPISODE_CORRESPONDENT : "reports"
+    EMPLOYEE ||--o{ EPISODE_EMPLOYEE : "works"
+    STAFF_ROLE ||--o{ EMPLOYEE : "defines"
     
-    EPISODE_GUEST ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG : "مصدر لـ"
-    SOCIAL_MEDIA_PUBLISHING_LOG ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG_PLATFORM : "يستهدف"
-    SOCIAL_MEDIA_PLATFORM ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG_PLATFORM : "معرف في"
+    EPISODE_GUEST ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG : "source_for"
+    SOCIAL_MEDIA_PUBLISHING_LOG ||--o{ SOCIAL_MEDIA_PUBLISHING_PLATFORM : "targets"
+    SOCIAL_MEDIA_PLATFORM ||--o{ SOCIAL_MEDIA_PUBLISHING_PLATFORM : "defined_in"
+    
+    USER ||--o{ EXECUTION_LOG : "performed_by"
+    USER ||--o{ SOCIAL_MEDIA_PUBLISHING_LOG : "published_by"
+    USER ||--o{ WEBSITE_PUBLISHING_LOG : "published_by"
+    ROLE ||--o{ USER : "assigned_to"
+    PERMISSION ||--o{ ROLE_PERMISSION : "granted_to"
+    ROLE ||--o{ ROLE_PERMISSION : "has"
+```
+
+### 🔄 Episode Status Lifecycle
+Episodes transition through the following states:
+1.  **Planned (0)**: Initial state for scheduling (Guests, Correspondents, Production Staff).
+2.  **Executed (1)**: Episode has been broadcasted. Transitioning to this state writes to `ExecutionLogs`.
+3.  **Published (2)**: Digital clips published to social media. Transitioning to this state writes to `SocialMediaPublishingLogs`.
+4.  **WebsitePublished (3)**: Episode is live on the official website. Transitioning to this state writes to `WebsitePublishingLogs`.
+5.  **Cancelled (4)**: Terminal state. Requires a reason (stored in `CancellationReason`).
+
+*   **Reversion (Undo)**: States can be reverted (e.g., Executed → Planned) using `ReasonInputDialog` to specify a reason, which is logged to `CancellationReason`.
+
+---
+
+## 4. Coding Patterns
+
+### Standard Service Method Template (Command)
+```csharp
+public async Task<Result<int>> UpdateSomethingAsync(MyDto dto, UserSession session)
+{
+    var permCheck = session.EnsurePermission(AppPermissions.SomePermission);
+    if (!permCheck.IsSuccess)
+        return Result<int>.Fail(permCheck.ErrorMessage!);
+
+    using var context = await contextFactory.CreateDbContextAsync();
+    var entity = await context.MyEntities.FindAsync(dto.Id);
+    if (entity == null)
+        return Result<int>.Fail("Record not found.");
+
+    // Map DTO to Entity fields...
+    
+    await context.SaveChangesAsync();
+    return Result<int>.Success(entity.Id);
+}
+```
+
+### Collection Sync Pattern
+When updating nested collections (such as updating guests in an episode):
+1.  Load the entity including its child collection.
+2.  Identify deleted items (present in DB but missing from DTO) → set `IsActive = false`.
+3.  Identify new items (`Id == 0`) → Add to database.
+4.  Identify updated items (`Id != 0`) → Update fields.
+
+---
+
+## 5. WPF UI Design & Styling Standards
+
+The UI leverages **MaterialDesignInXamlToolkit** and **MahApps.Metro** for a unified theme, utilizing Tajawal/Cairo fonts for Arabic layouts.
+
+### Standard XAML Style Keys
+*   **TextBox Inputs**: `Style="{StaticResource Input.Text}"` (Regular), `Input.Text.Multiline` (Multiline), `Input.Search` (Search Box).
+*   **ComboBox / DatePicker / TimePicker**: `Input.ComboBox`, `Input.DatePicker`, `Input.TimePicker`.
+*   **Buttons**: `Btn.Primary` (Action), `Btn.Cancel` (Dismiss), `Btn.AddNew` (Plus/Add actions), `Btn.Icon.Edit` (Edit icon button), `Btn.Icon.Delete` (Delete icon button).
+*   **DataGrid**: `Style="{StaticResource DataGrid.Main}"` for tables, with `DataGrid.ColumnHeader.Center`, `DataGrid.Row`, and `DataGrid.Cell`.
+*   **Stats Cards**: `Style="{StaticResource Card.Stat}"` for numeric dashboard widgets.
+*   **Colors & Brushes**: `PrimaryMainBrush`, `SuccessBrush`, `WarningBrush`, `ErrorBrush`, `SurfaceBrush`, `HeaderGradientBrush`.
+
+### Dialog Window Pattern
+All modals and entry dialogs should be shown using `DialogHost`:
+```csharp
+var view = new FormDialog(services...);
+var result = await DialogHost.Show(view, "RootDialog");
+if (result is true) await LoadDataAsync();
+```
+Close the dialog and pass the result back using:
+```csharp
+DialogHost.Close("RootDialog", true); // To save/confirm
+DialogHost.Close("RootDialog", null); // To cancel/close
 ```
 
 ---
 
-## 🔄 Detailed Operational Workflow | تفاصيل سير العمل اليومي
+## 6. Permissions & Security System
 
-1. **الأساس (Foundation):** إنشاء البرامج وتسكين الموظفين في أدوارهم.
-2. **الجدولة (Planning):** إنشاء الحلقة وربط الضيوف والمراسلين وطاقم التنفيذ.
-3. **التنفيذ (Execution):** توثيق البث الفعلي للحلقة وملاحظات المخرج.
-4. **النشر الاجتماعي (Social Publishing):** تقطيع الحلقة ونشر مقاطع الضيوف على المنصات الرقمية.
-5. **الأرشفة (Web Archiving):** رفع الحلقة للموقع الرسمي.
-6. **الرقابة (Audit):** تتبع كافة التغييرات والتراجعات مع حفظ أسباب الإلغاء.
-
----
-
-## 🛡️ Advanced Security & Audit | الأمان والتدقيق المتقدم
-
-صُمم النظام ليكون "بيئة آمنة وغير قابلة للتلاعب" من خلال عدة تقنيات متقدمة:
-
-### 1. التدقيق الآلي الشامل (Auto-Auditing)
-عبر `AuditInterceptor` في طبقة البيانات، يقوم النظام تلقائياً بـ:
-- **JSON Snapshots:** عند كل عملية تعديل، يتم حفظ نسخة من البيانات القديمة والجديدة بصيغة JSON في جدول `AuditLogs`.
-- **Metadata:** تسجيل هوية المستخدم وتاريخ العملية (CreatedAt/UpdatedAt) دون تدخل يدوي من المطور.
-- **Action Tracking:** تمييز العمليات (INSERT, UPDATE, DELETE, SOFT_DELETED, CANCEL).
-
-### 2. التحكم بالوصول (RBAC)
-نظام صلاحيات صارم يعتمد على الأدوار (Role-Based Access Control):
-- **12 صلاحية مستقلة:** مثل `EPISODE_PUBLISH`, `USER_MANAGE`, `EPISODE_REVERT`.
-- **التجاوز الآمن (Admin Bypass):** دور الـ `Admin` يتجاوز فحوصات الصلاحيات برمجياً لضمان استمرارية العمل في الحالات الطارئة.
-
-### 3. سلامة البيانات (Data Integrity)
-- **Soft Delete:** لا يتم حذف أي سجل تجاري نهائياً؛ يتم فقط تغيير حالة `IsActive` لضمان القدرة على استرجاع البيانات والتدقيق التاريخي.
-- **Optimistic Concurrency:** استخدام `RowVersion` (Timestamp) لمنع تضارب التعديلات عند محاولة مستخدمين اثنين تعديل نفس الحلقة في نفس اللحظة.
+Permissions are defined in `DataAccess/Common/AppPermissions.cs`. Check permissions using `UserSession.HasPermission` or `EnsurePermission`:
+*   `USER_MANAGE`: Managing users and system permissions.
+*   `PROGRAM_MANAGE`: Managing radio programs.
+*   `EPISODE_MANAGE`: Creating and editing episodes.
+*   `EPISODE_EXECUTE`: Recording execution logs.
+*   `EPISODE_PUBLISH`: Publishing social media clips.
+*   `EPISODE_WEB_PUBLISH`: Publishing to the website.
+*   `EPISODE_EDIT` / `EPISODE_DELETE` / `EPISODE_REVERT`: Managing lifecycle states.
+*   `STAFF_MANAGE`: Reused for employees, roles, and social media platforms.
+*   `VIEW_REPORTS`: Accessing database statistics and reports.
 
 ---
 
-## 🧠 AI Intelligence Portal (Context for LLMs)
-> [!IMPORTANT]
-> **AI models: Digest this section first.**
+## 7. CLI Development Commands
 
-- **Result Pattern**: Every service returns `Result` or `Result<T>`. No raw exceptions for business logic.
-- **BaseEntity**: Foundation for all audited entities (IsActive, CreatedAt/By, UpdatedAt/By, RowVersion).
-- **Stateless Services**: Use `IDbContextFactory` for thread-safety in WPF.
-- **No MVVM**: Logic is strictly in Services, wiring in Code-Behind.
+### Project Build & Run
+```powershell
+# Build application
+dotnet build Radio/Radio.csproj
 
----
+# Run application with watch mode
+dotnet watch run --project Radio/Radio.csproj
+```
 
-## 🚀 Key Features | المميزات الرئيسية
+### EF Core Migrations
+```powershell
+# Add a new migration
+dotnet ef migrations add <MigrationName> --project Domain --startup-project Radio
 
-### 🎙️ Episode Management (إدارة الحلقات)
-- **Multi-Guest Orchestration**: Link multiple guests and correspondents.
-- **Dynamic Staffing**: Assign directors and technicians with role tracking.
-
-### 🌐 Digital Publishing (النشر الرقمي)
-- **Cross-Platform Logging**: Per-guest logs for Facebook, X, and Instagram.
-- **Website Integration**: One-click archiving.
-
----
-
-## 🛠️ Tech Stack | التقنيات المستخدمة
-- .NET 10.0 | WPF | Material Design
-- EF Core 10 | SQL Server 2022
-- Result Pattern | Service Layer | Audit Interceptor
-
----
-
-## ⚙️ Getting Started | البدء بالتطوير
-
-```bash
-git clone https://github.com/dabasgaza/Radio.git
+# Apply migrations to database
 dotnet ef database update --project Domain --startup-project Radio
-dotnet run --project Radio
+
+# Remove last migration
+dotnet ef migrations remove --project Domain --startup-project Radio
 ```
 
 ---
 
-<div align="center">
+## 8. Common Troubleshooting
 
-**Radio (بث برو)** - *Precision Engineering for Broadcast Excellence.*
-
-Built with ❤️ for the future of Radio.
-
-</div>
+*   **XAML Namespace Errors**: Use `xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"`. Do not use `xmlns:md`.
+*   **Binding Errors**: Bindings must point to the fields/properties in the DTO, not internal entities. Ensure `ItemsSource` is set in the code-behind, not in XAML.
+*   **Thread Safety Exceptions**: Ensure every service operation instantiates its own `DbContext` scope via `IDbContextFactory`.

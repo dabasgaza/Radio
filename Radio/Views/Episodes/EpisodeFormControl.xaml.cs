@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using DataAccess.Common;
 using DataAccess.DTOs;
@@ -51,6 +52,10 @@ namespace Radio.Views.Episodes
             _session = session;
             _episodeId = episodeId;
 
+            // ── تسجيل اختصارات لوحة المفاتيح ──
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Save, (_, _) => BtnSave_Click(null!, null!)));
+            CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, (_, _) => BtnCancel_Click(null!, null!)));
+
             // ── تفعيل سحب النافذة وتحديد العنوان حسب نوع العملية ──
             IsWindowDraggable = true;
 
@@ -61,11 +66,25 @@ namespace Radio.Views.Episodes
             DgCorrespondents.ItemsSource = CorrespondentList;
             DgEmployees.ItemsSource = EmployeeList;
 
+            // ── تعطيل ذكي لزر الحفظ ──
+            TxtEpisodeName.TextChanged += (_, _) => UpdateSaveButtonState();
+            DpDate.SelectedDateChanged += (_, _) => UpdateSaveButtonState();
+            CbPrograms.SelectionChanged += (_, _) => UpdateSaveButtonState();
+
             Loaded += async (_, _) => await InitializeDataAsync();
+        }
+
+        private void UpdateSaveButtonState()
+        {
+            bool hasProgram = CbPrograms.SelectedValue != null;
+            bool hasName = !string.IsNullOrWhiteSpace(TxtEpisodeName.Text);
+            bool hasDate = DpDate.SelectedDate.HasValue;
+            BtnSave.IsEnabled = hasProgram && hasName && hasDate;
         }
 
         private async Task InitializeDataAsync()
         {
+            LoadingOverlay.Visibility = Visibility.Visible;
             try
             {
                 CbPrograms.ItemsSource = await _programService.GetAllActiveAsync();
@@ -102,6 +121,7 @@ namespace Radio.Views.Episodes
                         EmployeeList.Add(new EmployeeRow(e.EmployeeId, emp?.FullName ?? "غير معروف", emp?.StaffRoleName ?? "—"));
                     }
                     UpdateSectionCounts();
+                    UpdateSaveButtonState();
                 }
                 else
                 {
@@ -114,6 +134,10 @@ namespace Radio.Views.Episodes
             catch (Exception ex)
             {
                 MessageService.Current.ShowError($"خطأ في تحميل البيانات: {ex.Message}");
+            }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -138,10 +162,11 @@ namespace Radio.Views.Episodes
             GuestList.Add(new GuestRow(0, guest.GuestId, guest.FullName, topic, hostingTime));
             UpdateSectionCounts();
 
-            // تصفير حقول الإضافة
+            // تصفير حقول الإضافة وتركيز تلقائي
             CbAllGuests.SelectedItem = null;
             TxtGuestTopic.Clear();
             TpGuestHostingTime.SelectedTime = null;
+            Dispatcher.BeginInvoke(new Action(() => Keyboard.Focus(CbAllGuests)));
         }
 
         private void BtnRemoveGuest_Click(object sender, RoutedEventArgs e)
@@ -175,6 +200,7 @@ namespace Radio.Views.Episodes
             CbAllCorrespondents.SelectedItem = null;
             TxtCorrespondentTopic.Clear();
             TpCorrespondentHostingTime.SelectedTime = null;
+            Dispatcher.BeginInvoke(new Action(() => Keyboard.Focus(CbAllCorrespondents)));
         }
 
         private void BtnRemoveCorrespondent_Click(object sender, RoutedEventArgs e)
@@ -200,6 +226,7 @@ namespace Radio.Views.Episodes
             EmployeeList.Add(new EmployeeRow(emp.EmployeeId, emp.FullName, emp.StaffRoleName ?? "—"));
             UpdateSectionCounts();
             CbAllEmployees.SelectedItem = null;
+            Dispatcher.BeginInvoke(new Action(() => Keyboard.Focus(CbAllEmployees)));
         }
 
         private void BtnRemoveEmployee_Click(object sender, RoutedEventArgs e)
@@ -212,13 +239,24 @@ namespace Radio.Views.Episodes
         // ── الحفظ والإلغاء ────────────────────────────────────────
 
         // ═══════════════════════════════════════════════════════
-        // تحديث عدادات الأقسام
+        // تحديث عدادات الأقسام وحالات الفراغ
         // ═══════════════════════════════════════════════════════
         private void UpdateSectionCounts()
         {
             GuestCountText.Text = GuestList.Count.ToString();
             CorrespondentCountText.Text = CorrespondentList.Count.ToString();
             StaffCountText.Text = EmployeeList.Count.ToString();
+
+            TabGuestCountText.Text = GuestList.Count.ToString();
+            TabGuestCountBadge.Visibility = GuestList.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            TabCorrespondentCountText.Text = CorrespondentList.Count.ToString();
+            TabCorrespondentCountBadge.Visibility = CorrespondentList.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            TabStaffCountText.Text = EmployeeList.Count.ToString();
+            TabStaffCountBadge.Visibility = EmployeeList.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+            EmptyGuestState.Visibility = GuestList.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            EmptyCorrespondentState.Visibility = CorrespondentList.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            EmptyStaffState.Visibility = EmployeeList.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // ═══════════════════════════════════════════════════════
@@ -234,10 +272,17 @@ namespace Radio.Views.Episodes
 
         private async Task SaveDraftAsync()
         {
-            var draft = CollectDraftData();
-            await _draftService.SaveDraftAsync(draft);
-            PnlAutoSave.Visibility = Visibility.Visible;
-            TxtAutoSaveStatus.Text = $"تم الحفظ تلقائياً — {DateTime.Now:hh:mm tt}";
+            try
+            {
+                var draft = CollectDraftData();
+                await _draftService.SaveDraftAsync(draft);
+                PnlAutoSave.Visibility = Visibility.Visible;
+                TxtAutoSaveStatus.Text = $"تم الحفظ تلقائياً — {DateTime.Now:hh:mm tt}";
+            }
+            catch (Exception ex)
+            {
+                MessageService.Current.ShowError($"خطأ في الحفظ التلقائي: {ex.Message}");
+            }
         }
 
         private EpisodeDraft CollectDraftData()
@@ -304,6 +349,7 @@ namespace Radio.Views.Episodes
                         EmployeeList.Add(new EmployeeRow(e.EmployeeId, e.FullName ?? "", e.StaffRoleName ?? ""));
 
                     UpdateSectionCounts();
+                    UpdateSaveButtonState();
                     PnlAutoSave.Visibility = Visibility.Visible;
                     TxtAutoSaveStatus.Text = $"تم استعادة مسودة من {draft.SavedAt:hh:mm tt}";
                 }

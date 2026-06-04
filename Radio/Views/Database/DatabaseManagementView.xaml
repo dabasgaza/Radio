@@ -358,9 +358,9 @@
                     <Border
                         Grid.Row="0"
                         Padding="24,18"
-                        Style="{StaticResource Card.Info}"
                         BorderBrush="{DynamicResource DividerBrush}"
-                        BorderThickness="0,0,0,1">
+                        BorderThickness="0,0,0,1"
+                        Style="{StaticResource Card.Info}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />

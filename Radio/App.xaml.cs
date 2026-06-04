@@ -27,6 +27,22 @@ namespace Radio
 
         public App()
         {
+            var customCulture = new System.Globalization.CultureInfo("en-GB");
+            customCulture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
+            customCulture.DateTimeFormat.DateSeparator = "-";
+
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = customCulture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = customCulture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = customCulture;
+
+            FrameworkElement.LanguageProperty.OverrideMetadata(
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(
+                    System.Windows.Markup.XmlLanguage.GetLanguage("en-GB")));
+
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+
             var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
             {
                 ContentRootPath = AppContext.BaseDirectory
@@ -119,18 +135,6 @@ namespace Radio
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            var customCulture = new System.Globalization.CultureInfo("en-US");
-            customCulture.DateTimeFormat.ShortDatePattern = "dd-MM-yyyy";
-            customCulture.DateTimeFormat.DateSeparator = "-";
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-            System.Threading.Thread.CurrentThread.CurrentUICulture = customCulture;
-
-            FrameworkElement.LanguageProperty.OverrideMetadata(
-                typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(
-                    System.Windows.Markup.XmlLanguage.GetLanguage("en-US")));
-
             base.OnStartup(e);
 
             FontScaleService.Initialize();
@@ -166,6 +170,22 @@ namespace Radio
         {
             await AppHost.StopAsync();
             base.OnExit(e);
+        }
+
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            // تسجيل الخطأ كحالة حرجة في السجل مع استثناء التفاصيل كاملة
+            Log.Fatal(e.Exception, "حدث خطأ غير متوقع لم يتم معالجته في التطبيق.");
+
+            // عرض رسالة ودية للمستخدم باللغة العربية لمواصلة العمل دون انهيار التطبيق مفاجئاً
+            MessageBox.Show(
+                $"نعتذر عن هذا الخطأ غير المتوقع في النظام.\n\nتفاصيل الخطأ: {e.Exception.Message}\n\nيمكنك الاستمرار في استخدام التطبيق، وإذا استمرت المشكلة، يرجى التواصل مع الدعم الفني.",
+                "خطأ غير متوقع في النظام",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            // منع إغلاق التطبيق المفاجئ
+            e.Handled = true;
         }
     }
 }

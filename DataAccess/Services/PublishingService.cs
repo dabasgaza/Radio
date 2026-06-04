@@ -119,7 +119,13 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
 
             var now = DateTime.UtcNow;
 
-            // 2. إنشاء سجلات النشر لكل ضيف وإضافة منصات النشر المرافقة
+            // 2. الحصول على جميع كائنات ضيوف الحلقة المرتبطة بسجلات النشر دفعة واحدة لتفادي استعلام N+1
+            var guestIds = guestLogs.Select(g => g.EpisodeGuestId).ToList();
+            var episodeGuests = await context.EpisodeGuests
+                .Where(eg => guestIds.Contains(eg.EpisodeGuestId))
+                .ToListAsync();
+
+            // 3. إنشاء سجلات النشر لكل ضيف وإضافة منصات النشر المرافقة
             foreach (var g in guestLogs)
             {
                 var log = new SocialMediaPublishingLog
@@ -143,8 +149,8 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
 
                 context.SocialMediaPublishingLogs.Add(log);
 
-                // 4. تحديث ClipStatus للضيف
-                var episodeGuest = await context.EpisodeGuests.FindAsync(g.EpisodeGuestId);
+                // 4. تحديث ClipStatus للضيف من الذاكرة
+                var episodeGuest = episodeGuests.FirstOrDefault(eg => eg.EpisodeGuestId == g.EpisodeGuestId);
                 if (episodeGuest != null)
                 {
                     episodeGuest.ClipStatus = GuestClipStatus.Published;
@@ -218,21 +224,17 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
                 PublishedByUserId = session.UserId
             };
 
-            context.SocialMediaPublishingLogs.Add(log);
-            await context.SaveChangesAsync();
-
-            // إضافة المنصات والروابط
+            // إضافة المنصات والروابط عبر navigation property لتجنب الحاجة إلى SaveChangesAsync منفصل
             foreach (var platform in dto.Platforms)
             {
-                var platformLink = new SocialMediaPublishingLogPlatform
+                log.Platforms.Add(new SocialMediaPublishingLogPlatform
                 {
-                    SocialMediaPublishingLogId = log.SocialMediaPublishingLogId,
                     SocialMediaPlatformId = platform.PlatformId,
                     Url = platform.Url
-                };
-                context.SocialMediaPublishingLogPlatforms.Add(platformLink);
+                });
             }
 
+            context.SocialMediaPublishingLogs.Add(log);
             await context.SaveChangesAsync();
             return Result<int>.Success(log.SocialMediaPublishingLogId);
         }
@@ -507,59 +509,66 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
 
         records.AddRange(execLogs);
 
-        // 2. سجلات النشر الرقمي (سوشال ميديا) — استعلام Select لتقليل الأعمدة
+        // 2. سجلات النشر الرقمي (سوشال ميديا) - جلب البيانات الخام أولاً
         var socialQuery = context.SocialMediaPublishingLogs
             .AsNoTracking()
-            .AsSplitQuery()
             .Where(l => l.IsActive);
 
         if (episodeId.HasValue)
             socialQuery = socialQuery.Where(l => l.EpisodeGuest.EpisodeId == episodeId.Value);
 
-        var socialLogs = await socialQuery
-            .OrderByDescending(l => l.PublishedAt)
-            .Select(l => new PublishingRecordDto
+        var rawSocialLogs = await socialQuery
+            .Select(l => new
             {
-                RecordId = l.SocialMediaPublishingLogId,
-                RecordType = "SocialMedia",
+                l.SocialMediaPublishingLogId,
                 EpisodeId = l.EpisodeGuest.EpisodeId,
                 EpisodeName = l.EpisodeGuest.Episode != null ? l.EpisodeGuest.Episode.EpisodeName : null,
                 ProgramName = l.EpisodeGuest.Episode != null && l.EpisodeGuest.Episode.Program != null ? l.EpisodeGuest.Episode.Program.ProgramName : null,
-                RecordDate = l.PublishedAt,
+                l.PublishedAt,
                 RecordedBy = l.PublishedByUser != null ? l.PublishedByUser.FullName : null,
-                RecordIcon = "ShareVariant",
-                RecordColor = "#2196F3"
+                GuestName = l.EpisodeGuest.Guest != null ? l.EpisodeGuest.Guest.FullName : "ضيف غير معروف",
+                Platforms = l.Platforms
+                    .Where(p => p.IsActive)
+                    .Select(p => p.SocialMediaPlatform != null ? p.SocialMediaPlatform.Name : "منصة غير معروف")
+                    .ToList()
             })
             .ToListAsync();
 
-        // نُجمّع أسماء الضيوف والمنصات في الذاكرة (string.Join لا يُترجم)
-        if (socialLogs.Count > 0)
-        {
-            var socialLogIds = socialLogs.Select(s => s.RecordId).ToList();
-            var platformData = await context.SocialMediaPublishingLogPlatforms
-                .AsNoTracking()
-                .Where(p => socialLogIds.Contains(p.SocialMediaPublishingLogId) && p.IsActive)
-                .Select(p => new
-                {
-                    p.SocialMediaPublishingLogId,
-                    PlatformName = p.SocialMediaPlatform != null ? p.SocialMediaPlatform.Name : null,
-                    GuestName = p.SocialMediaPublishingLog.EpisodeGuest.Guest.FullName
-                })
-                .ToListAsync();
-
-            var platformLookup = platformData.GroupBy(p => p.SocialMediaPublishingLogId)
-                                              .ToDictionary(g => g.Key, g => g.ToList());
-
-            foreach (var log in socialLogs)
+        // تجميع السجلات حسب الحلقة في الذاكرة لمنع تكرار الحلقات التي تحتوي على أكثر من ضيف
+        var groupedSocialLogs = rawSocialLogs
+            .GroupBy(l => l.EpisodeId)
+            .Select(g =>
             {
-                if (platformLookup.TryGetValue(log.RecordId, out var platforms))
+                var first = g.First();
+                // تجميع أسماء الضيوف مع المنصات التي نشروا عليها
+                var guestSummaries = g.Select(l =>
                 {
-                    log.Summary = $"{platforms.First().GuestName} → {string.Join("، ", platforms.Select(p => p.PlatformName ?? "غير معروف"))}";
-                }
-            }
-        }
+                    var platformsStr = l.Platforms.Count > 0 ? $" ({string.Join("، ", l.Platforms.Distinct())})" : "";
+                    return $"{l.GuestName}{platformsStr}";
+                });
 
-        records.AddRange(socialLogs);
+                var summary = "نشر مقاطع للضيوف: " + string.Join(" | ", guestSummaries);
+                var maxPublishedAt = g.Max(l => l.PublishedAt);
+                var allRecorders = g.Select(l => l.RecordedBy).Where(r => r != null).Distinct().ToList();
+                var recordedBy = allRecorders.Count > 0 ? string.Join("، ", allRecorders) : null;
+
+                return new PublishingRecordDto
+                {
+                    RecordId = first.SocialMediaPublishingLogId,
+                    RecordType = "SocialMedia",
+                    EpisodeId = g.Key,
+                    EpisodeName = first.EpisodeName,
+                    ProgramName = first.ProgramName,
+                    Summary = summary,
+                    RecordDate = maxPublishedAt,
+                    RecordedBy = recordedBy,
+                    RecordIcon = "ShareVariant",
+                    RecordColor = "#2196F3"
+                };
+            })
+            .ToList();
+
+        records.AddRange(groupedSocialLogs);
 
         // 3. سجلات نشر الموقع الإلكتروني — Select مباشر + AsSplitQuery
         var webQuery = context.WebsitePublishingLogs

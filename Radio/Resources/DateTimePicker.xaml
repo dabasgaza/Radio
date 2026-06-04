@@ -78,6 +78,7 @@
         BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}"
         TargetType="DatePicker">
 
+        <Setter Property="Language" Value="en-GB" />
         <Setter Property="Height" Value="44" />
         <Setter Property="Padding" Value="10,6" />
         <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
