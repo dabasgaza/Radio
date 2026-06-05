@@ -52,25 +52,33 @@ namespace DataAccess.Services
             var permCheck = session.EnsurePermission(AppPermissions.UserManage);
             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-            await using var context = await contextFactory.CreateDbContextAsync();
-
-            if (await context.Users.AnyAsync(u => u.Username == dto.Username))
-                return Result.Fail("اسم المستخدم موجود بالفعل في النظام.");
-
-            var user = new User
+            try
             {
-                Username = dto.Username,
-                FullName = dto.FullName,
-                EmailAddress = dto.EmailAddress,
-                PhoneNumber = dto.PhoneNumber,
-                RoleId = dto.RoleId,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(plainPassword),
-                IsActive = true
-            };
+                await using var context = await contextFactory.CreateDbContextAsync();
 
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
-            return Result.Success();
+                if (await context.Users.AnyAsync(u => u.Username == dto.Username))
+                    return Result.Fail("اسم المستخدم موجود بالفعل في النظام.");
+
+                var user = new User
+                {
+                    Username = dto.Username,
+                    FullName = dto.FullName,
+                    EmailAddress = dto.EmailAddress,
+                    PhoneNumber = dto.PhoneNumber,
+                    RoleId = dto.RoleId,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(plainPassword),
+                    IsActive = true
+                };
+
+                context.Users.Add(user);
+                await context.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Failed to create User: {Username}", dto.Username);
+                return Result.Fail("حدث خطأ في قاعدة البيانات أثناء إضافة المستخدم. يرجى المحاولة لاحقاً.");
+            }
         }
 
         public async Task<Result> UpdateUserAsync(UserDto dto, string? newPassword, UserSession session)
@@ -78,27 +86,36 @@ namespace DataAccess.Services
             var permCheck = session.EnsurePermission(AppPermissions.UserManage);
             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-            await using var context = await contextFactory.CreateDbContextAsync();
-            var dbUser = await context.Users.FindAsync(dto.UserId);
-
-            if (dbUser == null) return Result.Fail("المستخدم غير موجود.");
-
-            dbUser.FullName = dto.FullName;
-            dbUser.EmailAddress = dto.EmailAddress;
-            dbUser.PhoneNumber = dto.PhoneNumber;
-            dbUser.RoleId = dto.RoleId;
-
-            if (!string.IsNullOrWhiteSpace(newPassword))
-                dbUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-
             try
             {
-                await context.SaveChangesAsync();
-                return Result.Success();
+                await using var context = await contextFactory.CreateDbContextAsync();
+                var dbUser = await context.Users.FindAsync(dto.UserId);
+
+                if (dbUser == null) return Result.Fail("المستخدم غير موجود.");
+
+                dbUser.FullName = dto.FullName;
+                dbUser.EmailAddress = dto.EmailAddress;
+                dbUser.PhoneNumber = dto.PhoneNumber;
+                dbUser.RoleId = dto.RoleId;
+
+                if (!string.IsNullOrWhiteSpace(newPassword))
+                    dbUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+                try
+                {
+                    await context.SaveChangesAsync();
+                    return Result.Success();
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    Serilog.Log.Error(ex, "Concurrency error updating User: {UserId}", dto.UserId);
+                    return Result.Fail("تم تعديل بيانات هذا المستخدم من قبل شخص آخر. يرجى التحديث والمحاولة ثانية.");
+                }
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                return Result.Fail("تم تعديل بيانات هذا المستخدم من قبل شخص آخر. يرجى التحديث والمحاولة ثانية.");
+                Serilog.Log.Error(ex, "Failed to update User: {UserId}, {Username}", dto.UserId, dto.Username);
+                return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تعديل بيانات المستخدم. يرجى المحاولة لاحقاً.");
             }
         }
 
@@ -110,14 +127,22 @@ namespace DataAccess.Services
             if (userId == session.UserId)
                 return Result.Fail("لا يمكنك تعطيل حسابك الشخصي لأسباب أمنية.");
 
-            await using var context = await contextFactory.CreateDbContextAsync();
-            var user = await context.Users.FindAsync(userId);
+            try
+            {
+                await using var context = await contextFactory.CreateDbContextAsync();
+                var user = await context.Users.FindAsync(userId);
 
-            if (user == null) return Result.Fail("المستخدم غير موجود.");
+                if (user == null) return Result.Fail("المستخدم غير موجود.");
 
-            user.IsActive = isActive;
-            await context.SaveChangesAsync();
-            return Result.Success();
+                user.IsActive = isActive;
+                await context.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Failed to toggle User status: {UserId} to {IsActive}", userId, isActive);
+                return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تغيير حالة المستخدم.");
+            }
         }
 
         #endregion
@@ -140,71 +165,95 @@ namespace DataAccess.Services
                 .ToListAsync();
         }
 
-        public async Task<Result> CreateRoleAsync(RoleDto dto, UserSession session)
-        {
-            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
-            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
-
-            await using var context = await contextFactory.CreateDbContextAsync();
-
-            if (await context.Roles.AnyAsync(r => r.RoleName == dto.RoleName))
-                return Result.Fail("اسم الدور موجود مسبقاً");
-
-            var role = new Role
-            {
-                RoleName = dto.RoleName,
-                RoleDescription = dto.RoleDescription,
-                IsActive = true,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
-
-            context.Roles.Add(role);
-            await context.SaveChangesAsync();
-            return Result.Success();
-        }
-
-        public async Task<Result> UpdateRoleAsync(RoleDto dto, UserSession session)
-        {
-            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
-            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
-
-            await using var context = await contextFactory.CreateDbContextAsync();
-            var role = await context.Roles.FindAsync(dto.RoleId);
-            if (role == null) return Result.Fail("الدور غير موجود");
-
-            if (await context.Roles.AnyAsync(r => r.RoleName == dto.RoleName && r.RoleId != dto.RoleId))
-                return Result.Fail("اسم الدور موجود مسبقاً");
-
-            role.RoleName = dto.RoleName;
-            role.RoleDescription = dto.RoleDescription;
-            role.UpdatedAt = DateTime.Now;
-
-            await context.SaveChangesAsync();
-            return Result.Success();
-        }
-
-        public async Task<Result> DeleteRoleAsync(int roleId, UserSession session)
-        {
-            var permCheck = session.EnsurePermission(AppPermissions.UserManage);
-            if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
-
-            await using var context = await contextFactory.CreateDbContextAsync();
-            var role = await context.Roles.FindAsync(roleId);
-            if (role == null) return Result.Fail("الدور غير موجود");
-
-            if (await context.Users.AnyAsync(u => u.RoleId == roleId))
-                return Result.Fail("لا يمكن حذف الدور لأنه مرتبط بمستخدمين حاليين");
-
-            // ✅ ExecuteDeleteAsync بدلاً من تحميل السجلات ثم حذفها
-            await context.RolePermissions
-                .Where(rp => rp.RoleId == roleId)
-                .ExecuteDeleteAsync();
-
-            context.Roles.Remove(role);
-            await context.SaveChangesAsync();
-            return Result.Success();
-        }
+         public async Task<Result> CreateRoleAsync(RoleDto dto, UserSession session)
+         {
+             var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+ 
+             try
+             {
+                 await using var context = await contextFactory.CreateDbContextAsync();
+ 
+                 if (await context.Roles.AnyAsync(r => r.RoleName == dto.RoleName))
+                     return Result.Fail("اسم الدور موجود مسبقاً");
+ 
+                 var role = new Role
+                 {
+                     RoleName = dto.RoleName,
+                     RoleDescription = dto.RoleDescription,
+                     IsActive = true,
+                     CreatedAt = DateTime.Now,
+                     UpdatedAt = DateTime.Now
+                 };
+ 
+                 context.Roles.Add(role);
+                 await context.SaveChangesAsync();
+                 return Result.Success();
+             }
+             catch (Exception ex)
+             {
+                 Serilog.Log.Error(ex, "Failed to create Role: {RoleName}", dto.RoleName);
+                 return Result.Fail("حدث خطأ في قاعدة البيانات أثناء إضافة الدور. يرجى المحاولة لاحقاً.");
+             }
+         }
+ 
+         public async Task<Result> UpdateRoleAsync(RoleDto dto, UserSession session)
+         {
+             var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+ 
+             try
+             {
+                 await using var context = await contextFactory.CreateDbContextAsync();
+                 var role = await context.Roles.FindAsync(dto.RoleId);
+                 if (role == null) return Result.Fail("الدور غير موجود");
+ 
+                 if (await context.Roles.AnyAsync(r => r.RoleName == dto.RoleName && r.RoleId != dto.RoleId))
+                     return Result.Fail("اسم الدور موجود مسبقاً");
+ 
+                 role.RoleName = dto.RoleName;
+                 role.RoleDescription = dto.RoleDescription;
+                 role.UpdatedAt = DateTime.Now;
+ 
+                 await context.SaveChangesAsync();
+                 return Result.Success();
+             }
+             catch (Exception ex)
+             {
+                 Serilog.Log.Error(ex, "Failed to update Role: {RoleId}, {RoleName}", dto.RoleId, dto.RoleName);
+                 return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تعديل الدور. يرجى المحاولة لاحقاً.");
+             }
+         }
+ 
+         public async Task<Result> DeleteRoleAsync(int roleId, UserSession session)
+         {
+             var permCheck = session.EnsurePermission(AppPermissions.UserManage);
+             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+ 
+             try
+             {
+                 await using var context = await contextFactory.CreateDbContextAsync();
+                 var role = await context.Roles.FindAsync(roleId);
+                 if (role == null) return Result.Fail("الدور غير موجود");
+ 
+                 if (await context.Users.AnyAsync(u => u.RoleId == roleId))
+                     return Result.Fail("لا يمكن حذف الدور لأنه مرتبط بمستخدمين حاليين");
+ 
+                 // ✅ ExecuteDeleteAsync بدلاً من تحميل السجلات ثم حذفها
+                 await context.RolePermissions
+                     .Where(rp => rp.RoleId == roleId)
+                     .ExecuteDeleteAsync();
+ 
+                 context.Roles.Remove(role);
+                 await context.SaveChangesAsync();
+                 return Result.Success();
+             }
+             catch (Exception ex)
+             {
+                 Serilog.Log.Error(ex, "Failed to delete Role: {RoleId}", roleId);
+                 return Result.Fail("حدث خطأ في قاعدة البيانات أثناء حذف الدور.");
+             }
+         }
 
         public async Task<List<PermissionViewModel>> GetPermissionsMatrixAsync(int roleId)
         {

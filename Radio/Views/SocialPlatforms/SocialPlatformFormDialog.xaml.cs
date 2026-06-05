@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -66,8 +66,9 @@ public partial class SocialPlatformFormDialog
         {
             MessageService.Current.ShowWarning("حدث تعارض في البيانات. يرجى إغلاق النافذة وإعادة المحاولة.");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Serilog.Log.Error(ex, "An unexpected error occurred during processing");
             MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حفظ البيانات.");
         }
         finally

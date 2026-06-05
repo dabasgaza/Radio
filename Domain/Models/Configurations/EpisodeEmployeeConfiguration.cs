@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Models.Configurations;
@@ -35,7 +35,16 @@ public class EpisodeEmployeeConfiguration : IEntityTypeConfiguration<EpisodeEmpl
               .HasForeignKey(e => e.EmployeeId)
               .OnDelete(DeleteBehavior.Restrict);
 
-        // 4. فلتر الحذف المنطقي
+        // 4. الفهارس (Indexes)
+        // فهرس فريد مركب لمنع إضافة نفس الموظف لنفس الحلقة مرتين وتأمين الاستعلامات
+        builder.HasIndex(e => new { e.EpisodeId, e.EmployeeId }, "UQ_EpisodeEmployees")
+               .IsUnique();
+
+        // فهرس لتسريع الاستعلام والبحث حسب الموظف
+        builder.HasIndex(e => e.EmployeeId)
+               .HasDatabaseName("IX_EpisodeEmployees_EmployeeId");
+
+        // 5. فلتر الحذف المنطقي
         builder.HasQueryFilter(ee => ee.IsActive);
     }
 }

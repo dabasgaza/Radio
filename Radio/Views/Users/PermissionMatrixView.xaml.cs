@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -40,8 +40,9 @@ namespace Radio.Views.Users
             {
                 MessageService.Current.ShowWarning(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل الأدوار.");
             }
         }
@@ -69,8 +70,9 @@ namespace Radio.Views.Users
             {
                 MessageService.Current.ShowWarning(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل صلاحيات الدور.");
             }
         }
@@ -119,8 +121,9 @@ namespace Radio.Views.Users
                     MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل تحديث الصلاحيات.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حفظ الصلاحيات.");
             }
             finally

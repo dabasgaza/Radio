@@ -11,7 +11,7 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <converter:FileSizeConverter x:Key="FileSizeConverter" xmlns:converter="clr-namespace:Radio.Converter" />
+        <converter:FileSizeConverter xmlns:converter="clr-namespace:Radio.Converter" x:Key="FileSizeConverter" />
     </UserControl.Resources>
 
     <Grid Margin="16">
@@ -20,7 +20,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Header -->
+        <!--  Header  -->
         <Border
             Grid.Row="0"
             Margin="0,0,0,16"
@@ -58,17 +58,17 @@
             </Grid>
         </Border>
 
-        <!-- Main Content Grid -->
+        <!--  Main Content Grid  -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="380" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Sidebar: Controls & Settings -->
+            <!--  Sidebar: Controls & Settings  -->
             <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                
-                <!-- Actions Card -->
+
+                <!--  Actions Card  -->
                 <materialDesign:Card Margin="0,0,0,16" Padding="16">
                     <StackPanel>
                         <TextBlock
@@ -128,7 +128,7 @@
                     </StackPanel>
                 </materialDesign:Card>
 
-                <!-- Configuration/Scheduler Settings Card -->
+                <!--  Configuration/Scheduler Settings Card  -->
                 <materialDesign:Card Padding="16">
                     <StackPanel>
                         <TextBlock
@@ -155,7 +155,7 @@
                             Foreground="{DynamicResource TextSecondaryBrush}"
                             Style="{StaticResource Type.BodySmall}"
                             Text="دورية النسخ التلقائي (بالساعات)" />
-                        
+
                         <ComboBox
                             x:Name="ComboInterval"
                             Margin="0,0,0,12"
@@ -170,7 +170,7 @@
                             Foreground="{DynamicResource TextSecondaryBrush}"
                             Style="{StaticResource Type.BodySmall}"
                             Text="فترة الاحتفاظ بالنسخ (أيام)" />
-                        
+
                         <TextBox
                             x:Name="TxtRetentionDays"
                             Margin="0,0,0,16"
@@ -195,7 +195,7 @@
 
             </StackPanel>
 
-            <!-- Main Panel: Backup History -->
+            <!--  Main Panel: Backup History  -->
             <Grid Grid.Column="1">
                 <materialDesign:Card Padding="16">
                     <Grid>
@@ -244,7 +244,7 @@
                                     Width="150"
                                     Binding="{Binding CreatedAt, StringFormat='dd-MM-yyyy HH:mm:ss'}"
                                     Header="التاريخ" />
-                                
+
                                 <DataGridTextColumn
                                     Width="100"
                                     Binding="{Binding BackupType}"
@@ -260,8 +260,8 @@
                                         <DataTemplate>
                                             <Border
                                                 Padding="6,2"
-                                                CornerRadius="4"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left"
+                                                CornerRadius="4">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
                                                         <Style.Triggers>
@@ -269,7 +269,10 @@
                                                                 <Setter Property="Background" Value="#E8F5E9" />
                                                                 <Setter Property="Child">
                                                                     <Setter.Value>
-                                                                        <TextBlock Foreground="#2E7D32" Text="ناجح" FontWeight="SemiBold"/>
+                                                                        <TextBlock
+                                                                            FontWeight="SemiBold"
+                                                                            Foreground="#2E7D32"
+                                                                            Text="ناجح" />
                                                                     </Setter.Value>
                                                                 </Setter>
                                                             </DataTrigger>
@@ -277,7 +280,10 @@
                                                                 <Setter Property="Background" Value="#FFEBEE" />
                                                                 <Setter Property="Child">
                                                                     <Setter.Value>
-                                                                        <TextBlock Foreground="#C62828" Text="فشل" FontWeight="SemiBold"/>
+                                                                        <TextBlock
+                                                                            FontWeight="SemiBold"
+                                                                            Foreground="#C62828"
+                                                                            Text="فشل" />
                                                                     </Setter.Value>
                                                                 </Setter>
                                                             </DataTrigger>

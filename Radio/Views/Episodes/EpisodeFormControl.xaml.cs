@@ -118,7 +118,7 @@ namespace Radio.Views.Episodes
                     foreach (var e in ep.EmployeeItems)
                     {
                         var emp = allEmployees.FirstOrDefault(em => em.EmployeeId == e.EmployeeId);
-                        EmployeeList.Add(new EmployeeRow(e.EmployeeId, emp?.FullName ?? "غير معروف", emp?.StaffRoleName ?? "—"));
+                        EmployeeList.Add(new EmployeeRow(e.Id, e.EmployeeId, emp?.FullName ?? "غير معروف", emp?.StaffRoleName ?? "—"));
                     }
                     UpdateSectionCounts();
                     UpdateSaveButtonState();
@@ -133,6 +133,7 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError($"خطأ في تحميل البيانات: {ex.Message}");
             }
             finally
@@ -223,7 +224,7 @@ namespace Radio.Views.Episodes
                 MessageService.Current.ShowWarning("هذا الموظف مضاف بالفعل."); return;
             }
 
-            EmployeeList.Add(new EmployeeRow(emp.EmployeeId, emp.FullName, emp.StaffRoleName ?? "—"));
+            EmployeeList.Add(new EmployeeRow(0, emp.EmployeeId, emp.FullName, emp.StaffRoleName ?? "—"));
             UpdateSectionCounts();
             CbAllEmployees.SelectedItem = null;
             Dispatcher.BeginInvoke(new Action(() => Keyboard.Focus(CbAllEmployees)));
@@ -281,6 +282,7 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError($"خطأ في الحفظ التلقائي: {ex.Message}");
             }
         }
@@ -346,7 +348,7 @@ namespace Radio.Views.Episodes
                     foreach (var c in draft.Correspondents)
                         CorrespondentList.Add(new CorrespondentRow(0, c.CorrespondentId, c.FullName ?? "", c.Topic, c.HostingTime));
                     foreach (var e in draft.Employees)
-                        EmployeeList.Add(new EmployeeRow(e.EmployeeId, e.FullName ?? "", e.StaffRoleName ?? ""));
+                        EmployeeList.Add(new EmployeeRow(0, e.EmployeeId, e.FullName ?? "", e.StaffRoleName ?? ""));
 
                     UpdateSectionCounts();
                     UpdateSaveButtonState();
@@ -377,7 +379,7 @@ namespace Radio.Views.Episodes
                     (int)CbPrograms.SelectedValue,
                     GuestList.Select(g => new EpisodeGuestDto(g.EpisodeGuestId, g.GuestId, g.FullName, g.Topic, g.HostingTime, null)).ToList(),
                     CorrespondentList.Select(c => new EpisodeCorrespondentDto(c.Id, c.CorrespondentId, c.FullName, c.Topic, c.HostingTime)).ToList(),
-                    EmployeeList.Select(emp => new EpisodeEmployeeDto(0, emp.EmployeeId)).ToList(),
+                    EmployeeList.Select(emp => new EpisodeEmployeeDto(emp.Id, emp.EmployeeId)).ToList(),
                     TxtEpisodeName.Text.Trim(),
                     DpDate.SelectedDate,
                     TpBroadcastTime.SelectedTime?.TimeOfDay,
@@ -407,6 +409,7 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 // ── معالجة أي استثناء غير متوقع ──
                 MessageService.Current.ShowError($"حدث خطأ غير متوقع أثناء الحفظ: {ex.Message}");
             }
@@ -537,8 +540,9 @@ namespace Radio.Views.Episodes
             public string HostingTimeDisplay => HostingTime.HasValue ? HostingTime.Value.ToString(@"hh\:mm") : "—";
         }
 
-        public class EmployeeRow(int employeeId, string fullName, string staffRoleName)
+        public class EmployeeRow(int id, int employeeId, string fullName, string staffRoleName)
         {
+            public int Id { get; set; } = id;
             public int EmployeeId { get; set; } = employeeId;
             public string FullName { get; set; } = fullName;
             public string StaffRoleName { get; set; } = staffRoleName;

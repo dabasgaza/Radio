@@ -1,4 +1,4 @@
-using DataAccess.DTOs;
+﻿using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
@@ -168,6 +168,7 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError($"خطأ في تحميل البيانات: {ex.Message}");
             }
         }
@@ -543,6 +544,7 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError($"خطأ غير متوقع: {ex.Message}");
             }
             finally

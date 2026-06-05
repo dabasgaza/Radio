@@ -42,21 +42,29 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
-
-        var employee = new Employee
+        try
         {
-            FullName = dto.FullName,
-            StaffRoleId = dto.StaffRoleId,
-            Notes = dto.Notes,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        context.Employees.Add(employee);
-        await context.SaveChangesAsync();
-        return Result<int>.Success(employee.EmployeeId);
+            var employee = new Employee
+            {
+                FullName = dto.FullName,
+                StaffRoleId = dto.StaffRoleId,
+                Notes = dto.Notes,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            context.Employees.Add(employee);
+            await context.SaveChangesAsync();
+            return Result<int>.Success(employee.EmployeeId);
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to create Employee: {FullName}", dto.FullName);
+            return Result<int>.Fail("حدث خطأ في قاعدة البيانات أثناء إضافة الموظف. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<Result> UpdateAsync(EmployeeDto dto, UserSession session)
@@ -64,19 +72,27 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        var employee = await context.Employees.FindAsync(dto.EmployeeId);
-        if (employee == null)
-            return Result.Fail("الموظف غير موجود");
+            var employee = await context.Employees.FindAsync(dto.EmployeeId);
+            if (employee == null)
+                return Result.Fail("الموظف غير موجود");
 
-        employee.FullName = dto.FullName;
-        employee.StaffRoleId = dto.StaffRoleId;
-        employee.Notes = dto.Notes;
-        employee.UpdatedAt = DateTime.UtcNow;
+            employee.FullName = dto.FullName;
+            employee.StaffRoleId = dto.StaffRoleId;
+            employee.Notes = dto.Notes;
+            employee.UpdatedAt = DateTime.UtcNow;
 
-        await context.SaveChangesAsync();
-        return Result.Success();
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to update Employee: {EmployeeId}, {FullName}", dto.EmployeeId, dto.FullName);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تعديل بيانات الموظف. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<Result> SoftDeleteAsync(int employeeId, UserSession session)
@@ -84,17 +100,25 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        var employee = await context.Employees.FindAsync(employeeId);
-        if (employee == null)
-            return Result.Fail("الموظف غير موجود");
+            var employee = await context.Employees.FindAsync(employeeId);
+            if (employee == null)
+                return Result.Fail("الموظف غير موجود");
 
-        employee.IsActive = false;
-        employee.UpdatedAt = DateTime.UtcNow;
+            employee.IsActive = false;
+            employee.UpdatedAt = DateTime.UtcNow;
 
-        await context.SaveChangesAsync();
-        return Result.Success();
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to soft delete Employee: {EmployeeId}", employeeId);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء حذف الموظف. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<List<StaffRoleDto>> GetAllRolesAsync()
@@ -114,19 +138,27 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
-
-        var role = new StaffRole
+        try
         {
-            RoleName = dto.RoleName,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        context.StaffRoles.Add(role);
-        await context.SaveChangesAsync();
-        return Result<int>.Success(role.StaffRoleId);
+            var role = new StaffRole
+            {
+                RoleName = dto.RoleName,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            context.StaffRoles.Add(role);
+            await context.SaveChangesAsync();
+            return Result<int>.Success(role.StaffRoleId);
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to create StaffRole: {RoleName}", dto.RoleName);
+            return Result<int>.Fail("حدث خطأ في قاعدة البيانات أثناء إضافة الدور الوظيفي. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<Result> UpdateRoleAsync(StaffRoleDto dto, UserSession session)
@@ -134,17 +166,25 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        var role = await context.StaffRoles.FindAsync(dto.StaffRoleId);
-        if (role == null)
-            return Result.Fail("الدور الوظيفي غير موجود");
+            var role = await context.StaffRoles.FindAsync(dto.StaffRoleId);
+            if (role == null)
+                return Result.Fail("الدور الوظيفي غير موجود");
 
-        role.RoleName = dto.RoleName;
-        role.UpdatedAt = DateTime.UtcNow;
+            role.RoleName = dto.RoleName;
+            role.UpdatedAt = DateTime.UtcNow;
 
-        await context.SaveChangesAsync();
-        return Result.Success();
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to update StaffRole: {RoleId}, {RoleName}", dto.StaffRoleId, dto.RoleName);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تعديل الدور الوظيفي. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<Result> SoftDeleteRoleAsync(int roleId, UserSession session)
@@ -152,16 +192,24 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        var role = await context.StaffRoles.FindAsync(roleId);
-        if (role == null)
-            return Result.Fail("الدور الوظيفي غير موجود");
+            var role = await context.StaffRoles.FindAsync(roleId);
+            if (role == null)
+                return Result.Fail("الدور الوظيفي غير موجود");
 
-        role.IsActive = false;
-        role.UpdatedAt = DateTime.UtcNow;
+            role.IsActive = false;
+            role.UpdatedAt = DateTime.UtcNow;
 
-        await context.SaveChangesAsync();
-        return Result.Success();
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to soft delete StaffRole: {RoleId}", roleId);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء حذف الدور الوظيفي. يرجى المحاولة لاحقاً.");
+        }
     }
 }

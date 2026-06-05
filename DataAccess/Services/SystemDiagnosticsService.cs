@@ -92,7 +92,7 @@ namespace DataAccess.Services
             var localLogs = ParseLocalLogFiles(level, searchTerm, count);
             if (localLogs.Count == 0)
             {
-                return Result<List<DiagnosticLogDto>>.Success(GetSimulatedLogs(level, searchTerm, count));
+                return Result<List<DiagnosticLogDto>>.Success(new List<DiagnosticLogDto>());
             }
             return Result<List<DiagnosticLogDto>>.Success(localLogs);
         }
@@ -130,18 +130,7 @@ namespace DataAccess.Services
             var localLogs = ParseLocalLogFiles(count: 500);
             if (localLogs.Count == 0)
             {
-                var simLogs = GetSimulatedLogs();
-                var simSqlLogs = simLogs.Where(x => x.Sql != null).ToList();
-                var simSummary = new DiagnosticsSummaryDto
-                {
-                    TotalLogs = simLogs.Count,
-                    TotalErrors = simLogs.Count(x => x.Level == "Error"),
-                    TotalWarnings = simLogs.Count(x => x.Level == "Warning"),
-                    TotalQueries = simSqlLogs.Count,
-                    SlowQueriesCount = simSqlLogs.Count(x => x.IsSlowQuery),
-                    AverageQueryTimeMs = simSqlLogs.Any() ? simSqlLogs.Average(x => x.DurationMs ?? 0) : 0
-                };
-                return Result<DiagnosticsSummaryDto>.Success(simSummary);
+                return Result<DiagnosticsSummaryDto>.Success(new DiagnosticsSummaryDto());
             }
 
             var localSqlLogs = localLogs.Where(x => x.Sql != null || x.Message.Contains("took ")).ToList();
@@ -183,12 +172,7 @@ namespace DataAccess.Services
             var localLogs = ParseLocalLogFiles(count: 500);
             if (localLogs.Count == 0)
             {
-                var simLogs = GetSimulatedLogs();
-                var simSqlLogs = simLogs.Where(x => x.Sql != null)
-                                       .OrderByDescending(x => x.Timestamp)
-                                       .Take(count)
-                                       .ToList();
-                return Result<List<DiagnosticLogDto>>.Success(simSqlLogs);
+                return Result<List<DiagnosticLogDto>>.Success(new List<DiagnosticLogDto>());
             }
 
             var localSqlLogs = localLogs.Where(x => x.Sql != null || x.Message.Contains("took "))
@@ -219,7 +203,17 @@ namespace DataAccess.Services
                     if (readCount >= 5) break; // Read at most 5 files
                     readCount++;
 
-                    var lines = System.IO.File.ReadAllLines(file);
+                    var lines = new List<string>();
+                    using (var fs = new System.IO.FileStream(file, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite))
+                    using (var reader = new System.IO.StreamReader(fs))
+                    {
+                        string? l;
+                        while ((l = reader.ReadLine()) != null)
+                        {
+                            lines.Add(l);
+                        }
+                    }
+
                     DiagnosticLogDto? currentDto = null;
                     var exceptionBuilder = new System.Text.StringBuilder();
 
@@ -485,6 +479,43 @@ namespace DataAccess.Services
             }
 
             return filtered.OrderByDescending(x => x.Timestamp).Take(count).ToList();
+        }
+
+        public async Task<Result> ClearLogsAsync()
+        {
+            try
+            {
+                var logsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+                if (Directory.Exists(logsDir))
+                {
+                    var files = Directory.GetFiles(logsDir, "radio*.log");
+                    foreach (var file in files)
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(file);
+                        }
+                        catch
+                        {
+                            // If log file is locked by Serilog, truncate it instead of deleting
+                            try
+                            {
+                                using var fs = new System.IO.FileStream(file, System.IO.FileMode.Truncate, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
+                                fs.SetLength(0);
+                            }
+                            catch
+                            {
+                                // Ignore
+                            }
+                        }
+                    }
+                }
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail($"فشل مسح السجلات: {ex.Message}");
+            }
         }
     }
 }

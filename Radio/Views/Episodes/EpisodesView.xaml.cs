@@ -1,4 +1,4 @@
-// ═══════════════════════════════════════════════════════════════════════════
+﻿// ═══════════════════════════════════════════════════════════════════════════
 // EpisodesView.xaml.cs — المرحلة الثانية: أنماط العرض المتقدمة
 // ═══════════════════════════════════════════════════════════════════════════
 // التحسينات:
@@ -145,6 +145,7 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ أثناء تحميل الحلقات: " + ex.Message);
             }
             finally

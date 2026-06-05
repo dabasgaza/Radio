@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.Services;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.DependencyInjection;
@@ -149,6 +149,7 @@ namespace Radio.Views.Database
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 DataAccess.Services.Messaging.MessageService.Current.ShowError($"خطأ أثناء تحميل لوحة الإدارة الفرعية: {ex.Message}");
             }
         }

@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -48,8 +48,9 @@ namespace Radio.Views.Programs
             {
                 MessageService.Current.ShowWarning(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل البرامج.");
             }
         }
@@ -171,8 +172,9 @@ namespace Radio.Views.Programs
                     MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشلت عملية الحذف.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حذف البرنامج.");
             }
         }

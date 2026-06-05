@@ -59,8 +59,9 @@ namespace Radio.Views.Users
             {
                 MessageService.Current.ShowWarning(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل الأدوار.");
             }
         }
@@ -118,8 +119,9 @@ namespace Radio.Views.Users
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حفظ بيانات المستخدم.");
             }
             finally

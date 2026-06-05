@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.ApplicationInsights;
@@ -193,6 +193,7 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         }
         catch (Exception ex)
         {
+            Serilog.Log.Error(ex, "An unexpected error occurred during processing");
             telemetryClient.TrackException(ex);
             operation.Telemetry.Success = false;
             throw;
@@ -240,6 +241,7 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         }
         catch (Exception ex)
         {
+            Serilog.Log.Error(ex, "An unexpected error occurred during processing");
             return Result<int>.Fail($"خطأ في حفظ سجل النشر: {ex.Message}");
         }
     }
@@ -286,6 +288,7 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
         }
         catch (Exception ex)
         {
+            Serilog.Log.Error(ex, "An unexpected error occurred during processing");
             return Result<int>.Fail($"خطأ في نشر الحلقة: {ex.Message}");
         }
     }

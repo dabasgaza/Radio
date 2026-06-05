@@ -1,4 +1,4 @@
-using DataAccess.Services;
+﻿using DataAccess.Services;
 using System.Windows.Controls;
 
 namespace Radio.Views.Home
@@ -37,8 +37,9 @@ namespace Radio.Views.Home
                 TxtTodayCount.Text = todayEpisodes.Count.ToString();
                 TxtGuestCount.Text = todayEpisodes.Sum(ep => string.IsNullOrEmpty(ep.GuestsDisplay) || ep.GuestsDisplay == "لا يوجد ضيف" ? 0 : ep.GuestsDisplay.Split('،').Length).ToString();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 // Silently fail for dashboard stats in this context
             }
         }

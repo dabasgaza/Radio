@@ -32,5 +32,6 @@ namespace DataAccess.Services
         Task<Result<List<DiagnosticLogDto>>> GetLogsAsync(string? level = null, string? searchTerm = null, int count = 200);
         Task<Result<DiagnosticsSummaryDto>> GetSummaryAsync();
         Task<Result<List<DiagnosticLogDto>>> GetSqlPerformanceLogsAsync(int count = 100);
+        Task<Result> ClearLogsAsync();
     }
 }

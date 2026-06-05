@@ -43,7 +43,13 @@ public class CorrespondentConfiguration : IEntityTypeConfiguration<Correspondent
         // ملاحظة: لا نحتاج لكتابة HasQueryFilter هنا لأننا أضفناه ديناميكياً 
         // في DbContext لكل الكيانات التي ترث من BaseEntity!
 
-        // 4. Seed Data
+        // 4. الفهارس (Indexes)
+        // فهرس مصفى لتسريع البحث بالاسم للمراسلين النشطين
+        builder.HasIndex(e => e.FullName)
+               .HasDatabaseName("IX_Correspondents_Active_FullName")
+               .HasFilter("[IsActive] = 1");
+
+        // 5. Seed Data
         builder.HasData(
             new Correspondent { CorrespondentId = 1, FullName = "محمد الحربي", PhoneNumber = "0550000001", AssignedLocations = "الرياض", CreatedByUserId = 1, CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc) },
             new Correspondent { CorrespondentId = 2, FullName = "فهد المطيري", PhoneNumber = "0550000002", AssignedLocations = "جدة", CreatedByUserId = 1, CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc) },

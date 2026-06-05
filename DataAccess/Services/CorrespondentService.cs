@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -40,17 +40,25 @@ namespace DataAccess.Services
             var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-            using var context = await contextFactory.CreateDbContextAsync();
-
-            context.Correspondents.Add(new Correspondent
+            try
             {
-                FullName = dto.FullName,
-                PhoneNumber = dto.PhoneNumber,
-                AssignedLocations = dto.AssignedLocations
-            });
+                using var context = await contextFactory.CreateDbContextAsync();
 
-            await context.SaveChangesAsync();
-            return Result.Success();
+                context.Correspondents.Add(new Correspondent
+                {
+                    FullName = dto.FullName,
+                    PhoneNumber = dto.PhoneNumber,
+                    AssignedLocations = dto.AssignedLocations
+                });
+
+                await context.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Failed to create Correspondent: {CorrespondentName}", dto.FullName);
+                return Result.Fail("حدث خطأ في قاعدة البيانات أثناء إضافة المراسل. يرجى المحاولة لاحقاً.");
+            }
         }
 
         public async Task<Result> UpdateAsync(CorrespondentDto dto, UserSession session)
@@ -58,17 +66,25 @@ namespace DataAccess.Services
             var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-            using var context = await contextFactory.CreateDbContextAsync();
-            var cor = await context.Correspondents.FindAsync(dto.CorrespondentId);
+            try
+            {
+                using var context = await contextFactory.CreateDbContextAsync();
+                var cor = await context.Correspondents.FindAsync(dto.CorrespondentId);
 
-            if (cor == null) return Result.Fail("المراسل غير موجود.");
+                if (cor == null) return Result.Fail("المراسل غير موجود.");
 
-            cor.FullName = dto.FullName;
-            cor.PhoneNumber = dto.PhoneNumber;
-            cor.AssignedLocations = dto.AssignedLocations;
+                cor.FullName = dto.FullName;
+                cor.PhoneNumber = dto.PhoneNumber;
+                cor.AssignedLocations = dto.AssignedLocations;
 
-            await context.SaveChangesAsync();
-            return Result.Success();
+                await context.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Failed to update Correspondent: {CorrespondentId}, {CorrespondentName}", dto.CorrespondentId, dto.FullName);
+                return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تعديل بيانات المراسل. يرجى المحاولة لاحقاً.");
+            }
         }
 
         public async Task<Result> SoftDeleteAsync(int id, UserSession session)
@@ -76,15 +92,23 @@ namespace DataAccess.Services
             var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-            using var context = await contextFactory.CreateDbContextAsync();
-            var cor = await context.Correspondents.FindAsync(id);
+            try
+            {
+                using var context = await contextFactory.CreateDbContextAsync();
+                var cor = await context.Correspondents.FindAsync(id);
 
-            if (cor == null) return Result.Fail("المراسل غير موجود.");
+                if (cor == null) return Result.Fail("المراسل غير موجود.");
 
-            cor.IsActive = false;
+                cor.IsActive = false;
 
-            await context.SaveChangesAsync();
-            return Result.Success();
+                await context.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Failed to soft delete Correspondent: {CorrespondentId}", id);
+                return Result.Fail("حدث خطأ في قاعدة البيانات أثناء حذف المراسل. يرجى المحاولة لاحقاً.");
+            }
         }
 
         public async Task<List<CorrespondentCoverageDto>> GetCoverageAsync(int correspondentId)

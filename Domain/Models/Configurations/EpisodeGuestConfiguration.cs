@@ -15,6 +15,10 @@ public class EpisodeGuestConfiguration : IEntityTypeConfiguration<EpisodeGuest>
         builder.HasIndex(e => new { e.EpisodeId, e.GuestId }, "UQ_EpisodeGuests")
               .IsUnique();
 
+        // فهرس لتسريع البحث والتحقق والربط للضيوف
+        builder.HasIndex(e => e.GuestId)
+              .HasDatabaseName("IX_EpisodeGuests_GuestId");
+
         // 3. إعدادات الخصائص (Properties)
         builder.Property(e => e.Topic)
                .HasMaxLength(500);

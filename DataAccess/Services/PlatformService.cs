@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -23,18 +23,26 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
-
-        var platform = new SocialMediaPlatform
+        try
         {
-            Name = dto.Name,
-            Icon = dto.Icon
-        };
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        context.SocialMediaPlatforms.Add(platform);
-        await context.SaveChangesAsync();
+            var platform = new SocialMediaPlatform
+            {
+                Name = dto.Name,
+                Icon = dto.Icon
+            };
 
-        return Result<int>.Success(platform.SocialMediaPlatformId);
+            context.SocialMediaPlatforms.Add(platform);
+            await context.SaveChangesAsync();
+
+            return Result<int>.Success(platform.SocialMediaPlatformId);
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to create Platform: {PlatformName}", dto.Name);
+            return Result<int>.Fail("حدث خطأ في قاعدة البيانات أثناء إضافة المنصة. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<Result> UpdateAsync(SocialMediaPlatformDto dto, UserSession session)
@@ -42,17 +50,25 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        var platform = await context.SocialMediaPlatforms.FindAsync(dto.SocialMediaPlatformId);
-        if (platform == null)
-            return Result.Fail("المنصة غير موجودة.");
+            var platform = await context.SocialMediaPlatforms.FindAsync(dto.SocialMediaPlatformId);
+            if (platform == null)
+                return Result.Fail("المنصة غير موجودة.");
 
-        platform.Name = dto.Name;
-        platform.Icon = dto.Icon;
+            platform.Name = dto.Name;
+            platform.Icon = dto.Icon;
 
-        await context.SaveChangesAsync();
-        return Result.Success();
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to update Platform: {PlatformId}, {PlatformName}", dto.SocialMediaPlatformId, dto.Name);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تعديل المنصة. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<Result> DeleteAsync(int platformId, UserSession session)
@@ -60,14 +76,22 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        var platform = await context.SocialMediaPlatforms.FindAsync(platformId);
-        if (platform == null)
-            return Result.Fail("المنصة غير موجودة.");
+            var platform = await context.SocialMediaPlatforms.FindAsync(platformId);
+            if (platform == null)
+                return Result.Fail("المنصة غير موجودة.");
 
-        platform.IsActive = false;
-        await context.SaveChangesAsync();
-        return Result.Success();
+            platform.IsActive = false;
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to soft delete Platform: {PlatformId}", platformId);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء حذف المنصة. يرجى المحاولة لاحقاً.");
+        }
     }
 }

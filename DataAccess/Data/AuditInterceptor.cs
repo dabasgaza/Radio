@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -153,6 +153,7 @@ namespace DataAccess.Data
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "فشل تسجيل التدقيق (Audit)");
                 System.Diagnostics.Debug.WriteLine("═══════════════════════════════════════");
                 System.Diagnostics.Debug.WriteLine($"⚠️ فشل تسجيل التدقيق (Audit)");
                 System.Diagnostics.Debug.WriteLine($"السبب: {ex.GetBaseException().Message}");

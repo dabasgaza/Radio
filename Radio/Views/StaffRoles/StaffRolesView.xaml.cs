@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -37,8 +37,9 @@ namespace Radio.Views.StaffRoles
                 DgRoles.ItemsSource = roles;
                 TxtTotalRoles.Text = roles.Count.ToString();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ أثناء تحميل الأدوار الوظيفية.");
             }
         }

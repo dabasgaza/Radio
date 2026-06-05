@@ -39,18 +39,25 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
-
-        context.Programs.Add(new Program
+        try
         {
-            ProgramName = dto.ProgramName,
-            Category = dto.Category,
-            ProgramDescription = dto.ProgramDescription
-            // ❌ تم إزالة CreatedByUserId (الـ Interceptor سيعبئه)
-        });
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        await context.SaveChangesAsync();
-        return Result.Success();
+            context.Programs.Add(new Program
+            {
+                ProgramName = dto.ProgramName,
+                Category = dto.Category,
+                ProgramDescription = dto.ProgramDescription
+            });
+
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to create Program: {ProgramName}", dto.ProgramName);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء إضافة البرنامج. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<Result> UpdateProgramAsync(ProgramDto dto, UserSession session)
@@ -58,21 +65,26 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        var prog = await context.Programs.FindAsync(dto.ProgramId);
+            var prog = await context.Programs.FindAsync(dto.ProgramId);
 
-        // ✨ إطلاق خطأ بدلاً من الصمت
-        if (prog == null) return Result.Fail("البرنامج غير موجود.");
+            if (prog == null) return Result.Fail("البرنامج غير موجود.");
 
-        prog.ProgramName = dto.ProgramName;
-        prog.Category = dto.Category;
-        prog.ProgramDescription = dto.ProgramDescription;
+            prog.ProgramName = dto.ProgramName;
+            prog.Category = dto.Category;
+            prog.ProgramDescription = dto.ProgramDescription;
 
-        // ❌ تم إزالة UpdatedAt و UpdatedByUserId (الـ Interceptor سيعبئهما)
-
-        await context.SaveChangesAsync();
-        return Result.Success();
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to update Program: {ProgramId}, {ProgramName}", dto.ProgramId, dto.ProgramName);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تعديل البرنامج. يرجى المحاولة لاحقاً.");
+        }
     }
 
 
@@ -81,29 +93,33 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     /// </summary>
     /// <param name="programId">معرّف البرنامج المراد حذفه.</param>
     /// <param name="session">جلسة المستخدم الحالي للتدقيق.</param>
-    /// <exception cref="UnauthorizedAccessException">إذا لم يكن لدى المستخدم صلاحية الحذف.</exception>
-    /// <exception cref="InvalidOperationException">إذا كان البرنامج مرتبطاً بحلقات لا يمكن حذفه.</exception>
     public async Task<Result> SoftDeleteAsync(int programId, UserSession session)
     {
         var permCheck = session.EnsurePermission(AppPermissions.ProgramManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        await using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
 
-        var program = await context.Programs
-            .FindAsync(programId);
-            
-        if (program == null) return Result.Fail("البرنامج المحدد غير موجود أو تم حذفه مسبقاً.");
+            var program = await context.Programs.FindAsync(programId);
+                
+            if (program == null) return Result.Fail("البرنامج المحدد غير موجود أو تم حذفه مسبقاً.");
 
-        // ── فحص وجود حلقات نشطة باستخدام AnyAsync بدلاً من Lazy Loading ──
-        var hasActiveEpisodes = await context.Episodes
-            .AnyAsync(e => e.ProgramId == programId);
-        if (hasActiveEpisodes)
-            return Result.Fail("لا يمكن حذف برنامج مرتبط بحلقات نشطة. يرجى حذف الحلقات أولاً.");
+            // ── فحص وجود حلقات نشطة باستخدام AnyAsync بدلاً من Lazy Loading ──
+            var hasActiveEpisodes = await context.Episodes.AnyAsync(e => e.ProgramId == programId);
+            if (hasActiveEpisodes)
+                return Result.Fail("لا يمكن حذف برنامج مرتبط بحلقات نشطة. يرجى حذف الحلقات أولاً.");
 
-        program.IsActive = false;
+            program.IsActive = false;
 
-        await context.SaveChangesAsync();
-        return Result.Success();
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to soft delete Program: {ProgramId}", programId);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء حذف البرنامج. يرجى المحاولة لاحقاً.");
+        }
     }
 }

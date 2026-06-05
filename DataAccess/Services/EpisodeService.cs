@@ -153,6 +153,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         }
         catch (Exception ex)
         {
+            Serilog.Log.Error(ex, "An unexpected error occurred during processing");
             telemetryClient.TrackException(ex);
             operation.Telemetry.Success = false;
             throw;
@@ -212,80 +213,88 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
-
-        // ── التحقق من صحة البرنامج ──
-        var programExists = await context.Programs.AnyAsync(p => p.ProgramId == dto.ProgramId && p.IsActive);
-        if (!programExists) return Result<int>.Fail("البرنامج المحدد غير موجود أو غير نشط.");
-
-        // ── التحقق من صحة الضيوف ──
-        if (dto.Guests?.Count > 0)
+        try
         {
-            var guestIds = dto.Guests.Select(g => g.GuestId).ToList();
-            var existingCount = await context.Guests.CountAsync(g => guestIds.Contains(g.GuestId) && g.IsActive);
-            if (existingCount != guestIds.Distinct().Count())
+            using var context = await contextFactory.CreateDbContextAsync();
+
+            // ── التحقق من صحة البرنامج ──
+            var programExists = await context.Programs.AnyAsync(p => p.ProgramId == dto.ProgramId && p.IsActive);
+            if (!programExists) return Result<int>.Fail("البرنامج المحدد غير موجود أو غير نشط.");
+
+            // ── التحقق من صحة الضيوف ──
+            if (dto.Guests?.Count > 0)
             {
-                return Result<int>.Fail("بعض الضيوف المحددين غير موجودين أو تم حذفهم.");
-            }
-        }
-
-        // ── التحقق من صحة المراسلين ──
-        if (dto.Correspondents?.Count > 0)
-        {
-            var corrIds = dto.Correspondents.Select(c => c.CorrespondentId).ToList();
-            var existingCount = await context.Correspondents.CountAsync(c => corrIds.Contains(c.CorrespondentId) && c.IsActive);
-            if (existingCount != corrIds.Distinct().Count())
-            {
-                return Result<int>.Fail("بعض المراسلين المحددين غير موجودين أو تم حذفهم.");
-            }
-        }
-
-        // ── التحقق من صحة الموظفين ──
-        if (dto.Employees?.Count > 0)
-        {
-            var empIds = dto.Employees.Select(ee => ee.EmployeeId).ToList();
-            var existingCount = await context.Employees.CountAsync(e => empIds.Contains(e.EmployeeId) && e.IsActive);
-            if (existingCount != empIds.Distinct().Count())
-            {
-                return Result<int>.Fail("بعض الموظفين المحددين غير موجودين في النظام. قد يكون تم حذفهم أو أنك تستخدم مسودة قديمة.");
-            }
-        }
-
-        var episode = new Episode
-        {
-            ProgramId = dto.ProgramId,
-            EpisodeName = dto.EpisodeName,
-            ScheduledExecutionTime = dto.ScheduledDateTime,   // دمج التاريخ + الوقت
-            StatusId = EpisodeStatus.Planned,
-            SpecialNotes = dto.SpecialNotes
-        };
-
-        if (dto.Guests?.Count > 0)
-            foreach (var g in dto.Guests)
-                episode.EpisodeGuests.Add(new EpisodeGuest
+                var guestIds = dto.Guests.Select(g => g.GuestId).ToList();
+                var existingCount = await context.Guests.CountAsync(g => guestIds.Contains(g.GuestId) && g.IsActive);
+                if (existingCount != guestIds.Distinct().Count())
                 {
-                    GuestId = g.GuestId,
-                    Topic = g.Topic,
-                    HostingTime = g.HostingTime,
-                    ClipNotes = g.ClipNotes
-                });
+                    return Result<int>.Fail("بعض الضيوف المحددين غير موجودين أو تم حذفهم.");
+                }
+            }
 
-        if (dto.Correspondents?.Count > 0)
-            foreach (var c in dto.Correspondents)
-                episode.EpisodeCorrespondents.Add(new EpisodeCorrespondent
+            // ── التحقق من صحة المراسلين ──
+            if (dto.Correspondents?.Count > 0)
+            {
+                var corrIds = dto.Correspondents.Select(c => c.CorrespondentId).ToList();
+                var existingCount = await context.Correspondents.CountAsync(c => corrIds.Contains(c.CorrespondentId) && c.IsActive);
+                if (existingCount != corrIds.Distinct().Count())
                 {
-                    CorrespondentId = c.CorrespondentId,
-                    Topic = c.Topic,
-                    HostingTime = c.HostingTime
-                });
+                    return Result<int>.Fail("بعض المراسلين المحددين غير موجودين أو تم حذفهم.");
+                }
+            }
 
-        if (dto.Employees?.Count > 0)
-            foreach (var ee in dto.Employees)
-                episode.EpisodeEmployees.Add(new EpisodeEmployee { EmployeeId = ee.EmployeeId });
+            // ── التحقق من صحة الموظفين ──
+            if (dto.Employees?.Count > 0)
+            {
+                var empIds = dto.Employees.Select(ee => ee.EmployeeId).ToList();
+                var existingCount = await context.Employees.CountAsync(e => empIds.Contains(e.EmployeeId) && e.IsActive);
+                if (existingCount != empIds.Distinct().Count())
+                {
+                    return Result<int>.Fail("بعض الموظفين المحددين غير موجودين في النظام. قد يكون تم حذفهم أو أنك تستخدم مسودة قديمة.");
+                }
+            }
 
-        context.Episodes.Add(episode);
-        await context.SaveChangesAsync();
-        return Result<int>.Success(episode.EpisodeId);
+            var episode = new Episode
+            {
+                ProgramId = dto.ProgramId,
+                EpisodeName = dto.EpisodeName,
+                ScheduledExecutionTime = dto.ScheduledDateTime,   // دمج التاريخ + الوقت
+                StatusId = EpisodeStatus.Planned,
+                SpecialNotes = dto.SpecialNotes
+            };
+
+            if (dto.Guests?.Count > 0)
+                foreach (var g in dto.Guests)
+                    episode.EpisodeGuests.Add(new EpisodeGuest
+                    {
+                        GuestId = g.GuestId,
+                        Topic = g.Topic,
+                        HostingTime = g.HostingTime,
+                        ClipNotes = g.ClipNotes
+                    });
+
+            if (dto.Correspondents?.Count > 0)
+                foreach (var c in dto.Correspondents)
+                    episode.EpisodeCorrespondents.Add(new EpisodeCorrespondent
+                    {
+                        CorrespondentId = c.CorrespondentId,
+                        Topic = c.Topic,
+                        HostingTime = c.HostingTime
+                    });
+
+            if (dto.Employees?.Count > 0)
+                foreach (var ee in dto.Employees)
+                    episode.EpisodeEmployees.Add(new EpisodeEmployee { EmployeeId = ee.EmployeeId });
+
+            context.Episodes.Add(episode);
+            await context.SaveChangesAsync();
+            return Result<int>.Success(episode.EpisodeId);
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to create Episode: {EpisodeName}, ProgramId: {ProgramId}", dto.EpisodeName, dto.ProgramId);
+            return Result<int>.Fail("حدث خطأ في قاعدة البيانات أثناء جدولة الحلقة. يرجى المحاولة لاحقاً.");
+        }
     }
 
     public async Task<Result> UpdateEpisodeAsync(EpisodeDto dto, UserSession session)
@@ -293,64 +302,78 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
-        using var context = await contextFactory.CreateDbContextAsync();
-
-        // ── التحقق من صحة البرنامج ──
-        var programExists = await context.Programs.AnyAsync(p => p.ProgramId == dto.ProgramId && p.IsActive);
-        if (!programExists) return Result.Fail("البرنامج المحدد غير موجود أو غير نشط.");
-
-        // ── التحقق من صحة الضيوف ──
-        if (dto.Guests?.Count > 0)
+        try
         {
-            var guestIds = dto.Guests.Select(g => g.GuestId).ToList();
-            var existingCount = await context.Guests.CountAsync(g => guestIds.Contains(g.GuestId) && g.IsActive);
-            if (existingCount != guestIds.Distinct().Count())
-            {
-                return Result.Fail("بعض الضيوف المحددين غير موجودين أو تم حذفهم.");
-            }
-        }
+            using var context = await contextFactory.CreateDbContextAsync();
 
-        // ── التحقق من صحة المراسلين ──
-        if (dto.Correspondents?.Count > 0)
+            // ── التحقق من صحة البرنامج ──
+            var programExists = await context.Programs.AnyAsync(p => p.ProgramId == dto.ProgramId && p.IsActive);
+            if (!programExists) return Result.Fail("البرنامج المحدد غير موجود أو غير نشط.");
+
+            // ── التحقق من صحة الضيوف ──
+            if (dto.Guests?.Count > 0)
+            {
+                var guestIds = dto.Guests.Select(g => g.GuestId).ToList();
+                var existingCount = await context.Guests.CountAsync(g => guestIds.Contains(g.GuestId) && g.IsActive);
+                if (existingCount != guestIds.Distinct().Count())
+                {
+                    return Result.Fail("بعض الضيوف المحددين غير موجودين أو تم حذفهم.");
+                }
+            }
+
+            // ── التحقق من صحة المراسلين ──
+            if (dto.Correspondents?.Count > 0)
+            {
+                var corrIds = dto.Correspondents.Select(c => c.CorrespondentId).ToList();
+                var existingCount = await context.Correspondents.CountAsync(c => corrIds.Contains(c.CorrespondentId) && c.IsActive);
+                if (existingCount != corrIds.Distinct().Count())
+                {
+                    return Result.Fail("بعض المراسلين المحددين غير موجودين أو تم حذفهم.");
+                }
+            }
+
+            // ── التحقق من صحة الموظفين ──
+            if (dto.Employees?.Count > 0)
+            {
+                var empIds = dto.Employees.Select(ee => ee.EmployeeId).ToList();
+                var existingCount = await context.Employees.CountAsync(e => empIds.Contains(e.EmployeeId) && e.IsActive);
+                if (existingCount != empIds.Distinct().Count())
+                {
+                    return Result.Fail("بعض الموظفين المحددين غير موجودين في النظام. قد يكون تم حذفهم أو أنك تستخدم مسودة قديمة.");
+                }
+            }
+
+            var episode = await context.Episodes
+                .Include(e => e.EpisodeGuests)
+                .Include(e => e.EpisodeCorrespondents)
+                .Include(e => e.EpisodeEmployees)
+                .FirstOrDefaultAsync(e => e.EpisodeId == dto.EpisodeId);
+
+            if (episode == null) return Result.Fail("الحلقة غير موجودة.");
+
+            // ── تحميل جميع سجلات الموظفين بما فيها المحذوفة ناعمياً لتجنب تعارض الفهرس الفريد ──
+            var allEpisodeEmployees = await context.EpisodeEmployees
+                .IgnoreQueryFilters()
+                .Where(ee => ee.EpisodeId == dto.EpisodeId)
+                .ToListAsync();
+
+            episode.ProgramId = dto.ProgramId;
+            episode.EpisodeName = dto.EpisodeName;
+            episode.ScheduledExecutionTime = dto.ScheduledDateTime;   // دمج التاريخ + الوقت
+            episode.SpecialNotes = dto.SpecialNotes;
+
+            SyncGuests(episode.EpisodeGuests.ToList(), dto.Guests ?? [], episode);
+            SyncCorrespondents(episode.EpisodeCorrespondents.ToList(), dto.Correspondents ?? [], episode);
+            SyncEmployees(episode.EpisodeEmployees.ToList(), allEpisodeEmployees, dto.Employees ?? [], episode);
+
+            await context.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
         {
-            var corrIds = dto.Correspondents.Select(c => c.CorrespondentId).ToList();
-            var existingCount = await context.Correspondents.CountAsync(c => corrIds.Contains(c.CorrespondentId) && c.IsActive);
-            if (existingCount != corrIds.Distinct().Count())
-            {
-                return Result.Fail("بعض المراسلين المحددين غير موجودين أو تم حذفهم.");
-            }
+            Serilog.Log.Error(ex, "Failed to update Episode: {EpisodeId}, {EpisodeName}", dto.EpisodeId, dto.EpisodeName);
+            return Result.Fail("حدث خطأ في قاعدة البيانات أثناء تعديل بيانات الحلقة. يرجى المحاولة لاحقاً.");
         }
-
-        // ── التحقق من صحة الموظفين ──
-        if (dto.Employees?.Count > 0)
-        {
-            var empIds = dto.Employees.Select(ee => ee.EmployeeId).ToList();
-            var existingCount = await context.Employees.CountAsync(e => empIds.Contains(e.EmployeeId) && e.IsActive);
-            if (existingCount != empIds.Distinct().Count())
-            {
-                return Result.Fail("بعض الموظفين المحددين غير موجودين في النظام. قد يكون تم حذفهم أو أنك تستخدم مسودة قديمة.");
-            }
-        }
-
-        var episode = await context.Episodes
-            .Include(e => e.EpisodeGuests)
-            .Include(e => e.EpisodeCorrespondents)
-            .Include(e => e.EpisodeEmployees)
-            .FirstOrDefaultAsync(e => e.EpisodeId == dto.EpisodeId);
-
-        if (episode == null) return Result.Fail("الحلقة غير موجودة.");
-
-        episode.ProgramId = dto.ProgramId;
-        episode.EpisodeName = dto.EpisodeName;
-        episode.ScheduledExecutionTime = dto.ScheduledDateTime;   // دمج التاريخ + الوقت
-        episode.SpecialNotes = dto.SpecialNotes;
-
-        SyncGuests(episode.EpisodeGuests.ToList(), dto.Guests ?? [], episode);
-        SyncCorrespondents(episode.EpisodeCorrespondents.ToList(), dto.Correspondents ?? [], episode);
-        SyncEmployees(episode.EpisodeEmployees.ToList(), dto.Employees ?? [], episode);
-
-        await context.SaveChangesAsync();
-        return Result.Success();
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -514,6 +537,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         }
         catch (Exception ex)
         {
+            Serilog.Log.Error(ex, "An unexpected error occurred during processing");
             telemetryClient.TrackException(ex);
             return Result.Fail($"خطأ أثناء الحذف: {ex.Message}");
         }
@@ -584,7 +608,7 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         }
     }
 
-    private static void SyncEmployees(List<EpisodeEmployee> existing, List<EpisodeEmployeeDto> newItems, Episode ep)
+    private static void SyncEmployees(List<EpisodeEmployee> existing, List<EpisodeEmployee> allIncludingDeleted, List<EpisodeEmployeeDto> newItems, Episode ep)
     {
         var existingById = existing.ToDictionary(e => e.EpisodeEmployeeId);
         var newIds = newItems.Where(i => i.Id != 0).Select(i => i.Id).ToHashSet();
@@ -596,9 +620,22 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         foreach (var dto in newItems)
         {
             if (dto.Id != 0 && existingById.TryGetValue(dto.Id, out var ex))
+            {
                 ex.EmployeeId = dto.EmployeeId;
+            }
             else
-                ep.EpisodeEmployees.Add(new EpisodeEmployee { EmployeeId = dto.EmployeeId });
+            {
+                // التحقق من وجود سجل محذوف ناعمياً لنفس الموظف وإعادة تفعيله بدلاً من إدراج سجل مكرر
+                var softDeleted = allIncludingDeleted.FirstOrDefault(e => e.EmployeeId == dto.EmployeeId && !e.IsActive);
+                if (softDeleted != null)
+                {
+                    softDeleted.IsActive = true;
+                }
+                else
+                {
+                    ep.EpisodeEmployees.Add(new EpisodeEmployee { EmployeeId = dto.EmployeeId });
+                }
+            }
         }
     }
 

@@ -1,11 +1,12 @@
 using DataAccess.Common;
 using DataAccess.Services;
+using DataAccess.Services.Messaging;
+using Radio.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace Radio.Views.Database
 {
@@ -107,35 +108,8 @@ namespace Radio.Views.Database
                 TxtLogPlaceholder.Visibility = Visibility.Collapsed;
                 PanelLogDetail.Visibility = Visibility.Visible;
 
-                TxtDetailTimestamp.Text = log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                TxtDetailSource.Text = log.SourceContext ?? "-";
+                TxtDetailContext.Text = log.SourceContext ?? "غير محدد";
                 TxtDetailMessage.Text = log.Message;
-
-                // Level badge
-                TxtDetailLevel.Text = log.Level switch
-                {
-                    "INF" or "Information" => "معلومات",
-                    "WRN" or "Warning" => "تحذير",
-                    "ERR" or "Error" => "خطأ",
-                    "FTL" or "Fatal" => "حرج",
-                    _ => log.Level
-                };
-                LevelBadgeDetail.Background = log.Level switch
-                {
-                    "INF" or "Information" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xE3, 0xF2, 0xFD)),
-                    "WRN" or "Warning" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xFF, 0xF8, 0xE1)),
-                    "ERR" or "Error" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xFF, 0xEB, 0xEE)),
-                    "FTL" or "Fatal" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF3, 0xE5, 0xF5)),
-                    _ => LevelBadgeDetail.Background
-                };
-                TxtDetailLevel.Foreground = log.Level switch
-                {
-                    "INF" or "Information" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x15, 0x65, 0xC0)),
-                    "WRN" or "Warning" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xFF, 0x8F, 0x00)),
-                    "ERR" or "Error" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xC6, 0x28, 0x28)),
-                    "FTL" or "Fatal" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x6A, 0x1B, 0x9A)),
-                    _ => TxtDetailLevel.Foreground
-                };
 
                 if (!string.IsNullOrEmpty(log.Sql))
                 {
@@ -168,6 +142,30 @@ namespace Radio.Views.Database
         private async void BtnRefreshAll_Click(object sender, RoutedEventArgs e)
         {
             await RefreshDataAsync();
+        }
+
+        private async void BtnClearLogs_Click(object sender, RoutedEventArgs e)
+        {
+            var permCheck = _session.EnsurePermission(AppPermissions.DatabaseManage);
+            if (!permCheck.IsSuccess)
+            {
+                NotificationManager.Show(NotificationType.Error, "خطأ في الصلاحيات", "ليس لديك الصلاحية لمسح سجل الأخطاء.");
+                return;
+            }
+
+            var confirm = await MessageService.Current.ShowConfirmationAsync("هل أنت متأكد من رغبتك في مسح كافة سجلات الأخطاء والأحداث؟ لا يمكن التراجع عن هذا الإجراء.", "تأكيد المسح");
+            if (!confirm) return;
+
+            var result = await _diagnosticsService.ClearLogsAsync();
+            if (result.IsSuccess)
+            {
+                NotificationManager.Show(NotificationType.Success, "تم بنجاح", "تم مسح كافة سجلات الأخطاء بنجاح.");
+                await RefreshDataAsync();
+            }
+            else
+            {
+                NotificationManager.Show(NotificationType.Error, "فشل المسح", result.ErrorMessage ?? "حدث خطأ غير متوقع.");
+            }
         }
     }
 }

@@ -51,8 +51,9 @@ namespace Radio.Views.Correspondents
             {
                 MessageService.Current.ShowWarning(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل التغطيات.");
             }
         }
@@ -128,8 +129,9 @@ namespace Radio.Views.Correspondents
                     MessageService.Current.ShowWarning(result.ErrorMessage ?? "فشل الحذف.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حذف التغطية.");
             }
         }

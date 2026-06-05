@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using Domain.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -106,6 +106,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 await LogBackupAsync(customBackupFolder ?? "N/A", "Local", 0, "Failed", ex.Message);
                 return Result<string>.Fail($"حدث خطأ أثناء عمل النسخة الاحتياطية: {ex.Message}");
             }
@@ -172,6 +173,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 // Re-enable multi-user mode just in case of failure
                 try
                 {
@@ -203,6 +205,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 return Result.Fail($"حدث خطأ أثناء فحص/تهيئة قاعدة البيانات: {ex.Message}");
             }
         }
@@ -242,6 +245,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 return Result.Fail($"حدث خطأ أثناء إعادة تعيين قاعدة البيانات: {ex.Message}");
             }
         }
@@ -263,6 +267,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 return Result<List<DatabaseBackupLog>>.Fail($"حدث خطأ أثناء جلب سجل النسخ الاحتياطي: {ex.Message}");
             }
         }
@@ -318,6 +323,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 return Result.Fail($"حدث خطأ أثناء المزامنة السحابية: {ex.Message}");
             }
         }
@@ -367,6 +373,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 return Result.Fail($"حدث خطأ أثناء تطبيق سياسة الاحتفاظ: {ex.Message}");
             }
         }

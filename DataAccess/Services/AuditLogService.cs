@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -74,6 +74,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 return Result<List<AuditLogDto>>.Fail($"حدث خطأ أثناء جلب سجل العمليات: {ex.Message}");
             }
         }
@@ -94,6 +95,7 @@ namespace DataAccess.Services
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 return Result<List<User>>.Fail($"حدث خطأ أثناء جلب المستخدمين: {ex.Message}");
             }
         }

@@ -112,8 +112,9 @@ namespace Radio.Views.Guests
                         MessageService.Current.ShowWarning(
                             "لا يزال هناك تعارض في البيانات. يرجى إغلاق النافذة وإعادة المحاولة.");
                     }
-                    catch (Exception)
+                    catch (Exception innerEx)
                     {
+                        Serilog.Log.Error(innerEx, "An unexpected error occurred during processing");
                         MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء إعادة المحاولة.");
                     }
                 }
@@ -123,8 +124,9 @@ namespace Radio.Views.Guests
                         "تم إلغاء العملية. يرجى إغلاق النافذة وإعادة فتحها للحصول على أحدث نسخة.");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء حفظ بيانات الضيف.");
             }
             finally

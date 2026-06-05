@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -80,6 +80,7 @@ namespace Radio.Views.Publishing
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError($"خطأ في تحضير النموذج: {ex.Message}");
             }
         }
@@ -170,6 +171,7 @@ namespace Radio.Views.Publishing
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError($"خطأ غير متوقع: {ex.Message}");
             }
         }

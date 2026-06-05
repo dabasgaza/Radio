@@ -64,6 +64,7 @@ public partial class BroadcastWorkflowDBContext : DbContext
         modelBuilder.Entity<WebsitePublishingLog>().HasIndex(l => l.PublishedAt);
         modelBuilder.Entity<ExecutionLog>().HasIndex(l => l.EpisodeId);
         modelBuilder.Entity<ExecutionLog>().HasIndex(l => l.CreatedAt);
+        modelBuilder.Entity<Employee>().HasIndex(e => e.FullName).HasDatabaseName("IX_Employees_Active_FullName").HasFilter("[IsActive] = 1");
 
 
         // ✨ إصلاح خلل الحذف المنطقي: تطبيق الفلتر على أي كيان يرث من BaseEntity

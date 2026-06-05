@@ -87,8 +87,9 @@ namespace Radio.Views.Reports
             {
                 MessageService.Current.ShowWarning(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل لوحة التقارير.");
             }
         }
@@ -122,8 +123,9 @@ namespace Radio.Views.Reports
                 // نفعّل زر التصدير فقط إذا في نتائج
                 BtnExport.IsEnabled = _lastSearchResults.Count > 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ أثناء تحميل تقرير الفترة الزمنية.");
             }
             finally
@@ -275,6 +277,7 @@ namespace Radio.Views.Reports
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError($"فشل تصدير الملف: {ex.Message}");
             }
             finally

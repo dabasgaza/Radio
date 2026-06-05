@@ -1,4 +1,4 @@
-using DataAccess.Common;
+﻿using DataAccess.Common;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
@@ -75,6 +75,7 @@ namespace Radio.Views.Database
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 NotificationManager.Show(NotificationType.Warning, "تحذير", $"لم يتمكن التطبيق من تحميل الإعدادات: {ex.Message}");
             }
         }
@@ -126,6 +127,7 @@ namespace Radio.Views.Database
             }
             catch (Exception ex)
             {
+                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 NotificationManager.Show(NotificationType.Error, "خطأ", $"فشل حفظ الإعدادات: {ex.Message}");
             }
         }
@@ -279,6 +281,7 @@ namespace Radio.Views.Database
                     }
                     catch (Exception ex)
                     {
+                        Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                         NotificationManager.Show(NotificationType.Error, "خطأ", ex.Message);
                     }
                 }
@@ -306,6 +309,7 @@ namespace Radio.Views.Database
                 }
                 catch (Exception ex)
                 {
+                    Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                     NotificationManager.Show(NotificationType.Error, "خطأ", ex.Message);
                 }
             }

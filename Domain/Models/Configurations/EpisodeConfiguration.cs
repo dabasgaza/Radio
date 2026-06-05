@@ -64,9 +64,10 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
         builder.HasIndex(e => e.ProgramId)
               .HasDatabaseName("IX_Episodes_ProgramId");
 
-        // ── فهرس على ScheduledExecutionTime لتسريع فلترة التاريخ ──
+        // ── فهرس مصفى على ScheduledExecutionTime لتسريع فلترة التاريخ للحلقات النشطة ──
         builder.HasIndex(e => e.ScheduledExecutionTime)
-              .HasDatabaseName("IX_Episodes_ScheduledExecutionTime");
+              .HasDatabaseName("IX_Episodes_ScheduledExecutionTime")
+              .HasFilter("[IsActive] = 1");
 
     }
 }
