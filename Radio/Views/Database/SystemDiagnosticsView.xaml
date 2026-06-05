@@ -5,1209 +5,376 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Background="{DynamicResource AppBackgroundBrush}"
-    Style="{StaticResource View.Base}"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    FlowDirection="RightToLeft"
     mc:Ignorable="d">
 
-    <Grid Margin="{StaticResource SpacingLarge}">
+    <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  Header with gradient + magic glow  -->
-        <materialDesign:Card
+        <!-- Header -->
+        <Border
             Grid.Row="0"
-            Margin="0,0,0,24"
-            Padding="32"
-            materialDesign:ElevationAssist.Elevation="Dp2"
-            Background="{DynamicResource HeaderGradientBrush}"
-            UniformCornerRadius="16">
+            Margin="0,0,0,16"
+            Padding="16"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource DividerBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!--  Shine overlay for glass effect  -->
-                <Border
-                    Grid.ColumnSpan="3"
-                    Margin="0,0,0,0"
-                    Background="#11FFFFFF"
-                    CornerRadius="{StaticResource RadiusLarge}"
-                    IsHitTestVisible="False" />
-
-                <Border
-                    Grid.Column="0"
-                    Width="48"
-                    Height="48"
-                    Background="#22FFFFFF"
-                    CornerRadius="{StaticResource RadiusMedium}">
-                    <materialDesign:PackIcon
-                        Width="24"
-                        Height="24"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Foreground="White"
-                        Kind="MonitorDashboard" />
-                </Border>
-
-                <StackPanel
-                    Grid.Column="1"
-                    Margin="14,0,0,0"
-                    VerticalAlignment="Center">
+                <StackPanel>
                     <TextBlock
-                        Foreground="White"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource PrimaryDarkBrush}"
                         Style="{StaticResource Type.Headline}"
-                        Text="مراقبة النظام وأداء العمليات" />
+                        Text="مراقبة النظام وأداء العمليات (Seq Dashboard)" />
                     <TextBlock
                         Margin="0,4,0,0"
-                        Foreground="#DDDDDD"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
                         Style="{StaticResource Type.BodyMedium}"
-                        Text="تتبع أحداث النظام، تحليل أداء استعلامات SQL، وتشخيص الأخطاء" />
+                        Text="تتبع أحداث النظام المنظمة، وتحليل أداء استعلامات SQL، وتشخيص الأخطاء والمشاكل بكفاءة عالية." />
                 </StackPanel>
 
-                <Button
-                    x:Name="BtnRefreshAll"
-                    Grid.Column="2"
+                <materialDesign:PackIcon
+                    Grid.Column="1"
                     Width="40"
                     Height="40"
-                    Padding="0"
-                    Click="BtnRefreshAll_Click"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    ToolTip="تحديث الكل">
-                    <materialDesign:PackIcon
-                        Width="20"
-                        Height="20"
-                        Foreground="White"
-                        Kind="Refresh" />
-                </Button>
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource PrimaryMainBrush}"
+                    Kind="MonitorDashboard" />
             </Grid>
-        </materialDesign:Card>
+        </Border>
 
-        <!--  Tab Control  -->
-        <TabControl Grid.Row="1" Style="{StaticResource Tab.Modern}">
-
-            <!--
-                ════════════════════════════════════════
-                Tab 1: Dashboard Overview
-                ════════════════════════════════════════
-            -->
-            <TabItem Header="لوحة المراقبة">
-                <Grid Margin="{StaticResource SpacingSmall}">
+        <!-- Tabbed Dashboard Content -->
+        <TabControl Grid.Row="1" Style="{StaticResource MaterialDesignNavigationRailTabControl}">
+            
+            <!-- Tab 1: Dashboard Overview -->
+            <TabItem Header="لوحة المراقبة العامة">
+                <Grid Margin="0,16,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="12" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!--  Stat Cards  -->
-                    <UniformGrid
-                        Grid.Row="0"
-                        Margin="0"
-                        HorizontalAlignment="Stretch"
-                        Columns="2">
-                        <materialDesign:Card
-                            Padding="24"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="16">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Border
-                                    Width="44"
-                                    Height="44"
-                                    Background="{DynamicResource InfoLightBrush}"
-                                    CornerRadius="{StaticResource RadiusMedium}">
-                                    <materialDesign:PackIcon
-                                        Width="20"
-                                        Height="20"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Foreground="{DynamicResource InfoBrush}"
-                                        Kind="ListBoxOutline" />
-                                </Border>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="12,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Foreground="{DynamicResource TextSecondaryBrush}"
-                                        Style="{StaticResource Type.Caption}"
-                                        Text="إجمالي الأحداث" />
-                                    <TextBlock
-                                        x:Name="TxtTotalLogs"
-                                        FontSize="{DynamicResource FontSize.Numeric.Large}"
-                                        FontWeight="Bold"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
-                                        Text="0" />
-                                </StackPanel>
-                            </Grid>
-                        </materialDesign:Card>
-                        <materialDesign:Card
-                            Padding="24"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="16">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Border
-                                    Width="44"
-                                    Height="44"
-                                    Background="{DynamicResource ErrorLightBrush}"
-                                    CornerRadius="{StaticResource RadiusMedium}">
-                                    <materialDesign:PackIcon
-                                        Width="20"
-                                        Height="20"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Foreground="{DynamicResource ErrorBrush}"
-                                        Kind="AlertCircleOutline" />
-                                </Border>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="12,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Foreground="{DynamicResource TextSecondaryBrush}"
-                                        Style="{StaticResource Type.Caption}"
-                                        Text="الأخطاء" />
-                                    <TextBlock
-                                        x:Name="TxtTotalErrors"
-                                        FontSize="{DynamicResource FontSize.Numeric.Large}"
-                                        FontWeight="Bold"
-                                        Foreground="{DynamicResource ErrorBrush}"
-                                        Text="0" />
-                                </StackPanel>
-                            </Grid>
-                        </materialDesign:Card>
-                        <materialDesign:Card
-                            Padding="24"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="16">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Border
-                                    Width="44"
-                                    Height="44"
-                                    Background="{DynamicResource PrimaryXLightBrush}"
-                                    CornerRadius="{StaticResource RadiusMedium}">
-                                    <materialDesign:PackIcon
-                                        Width="20"
-                                        Height="20"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Foreground="{DynamicResource PrimaryMainBrush}"
-                                        Kind="DatabaseSearch" />
-                                </Border>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="12,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Foreground="{DynamicResource TextSecondaryBrush}"
-                                        Style="{StaticResource Type.Caption}"
-                                        Text="استعلامات SQL" />
-                                    <TextBlock
-                                        x:Name="TxtTotalQueries"
-                                        FontSize="{DynamicResource FontSize.Numeric.Large}"
-                                        FontWeight="Bold"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
-                                        Text="0" />
-                                </StackPanel>
-                            </Grid>
-                        </materialDesign:Card>
-                        <materialDesign:Card
-                            Padding="24"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="16">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Border
-                                    Width="44"
-                                    Height="44"
-                                    Background="{DynamicResource WarningLightBrush}"
-                                    CornerRadius="{StaticResource RadiusMedium}">
-                                    <materialDesign:PackIcon
-                                        Width="20"
-                                        Height="20"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Foreground="{DynamicResource WarningBrush}"
-                                        Kind="TimerAlertOutline" />
-                                </Border>
-                                <StackPanel
-                                    Grid.Column="1"
-                                    Margin="12,0,0,0"
-                                    VerticalAlignment="Center">
-                                    <TextBlock
-                                        Foreground="{DynamicResource TextSecondaryBrush}"
-                                        Style="{StaticResource Type.Caption}"
-                                        Text="الاستعلامات البطيئة" />
-                                    <TextBlock
-                                        x:Name="TxtSlowQueries"
-                                        FontSize="{DynamicResource FontSize.Numeric.Large}"
-                                        FontWeight="Bold"
-                                        Foreground="{DynamicResource WarningBrush}"
-                                        Text="0" />
-                                </StackPanel>
-                            </Grid>
-                        </materialDesign:Card>
-                    </UniformGrid>
-
-                    <!--  Metrics + Server Info  -->
-                    <Grid Grid.Row="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="20" />
-                            <ColumnDefinition Width="3*" />
-                        </Grid.ColumnDefinitions>
-
-                        <!--  Performance Metrics - magic glass card  -->
-                        <materialDesign:Card
-                            Grid.Column="0"
-                            Padding="24"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="16">
+                    <!-- Summary Cards -->
+                    <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,16">
+                        <!-- Card 1: Total Logs -->
+                        <materialDesign:Card Margin="0,0,12,0" Padding="16" Background="#E8EAF6">
                             <StackPanel>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Border
-                                        Width="32"
-                                        Height="32"
-                                        Background="{DynamicResource PrimaryXLightBrush}"
-                                        CornerRadius="{StaticResource RadiusSmall}">
-                                        <materialDesign:PackIcon
-                                            Width="16"
-                                            Height="16"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Foreground="{DynamicResource PrimaryMainBrush}"
-                                            Kind="Speedometer" />
-                                    </Border>
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
-                                        Style="{StaticResource Type.TitleMedium}"
-                                        Text="مؤشرات الأداء" />
-                                </Grid>
-
-                                <StackPanel Margin="0,14,0,0">
-                                    <Grid Margin="0,0,0,10">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="6" />
-                                        </Grid.RowDefinitions>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                Foreground="{DynamicResource TextSecondaryBrush}"
-                                                Style="{StaticResource Type.BodyMedium}"
-                                                Text="متوسط سرعة SQL" />
-                                            <TextBlock
-                                                x:Name="TxtAvgQueryTime"
-                                                Grid.Column="1"
-                                                FontSize="{DynamicResource FontSize.Input}"
-                                                FontWeight="Bold"
-                                                Foreground="{DynamicResource PrimaryMainBrush}"
-                                                Text="0.0 ms" />
-                                        </Grid>
-                                        <ProgressBar
-                                            x:Name="ProgressQueryTime"
-                                            Grid.Row="1"
-                                            Height="4"
-                                            Foreground="{DynamicResource PrimaryMainBrush}"
-                                            Maximum="100"
-                                            Value="20" />
-                                    </Grid>
-
-                                    <Grid Margin="0,0,0,10">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="6" />
-                                        </Grid.RowDefinitions>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                Foreground="{DynamicResource TextSecondaryBrush}"
-                                                Style="{StaticResource Type.BodyMedium}"
-                                                Text="نسبة الاستعلامات البطيئة" />
-                                            <TextBlock
-                                                x:Name="TxtSlowQueryRatio"
-                                                Grid.Column="1"
-                                                FontSize="{DynamicResource FontSize.Input}"
-                                                FontWeight="Bold"
-                                                Foreground="{DynamicResource WarningBrush}"
-                                                Text="0%" />
-                                        </Grid>
-                                        <ProgressBar
-                                            x:Name="ProgressSlowRatio"
-                                            Grid.Row="1"
-                                            Height="4"
-                                            Foreground="{DynamicResource WarningBrush}"
-                                            Maximum="100"
-                                            Value="10" />
-                                    </Grid>
-
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="6" />
-                                        </Grid.RowDefinitions>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                Foreground="{DynamicResource TextSecondaryBrush}"
-                                                Style="{StaticResource Type.BodyMedium}"
-                                                Text="معدل استقرار النظام" />
-                                            <TextBlock
-                                                x:Name="TxtStabilityRate"
-                                                Grid.Column="1"
-                                                FontSize="{DynamicResource FontSize.Input}"
-                                                FontWeight="Bold"
-                                                Foreground="{DynamicResource SuccessBrush}"
-                                                Text="100%" />
-                                        </Grid>
-                                        <ProgressBar
-                                            x:Name="ProgressStability"
-                                            Grid.Row="1"
-                                            Height="4"
-                                            Foreground="{DynamicResource SuccessBrush}"
-                                            Maximum="100"
-                                            Value="95" />
-                                    </Grid>
-                                </StackPanel>
+                                <materialDesign:PackIcon Kind="ListBoxOutline" Width="28" Height="28" Foreground="#3F51B5" />
+                                <TextBlock Text="إجمالي الأحداث المسجلة" Margin="0,8,0,0" Foreground="#5C6BC0" Style="{StaticResource Type.BodySmall}" />
+                                <TextBlock x:Name="TxtTotalLogs" Text="0" FontWeight="Bold" FontSize="28" Foreground="#303F9F" Margin="0,4,0,0" />
                             </StackPanel>
                         </materialDesign:Card>
 
-                        <!--  Server Info - magic glass card with glow  -->
-                        <materialDesign:Card
-                            Grid.Column="2"
-                            Padding="24"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="16">
+                        <!-- Card 2: Total Errors -->
+                        <materialDesign:Card Margin="0,0,12,0" Padding="16" Background="#FFEBEE">
                             <StackPanel>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Border
-                                        Width="32"
-                                        Height="32"
-                                        Background="{DynamicResource SecondaryLightBrush}"
-                                        CornerRadius="{StaticResource RadiusSmall}">
-                                        <materialDesign:PackIcon
-                                            Width="16"
-                                            Height="16"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Foreground="{DynamicResource SecondaryMainBrush}"
-                                            Kind="Server" />
-                                    </Border>
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
-                                        Style="{StaticResource Type.TitleMedium}"
-                                        Text="معلومات الخادم" />
+                                <materialDesign:PackIcon Kind="AlertCircleOutline" Width="28" Height="28" Foreground="#F44336" />
+                                <TextBlock Text="الأخطاء والعيوب المكتشفة" Margin="0,8,0,0" Foreground="#E57373" Style="{StaticResource Type.BodySmall}" />
+                                <TextBlock x:Name="TxtTotalErrors" Text="0" FontWeight="Bold" FontSize="28" Foreground="#D32F2F" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <!-- Card 3: Total SQL Queries -->
+                        <materialDesign:Card Margin="0,0,12,0" Padding="16" Background="#E0F7FA">
+                            <StackPanel>
+                                <materialDesign:PackIcon Kind="DatabaseSearch" Width="28" Height="28" Foreground="#00BCD4" />
+                                <TextBlock Text="استعلامات قاعدة البيانات" Margin="0,8,0,0" Foreground="#4DD0E1" Style="{StaticResource Type.BodySmall}" />
+                                <TextBlock x:Name="TxtTotalQueries" Text="0" FontWeight="Bold" FontSize="28" Foreground="#0097A7" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <!-- Card 4: Slow Queries -->
+                        <materialDesign:Card Padding="16" Background="#FFF3E0">
+                            <StackPanel>
+                                <materialDesign:PackIcon Kind="TimerAlertOutline" Width="28" Height="28" Foreground="#FF9800" />
+                                <TextBlock Text="الاستعلامات البطيئة (>100ms)" Margin="0,8,0,0" Foreground="#FFB74D" Style="{StaticResource Type.BodySmall}" />
+                                <TextBlock x:Name="TxtSlowQueries" Text="0" FontWeight="Bold" FontSize="28" Foreground="#F57C00" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </UniformGrid>
+
+                    <!-- Metrics and Health Charts -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Health & Performance Details -->
+                        <materialDesign:Card Grid.Column="0" Margin="0,0,12,0" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="مؤشرات كفاءة الاستعلامات وقاعدة البيانات" FontWeight="Bold" Margin="0,0,0,16" Style="{StaticResource Type.TitleMedium}" />
+                                
+                                <Grid Margin="0,8">
+                                    <TextBlock Text="متوسط سرعة استجابة قاعدة البيانات (SQL)" HorizontalAlignment="Left" />
+                                    <TextBlock x:Name="TxtAvgQueryTime" Text="0.0 ms" FontWeight="Bold" HorizontalAlignment="Right" />
                                 </Grid>
+                                <ProgressBar x:Name="ProgressQueryTime" Value="20" Maximum="100" Height="8" Margin="0,0,0,16" Foreground="{DynamicResource PrimaryMainBrush}" />
 
-                                <StackPanel Margin="0,18,0,0">
-                                    <TextBlock
-                                        Foreground="{DynamicResource TextDisabledBrush}"
-                                        Style="{StaticResource Type.Caption}"
-                                        Text="خادم Seq" />
-                                    <Border
-                                        Margin="0,4,0,14"
-                                        Padding="12,10"
-                                        Background="{DynamicResource SurfaceVariantBrush}"
-                                        CornerRadius="{StaticResource RadiusSmall}">
-                                        <TextBlock
-                                            x:Name="TxtSeqServerUrl"
-                                            FontFamily="{StaticResource Font.Monospace}"
-                                            FontSize="{DynamicResource FontSize.Input}"
-                                            Foreground="{DynamicResource TextPrimaryBrush}"
-                                            Text="http://localhost:5341" />
-                                    </Border>
+                                <Grid Margin="0,8">
+                                    <TextBlock Text="نسبة الاستعلامات البطيئة من الإجمالي" HorizontalAlignment="Left" />
+                                    <TextBlock x:Name="TxtSlowQueryRatio" Text="0%" FontWeight="Bold" HorizontalAlignment="Right" />
+                                </Grid>
+                                <ProgressBar x:Name="ProgressSlowRatio" Value="10" Maximum="100" Height="8" Margin="0,0,0,16" Foreground="#FF9800" />
 
-                                    <TextBlock
-                                        Foreground="{DynamicResource TextDisabledBrush}"
-                                        Style="{StaticResource Type.Caption}"
-                                        Text="حالة الاتصال" />
-                                    <Border
-                                        x:Name="BorderStatus"
-                                        Margin="0,4,0,14"
-                                        Padding="12,8"
-                                        HorizontalAlignment="Left"
-                                        Background="{DynamicResource SuccessLightBrush}"
-                                        CornerRadius="{StaticResource RadiusMedium}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <!--  Pulsing live dot  -->
-                                            <Border
-                                                Width="10"
-                                                Height="10"
-                                                Margin="0,0,8,0"
-                                                Background="{DynamicResource SuccessBrush}"
-                                                CornerRadius="5">
-                                                <Border.Effect>
-                                                    <DropShadowEffect
-                                                        BlurRadius="8"
-                                                        Opacity="0.6"
-                                                        ShadowDepth="0"
-                                                        Color="#10B981" />
-                                                </Border.Effect>
-                                            </Border>
-                                            <TextBlock
-                                                x:Name="TxtStatusText"
-                                                Grid.Column="1"
-                                                FontWeight="Bold"
-                                                Foreground="{DynamicResource SuccessBrush}"
-                                                Style="{StaticResource Type.BodyMedium}"
-                                                Text="متصل" />
-                                        </Grid>
-                                    </Border>
+                                <Grid Margin="0,8">
+                                    <TextBlock Text="معدل استقرار النظام (خالٍ من الأخطاء)" HorizontalAlignment="Left" />
+                                    <TextBlock x:Name="TxtStabilityRate" Text="100%" FontWeight="Bold" HorizontalAlignment="Right" />
+                                </Grid>
+                                <ProgressBar x:Name="ProgressStability" Value="95" Maximum="100" Height="8" Margin="0,0,0,16" Foreground="#2E7D32" />
+                            </StackPanel>
+                        </materialDesign:Card>
 
-                                    <TextBlock
-                                        Foreground="{DynamicResource TextDisabledBrush}"
-                                        Style="{StaticResource Type.Caption}"
-                                        Text="مستوى التسجيل" />
-                                    <Border
-                                        Margin="0,4,0,0"
-                                        Padding="12,10"
-                                        Background="{DynamicResource SurfaceVariantBrush}"
-                                        CornerRadius="{StaticResource RadiusSmall}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <materialDesign:PackIcon
-                                                Width="16"
-                                                Height="16"
-                                                Margin="0,0,8,0"
-                                                Foreground="{DynamicResource InfoBrush}"
-                                                Kind="Tune" />
-                                            <TextBlock
-                                                Grid.Column="1"
-                                                Foreground="{DynamicResource TextPrimaryBrush}"
-                                                Style="{StaticResource Type.BodyMedium}"
-                                                Text="Information" />
-                                        </Grid>
+                        <!-- Server connection & Seq Info -->
+                        <materialDesign:Card Grid.Column="1" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="معلومات خادم التتبع والربط" FontWeight="Bold" Margin="0,0,0,16" Style="{StaticResource Type.TitleMedium}" />
+                                
+                                <StackPanel Orientation="Horizontal" Margin="0,8">
+                                    <TextBlock Text="خادم Seq النشط:" FontWeight="SemiBold" Width="130" />
+                                    <TextBlock x:Name="TxtSeqServerUrl" Text="http://localhost:5341" Foreground="{DynamicResource PrimaryMainBrush}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,8">
+                                    <TextBlock Text="حالة الاتصال بالخادم:" FontWeight="SemiBold" Width="130" />
+                                    <Border CornerRadius="4" Padding="6,2" Background="#E8F5E9" x:Name="BorderStatus">
+                                        <TextBlock Text="متصل / محاكاة افتراضية" Foreground="#2E7D32" FontWeight="Bold" FontSize="11" x:Name="TxtStatusText" />
                                     </Border>
                                 </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,8">
+                                    <TextBlock Text="مستوى التسجيل:" FontWeight="SemiBold" Width="130" />
+                                    <TextBlock Text="Information (أو أعلى)" />
+                                </StackPanel>
+
+                                <Button Margin="0,16,0,0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignRaisedSecondaryButton}" Click="BtnRefreshAll_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Refresh" Width="16" Height="16" Margin="0,0,8,0" />
+                                        <TextBlock Text="تحديث كافة البيانات" />
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
                         </materialDesign:Card>
                     </Grid>
                 </Grid>
             </TabItem>
 
-            <!--
-                ════════════════════════════════════════
-                Tab 2: Logs Viewer
-                ════════════════════════════════════════
-            -->
+            <!-- Tab 2: Logs Viewer -->
             <TabItem Header="سجل أحداث النظام">
-                <Grid Margin="{StaticResource SpacingSmall}">
+                <Grid Margin="0,16,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="12" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!--  Filter Bar  -->
-                    <materialDesign:Card
-                        Grid.Row="0"
-                        Padding="24"
-                        materialDesign:ElevationAssist.Elevation="Dp1"
-                        UniformCornerRadius="16">
+                    <!-- Filters -->
+                    <materialDesign:Card Grid.Row="0" Margin="0,0,0,16" Padding="12">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="16" />
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <ComboBox
-                                x:Name="ComboLogLevels"
-                                Grid.Column="0"
-                                materialDesign:HintAssist.Hint="مستوى السجل"
-                                SelectionChanged="ComboLogLevels_SelectionChanged"
-                                Style="{StaticResource Input.ComboBox}">
-                                <ComboBoxItem
-                                    Content="الكل"
-                                    IsSelected="True"
-                                    Tag="" />
-                                <ComboBoxItem Content="معلومات" Tag="Information" />
-                                <ComboBoxItem Content="تحذيرات" Tag="Warning" />
-                                <ComboBoxItem Content="أخطاء" Tag="Error" />
-                            </ComboBox>
+                            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                <TextBlock Text="مستوى السجل" Style="{StaticResource Type.BodySmall}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4" />
+                                <ComboBox x:Name="ComboLogLevels" SelectionChanged="ComboLogLevels_SelectionChanged">
+                                    <ComboBoxItem Content="الكل" Tag="" />
+                                    <ComboBoxItem Content="معلومات (Information)" Tag="Information" />
+                                    <ComboBoxItem Content="تحذيرات (Warning)" Tag="Warning" />
+                                    <ComboBoxItem Content="أخطاء (Error)" Tag="Error" />
+                                </ComboBox>
+                            </StackPanel>
 
-                            <TextBox
-                                x:Name="TxtSearchLogs"
-                                Grid.Column="2"
-                                materialDesign:HintAssist.Hint="بحث في النص..."
-                                Style="{StaticResource Input.Text}"
-                                TextChanged="TxtSearchLogs_TextChanged" />
+                            <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                                <TextBlock Text="بحث في محتوى السجلات" Style="{StaticResource Type.BodySmall}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4" />
+                                <TextBox x:Name="TxtSearchLogs" materialDesign:HintAssist.Hint="ابحث عن نص، دالة، أو استعلام معين..." TextChanged="TxtSearchLogs_TextChanged" />
+                            </StackPanel>
 
-                            <Button
-                                x:Name="BtnResetLogsFilters"
-                                Grid.Column="4"
-                                Height="40"
-                                Padding="16,0"
-                                Click="BtnResetLogsFilters_Click"
-                                Style="{StaticResource MaterialDesignFlatButton}">
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon
-                                        Width="18"
-                                        Height="18"
-                                        Margin="0,0,6,0"
-                                        Kind="FilterOff" />
-                                    <TextBlock Text="إعادة تعيين" />
-                                </StackPanel>
+                            <Button Grid.Column="2" VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignOutlinedButton}" Click="BtnResetLogsFilters_Click">
+                                <materialDesign:PackIcon Kind="FilterOff" Width="16" Height="16" />
                             </Button>
                         </Grid>
                     </materialDesign:Card>
 
-                    <!--  Logs Grid + Detail Panel  -->
-                    <Grid Grid.Row="2">
+                    <!-- Data Grid & Details -->
+                    <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="20" />
                             <ColumnDefinition Width="2*" />
                         </Grid.ColumnDefinitions>
 
-                        <!--  Logs DataGrid Card  -->
-                        <materialDesign:Card
-                            Grid.Column="0"
-                            Padding="0"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="16">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-
-                                <Border
-                                    Grid.Row="0"
-                                    Padding="16,12"
-                                    BorderBrush="{DynamicResource DividerBrush}"
-                                    BorderThickness="0,0,0,1">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="28"
-                                            Height="28"
-                                            Background="{DynamicResource PrimaryXLightBrush}"
-                                            CornerRadius="{StaticResource RadiusSmall}">
-                                            <materialDesign:PackIcon
-                                                Width="14"
-                                                Height="14"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="{DynamicResource PrimaryMainBrush}"
-                                                Kind="FormatListBulleted" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            Foreground="{DynamicResource TextPrimaryBrush}"
-                                            Style="{StaticResource Type.TitleMedium}"
-                                            Text="أحداث السجل" />
-                                    </Grid>
-                                </Border>
-
-                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                    <DataGrid
-                                        x:Name="GridLogs"
-                                        AutoGenerateColumns="False"
-                                        BorderThickness="0"
-                                        CanUserAddRows="False"
-                                        CellStyle="{StaticResource DataGrid.Cell}"
-                                        ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
-                                        IsReadOnly="True"
-                                        RowStyle="{StaticResource DataGrid.Row}"
-                                        SelectionChanged="GridLogs_SelectionChanged"
-                                        SelectionMode="Single"
-                                        Style="{StaticResource DataGrid.Main}">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn
-                                                Width="160"
-                                                Binding="{Binding Timestamp, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}"
-                                                CellStyle="{StaticResource DataGrid.Cell.Center}"
-                                                Header="الوقت والتاريخ" />
-
-                                            <DataGridTemplateColumn Width="90" Header="المستوى">
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Border
-                                                            Padding="8,4"
-                                                            HorizontalAlignment="Center"
-                                                            CornerRadius="{StaticResource RadiusSmall}">
-                                                            <Border.Style>
-                                                                <Style TargetType="Border">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Level}" Value="INF">
-                                                                            <Setter Property="Background" Value="{DynamicResource InfoLightBrush}" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Level}" Value="Information">
-                                                                            <Setter Property="Background" Value="{DynamicResource InfoLightBrush}" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Level}" Value="WRN">
-                                                                            <Setter Property="Background" Value="{DynamicResource WarningLightBrush}" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Level}" Value="Warning">
-                                                                            <Setter Property="Background" Value="{DynamicResource WarningLightBrush}" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Level}" Value="ERR">
-                                                                            <Setter Property="Background" Value="{DynamicResource ErrorLightBrush}" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Level}" Value="Error">
-                                                                            <Setter Property="Background" Value="{DynamicResource ErrorLightBrush}" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Level}" Value="FTL">
-                                                                            <Setter Property="Background" Value="#F3E5F5" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Level}" Value="Fatal">
-                                                                            <Setter Property="Background" Value="#F3E5F5" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Border.Style>
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                    <ColumnDefinition Width="*" />
-                                                                </Grid.ColumnDefinitions>
-                                                                <materialDesign:PackIcon
-                                                                    Width="12"
-                                                                    Height="12"
-                                                                    Margin="0,0,4,0"
-                                                                    VerticalAlignment="Center">
-                                                                    <materialDesign:PackIcon.Style>
-                                                                        <Style TargetType="materialDesign:PackIcon">
-                                                                            <Style.Triggers>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="INF">
-                                                                                    <Setter Property="Kind" Value="Information" />
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource InfoBrush}" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="Information">
-                                                                                    <Setter Property="Kind" Value="Information" />
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource InfoBrush}" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="WRN">
-                                                                                    <Setter Property="Kind" Value="Alert" />
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="Warning">
-                                                                                    <Setter Property="Kind" Value="Alert" />
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="ERR">
-                                                                                    <Setter Property="Kind" Value="CloseCircle" />
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="Error">
-                                                                                    <Setter Property="Kind" Value="CloseCircle" />
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="FTL">
-                                                                                    <Setter Property="Kind" Value="SkullCrossbones" />
-                                                                                    <Setter Property="Foreground" Value="#6A1B9A" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="Fatal">
-                                                                                    <Setter Property="Kind" Value="SkullCrossbones" />
-                                                                                    <Setter Property="Foreground" Value="#6A1B9A" />
-                                                                                </DataTrigger>
-                                                                            </Style.Triggers>
-                                                                        </Style>
-                                                                    </materialDesign:PackIcon.Style>
-                                                                </materialDesign:PackIcon>
-                                                                <TextBlock Grid.Column="1" FontWeight="SemiBold">
-                                                                    <TextBlock.Style>
-                                                                        <Style BasedOn="{StaticResource Type.BodyMedium}" TargetType="TextBlock">
-                                                                            <Style.Triggers>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="INF">
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource InfoBrush}" />
-                                                                                    <Setter Property="Text" Value="معلومات" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="Information">
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource InfoBrush}" />
-                                                                                    <Setter Property="Text" Value="معلومات" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="WRN">
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
-                                                                                    <Setter Property="Text" Value="تحذير" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="Warning">
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
-                                                                                    <Setter Property="Text" Value="تحذير" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="ERR">
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
-                                                                                    <Setter Property="Text" Value="خطأ" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="Error">
-                                                                                    <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
-                                                                                    <Setter Property="Text" Value="خطأ" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="FTL">
-                                                                                    <Setter Property="Foreground" Value="#6A1B9A" />
-                                                                                    <Setter Property="Text" Value="حرج" />
-                                                                                </DataTrigger>
-                                                                                <DataTrigger Binding="{Binding Level}" Value="Fatal">
-                                                                                    <Setter Property="Foreground" Value="#6A1B9A" />
-                                                                                    <Setter Property="Text" Value="حرج" />
-                                                                                </DataTrigger>
-                                                                            </Style.Triggers>
-                                                                        </Style>
-                                                                    </TextBlock.Style>
-                                                                </TextBlock>
-                                                            </Grid>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
-
-                                            <DataGridTextColumn
-                                                Width="*"
-                                                Binding="{Binding Message}"
-                                                CellStyle="{StaticResource DataGrid.Cell.Left}"
-                                                Header="رسالة الحدث"
-                                                HeaderStyle="{StaticResource DataGrid.ColumnHeader.Right}" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </ScrollViewer>
-                            </Grid>
-                        </materialDesign:Card>
-
-                        <!--  Detail Panel - magic glass  -->
-                        <materialDesign:Card
-                            Grid.Column="2"
-                            Padding="24"
-                            materialDesign:ElevationAssist.Elevation="Dp1"
-                            UniformCornerRadius="16">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-
-                                <Border
-                                    Grid.Row="0"
-                                    Padding="16,12"
-                                    BorderBrush="{DynamicResource DividerBrush}"
-                                    BorderThickness="0,0,0,1">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="28"
-                                            Height="28"
-                                            Background="{DynamicResource SecondaryLightBrush}"
-                                            CornerRadius="{StaticResource RadiusSmall}">
-                                            <materialDesign:PackIcon
-                                                Width="14"
-                                                Height="14"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="{DynamicResource SecondaryMainBrush}"
-                                                Kind="Textbox" />
-                                        </Border>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontSize="{DynamicResource FontSize.Input}"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource TextPrimaryBrush}"
-                                            Text="التفاصيل الكاملة" />
-                                    </Grid>
-                                </Border>
-
-                                <ScrollViewer
-                                    Grid.Row="1"
-                                    Padding="16"
-                                    VerticalScrollBarVisibility="Auto">
-                                    <Grid>
-                                        <StackPanel x:Name="PanelLogDetail" Visibility="Collapsed">
-                                            <!--  Timestamp  -->
-                                            <TextBlock
-                                                Foreground="{DynamicResource TextDisabledBrush}"
-                                                Style="{StaticResource Type.Caption}"
-                                                Text="وقت الحدث" />
-                                            <Border
-                                                Margin="0,2,0,8"
-                                                Padding="10,8"
-                                                Background="{DynamicResource SurfaceVariantBrush}"
-                                                CornerRadius="{StaticResource RadiusSmall}">
-                                                <TextBlock
-                                                    x:Name="TxtDetailTimestamp"
-                                                    FontWeight="SemiBold"
-                                                    Foreground="{DynamicResource TextPrimaryBrush}"
-                                                    Style="{StaticResource Type.BodyMedium}"
-                                                    Text="-" />
-                                            </Border>
-
-                                            <!--  Level badge  -->
-                                            <TextBlock
-                                                Foreground="{DynamicResource TextDisabledBrush}"
-                                                Style="{StaticResource Type.Caption}"
-                                                Text="مستوى الحدث" />
-                                            <Border
-                                                x:Name="LevelBadgeDetail"
-                                                Margin="0,2,0,8"
-                                                Padding="10,4"
-                                                HorizontalAlignment="Left"
-                                                CornerRadius="{StaticResource RadiusSmall}">
-                                                <TextBlock
-                                                    x:Name="TxtDetailLevel"
-                                                    FontWeight="Bold"
-                                                    Style="{StaticResource Type.BodyMedium}"
-                                                    Text="-" />
-                                            </Border>
-
-                                            <!--  Source  -->
-                                            <TextBlock
-                                                Foreground="{DynamicResource TextDisabledBrush}"
-                                                Style="{StaticResource Type.Caption}"
-                                                Text="المصدر" />
-                                            <Border
-                                                Margin="0,2,0,8"
-                                                Padding="10,8"
-                                                Background="{DynamicResource SurfaceVariantBrush}"
-                                                CornerRadius="{StaticResource RadiusSmall}">
-                                                <TextBlock
-                                                    x:Name="TxtDetailSource"
-                                                    FontWeight="SemiBold"
-                                                    Foreground="{DynamicResource TextPrimaryBrush}"
-                                                    Style="{StaticResource Type.BodyMedium}"
-                                                    Text="-" />
-                                            </Border>
-
-                                            <!--  Message  -->
-                                            <TextBlock
-                                                Foreground="{DynamicResource TextDisabledBrush}"
-                                                Style="{StaticResource Type.Caption}"
-                                                Text="الرسالة" />
-                                            <Border
-                                                Margin="0,2,0,8"
-                                                Padding="10"
-                                                Background="{DynamicResource SurfaceVariantBrush}"
-                                                CornerRadius="{StaticResource RadiusSmall}">
-                                                <TextBlock
-                                                    x:Name="TxtDetailMessage"
-                                                    Foreground="{DynamicResource TextPrimaryBrush}"
-                                                    Style="{StaticResource Type.BodyMedium}"
-                                                    TextWrapping="Wrap" />
-                                            </Border>
-
-                                            <!--  SQL Section  -->
-                                            <StackPanel x:Name="PanelSqlSection" Visibility="Collapsed">
-                                                <TextBlock
-                                                    Foreground="{DynamicResource TextDisabledBrush}"
-                                                    Style="{StaticResource Type.Caption}"
-                                                    Text="استعلام SQL" />
-                                                <Border
-                                                    Margin="0,2,0,6"
-                                                    Padding="10"
-                                                    Background="#1A3B82F6"
-                                                    CornerRadius="{StaticResource RadiusSmall}">
-                                                    <TextBlock
-                                                        x:Name="TxtDetailSql"
-                                                        FontFamily="{StaticResource Font.Monospace}"
-                                                        Style="{StaticResource Type.Caption}"
-                                                        TextWrapping="Wrap" />
-                                                </Border>
-                                                <TextBlock
-                                                    Foreground="{DynamicResource TextDisabledBrush}"
-                                                    Style="{StaticResource Type.Caption}"
-                                                    Text="زمن التنفيذ" />
-                                                <Border
-                                                    Margin="0,2,0,8"
-                                                    Padding="10,8"
-                                                    Background="{DynamicResource SurfaceVariantBrush}"
-                                                    CornerRadius="{StaticResource RadiusSmall}">
-                                                    <TextBlock
-                                                        x:Name="TxtDetailDuration"
-                                                        FontWeight="Bold"
-                                                        Foreground="{DynamicResource PrimaryMainBrush}"
-                                                        Style="{StaticResource Type.BodyMedium}"
-                                                        Text="-" />
-                                                </Border>
-                                            </StackPanel>
-
-                                            <!--  Exception Section  -->
-                                            <StackPanel x:Name="PanelExceptionSection" Visibility="Collapsed">
-                                                <TextBlock
-                                                    Foreground="{DynamicResource TextDisabledBrush}"
-                                                    Style="{StaticResource Type.Caption}"
-                                                    Text="تفاصيل الاستثناء" />
-                                                <Border
-                                                    Padding="12"
-                                                    Background="{DynamicResource ErrorLightBrush}"
-                                                    BorderBrush="{DynamicResource ErrorBrush}"
-                                                    BorderThickness="1"
-                                                    CornerRadius="{StaticResource RadiusMedium}">
-                                                    <TextBlock
-                                                        x:Name="TxtDetailException"
-                                                        FontFamily="{StaticResource Font.Monospace}"
-                                                        Foreground="{DynamicResource ErrorBrush}"
-                                                        Style="{StaticResource Type.BodyMedium}"
-                                                        TextWrapping="Wrap" />
-                                                </Border>
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <TextBlock
-                                            x:Name="TxtLogPlaceholder"
-                                            Margin="0,40,0,0"
-                                            HorizontalAlignment="Center"
-                                            Foreground="{DynamicResource TextDisabledBrush}"
-                                            Style="{StaticResource Type.TitleMedium}"
-                                            Text="اختر حدثاً من القائمة لعرض التفاصيل." />
-                                    </Grid>
-                                </ScrollViewer>
-                            </Grid>
-                        </materialDesign:Card>
-                    </Grid>
-                </Grid>
-            </TabItem>
-
-            <!--
-                ════════════════════════════════════════
-                Tab 3: SQL Performance
-                ════════════════════════════════════════
-            -->
-            <TabItem Header="أداء استعلامات SQL">
-                <Grid Margin="{StaticResource SpacingSmall}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="12" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <!--  Alert card  -->
-                    <materialDesign:Card
-                        Grid.Row="0"
-                        Padding="24"
-                        materialDesign:ElevationAssist.Elevation="Dp1"
-                        UniformCornerRadius="16">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Border
-                                Width="36"
-                                Height="36"
-                                Background="#33F59E0B"
-                                CornerRadius="{StaticResource RadiusSmall}">
-                                <materialDesign:PackIcon
-                                    Width="18"
-                                    Height="18"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Foreground="{DynamicResource WarningBrush}"
-                                    Kind="AlertDecagram" />
-                            </Border>
-                            <TextBlock
-                                Grid.Column="1"
-                                Margin="12,0,0,0"
-                                VerticalAlignment="Center"
-                                Foreground="{DynamicResource WarningBrush}"
-                                Style="{StaticResource Type.BodyMedium}"
-                                Text="يتم تظليل الاستعلامات التي تستغرق أكثر من 100ms باللون البرتقالي." />
-                        </Grid>
-                    </materialDesign:Card>
-
-                    <!--  SQL Performance Grid  -->
-                    <materialDesign:Card
-                        Grid.Row="2"
-                        Padding="0"
-                        materialDesign:ElevationAssist.Elevation="Dp1"
-                        UniformCornerRadius="16">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <Border
-                                Grid.Row="0"
-                                Padding="16,12"
-                                BorderBrush="{DynamicResource DividerBrush}"
-                                BorderThickness="0,0,0,1">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Border
-                                        Width="28"
-                                        Height="28"
-                                        Background="{DynamicResource WarningLightBrush}"
-                                        CornerRadius="{StaticResource RadiusSmall}">
-                                        <materialDesign:PackIcon
-                                            Width="14"
-                                            Height="14"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Foreground="{DynamicResource WarningBrush}"
-                                            Kind="DatabaseSearch" />
-                                    </Border>
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
-                                        Style="{StaticResource Type.TitleMedium}"
-                                        Text="استعلامات SQL المسجلة" />
-                                </Grid>
-                            </Border>
-
-                            <DataGrid
-                                x:Name="GridSqlPerformance"
-                                Grid.Row="1"
-                                AlternatingRowBackground="{DynamicResource RowAlternateBrush}"
-                                AutoGenerateColumns="False"
-                                BorderThickness="0"
-                                CanUserAddRows="False"
-                                CellStyle="{StaticResource DataGrid.Cell}"
-                                ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
-                                IsReadOnly="True"
-                                RowStyle="{StaticResource DataGrid.Row}"
-                                SelectionMode="Single">
+                        <!-- Grid -->
+                        <materialDesign:Card Grid.Column="0" Margin="0,0,12,0" Padding="8">
+                            <DataGrid x:Name="GridLogs" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" SelectionMode="Single" SelectionChanged="GridLogs_SelectionChanged">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn
-                                        Width="100"
-                                        Binding="{Binding Timestamp, StringFormat='HH:mm:ss'}"
-                                        CellStyle="{StaticResource DataGrid.Cell.Center}"
-                                        Header="الوقت" />
-
-                                    <DataGridTemplateColumn Width="100" Header="الحالة">
+                                    <DataGridTextColumn Header="الوقت" Binding="{Binding Timestamp, StringFormat='dd-MM HH:mm:ss'}" Width="100" />
+                                    
+                                    <DataGridTemplateColumn Header="المستوى" Width="90">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Border
-                                                    Padding="8,4"
-                                                    HorizontalAlignment="Center"
-                                                    CornerRadius="{StaticResource RadiusSmall}">
+                                                <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsSlowQuery}" Value="True">
-                                                                    <Setter Property="Background" Value="{DynamicResource WarningLightBrush}" />
+                                                                <DataTrigger Binding="{Binding Level}" Value="Information">
+                                                                    <Setter Property="Background" Value="#E3F2FD" />
+                                                                    <Setter Property="Child">
+                                                                        <Setter.Value>
+                                                                            <TextBlock Text="معلومات" Foreground="#1565C0" FontWeight="SemiBold" FontSize="11" />
+                                                                        </Setter.Value>
+                                                                    </Setter>
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsSlowQuery}" Value="False">
-                                                                    <Setter Property="Background" Value="{DynamicResource SuccessLightBrush}" />
+                                                                <DataTrigger Binding="{Binding Level}" Value="Warning">
+                                                                    <Setter Property="Background" Value="#FFF3E0" />
+                                                                    <Setter Property="Child">
+                                                                        <Setter.Value>
+                                                                            <TextBlock Text="تحذير" Foreground="#EF6C00" FontWeight="SemiBold" FontSize="11" />
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Level}" Value="Error">
+                                                                    <Setter Property="Background" Value="#FFEBEE" />
+                                                                    <Setter Property="Child">
+                                                                        <Setter.Value>
+                                                                            <TextBlock Text="خطأ" Foreground="#C62828" FontWeight="SemiBold" FontSize="11" />
+                                                                        </Setter.Value>
+                                                                    </Setter>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Border.Style>
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="*" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <materialDesign:PackIcon
-                                                            Width="12"
-                                                            Height="12"
-                                                            Margin="0,0,4,0"
-                                                            VerticalAlignment="Center">
-                                                            <materialDesign:PackIcon.Style>
-                                                                <Style TargetType="materialDesign:PackIcon">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding IsSlowQuery}" Value="True">
-                                                                            <Setter Property="Kind" Value="Alert" />
-                                                                            <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding IsSlowQuery}" Value="False">
-                                                                            <Setter Property="Kind" Value="CheckCircle" />
-                                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </materialDesign:PackIcon.Style>
-                                                        </materialDesign:PackIcon>
-                                                        <TextBlock Grid.Column="1" FontWeight="SemiBold">
-                                                            <TextBlock.Style>
-                                                                <Style BasedOn="{StaticResource Type.BodyMedium}" TargetType="TextBlock">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding IsSlowQuery}" Value="True">
-                                                                            <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
-                                                                            <Setter Property="Text" Value="بطيء" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding IsSlowQuery}" Value="False">
-                                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
-                                                                            <Setter Property="Text" Value="طبيعي" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                    </Grid>
                                                 </Border>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTextColumn
-                                        Width="100"
-                                        Binding="{Binding DurationMs, StringFormat='{}{0:F1} ms'}"
-                                        CellStyle="{StaticResource DataGrid.Cell.Center}"
-                                        Header="المدة" />
-
-                                    <DataGridTextColumn
-                                        Width="*"
-                                        Binding="{Binding Sql}"
-                                        CellStyle="{StaticResource DataGrid.Cell.Left}"
-                                        Header="نص الاستعلام"
-                                        HeaderStyle="{StaticResource DataGrid.ColumnHeader.Right}" />
+                                    <DataGridTextColumn Header="المحتوى" Binding="{Binding Message}" Width="*" />
+                                    <DataGridTextColumn Header="المصدر" Binding="{Binding SourceContext}" Width="150" />
                                 </DataGrid.Columns>
                             </DataGrid>
-                        </Grid>
+                        </materialDesign:Card>
+
+                        <!-- Detail Panel -->
+                        <materialDesign:Card Grid.Column="1" Padding="16">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="تفاصيل الحدث المالي والبرمجي" FontWeight="Bold" Style="{StaticResource Type.TitleMedium}" Margin="0,0,0,12" />
+
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel x:Name="PanelLogDetail" Visibility="Collapsed">
+                                        <TextBlock Text="المصدر البرمجي (Context):" FontWeight="Bold" Style="{StaticResource Type.BodySmall}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                        <TextBlock x:Name="TxtDetailContext" Text="Source" TextWrapping="Wrap" Margin="0,4,0,12" FontWeight="SemiBold" />
+
+                                        <TextBlock Text="الرسالة:" FontWeight="Bold" Style="{StaticResource Type.BodySmall}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                        <Border Background="{DynamicResource DividerBrush}" Padding="8" CornerRadius="4" Margin="0,4,0,12">
+                                            <TextBlock x:Name="TxtDetailMessage" Text="Message" TextWrapping="Wrap" />
+                                        </Border>
+
+                                        <StackPanel x:Name="PanelSqlSection" Visibility="Collapsed">
+                                            <TextBlock Text="استعلام SQL المتأثر:" FontWeight="Bold" Style="{StaticResource Type.BodySmall}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                            <Border Background="#F5F5F5" Padding="8" CornerRadius="4" Margin="0,4,0,12">
+                                                <TextBlock x:Name="TxtDetailSql" Text="SELECT..." FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Foreground="#1A237E" />
+                                            </Border>
+                                            
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                                <TextBlock Text="زمن التنفيذ:" FontWeight="Bold" Style="{StaticResource Type.BodySmall}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" />
+                                                <TextBlock x:Name="TxtDetailDuration" Text="15ms" FontWeight="Bold" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel x:Name="PanelExceptionSection" Visibility="Collapsed">
+                                            <TextBlock Text="تفاصيل الاستثناء (Exception):" FontWeight="Bold" Style="{StaticResource Type.BodySmall}" Foreground="#C62828" />
+                                            <Border Background="#FFEBEE" Padding="8" CornerRadius="4" Margin="0,4,0,12">
+                                                <TextBlock x:Name="TxtDetailException" Text="Exception details..." FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Foreground="#B71C1C" />
+                                            </Border>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </ScrollViewer>
+
+                                <TextBlock x:Name="TxtLogPlaceholder" Grid.Row="1" Text="اختر حداً من القائمة لعرض تفاصيله الكاملة." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextDisabledBrush}" />
+                            </Grid>
+                        </materialDesign:Card>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab 3: SQL Performance -->
+            <TabItem Header="أداء قاعدة البيانات">
+                <Grid Margin="0,16,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Alert message about Slow Queries -->
+                    <Border Grid.Row="0" Background="#FFF3E0" BorderBrush="#FFE0B2" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,16">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="AlertDecagram" Width="20" Height="20" Foreground="#E65100" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <TextBlock Text="يعرض هذا القسم كافة استعلامات قاعدة البيانات المنفذة. يتم تظليل الاستعلامات التي تستغرق أكثر من 100ms باللون البرتقالي لتسهيل تعقب وتحسين الأداء." VerticalAlignment="Center" Foreground="#E65100" Style="{StaticResource Type.BodyMedium}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- SQL Log list -->
+                    <materialDesign:Card Grid.Row="1" Padding="8">
+                        <DataGrid x:Name="GridSqlPerformance" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="الوقت" Binding="{Binding Timestamp, StringFormat='HH:mm:ss'}" Width="100" />
+                                
+                                <DataGridTemplateColumn Header="الحالة" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSlowQuery}" Value="True">
+                                                                <Setter Property="Background" Value="#FFE0B2" />
+                                                                <Setter Property="Child">
+                                                                    <Setter.Value>
+                                                                        <TextBlock Text="استعلام بطيء" Foreground="#E65100" FontWeight="Bold" FontSize="11" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsSlowQuery}" Value="False">
+                                                                <Setter Property="Background" Value="#E8F5E9" />
+                                                                <Setter Property="Child">
+                                                                    <Setter.Value>
+                                                                        <TextBlock Text="طبيعي" Foreground="#2E7D32" FontWeight="SemiBold" FontSize="11" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="زمن التنفيذ" Binding="{Binding DurationMs, StringFormat='{}{0:F1} ms'}" Width="110" FontWeight="Bold" />
+                                <DataGridTextColumn Header="استعلام SQL" Binding="{Binding Sql}" Width="*" FontFamily="Consolas" FontSize="11" />
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </materialDesign:Card>
                 </Grid>
             </TabItem>
+            
         </TabControl>
     </Grid>
 </UserControl>
