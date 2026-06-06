@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Markup;
 
 namespace Radio.Common;

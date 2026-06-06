@@ -147,12 +147,6 @@
                 <ResourceDictionary Source="Resources/TabControl.xaml" />
 
 
-                <!--
-                    ══════════════════════════════════════════════
-                    15. NavRail
-                    ══════════════════════════════════════════════
-                -->
-                <ResourceDictionary Source="Resources/NavRail.xaml" />
                 <ResourceDictionary Source="Resources/PopupBox.xaml" />
 
             </ResourceDictionary.MergedDictionaries>

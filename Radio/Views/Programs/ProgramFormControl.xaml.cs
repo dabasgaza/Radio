@@ -1,15 +1,13 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
-using MaterialDesignThemes.Wpf;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Radio.Views.Programs
 {
-    public partial class ProgramFormControl : UserControl
+    public partial class ProgramFormControl
     {
         private readonly IProgramService _programService;
         private readonly UserSession _session;
@@ -59,8 +57,8 @@ namespace Radio.Views.Programs
 
                 if (result.IsSuccess)
                 {
-                    // إغلاق الـ DialogHost مع إرجاع true للنافذة الأب
-                    DialogHost.Close(null, true);
+                    DialogResult = true;
+                    Close();
                 }
                 else
                 {
@@ -78,12 +76,18 @@ namespace Radio.Views.Programs
             }
         }
 
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         private void SetLoading(bool isLoading)
         {
             BtnSave.IsEnabled = !isLoading;
             TxtName.IsEnabled = !isLoading;
             TxtCategory.IsEnabled = !isLoading;
             TxtDesc.IsEnabled = !isLoading;
+            LoadingOverlay.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

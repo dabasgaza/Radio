@@ -11,7 +11,7 @@ public class EpisodeViewPreferences
     public DateTime? DateFrom { get; set; }
     public DateTime? DateTo { get; set; }
     public string? DatePreset { get; set; }
-    public string SearchText { get; set; } = "";
+    public string SearchText { get; set; } = string.Empty;
 
     private static readonly string FilePath = System.IO.Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

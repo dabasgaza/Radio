@@ -8,8 +8,6 @@ using Radio.Views.Employees;
 using Radio.Views.SocialPlatforms;
 using Radio.Views.StaffRoles;
 using Radio.Views.Users;
-using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -122,7 +120,7 @@ namespace Radio.Views.Database
                 if (chip.Visibility == Visibility.Visible)
                 {
                     chip.IsChecked = true;
-                    NavigateToSubView(chip.Tag as string ?? "");
+                    NavigateToSubView(chip.Tag as string ?? string.Empty);
                     break;
                 }
             }

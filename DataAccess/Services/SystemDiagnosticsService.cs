@@ -1,13 +1,7 @@
 using DataAccess.Common;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -74,8 +68,8 @@ namespace DataAccess.Services
                     }
                     if (!string.IsNullOrEmpty(searchTerm))
                     {
-                        resultList = resultList.Where(x => 
-                            x.Message.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
+                        resultList = resultList.Where(x =>
+                            x.Message.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                             (x.Sql != null && x.Sql.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                             (x.Exception != null && x.Exception.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                         ).ToList();
@@ -222,7 +216,7 @@ namespace DataAccess.Services
                         if (string.IsNullOrWhiteSpace(line)) continue;
 
                         // Match Log line start: 2026-06-03 16:43:37.291 +03:00 [ERR] ...
-                        if (line.Length >= 23 && 
+                        if (line.Length >= 23 &&
                             char.IsDigit(line[0]) && char.IsDigit(line[1]) && char.IsDigit(line[2]) && char.IsDigit(line[3]) &&
                             line[4] == '-' && char.IsDigit(line[5]) && char.IsDigit(line[6]) &&
                             line[7] == '-' && char.IsDigit(line[8]) && char.IsDigit(line[9]) &&
@@ -239,10 +233,10 @@ namespace DataAccess.Services
                             }
 
                             currentDto = new DiagnosticLogDto();
-                            
+
                             int levelStart = line.IndexOf('[');
                             int levelEnd = line.IndexOf(']');
-                            
+
                             if (levelStart > 19 && levelEnd > levelStart)
                             {
                                 var tsString = line.Substring(0, levelStart).Trim();
@@ -301,7 +295,7 @@ namespace DataAccess.Services
                 if (log.Message.Contains("SQL Query Executed:") || log.Message.Contains("Slow SQL Query Detected:") || log.Message.Contains("SQL Command Failed:"))
                 {
                     log.Sql = log.Message;
-                    
+
                     var match = System.Text.RegularExpressions.Regex.Match(log.Message, @"took (\d+(\.\d+)?)ms");
                     if (match.Success && double.TryParse(match.Groups[1].Value, out var dur))
                     {
@@ -318,7 +312,7 @@ namespace DataAccess.Services
             }
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                filtered = filtered.Where(x => 
+                filtered = filtered.Where(x =>
                     x.Message.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     (x.Sql != null && x.Sql.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                     (x.Exception != null && x.Exception.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
@@ -471,7 +465,7 @@ namespace DataAccess.Services
             }
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                filtered = filtered.Where(x => 
+                filtered = filtered.Where(x =>
                     x.Message.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     (x.Sql != null && x.Sql.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                     (x.Exception != null && x.Exception.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))

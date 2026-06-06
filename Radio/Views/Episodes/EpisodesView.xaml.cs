@@ -10,6 +10,7 @@ using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Messaging;
 using Radio.Views.Common;
@@ -17,8 +18,6 @@ using Radio.Views.Publishing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using MaterialDesignThemes.Wpf;
-using System.Diagnostics;
 
 namespace Radio.Views.Episodes
 {
@@ -273,7 +272,7 @@ namespace Radio.Views.Episodes
                     "Custom" when _dateFrom.HasValue && _dateTo.HasValue => $"من {_dateFrom:yyyy/MM/dd} إلى {_dateTo:yyyy/MM/dd}",
                     "Custom" when _dateFrom.HasValue => $"من {_dateFrom:yyyy/MM/dd}",
                     "Custom" when _dateTo.HasValue => $"حتى {_dateTo:yyyy/MM/dd}",
-                    _ => ""
+                    _ => string.Empty
                 };
                 if (!string.IsNullOrWhiteSpace(label))
                     activeChips.Add(new FilterChipItem { Type = "Date", Label = $"التاريخ: {label}" });
@@ -762,7 +761,7 @@ namespace Radio.Views.Episodes
             _prefs.DateFrom = _dateFrom;
             _prefs.DateTo = _dateTo;
             _prefs.DatePreset = _activeDatePreset;
-            _prefs.SearchText = TxtSearch.Text?.Trim() ?? "";
+            _prefs.SearchText = TxtSearch.Text?.Trim() ?? string.Empty;
             _prefs.Save();
         }
 
@@ -818,7 +817,7 @@ namespace Radio.Views.Episodes
                 if (await MessageService.Current.ShowConfirmationAsync($"حذف {selectedEpisode.EpisodeName}؟", "تأكيد"))
                 {
                     var res = await _episodeService.DeleteEpisodeAsync(selectedEpisode.EpisodeId, _session);
-                    
+
                     if (res.IsSuccess)
                     {
                         await LoadDataAsync();

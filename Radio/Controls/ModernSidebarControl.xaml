@@ -1,0 +1,449 @@
+<UserControl
+    x:Class="Radio.Controls.ModernSidebarControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:Radio.Models"
+    d:DesignHeight="700"
+    d:DesignWidth="260"
+    mc:Ignorable="d"
+    Style="{StaticResource View.Base}">
+
+    <UserControl.Resources>
+
+        <!--  ═══ Glass Nav Item — Expanded ═══  -->
+        <Style x:Key="GlassNavItem" TargetType="RadioButton">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Margin" Value="8,2" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="GroupName" Value="GlassNav" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border
+                            x:Name="Bd"
+                            Height="{TemplateBinding Height}"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="10"
+                            SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Active Indicator Line (RTL Right Edge) -->
+                                <Border
+                                    x:Name="ActiveIndicator"
+                                    Grid.Column="0"
+                                    Width="3"
+                                    Height="16"
+                                    Background="Transparent"
+                                    CornerRadius="1.5"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center" />
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Icon Wrapper with Optional Background Pill -->
+                                    <Border
+                                        x:Name="IconBg"
+                                        Width="30"
+                                        Height="30"
+                                        CornerRadius="15"
+                                        Background="Transparent"
+                                        VerticalAlignment="Center">
+                                        <ContentPresenter
+                                            x:Name="IconHost"
+                                            Width="18"
+                                            Height="18"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock
+                                        x:Name="LabelHost"
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="{DynamicResource FontSize.Label}"
+                                        FontWeight="Medium"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        Text="{TemplateBinding Tag}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="LabelHost" Property="FontWeight" Value="SemiBold" />
+                                <Setter TargetName="ActiveIndicator" Property="Background" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="IconBg" Property="Background" Value="{DynamicResource PrimaryContainerBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.38" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ═══ Glass Nav Item — Collapsed (icon only) ═══  -->
+        <Style x:Key="GlassNavItemMin" TargetType="RadioButton">
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Margin" Value="4,2" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="GroupName" Value="GlassNav" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border
+                            x:Name="Bd"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="10"
+                            SnapsToDevicePixels="True">
+                            <Grid>
+                                <!-- Active Indicator Line (RTL Right Edge) -->
+                                <Border
+                                    x:Name="ActiveIndicator"
+                                    Width="3"
+                                    Height="16"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    CornerRadius="1.5"
+                                    Margin="0,0,2,0" />
+                                <Border
+                                    x:Name="IconBg"
+                                    Width="30"
+                                    Height="30"
+                                    CornerRadius="15"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                    <ContentPresenter
+                                        x:Name="IconHost"
+                                        Width="18"
+                                        Height="18"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="ActiveIndicator" Property="Background" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="IconBg" Property="Background" Value="{DynamicResource PrimaryContainerBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.38" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ═══ Glass Pill Tab Button ═══  -->
+        <Style x:Key="GlassTabBtn" TargetType="ToggleButton">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border
+                            x:Name="Bd"
+                            Height="{TemplateBinding Height}"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="Bd" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="4" Opacity="0.08" ShadowDepth="1" Color="#0F172A" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="#E2E8F0" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ═══ Glass Tab Button — Collapsed (icon only) ═══  -->
+        <Style x:Key="GlassTabBtnMin" TargetType="ToggleButton">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Margin" Value="1,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border
+                            x:Name="Bd"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="Bd" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="4" Opacity="0.08" ShadowDepth="1" Color="#0F172A" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="#E2E8F0" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  ═══ Expanded Item XAML DataTemplate ═══  -->
+        <DataTemplate x:Key="ExpandedItemTemplate" DataType="{x:Type models:NavigationItem}">
+            <RadioButton
+                Style="{StaticResource GlassNavItem}"
+                Tag="{Binding Label}"
+                IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                Click="NavItem_Click">
+                <materialDesign:PackIcon
+                    Width="18"
+                    Height="18"
+                    VerticalAlignment="Center"
+                    Kind="{Binding Icon}" />
+            </RadioButton>
+        </DataTemplate>
+
+        <!--  ═══ Collapsed Item XAML DataTemplate ═══  -->
+        <DataTemplate x:Key="CollapsedItemTemplate" DataType="{x:Type models:NavigationItem}">
+            <RadioButton
+                Style="{StaticResource GlassNavItemMin}"
+                ToolTip="{Binding Label}"
+                IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                Click="NavItem_Click">
+                <materialDesign:PackIcon
+                    Width="18"
+                    Height="18"
+                    VerticalAlignment="Center"
+                    Kind="{Binding Icon}" />
+            </RadioButton>
+        </DataTemplate>
+
+    </UserControl.Resources>
+
+    <!--  ═══════════════════════════════════════════════════  -->
+    <!--  Floating Premium Card Sidebar Container  -->
+    <!--  ═══════════════════════════════════════════════════  -->
+    <Border
+        x:Name="RootBorder"
+        Margin="8,10,8,10"
+        Background="{DynamicResource PrimaryXLightBrush}"
+        BorderBrush="{DynamicResource DividerBrush}"
+        BorderThickness="1"
+        CornerRadius="16"
+        SnapsToDevicePixels="True">
+        <Border.Effect>
+            <DropShadowEffect
+                BlurRadius="24"
+                Opacity="0.08"
+                ShadowDepth="2"
+                Color="#0F172A" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  ── Dashboard Button ──  -->
+            <RadioButton
+                x:Name="DashboardBtn"
+                Grid.Row="0"
+                Margin="4,6,4,4"
+                Click="NavItem_Click"
+                GroupName="GlassNav"
+                Style="{StaticResource GlassNavItem}"
+                Tag="لوحة التحكم">
+                <materialDesign:PackIcon
+                    Width="18"
+                    Height="18"
+                    Kind="ViewDashboardOutline" />
+            </RadioButton>
+
+            <!--  ── Expanded Tabs ──  -->
+            <Border
+                x:Name="TabsExpanded"
+                Grid.Row="1"
+                Margin="12,4"
+                Padding="3"
+                Background="{DynamicResource DividerBrush}"
+                CornerRadius="10">
+                <UniformGrid Columns="2">
+                    <ToggleButton
+                        x:Name="TabBroadcast"
+                        Click="TabBroadcast_Click"
+                        IsChecked="True"
+                        Style="{StaticResource GlassTabBtn}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="14"
+                                Height="14"
+                                Kind="PlaylistPlay" />
+                            <TextBlock
+                                x:Name="TabBroadcastLabel"
+                                Margin="6,0,0,0"
+                                FontSize="{DynamicResource FontSize.Input}"
+                                FontWeight="Medium"
+                                Text="البث والبرامج" />
+                        </StackPanel>
+                    </ToggleButton>
+
+                    <ToggleButton
+                        x:Name="TabSystem"
+                        Click="TabSystem_Click"
+                        Style="{StaticResource GlassTabBtn}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon
+                                Width="14"
+                                Height="14"
+                                Kind="ShieldOutline" />
+                            <TextBlock
+                                x:Name="TabSystemLabel"
+                                Margin="6,0,0,0"
+                                FontSize="{DynamicResource FontSize.Input}"
+                                FontWeight="Medium"
+                                Text="النظام والأمان" />
+                        </StackPanel>
+                    </ToggleButton>
+                </UniformGrid>
+            </Border>
+
+            <!--  ── Collapsed Tabs ──  -->
+            <Border
+                x:Name="TabsCollapsed"
+                Grid.Row="1"
+                Margin="12,4"
+                Padding="3"
+                HorizontalAlignment="Center"
+                Background="{DynamicResource DividerBrush}"
+                CornerRadius="10"
+                Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal">
+                    <ToggleButton
+                        x:Name="TabBroadcastMin"
+                        Click="TabBroadcast_Click"
+                        IsChecked="True"
+                        Style="{StaticResource GlassTabBtnMin}"
+                        ToolTip="البث والبرامج">
+                        <materialDesign:PackIcon
+                            Width="14"
+                            Height="14"
+                            Kind="PlaylistPlay" />
+                    </ToggleButton>
+                    <ToggleButton
+                        x:Name="TabSystemMin"
+                        Click="TabSystem_Click"
+                        Style="{StaticResource GlassTabBtnMin}"
+                        ToolTip="النظام والأمان">
+                        <materialDesign:PackIcon
+                            Width="14"
+                            Height="14"
+                            Kind="ShieldOutline" />
+                    </ToggleButton>
+                </StackPanel>
+            </Border>
+
+            <!--  ── Separator ──  -->
+            <Separator
+                x:Name="TabSeparator"
+                Grid.Row="2"
+                Height="1"
+                Margin="12,6,12,4"
+                Background="{DynamicResource DividerBrush}" />
+
+            <!--  ── Items List ──  -->
+            <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="NavItemsControl" Margin="0,4" />
+            </ScrollViewer>
+
+            <!--  ── Accent Strip (bottom) ──  -->
+            <Border
+                Grid.Row="4"
+                Height="4"
+                Margin="16,6,16,12"
+                CornerRadius="2"
+                Opacity="0.8">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Offset="0" Color="{DynamicResource Primary500Color}" />
+                        <GradientStop Offset="1" Color="{DynamicResource Secondary500Color}" />
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

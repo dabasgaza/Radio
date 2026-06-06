@@ -1,14 +1,14 @@
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Threading;
 using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using MahApps.Metro.Controls;
 using Radio.Messaging;
+using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Radio.Views.Episodes
 {
@@ -289,7 +289,7 @@ namespace Radio.Views.Episodes
 
         private EpisodeDraft CollectDraftData()
         {
-            var program = CbPrograms.SelectedItem as dynamic;
+            dynamic? program = CbPrograms.SelectedItem;
             return new EpisodeDraft
             {
                 ProgramId = CbPrograms.SelectedValue as int?,
@@ -336,19 +336,19 @@ namespace Radio.Views.Episodes
                 {
                     if (draft.ProgramId.HasValue)
                         CbPrograms.SelectedValue = draft.ProgramId.Value;
-                    TxtEpisodeName.Text = draft.EpisodeName ?? "";
+                    TxtEpisodeName.Text = draft.EpisodeName ?? string.Empty;
                     if (draft.ScheduledDate.HasValue)
                         DpDate.SelectedDate = draft.ScheduledDate.Value;
                     if (draft.BroadcastTime.HasValue)
                         TpBroadcastTime.SelectedTime = DateTime.Today.Add(draft.BroadcastTime.Value);
-                    TxtSpecialNotes.Text = draft.SpecialNotes ?? "";
+                    TxtSpecialNotes.Text = draft.SpecialNotes ?? string.Empty;
 
                     foreach (var g in draft.Guests)
-                        GuestList.Add(new GuestRow(0, g.GuestId, g.FullName ?? "", g.Topic, g.HostingTime));
+                        GuestList.Add(new GuestRow(0, g.GuestId, g.FullName ?? string.Empty, g.Topic, g.HostingTime));
                     foreach (var c in draft.Correspondents)
-                        CorrespondentList.Add(new CorrespondentRow(0, c.CorrespondentId, c.FullName ?? "", c.Topic, c.HostingTime));
+                        CorrespondentList.Add(new CorrespondentRow(0, c.CorrespondentId, c.FullName ?? string.Empty, c.Topic, c.HostingTime));
                     foreach (var e in draft.Employees)
-                        EmployeeList.Add(new EmployeeRow(0, e.EmployeeId, e.FullName ?? "", e.StaffRoleName ?? ""));
+                        EmployeeList.Add(new EmployeeRow(0, e.EmployeeId, e.FullName ?? string.Empty, e.StaffRoleName ?? string.Empty));
 
                     UpdateSectionCounts();
                     UpdateSaveButtonState();
@@ -550,7 +550,7 @@ namespace Radio.Views.Episodes
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
-            Close();    
+            Close();
         }
     }
 }

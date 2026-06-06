@@ -3,7 +3,7 @@ namespace Domain.Models;
 public class EpisodeEmployee : BaseEntity
 {
     public int EpisodeEmployeeId { get; set; }
-    
+
     public int EpisodeId { get; set; }
     public int EmployeeId { get; set; }
 

@@ -1,7 +1,4 @@
 using DataAccess.Common;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {

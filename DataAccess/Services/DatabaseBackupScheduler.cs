@@ -1,11 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -16,7 +12,7 @@ namespace DataAccess.Services
         private readonly IConfiguration _configuration;
 
         public DatabaseBackupScheduler(
-            IServiceProvider serviceProvider, 
+            IServiceProvider serviceProvider,
             ILogger<DatabaseBackupScheduler> logger,
             IConfiguration configuration)
         {
@@ -57,41 +53,41 @@ namespace DataAccess.Services
                     if (enabled)
                     {
                         _logger.LogInformation("بدء عملية النسخ الاحتياطي المجدول...");
-                        
+
                         using (var scope = _serviceProvider.CreateScope())
                         {
                             var dbService = scope.ServiceProvider.GetRequiredService<IDatabaseManagementService>();
-                                                        // Perform local backup
-                             var backupResult = await dbService.BackupDatabaseAsync();
-                             if (backupResult.IsSuccess && backupResult.Value != null)
-                             {
-                                 _logger.LogInformation($"تم إنشاء النسخة الاحتياطية المجدولة بنجاح: {backupResult.Value}");
-                                 
-                                 // Cloud sync if enabled
-                                 if (cloudSync)
-                                 {
-                                     var cloudResult = await dbService.CloudSyncBackupAsync(backupResult.Value);
-                                     if (cloudResult.IsSuccess)
-                                     {
-                                         _logger.LogInformation("تمت مزامنة النسخة الاحتياطية السحابية بنجاح.");
-                                     }
-                                     else
-                                     {
-                                         _logger.LogWarning($"فشلت المزامنة السحابية المجدولة: {cloudResult.ErrorMessage}");
-                                     }
-                                 }
+                            // Perform local backup
+                            var backupResult = await dbService.BackupDatabaseAsync();
+                            if (backupResult.IsSuccess && backupResult.Value != null)
+                            {
+                                _logger.LogInformation($"تم إنشاء النسخة الاحتياطية المجدولة بنجاح: {backupResult.Value}");
 
-                                 // Run retention policy
-                                 var retentionResult = await dbService.RunRetentionPolicyAsync(retentionDays);
-                                 if (!retentionResult.IsSuccess)
-                                 {
-                                     _logger.LogWarning($"فشل تطبيق سياسة الاحتفاظ بالملفات: {retentionResult.ErrorMessage}");
-                                 }
-                             }
-                             else
-                             {
-                                 _logger.LogError($"فشل النسخ الاحتياطي المجدول: {backupResult.ErrorMessage}");
-                             }
+                                // Cloud sync if enabled
+                                if (cloudSync)
+                                {
+                                    var cloudResult = await dbService.CloudSyncBackupAsync(backupResult.Value);
+                                    if (cloudResult.IsSuccess)
+                                    {
+                                        _logger.LogInformation("تمت مزامنة النسخة الاحتياطية السحابية بنجاح.");
+                                    }
+                                    else
+                                    {
+                                        _logger.LogWarning($"فشلت المزامنة السحابية المجدولة: {cloudResult.ErrorMessage}");
+                                    }
+                                }
+
+                                // Run retention policy
+                                var retentionResult = await dbService.RunRetentionPolicyAsync(retentionDays);
+                                if (!retentionResult.IsSuccess)
+                                {
+                                    _logger.LogWarning($"فشل تطبيق سياسة الاحتفاظ بالملفات: {retentionResult.ErrorMessage}");
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogError($"فشل النسخ الاحتياطي المجدول: {backupResult.ErrorMessage}");
+                            }
                         }
                     }
 
@@ -102,7 +98,7 @@ namespace DataAccess.Services
                     // To respond quickly to stopping, we sleep in shorter increments (e.g. 5 minutes)
                     var totalSlept = TimeSpan.Zero;
                     var sleepChunk = TimeSpan.FromMinutes(5);
-                    
+
                     while (totalSlept < delayTime && !stoppingToken.IsCancellationRequested)
                     {
                         await Task.Delay(sleepChunk, stoppingToken);

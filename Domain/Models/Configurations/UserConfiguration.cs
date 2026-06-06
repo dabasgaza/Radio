@@ -15,6 +15,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(e => e.Username, "UQ_Users_Username")
               .IsUnique();
 
+        // فهرس لتسريع فلترة وترتيب المستخدمين النشطين حسب الاسم الكامل
+        builder.HasIndex(e => new { e.IsActive, e.FullName }, "IX_Users_IsActive_FullName");
+
         // 3. إعدادات الخصائص
         builder.Property(e => e.FullName)
                .IsRequired()

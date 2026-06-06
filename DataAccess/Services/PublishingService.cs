@@ -478,7 +478,7 @@ public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> con
     /// استرجاع قائمة موحّدة من جميع سجلات النشر (الأنواع الثلاثة)
     /// تُستخدم في شاشة العرض الشامل مع دعم الفلترة حسب الحلقة
     /// </summary>
-        public async Task<List<PublishingRecordDto>> GetAllPublishingRecordsAsync(int? episodeId = null)
+    public async Task<List<PublishingRecordDto>> GetAllPublishingRecordsAsync(int? episodeId = null)
     {
         using var context = await contextFactory.CreateDbContextAsync();
 

@@ -1,5 +1,3 @@
-using System;
-
 namespace Domain.Models;
 
 public class WebsitePublishingLog : BaseEntity
@@ -12,7 +10,7 @@ public class WebsitePublishingLog : BaseEntity
     public MediaType MediaType { get; set; }
     public string? Title { get; set; }
     public string? Notes { get; set; }
-    
+
     public DateTime PublishedAt { get; set; }
 
     public virtual Episode Episode { get; set; } = null!;

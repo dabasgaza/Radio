@@ -2,11 +2,8 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Domain.Models;
 using MahApps.Metro.Controls;
 using System.Windows;
-using System.Windows.Controls;
-using Radio.Messaging;
 
 
 namespace Radio.Views.Publishing

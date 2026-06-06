@@ -1,5 +1,6 @@
 using DataAccess.Common;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Extensions.DependencyInjection;
 using Radio.Controls;
 using Radio.Messaging;
 using Radio.Models;
@@ -17,9 +18,10 @@ namespace Radio
         private readonly NavigationService _navigationService;
         private readonly UserSession _session;
         private NavigationMode _navigationMode = NavigationMode.Expanded;
+        private bool _isDrawerOpen = false;
 
         private DateTime? _broadcastStartTime;
-        private DispatcherTimer _onAirTimer;
+        private DispatcherTimer? _onAirTimer;
 
         public ModernMainWindow(NavigationService navigationService, CurrentSessionProvider sessionProvider)
         {
@@ -30,7 +32,21 @@ namespace Radio
             InitializeComponent();
             NotificationManager.RegisterHost(NotificationHost);
 
-            ResponsiveNav.NavigationRequested += OnNavigationRequested;
+            PopupUserName.Text = _session.FullName;
+            PopupUserRole.Text = _session.RoleName;
+
+            // Set avatar initials and first name in title bar and popup
+            var nameParts = _session.FullName?.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
+            var initials = nameParts?.Length >= 2
+                ? $"{nameParts[0][0]}{nameParts[1][0]}"
+                : nameParts?.Length == 1 ? $"{nameParts[0][0]}" : "?";
+            UserInitials.Text = initials;
+            PopupUserInitials.Text = initials;
+
+            var firstName = nameParts?.Length >= 1 ? nameParts[0] : "";
+            UserFirstName.Text = _session.FullName;
+
+            SidebarNav.NavigationRequested += OnNavigationRequested;
             BottomNav.NavigationRequested += OnNavigationRequested;
 
             InitializeNavigationItems();
@@ -39,28 +55,45 @@ namespace Radio
             InitializeFontScaleControls();
         }
 
-        private ObservableCollection<NavigationItem>? _navItems;
-
         private void InitializeNavigationItems()
         {
-            _navItems = NavigationBuilder.CreateMainNavigation();
-            ResponsiveNav.NavigationItems = _navItems;
-            BottomNav.NavigationItems = NavigationBuilder.CreateBottomNavigation();
+            var mainItems = NavigationBuilder.CreateMainNavigation();
+            ApplyPermissionFilter(mainItems);
+
+            SidebarNav.NavigationItems = mainItems;
+
+            var bottomItems = NavigationBuilder.CreateBottomNavigation();
+            ApplyPermissionFilter(bottomItems);
+            BottomNav.NavigationItems = bottomItems;
         }
 
         private void InitializeUI()
         {
-            ApplyPermissionSecurity();
             var homeView = _navigationService.NavigateTo("Home");
             if (homeView != null)
                 MainContentArea.Content = homeView;
+        }
+
+        private void ApplyPermissionFilter(ObservableCollection<NavigationItem> items)
+        {
+            foreach (var item in items)
+            {
+                if (!string.IsNullOrEmpty(item.RequiredPermission))
+                {
+                    item.IsVisible = _session.HasPermission(item.RequiredPermission);
+                }
+                else
+                {
+                    item.IsVisible = true;
+                }
+            }
         }
 
         private void OnViewChanged(string viewName)
         {
             UpdateBreadcrumb();
             BtnGoBack.Visibility = _navigationService.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
-            ResponsiveNav.SetSelected(viewName);
+            SidebarNav.SetSelected(viewName);
             BottomNav.SetSelected(viewName);
         }
 
@@ -68,31 +101,6 @@ namespace Radio
         {
             var path = string.Join(" / ", _navigationService.History.Reverse());
             BreadcrumbBar.Text = path;
-        }
-
-        private void ApplyPermissionSecurity()
-        {
-            if (_navItems != null)
-            {
-                foreach (var item in _navItems)
-                {
-                    if (!string.IsNullOrEmpty(item.RequiredPermission))
-                    {
-                        item.IsVisible = _session.HasPermission(item.RequiredPermission);
-                    }
-                }
-            }
-
-            if (BottomNav.NavigationItems != null)
-            {
-                foreach (var item in BottomNav.NavigationItems)
-                {
-                    if (!string.IsNullOrEmpty(item.RequiredPermission))
-                    {
-                        item.IsVisible = _session.HasPermission(item.RequiredPermission);
-                    }
-                }
-            }
         }
 
         public void NavigateToView(string viewName)
@@ -134,28 +142,58 @@ namespace Radio
 
         private void BtnMenuToggle_Click(object sender, RoutedEventArgs e)
         {
-            if (_navigationMode == NavigationMode.Expanded)
+            if (_navigationMode == NavigationMode.Drawer)
             {
-                ToggleDrawer(false);
+                ToggleDrawer(!_isDrawerOpen);
             }
             else if (_navigationMode == NavigationMode.Collapsed)
             {
                 ToggleDrawer(true);
             }
+            else if (_navigationMode == NavigationMode.Expanded)
+            {
+                SetNavigationMode(NavigationMode.Collapsed);
+            }
         }
 
-        private bool _isDrawerOpen = false;
         private void ToggleDrawer(bool open)
         {
             _isDrawerOpen = open;
             MenuIcon.Kind = open ? PackIconKind.MenuOpen : PackIconKind.Menu;
+            SidebarNav.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
+        }
 
-            _navigationMode = open ? NavigationMode.Expanded : NavigationMode.Collapsed;
-            ResponsiveNav.Mode = _navigationMode;
+        private void SetNavigationMode(NavigationMode mode)
+        {
+            _navigationMode = mode;
+            MenuIcon.Kind = mode == NavigationMode.Expanded ? PackIconKind.Menu : PackIconKind.MenuOpen;
 
-            ColSidebar.MinWidth = open ? 260 : 64;
-            ColSidebar.MaxWidth = open ? 260 : 64;
-            ColSidebar.Width = GridLength.Auto;
+            switch (mode)
+            {
+                case NavigationMode.Expanded:
+                    ColSidebar.MinWidth = 260;
+                    ColSidebar.MaxWidth = 260;
+                    ColSidebar.Width = GridLength.Auto;
+                    SidebarNav.Visibility = Visibility.Visible;
+                    BottomNav.Visibility = Visibility.Collapsed;
+                    break;
+
+                case NavigationMode.Collapsed:
+                    ColSidebar.MinWidth = 72;
+                    ColSidebar.MaxWidth = 72;
+                    ColSidebar.Width = GridLength.Auto;
+                    SidebarNav.Visibility = Visibility.Visible;
+                    BottomNav.Visibility = Visibility.Collapsed;
+                    break;
+
+                case NavigationMode.Drawer:
+                    ColSidebar.Width = new GridLength(0);
+                    SidebarNav.Visibility = Visibility.Collapsed;
+                    BottomNav.Visibility = Visibility.Visible;
+                    break;
+            }
+
+            SidebarNav.Mode = mode == NavigationMode.Drawer ? NavigationMode.Expanded : mode;
         }
 
         private void Window_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
@@ -172,31 +210,7 @@ namespace Radio
 
             if (newMode != _navigationMode)
             {
-                _navigationMode = newMode;
-                ColSidebar.MinWidth = newMode == NavigationMode.Drawer ? 0 :
-                                    newMode == NavigationMode.Collapsed ? 64 : 260;
-                ColSidebar.MaxWidth = newMode == NavigationMode.Drawer ? 260 :
-                                     newMode == NavigationMode.Collapsed ? 64 : 260;
-                ColSidebar.Width = new GridLength(
-                    newMode == NavigationMode.Drawer ? (double)ColSidebar.ActualWidth :
-                    newMode == NavigationMode.Collapsed ? 64 : 260);
-
-                if (newMode == NavigationMode.Drawer)
-                {
-                    BottomNav.Visibility = Visibility.Visible;
-                    ResponsiveNav.Visibility = Visibility.Collapsed;
-                    AppTitle.Visibility = Visibility.Collapsed;
-                    ColSidebar.Width = new GridLength(0);
-                }
-                else
-                {
-                    BottomNav.Visibility = Visibility.Collapsed;
-                    ResponsiveNav.Visibility = Visibility.Visible;
-                    AppTitle.Visibility = Visibility.Visible;
-                    ColSidebar.Width = GridLength.Auto;
-                }
-
-                ResponsiveNav.Mode = newMode;
+                SetNavigationMode(newMode);
             }
         }
 
@@ -225,12 +239,12 @@ namespace Radio
             _broadcastStartTime = DateTime.Now;
             OnAirProgramName.Text = programName;
             OnAirWidget.Visibility = Visibility.Visible;
-            _onAirTimer.Start();
+            _onAirTimer?.Start();
         }
 
         private void BtnStopOnAir_Click(object sender, RoutedEventArgs e)
         {
-            _onAirTimer.Stop();
+            _onAirTimer?.Stop();
             OnAirWidget.Visibility = Visibility.Collapsed;
             _broadcastStartTime = null;
         }
@@ -242,11 +256,13 @@ namespace Radio
 
         private void BtnLogout_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
+            var loginWindow = App.ServiceProvider.GetRequiredService<Forms.LoginWindow>();
+            loginWindow.Show();
+            Close();
         }
 
-        public async Task ShowOverlay() => await this.ShowOverlayAsync();
-        public async Task HideOverlay() => await this.HideOverlayAsync();
+        public new System.Threading.Tasks.Task ShowOverlay() => this.ShowOverlayAsync();
+        public new System.Threading.Tasks.Task HideOverlay() => this.HideOverlayAsync();
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

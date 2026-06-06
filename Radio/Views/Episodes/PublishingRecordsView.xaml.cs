@@ -227,7 +227,7 @@ namespace Radio.Views.Episodes
             // إذا تم الحفظ بنجاح، نعيد تحميل البيانات
             if (dialog.ShowDialog() == true)
             {
-                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل سجل التنفيذ لـ", "الحلقة", record.EpisodeName ?? ""));
+                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل سجل التنفيذ لـ", "الحلقة", record.EpisodeName ?? string.Empty));
                 await LoadDataAsync();
             }
         }
@@ -258,7 +258,7 @@ namespace Radio.Views.Episodes
 
             if (dialog.ShowDialog() == true)
             {
-                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات النشر الرقمي لـ", "الحلقة", record.EpisodeName ?? ""));
+                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات النشر الرقمي لـ", "الحلقة", record.EpisodeName ?? string.Empty));
                 await LoadDataAsync();
             }
         }
@@ -284,7 +284,7 @@ namespace Radio.Views.Episodes
 
             if (dialog.ShowDialog() == true)
             {
-                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات نشر الموقع لـ", "الحلقة", record.EpisodeName ?? ""));
+                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات نشر الموقع لـ", "الحلقة", record.EpisodeName ?? string.Empty));
                 await LoadDataAsync();
             }
         }

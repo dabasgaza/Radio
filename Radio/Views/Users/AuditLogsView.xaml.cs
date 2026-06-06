@@ -2,10 +2,7 @@ using DataAccess.Common;
 using DataAccess.Services;
 using Domain.Models;
 using Radio.Messaging;
-using System;
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -28,7 +25,7 @@ namespace Radio.Views.Users
             InitializeComponent();
             _auditLogService = auditLogService;
             _session = session;
-            
+
             Loaded += AuditLogsView_Loaded;
         }
 
@@ -140,11 +137,11 @@ namespace Radio.Views.Users
 
             try
             {
-                var oldDict = !string.IsNullOrEmpty(oldJson) 
+                var oldDict = !string.IsNullOrEmpty(oldJson)
                     ? (JsonSerializer.Deserialize<Dictionary<string, object>>(oldJson) ?? new Dictionary<string, object>())
                     : new Dictionary<string, object>();
 
-                var newDict = !string.IsNullOrEmpty(newJson) 
+                var newDict = !string.IsNullOrEmpty(newJson)
                     ? (JsonSerializer.Deserialize<Dictionary<string, object>>(newJson) ?? new Dictionary<string, object>())
                     : new Dictionary<string, object>();
 

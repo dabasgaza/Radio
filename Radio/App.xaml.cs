@@ -3,7 +3,6 @@ using DataAccess.Data;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Domain.Models;
-using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -50,7 +49,7 @@ namespace Radio
 
             // Configure Serilog with Seq
             var seqUrl = builder.Configuration["Seq:ServerUrl"] ?? "http://localhost:5341";
-            var apiKey = builder.Configuration["Seq:ApiKey"] ?? "";
+            var apiKey = builder.Configuration["Seq:ApiKey"] ?? string.Empty;
             var slowQueryThreshold = builder.Configuration.GetValue<int>("Seq:SlowQueryThresholdMs", 100);
 
             Log.Logger = new LoggerConfiguration()

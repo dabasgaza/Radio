@@ -103,7 +103,7 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             await using var context = await contextFactory.CreateDbContextAsync();
 
             var program = await context.Programs.FindAsync(programId);
-                
+
             if (program == null) return Result.Fail("البرنامج المحدد غير موجود أو تم حذفه مسبقاً.");
 
             // ── فحص وجود حلقات نشطة باستخدام AnyAsync بدلاً من Lazy Loading ──

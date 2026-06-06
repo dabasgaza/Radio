@@ -10,48 +10,56 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <Style x:Key="BottomNav.Item" TargetType="RadioButton">
-            <Setter Property="Width" Value="56" />
-            <Setter Property="Height" Value="56" />
+        <Style x:Key="BottomNavItem" TargetType="RadioButton">
+            <Setter Property="Width" Value="72" />
+            <Setter Property="Height" Value="60" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariantBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Padding" Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Grid>
-                            <Ellipse
-                                x:Name="Indicator"
-                                Width="40"
-                                Height="40"
+                            <Border
+                                x:Name="ActivePill"
+                                Width="48"
+                                Height="32"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                Fill="{DynamicResource SecondaryContainerBrush}"
+                                Background="{DynamicResource PrimaryContainerBrush}"
+                                CornerRadius="16"
                                 Opacity="0" />
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
                                 <ContentPresenter
-                                    x:Name="IconPresenter"
-                                    Width="24"
-                                    Height="24"
+                                    x:Name="IconHost"
+                                    Width="20"
+                                    Height="20"
                                     HorizontalAlignment="Center" />
                                 <TextBlock
-                                    x:Name="Label"
+                                    x:Name="LabelHost"
                                     Margin="0,2,0,0"
                                     HorizontalAlignment="Center"
                                     FontSize="{DynamicResource FontSize.Micro}"
                                     FontWeight="Medium"
-                                    Text="{TemplateBinding Tag}"
-                                    TextWrapping="Wrap" />
+                                    Foreground="{TemplateBinding Foreground}"
+                                    Text="{TemplateBinding Tag}" />
                             </StackPanel>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Indicator" Property="Opacity" Value="1" />
-                                <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainerBrush}" />
+                                <Setter TargetName="ActivePill" Property="Opacity" Value="1" />
+                                <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainerBrush}" />
+                                <Setter TargetName="LabelHost" Property="FontWeight" Value="SemiBold" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Indicator" Property="Opacity" Value="0.12" />
+                                <Setter TargetName="ActivePill" Property="Opacity" Value="0.6" />
+                                <Setter TargetName="ActivePill" Property="Background" Value="#0A6366F1" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.38" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -62,15 +70,20 @@
 
     <Border
         Height="80"
-        Background="{DynamicResource SurfaceContainerBrush}"
+        Background="{DynamicResource SurfaceBrush}"
+        BorderBrush="{DynamicResource DividerBrush}"
+        BorderThickness="0,1,0,0"
         CornerRadius="28,28,0,0"
         Effect="{DynamicResource MaterialDesignShadowElevation3}">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-            <StackPanel
-                x:Name="NavPanel"
-                Margin="8"
-                HorizontalAlignment="Center"
-                Orientation="Horizontal" />
-        </ScrollViewer>
+        <ItemsControl
+            x:Name="NavItemsControl"
+            Margin="8"
+            HorizontalAlignment="Center">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
     </Border>
 </UserControl>

@@ -5,7 +5,6 @@ using DataAccess.Services.Messaging;
 using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;
-using MaterialDesignThemes.Wpf;
 
 namespace Radio.Views.Programs
 {
@@ -92,18 +91,12 @@ namespace Radio.Views.Programs
 
             try
             {
-                var view = new ProgramFormControl(null, _programService, _session);
-                var result = await DialogHost.Show(view, "ModernRootDialog");
-                if (result is true)
+                var dialog = new ProgramFormControl(null, _programService, _session) { Owner = mainWindow };
+                if (dialog.ShowDialog() == true)
                 {
                     MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "البرنامج"));
                     await LoadDataAsync();
                 }
-            }
-            catch (Exception ex)
-            {
-                Serilog.Log.Error(ex, "Error opening ProgramFormControl for creation");
-                MessageService.Current.ShowError($"حدث خطأ غير متوقع أثناء فتح نافذة إضافة البرنامج: {ex.Message}\n{ex.InnerException?.Message}");
             }
             finally
             {
@@ -111,9 +104,6 @@ namespace Radio.Views.Programs
             }
         }
 
-        /// <summary>
-        /// فتح نافذة تعديل برنامج موجود.
-        /// </summary>
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.DataContext is not ProgramDto prog)
@@ -124,18 +114,12 @@ namespace Radio.Views.Programs
 
             try
             {
-                var view = new ProgramFormControl(prog, _programService, _session);
-                var result = await DialogHost.Show(view, "ModernRootDialog");
-                if (result is true)
+                var dialog = new ProgramFormControl(prog, _programService, _session) { Owner = mainWindow };
+                if (dialog.ShowDialog() == true)
                 {
                     MessageService.Current.ShowSuccess(Messages.Updated("البرنامج", prog.ProgramName));
                     await LoadDataAsync();
                 }
-            }
-            catch (Exception ex)
-            {
-                Serilog.Log.Error(ex, "Error opening ProgramFormControl for editing");
-                MessageService.Current.ShowError($"حدث خطأ غير متوقع أثناء فتح نافذة تعديل البرنامج: {ex.Message}\n{ex.InnerException?.Message}");
             }
             finally
             {

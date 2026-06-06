@@ -24,7 +24,7 @@ namespace Radio.Views.Reports
             _reportsService = reportsService;
 
             DpFrom.SelectedDate = DateTime.Today.AddDays(-6);
-            DpTo.SelectedDate   = DateTime.Today;
+            DpTo.SelectedDate = DateTime.Today;
 
             Loaded += async (_, _) => await LoadDashboardDataAsync();
         }
@@ -38,32 +38,32 @@ namespace Radio.Views.Reports
                 // ── KPIs ──
                 var stats = await _reportsService.GetEpisodeStatusStatsAsync();
 
-                int planned   = stats.GetValueOrDefault("Planned",   0);
-                int executed  = stats.GetValueOrDefault("Executed",  0);
+                int planned = stats.GetValueOrDefault("Planned", 0);
+                int executed = stats.GetValueOrDefault("Executed", 0);
                 int published = stats.GetValueOrDefault("Published", 0);
                 int cancelled = stats.GetValueOrDefault("Cancelled", 0);
-                int total     = planned + executed + published + cancelled;
+                int total = planned + executed + published + cancelled;
 
-                TxtPlannedCount.Text   = planned.ToString();
-                TxtExecutedCount.Text  = executed.ToString();
+                TxtPlannedCount.Text = planned.ToString();
+                TxtExecutedCount.Text = executed.ToString();
                 TxtPublishedCount.Text = published.ToString();
                 TxtCancelledCount.Text = cancelled.ToString();
 
                 // نسب مئوية وشرائط التقدم
                 if (total > 0)
                 {
-                    double pPlanned   = planned   * 100.0 / total;
-                    double pExecuted  = executed  * 100.0 / total;
+                    double pPlanned = planned * 100.0 / total;
+                    double pExecuted = executed * 100.0 / total;
                     double pPublished = published * 100.0 / total;
                     double pCancelled = cancelled * 100.0 / total;
 
-                    PbPlanned.Value   = pPlanned;
-                    PbExecuted.Value  = pExecuted;
+                    PbPlanned.Value = pPlanned;
+                    PbExecuted.Value = pExecuted;
                     PbPublished.Value = pPublished;
                     PbCancelled.Value = pCancelled;
 
-                    TxtPlannedPct.Text   = $"{pPlanned:F0}%";
-                    TxtExecutedPct.Text  = $"{pExecuted:F0}%";
+                    TxtPlannedPct.Text = $"{pPlanned:F0}%";
+                    TxtExecutedPct.Text = $"{pExecuted:F0}%";
                     TxtPublishedPct.Text = $"{pPublished:F0}%";
                     TxtCancelledPct.Text = $"{pCancelled:F0}%";
                 }
@@ -117,7 +117,7 @@ namespace Radio.Views.Reports
                 DgDateRange.ItemsSource = _lastSearchResults;
 
                 var days = (to - from).Days + 1;
-                TxtSearchSummary.Text       = $"{_lastSearchResults.Count} حلقة خلال {days} يوم";
+                TxtSearchSummary.Text = $"{_lastSearchResults.Count} حلقة خلال {days} يوم";
                 PnlSearchSummary.Visibility = Visibility.Visible;
 
                 // نفعّل زر التصدير فقط إذا في نتائج
@@ -143,12 +143,12 @@ namespace Radio.Views.Reports
 
         private void BtnReset_Click(object sender, RoutedEventArgs e)
         {
-            DpFrom.SelectedDate         = DateTime.Today.AddDays(-6);
-            DpTo.SelectedDate           = DateTime.Today;
-            DgDateRange.ItemsSource     = null;
+            DpFrom.SelectedDate = DateTime.Today.AddDays(-6);
+            DpTo.SelectedDate = DateTime.Today;
+            DgDateRange.ItemsSource = null;
             PnlSearchSummary.Visibility = Visibility.Collapsed;
-            BtnExport.IsEnabled         = false;
-            _lastSearchResults          = [];
+            BtnExport.IsEnabled = false;
+            _lastSearchResults = [];
         }
 
         private void BtnExport_Click(object sender, RoutedEventArgs e)
@@ -157,10 +157,10 @@ namespace Radio.Views.Reports
 
             var dialog = new SaveFileDialog
             {
-                Title            = "حفظ تقرير Excel",
-                Filter           = "Excel Workbook (*.xlsx)|*.xlsx",
-                FileName         = $"تقرير_الحلقات_{DateTime.Today:yyyy-MM-dd}.xlsx",
-                DefaultExt       = ".xlsx",
+                Title = "حفظ تقرير Excel",
+                Filter = "Excel Workbook (*.xlsx)|*.xlsx",
+                FileName = $"تقرير_الحلقات_{DateTime.Today:yyyy-MM-dd}.xlsx",
+                DefaultExt = ".xlsx",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
             };
 
@@ -218,7 +218,7 @@ namespace Radio.Views.Reports
                 // ── البيانات ──
                 for (int i = 0; i < _lastSearchResults.Count; i++)
                 {
-                    var row  = _lastSearchResults[i];
+                    var row = _lastSearchResults[i];
                     int rowN = i + 5;
                     bool isAlt = i % 2 == 1;
 
@@ -231,12 +231,12 @@ namespace Radio.Views.Reports
                     // تلوين خلية الحالة
                     var statusColor = row.StatusText switch
                     {
-                        "منفّذة"           => XLColor.FromHtml("#E8F5E9"),
-                        "منشورة"           => XLColor.FromHtml("#E0F2F1"),
-                        "مجدولة"           => XLColor.FromHtml("#FFF3E0"),
-                        "ملغاة"            => XLColor.FromHtml("#FFEBEE"),
+                        "منفّذة" => XLColor.FromHtml("#E8F5E9"),
+                        "منشورة" => XLColor.FromHtml("#E0F2F1"),
+                        "مجدولة" => XLColor.FromHtml("#FFF3E0"),
+                        "ملغاة" => XLColor.FromHtml("#FFEBEE"),
                         "منشورة على الموقع" => XLColor.FromHtml("#E3F2FD"),
-                        _                  => XLColor.NoColor
+                        _ => XLColor.NoColor
                     };
                     ws.Cell(rowN, 5).Style.Fill.SetBackgroundColor(statusColor);
                     ws.Cell(rowN, 5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);

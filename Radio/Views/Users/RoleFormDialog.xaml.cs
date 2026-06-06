@@ -2,7 +2,6 @@ using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Radio.Messaging;
 using System.Windows;
 
 namespace Radio.Views.Users

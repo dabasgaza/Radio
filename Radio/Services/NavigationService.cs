@@ -2,6 +2,7 @@ using DataAccess.Common;
 using DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Views.Correspondents;
+using Radio.Views.Database;
 using Radio.Views.Employees;
 using Radio.Views.Episodes;
 using Radio.Views.Guests;
@@ -11,8 +12,6 @@ using Radio.Views.Reports;
 using Radio.Views.SocialPlatforms;
 using Radio.Views.StaffRoles;
 using Radio.Views.Users;
-using Radio.Views.Database;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace Radio.Services
@@ -146,7 +145,8 @@ namespace Radio.Services
             {
                 case "Home":
                     var homeReportService = _serviceProvider.GetRequiredService<IReportsService>();
-                    return new HomeView(homeReportService);
+                    var homeSession = _serviceProvider.GetRequiredService<CurrentSessionProvider>();
+                    return new HomeView(homeReportService, homeSession);
 
                 case "Programs":
                     var programService = _serviceProvider.GetRequiredService<IProgramService>();

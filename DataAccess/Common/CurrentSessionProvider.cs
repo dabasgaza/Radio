@@ -1,9 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using Domain.Models;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DataAccess.Common
@@ -21,7 +17,7 @@ namespace DataAccess.Common
 
             var contextFactory = serviceProvider.GetRequiredService<IDbContextFactory<BroadcastWorkflowDBContext>>();
             await using var context = await contextFactory.CreateDbContextAsync();
-            
+
             var userRoleInfo = await context.Users
                 .AsNoTracking()
                 .Where(u => u.UserId == CurrentSession.UserId)

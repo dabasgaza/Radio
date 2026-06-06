@@ -1,5 +1,3 @@
-using System;
-
 namespace DataAccess.Common
 {
     [AttributeUsage(AttributeTargets.Field)]

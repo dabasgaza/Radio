@@ -69,5 +69,9 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
               .HasDatabaseName("IX_Episodes_ScheduledExecutionTime")
               .HasFilter("[IsActive] = 1");
 
+        // ── فهرس على EpisodeName لتسريع البحث النصي والترتيب ──
+        builder.HasIndex(e => e.EpisodeName)
+              .HasDatabaseName("IX_Episodes_EpisodeName");
+
     }
 }

@@ -1,10 +1,6 @@
 ﻿using DataAccess.Common;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -18,10 +14,10 @@ namespace DataAccess.Services
         }
 
         public async Task<Result<List<AuditLogDto>>> GetFilteredAuditLogsAsync(
-            string? tableName = null, 
-            int? userId = null, 
-            string? action = null, 
-            DateTime? fromDate = null, 
+            string? tableName = null,
+            int? userId = null,
+            string? action = null,
+            DateTime? fromDate = null,
             DateTime? toDate = null)
         {
             try
@@ -56,17 +52,17 @@ namespace DataAccess.Services
                                   from u in userJoin.DefaultIfEmpty()
                                   select new AuditLogDto
                                   {
-                                      AuditLogId   = log.AuditLogId,
-                                      TableName    = log.TableName,
-                                      RecordId     = log.RecordId,
-                                      Action       = log.Action,
-                                      OldValues    = log.OldValues,
-                                      NewValues    = log.NewValues,
-                                      Reason       = log.Reason,
-                                      UserId       = log.UserId,
-                                      Username     = u != null ? u.Username   : "غير معروف",
-                                      UserFullName = u != null ? u.FullName   : "غير معروف",
-                                      ChangedAt    = log.ChangedAt
+                                      AuditLogId = log.AuditLogId,
+                                      TableName = log.TableName,
+                                      RecordId = log.RecordId,
+                                      Action = log.Action,
+                                      OldValues = log.OldValues,
+                                      NewValues = log.NewValues,
+                                      Reason = log.Reason,
+                                      UserId = log.UserId,
+                                      Username = u != null ? u.Username : "غير معروف",
+                                      UserFullName = u != null ? u.FullName : "غير معروف",
+                                      ChangedAt = log.ChangedAt
                                   })
                                  .ToListAsync();
 

@@ -52,10 +52,10 @@ public class AuthService(IDbContextFactory<BroadcastWorkflowDBContext> contextFa
 
         return Result<UserSession>.Success(new UserSession
         {
-            UserId      = userProjection.UserId,
-            Username    = userProjection.Username,
-            FullName    = userProjection.FullName,
-            RoleName    = userProjection.RoleName ?? "Unknown",
+            UserId = userProjection.UserId,
+            Username = userProjection.Username,
+            FullName = userProjection.FullName,
+            RoleName = userProjection.RoleName ?? "Unknown",
             Permissions = userProjection.Permissions
         });
     }

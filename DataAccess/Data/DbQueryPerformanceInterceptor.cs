@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Serilog;
 using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DataAccess.Data
 {

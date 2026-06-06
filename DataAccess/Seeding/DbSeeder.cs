@@ -68,10 +68,10 @@ public static class DbSeeder
             if (!field.IsLiteral || field.IsInitOnly || field.FieldType != typeof(string))
                 continue;
 
-            var systemName  = (string)field.GetValue(null)!;
-            var attr        = (PermissionInfoAttribute?)Attribute.GetCustomAttribute(field, typeof(PermissionInfoAttribute));
+            var systemName = (string)field.GetValue(null)!;
+            var attr = (PermissionInfoAttribute?)Attribute.GetCustomAttribute(field, typeof(PermissionInfoAttribute));
             var displayName = attr?.DisplayName ?? systemName;
-            var module      = attr?.Module ?? "عام";
+            var module = attr?.Module ?? "عام";
 
             if (dbPermissions.TryGetValue(systemName, out var existing))
             {
@@ -79,7 +79,7 @@ public static class DbSeeder
                 if (existing.DisplayName != displayName || existing.Module != module)
                 {
                     existing.DisplayName = displayName;
-                    existing.Module      = module;
+                    existing.Module = module;
                     anyChange = true;
                 }
             }
@@ -102,7 +102,7 @@ public static class DbSeeder
             if (adminRole != null)
             {
                 var allPermIds = await context.Set<Permission>().Select(p => p.PermissionId).ToListAsync();
-                var assigned   = await context.Set<RolePermission>()
+                var assigned = await context.Set<RolePermission>()
                     .Where(rp => rp.RoleId == adminRole.RoleId)
                     .Select(rp => rp.PermissionId)
                     .ToHashSetAsync();
@@ -236,15 +236,15 @@ public static class DbSeeder
         var now = DateTime.UtcNow;
         context.Set<User>().Add(new User
         {
-            Username     = "admin",
+            Username = "admin",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
-            FullName     = "مسؤول النظام",
+            FullName = "مسؤول النظام",
             EmailAddress = "admin@broadcast.pro",
-            PhoneNumber  = "",
-            RoleId       = adminRole.RoleId,
-            IsActive     = true,
-            CreatedAt    = now,
-            UpdatedAt    = now,
+            PhoneNumber = "",
+            RoleId = adminRole.RoleId,
+            IsActive = true,
+            CreatedAt = now,
+            UpdatedAt = now,
         });
 
         await context.SaveChangesAsync();
@@ -260,11 +260,11 @@ public static class DbSeeder
             return;
 
         context.Set<SocialMediaPlatform>().AddRange(
-            new SocialMediaPlatform { Name = "Facebook",  Icon = "Facebook"   },
-            new SocialMediaPlatform { Name = "Twitter",   Icon = "Twitter"    },
-            new SocialMediaPlatform { Name = "TikTok",    Icon = "MusicNote"  },
-            new SocialMediaPlatform { Name = "YouTube",   Icon = "Youtube"    },
-            new SocialMediaPlatform { Name = "Instagram", Icon = "Instagram"  });
+            new SocialMediaPlatform { Name = "Facebook", Icon = "Facebook" },
+            new SocialMediaPlatform { Name = "Twitter", Icon = "Twitter" },
+            new SocialMediaPlatform { Name = "TikTok", Icon = "MusicNote" },
+            new SocialMediaPlatform { Name = "YouTube", Icon = "Youtube" },
+            new SocialMediaPlatform { Name = "Instagram", Icon = "Instagram" });
     }
 
     // ═══════════════════════════════════════════
@@ -277,10 +277,10 @@ public static class DbSeeder
             return;
 
         context.Set<StaffRole>().AddRange(
-            new StaffRole { RoleName = "مذيع"        },
-            new StaffRole { RoleName = "منفذ"        },
-            new StaffRole { RoleName = "مهندس صوت"   },
-            new StaffRole { RoleName = "مخرج"        },
-            new StaffRole { RoleName = "مصور"        });
+            new StaffRole { RoleName = "مذيع" },
+            new StaffRole { RoleName = "منفذ" },
+            new StaffRole { RoleName = "مهندس صوت" },
+            new StaffRole { RoleName = "مخرج" },
+            new StaffRole { RoleName = "مصور" });
     }
 }

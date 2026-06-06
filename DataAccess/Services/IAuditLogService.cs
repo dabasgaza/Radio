@@ -1,8 +1,5 @@
 using DataAccess.Common;
 using Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
@@ -24,10 +21,10 @@ namespace DataAccess.Services
     public interface IAuditLogService
     {
         Task<Result<List<AuditLogDto>>> GetFilteredAuditLogsAsync(
-            string? tableName = null, 
-            int? userId = null, 
-            string? action = null, 
-            DateTime? fromDate = null, 
+            string? tableName = null,
+            int? userId = null,
+            string? action = null,
+            DateTime? fromDate = null,
             DateTime? toDate = null);
 
         Task<Result<List<User>>> GetAuditUsersAsync();

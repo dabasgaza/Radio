@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Domain.Models;
 
 public class SocialMediaPublishingLog : BaseEntity
@@ -14,7 +11,7 @@ public class SocialMediaPublishingLog : BaseEntity
     public TimeSpan? ClipDuration { get; set; }
     public string? ClipTitle { get; set; }
     public string? Notes { get; set; }
-    
+
     public DateTime PublishedAt { get; set; }
 
     public virtual EpisodeGuest EpisodeGuest { get; set; } = null!;

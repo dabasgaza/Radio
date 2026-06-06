@@ -2,7 +2,6 @@
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
-using Domain.Models;
 using Radio.Messaging;
 using System.Windows;
 using System.Windows.Controls;

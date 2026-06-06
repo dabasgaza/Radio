@@ -2,9 +2,6 @@ using DataAccess.Common;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
