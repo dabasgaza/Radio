@@ -1,0 +1,26 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Episode Specific Colors -->
+    <Color x:Key="EpisodeActiveColor">#FF4CAF50</Color>
+    <Color x:Key="EpisodePendingColor">#FFFF9800</Color>
+    <Color x:Key="EpisodeCancelledColor">#FFF44336</Color>
+    <Color x:Key="EpisodeCompletedColor">#FF2196F3</Color>
+
+    <!-- Status Badge Styles -->
+    <Style x:Key="EpisodeStatusBadge" TargetType="Border">
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Margin" Value="0,4,0,0"/>
+        <Setter Property="Height" Value="22"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="4" ShadowDepth="1" Opacity="0.2"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Converting specific converters if needed -->
+    <!-- Add any episode-specific converters here -->
+
+</ResourceDictionary>

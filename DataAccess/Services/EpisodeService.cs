@@ -46,7 +46,8 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                 .AsNoTracking()
                 .Where(e => e.IsActive)
                 .AsSplitQuery()
-                .OrderBy(e => e.ScheduledExecutionTime)
+                .OrderByDescending(e => e.ScheduledExecutionTime.HasValue ? e.ScheduledExecutionTime.Value.Date : DateTime.MinValue)
+                .ThenBy(e => e.ScheduledExecutionTime)
                 .Select(e => new ActiveEpisodeDto
                 {
                     EpisodeId = e.EpisodeId,

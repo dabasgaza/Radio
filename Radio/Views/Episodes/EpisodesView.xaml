@@ -1,4 +1,4 @@
-﻿<!--
+<!--
     ═══════════════════════════════════════════════════════════════════════════
     EpisodesView.xaml — المرحلة الثانية: أنماط العرض المتقدمة
     ═══════════════════════════════════════════════════════════════════════════
@@ -886,7 +886,7 @@
                                             CornerRadius="8">
                                             <Border.Style>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="#15FFA726" /> 
+                                                    <Setter Property="Background" Value="#15FFA726" />
                                                     <!--  مجدولة  -->
                                                     <Setter Property="BorderBrush" Value="#40FFA726" />
                                                     <Style.Triggers>
@@ -1341,164 +1341,381 @@
                                                     <materialDesign:PackIcon
                                                         Width="14"
                                                         Height="14"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
                                                         Kind="Web" />
                                                 </Button>
                                             </StackPanel>
 
-                                            <!--  قائمة الإجراءات الإضافية  -->
+                                            <!--  قائمة الإجراءات الإضافية الحديثة  -->
+                                            <!--  قائمة الإجراءات الإضافية الحديثة  -->
                                             <materialDesign:PopupBox
                                                 Grid.Column="1"
-                                                Width="30"
-                                                Height="30"
+                                                Width="34"
+                                                Height="34"
                                                 Margin="0"
                                                 VerticalAlignment="Center"
                                                 PlacementMode="BottomAndAlignRightEdges"
                                                 ToolTip="المزيد من الإجراءات">
+
                                                 <materialDesign:PopupBox.ToggleContent>
-                                                    <materialDesign:PackIcon
-                                                        Width="20"
-                                                        Height="20"
-                                                        Cursor="Hand"
-                                                        Foreground="{StaticResource TextSecondaryBrush}"
-                                                        Kind="DotsVertical" />
+                                                    <Border
+                                                        Width="34"
+                                                        Height="34"
+                                                        Background="Transparent"
+                                                        CornerRadius="17">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="Transparent" />
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <materialDesign:PackIcon
+                                                            Width="20"
+                                                            Height="20"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            Cursor="Hand"
+                                                            Foreground="{StaticResource TextSecondaryBrush}"
+                                                            Kind="DotsVertical" />
+                                                    </Border>
                                                 </materialDesign:PopupBox.ToggleContent>
-                                                <StackPanel Width="180" Margin="6">
-                                                    <TextBlock
-                                                        Margin="0,4,0,8"
-                                                        HorizontalAlignment="Center"
-                                                        FontSize="12"
-                                                        FontWeight="Bold"
-                                                        Foreground="{StaticResource PrimaryMainBrush}"
-                                                        Text="خيارات الحلقة" />
 
-                                                    <Button
-                                                        Margin="0,1"
-                                                        Click="BtnViewRecords_Click"
-                                                        Style="{StaticResource Btn.Ghost}"
-                                                        Visibility="{Binding CanViewRecords, Converter={StaticResource BoolToVisConverter}}">
-                                                        <Grid HorizontalAlignment="Stretch">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="24" />
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <materialDesign:PackIcon
-                                                                Grid.Column="0"
-                                                                Width="14"
-                                                                Height="14"
-                                                                VerticalAlignment="Center"
-                                                                Kind="History" />
-                                                            <TextBlock
-                                                                Grid.Column="1"
-                                                                Margin="6,0,0,0"
-                                                                VerticalAlignment="Center"
-                                                                FontSize="11"
-                                                                Text="عرض السجلات" />
-                                                        </Grid>
-                                                    </Button>
+                                                <!--  القائمة المنبثقة  -->
+                                                <Border
+                                                    Width="240"
+                                                    Padding="8"
+                                                    Background="{StaticResource SurfaceBrush}"
+                                                    BorderBrush="{StaticResource BorderDefaultBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="16"
+                                                    FlowDirection="RightToLeft">
+                                                    <StackPanel>
 
-                                                    <Button
-                                                        Margin="0,1"
-                                                        Click="BtnRevert_Click"
-                                                        Style="{StaticResource Btn.Ghost}"
-                                                        Visibility="{Binding CanRevert, Converter={StaticResource BoolToVisConverter}}">
-                                                        <Grid HorizontalAlignment="Stretch">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="24" />
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <materialDesign:PackIcon
-                                                                Grid.Column="0"
-                                                                Width="14"
-                                                                Height="14"
-                                                                VerticalAlignment="Center"
-                                                                Kind="Undo" />
-                                                            <TextBlock
-                                                                Grid.Column="1"
-                                                                Margin="6,0,0,0"
-                                                                VerticalAlignment="Center"
-                                                                FontSize="11"
-                                                                Text="تراجع عن الإجراء" />
-                                                        </Grid>
-                                                    </Button>
+                                                        <!--
+                                                            ───────────────────────────────
+                                                            Header القائمة
+                                                            ───────────────────────────────
+                                                        -->
+                                                        <Border
+                                                            Height="44"
+                                                            Margin="0,0,0,8"
+                                                            Padding="4,0"
+                                                            Background="{StaticResource HeaderGradientBrush}"
+                                                            CornerRadius="10">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="40" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
 
-                                                    <Button
-                                                        Margin="0,1"
-                                                        Click="BtnCancelEpisode_Click"
-                                                        Style="{StaticResource Btn.Ghost}"
-                                                        Visibility="{Binding CanCancel, Converter={StaticResource BoolToVisConverter}}">
-                                                        <Grid HorizontalAlignment="Stretch">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="24" />
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <materialDesign:PackIcon
-                                                                Grid.Column="0"
-                                                                Width="14"
-                                                                Height="14"
-                                                                VerticalAlignment="Center"
-                                                                Foreground="{StaticResource ErrorBrush}"
-                                                                Kind="CloseCircleOutline" />
-                                                            <TextBlock
-                                                                Grid.Column="1"
-                                                                Margin="6,0,0,0"
-                                                                VerticalAlignment="Center"
-                                                                FontSize="11"
-                                                                Text="إلغاء الحلقة" />
-                                                        </Grid>
-                                                    </Button>
+                                                                <Border
+                                                                    Grid.Column="0"
+                                                                    Width="32"
+                                                                    Height="32"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center">
+                                                                    <materialDesign:PackIcon
+                                                                        Width="16"
+                                                                        Height="16"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Foreground="White"
+                                                                        Kind="TuneVertical" />
+                                                                </Border>
 
-                                                    <Separator Margin="4,6" Background="{StaticResource DividerBrush}" />
+                                                                <TextBlock
+                                                                    Grid.Column="1"
+                                                                    Margin="0,0,4,0"
+                                                                    VerticalAlignment="Center"
+                                                                    FontSize="12"
+                                                                    FontWeight="Bold"
+                                                                    Foreground="White"
+                                                                    Text="إجراءات الحلقة" />
+                                                            </Grid>
+                                                        </Border>
 
-                                                    <Button
-                                                        Margin="0,1"
-                                                        Click="BtnEdit_Click"
-                                                        Style="{StaticResource Btn.Ghost}">
-                                                        <Grid HorizontalAlignment="Stretch">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="24" />
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <materialDesign:PackIcon
-                                                                Grid.Column="0"
-                                                                Width="14"
-                                                                Height="14"
-                                                                VerticalAlignment="Center"
-                                                                Kind="PencilOutline" />
-                                                            <TextBlock
-                                                                Grid.Column="1"
-                                                                Margin="6,0,0,0"
-                                                                VerticalAlignment="Center"
-                                                                FontSize="11"
-                                                                Text="تعديل" />
-                                                        </Grid>
-                                                    </Button>
+                                                        <!--
+                                                            ───────────────────────────────
+                                                            عرض السجلات
+                                                            ───────────────────────────────
+                                                        -->
+                                                        <Button
+                                                            Height="44"
+                                                            Margin="0,2"
+                                                            Padding="4,0"
+                                                            HorizontalContentAlignment="Stretch"
+                                                            Click="BtnViewRecords_Click"
+                                                            Style="{StaticResource Btn.Ghost}"
+                                                            Visibility="{Binding CanViewRecords, Converter={StaticResource BoolToVisConverter}}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="40" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
 
-                                                    <Button
-                                                        Margin="0,1"
-                                                        Click="BtnDelete_Click"
-                                                        Style="{StaticResource Btn.Ghost}">
-                                                        <Grid HorizontalAlignment="Stretch">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="24" />
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <materialDesign:PackIcon
-                                                                Grid.Column="0"
-                                                                Width="14"
-                                                                Height="14"
-                                                                VerticalAlignment="Center"
-                                                                Foreground="{StaticResource ErrorBrush}"
-                                                                Kind="DeleteOutline" />
-                                                            <TextBlock
-                                                                Grid.Column="1"
-                                                                Margin="6,0,0,0"
-                                                                VerticalAlignment="Center"
-                                                                FontSize="11"
-                                                                Foreground="{StaticResource ErrorBrush}"
-                                                                Text="حذف" />
-                                                        </Grid>
-                                                    </Button>
-                                                </StackPanel>
+                                                                <Border
+                                                                    Grid.Column="0"
+                                                                    Width="32"
+                                                                    Height="32"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    Background="{StaticResource PrimaryXLightBrush}"
+                                                                    CornerRadius="8">
+                                                                    <materialDesign:PackIcon
+                                                                        Width="16"
+                                                                        Height="16"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Foreground="{StaticResource PrimaryMainBrush}"
+                                                                        Kind="History" />
+                                                                </Border>
+
+                                                                <StackPanel
+                                                                    Grid.Column="1"
+                                                                    Margin="0,0,4,0"
+                                                                    VerticalAlignment="Center">
+                                                                    <TextBlock
+                                                                        FontSize="12"
+                                                                        FontWeight="Medium"
+                                                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                                                        Text="عرض السجلات" />
+                                                                    <TextBlock
+                                                                        Margin="0,2,0,0"
+                                                                        FontSize="10"
+                                                                        Foreground="{StaticResource TextHintBrush}"
+                                                                        Text="سجل تعديلات الحلقة" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Button>
+
+                                                        <!--
+                                                            ───────────────────────────────
+                                                            تراجع عن الإجراء
+                                                            ───────────────────────────────
+                                                        -->
+                                                        <Button
+                                                            Height="44"
+                                                            Margin="0,2"
+                                                            Padding="4,0"
+                                                            HorizontalContentAlignment="Stretch"
+                                                            Click="BtnRevert_Click"
+                                                            Style="{StaticResource Btn.Ghost}"
+                                                            Visibility="{Binding CanRevert, Converter={StaticResource BoolToVisConverter}}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="40" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Border
+                                                                    Grid.Column="0"
+                                                                    Width="32"
+                                                                    Height="32"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    Background="#FFFEF3E0"
+                                                                    CornerRadius="8">
+                                                                    <materialDesign:PackIcon
+                                                                        Width="16"
+                                                                        Height="16"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Foreground="#FFF57C00"
+                                                                        Kind="Undo" />
+                                                                </Border>
+
+                                                                <StackPanel
+                                                                    Grid.Column="1"
+                                                                    Margin="0,0,4,0"
+                                                                    VerticalAlignment="Center">
+                                                                    <TextBlock
+                                                                        FontSize="12"
+                                                                        FontWeight="Medium"
+                                                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                                                        Text="تراجع عن الإجراء" />
+                                                                    <TextBlock
+                                                                        Margin="0,2,0,0"
+                                                                        FontSize="10"
+                                                                        Foreground="{StaticResource TextHintBrush}"
+                                                                        Text="إلغاء آخر تعديل" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Button>
+
+                                                        <!--
+                                                            ───────────────────────────────
+                                                            إلغاء الحلقة
+                                                            ───────────────────────────────
+                                                        -->
+                                                        <Button
+                                                            Height="44"
+                                                            Margin="0,2"
+                                                            Padding="4,0"
+                                                            HorizontalContentAlignment="Stretch"
+                                                            Click="BtnCancelEpisode_Click"
+                                                            Style="{StaticResource Btn.Ghost}"
+                                                            Visibility="{Binding CanCancel, Converter={StaticResource BoolToVisConverter}}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="40" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Border
+                                                                    Grid.Column="0"
+                                                                    Width="32"
+                                                                    Height="32"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    Background="{StaticResource ErrorLightBrush}"
+                                                                    CornerRadius="8">
+                                                                    <materialDesign:PackIcon
+                                                                        Width="16"
+                                                                        Height="16"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Foreground="{StaticResource ErrorBrush}"
+                                                                        Kind="CloseCircleOutline" />
+                                                                </Border>
+
+                                                                <StackPanel
+                                                                    Grid.Column="1"
+                                                                    Margin="0,0,4,0"
+                                                                    VerticalAlignment="Center">
+                                                                    <TextBlock
+                                                                        FontSize="12"
+                                                                        FontWeight="Medium"
+                                                                        Foreground="{StaticResource ErrorBrush}"
+                                                                        Text="إلغاء الحلقة" />
+                                                                    <TextBlock
+                                                                        Margin="0,2,0,0"
+                                                                        FontSize="10"
+                                                                        Foreground="{StaticResource TextHintBrush}"
+                                                                        Text="إلغاء الحلقة الحالية" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Button>
+
+                                                        <!--  الفاصل  -->
+                                                        <Border
+                                                            Height="1"
+                                                            Margin="8,8"
+                                                            Background="{StaticResource DividerBrush}"
+                                                            Opacity="0.5" />
+
+                                                        <!--
+                                                            ───────────────────────────────
+                                                            تعديل
+                                                            ───────────────────────────────
+                                                        -->
+                                                        <Button
+                                                            Height="44"
+                                                            Margin="0,2"
+                                                            Padding="4,0"
+                                                            HorizontalContentAlignment="Stretch"
+                                                            Click="BtnEdit_Click"
+                                                            Style="{StaticResource Btn.Ghost}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="40" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Border
+                                                                    Grid.Column="0"
+                                                                    Width="32"
+                                                                    Height="32"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    Background="#FFE3F2FD"
+                                                                    CornerRadius="8">
+                                                                    <materialDesign:PackIcon
+                                                                        Width="16"
+                                                                        Height="16"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Foreground="#FF1976D2"
+                                                                        Kind="PencilOutline" />
+                                                                </Border>
+
+                                                                <StackPanel
+                                                                    Grid.Column="1"
+                                                                    Margin="0,0,4,0"
+                                                                    VerticalAlignment="Center">
+                                                                    <TextBlock
+                                                                        FontSize="12"
+                                                                        FontWeight="Medium"
+                                                                        Foreground="{StaticResource TextPrimaryBrush}"
+                                                                        Text="تعديل" />
+                                                                    <TextBlock
+                                                                        Margin="0,2,0,0"
+                                                                        FontSize="10"
+                                                                        Foreground="{StaticResource TextHintBrush}"
+                                                                        Text="تعديل بيانات الحلقة" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Button>
+
+                                                        <!--
+                                                            ───────────────────────────────
+                                                            حذف
+                                                            ───────────────────────────────
+                                                        -->
+                                                        <Button
+                                                            Height="44"
+                                                            Margin="0,2"
+                                                            Padding="4,0"
+                                                            HorizontalContentAlignment="Stretch"
+                                                            Click="BtnDelete_Click"
+                                                            Style="{StaticResource Btn.Ghost}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="40" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Border
+                                                                    Grid.Column="0"
+                                                                    Width="32"
+                                                                    Height="32"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    Background="{StaticResource ErrorLightBrush}"
+                                                                    CornerRadius="8">
+                                                                    <materialDesign:PackIcon
+                                                                        Width="16"
+                                                                        Height="16"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Foreground="{StaticResource ErrorBrush}"
+                                                                        Kind="DeleteOutline" />
+                                                                </Border>
+
+                                                                <StackPanel
+                                                                    Grid.Column="1"
+                                                                    Margin="0,0,4,0"
+                                                                    VerticalAlignment="Center">
+                                                                    <TextBlock
+                                                                        FontSize="12"
+                                                                        FontWeight="Medium"
+                                                                        Foreground="{StaticResource ErrorBrush}"
+                                                                        Text="حذف" />
+                                                                    <TextBlock
+                                                                        Margin="0,2,0,0"
+                                                                        FontSize="10"
+                                                                        Foreground="{StaticResource TextHintBrush}"
+                                                                        Text="حذف الحلقة بشكل نهائي" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Button>
+
+                                                    </StackPanel>
+                                                </Border>
                                             </materialDesign:PopupBox>
                                         </Grid>
                                     </Border>

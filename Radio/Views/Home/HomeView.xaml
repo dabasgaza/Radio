@@ -18,7 +18,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- ═══════════════ 1. HERO WELCOME BANNER ═══════════════ -->
+            <!--  ═══════════════ 1. HERO WELCOME BANNER ═══════════════  -->
             <Border
                 Grid.Row="0"
                 Margin="0,0,0,24"
@@ -31,7 +31,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Clock Circle -->
+                    <!--  Clock Circle  -->
                     <Border
                         Width="88"
                         Height="88"
@@ -49,7 +49,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Greeting + Subtitle -->
+                    <!--  Greeting + Subtitle  -->
                     <StackPanel
                         Grid.Column="1"
                         Margin="0,24"
@@ -73,7 +73,7 @@
                             Text="نظرة عامة على سير العمل والنشاط الميداني لليوم" />
                     </StackPanel>
 
-                    <!-- Broadcast Status -->
+                    <!--  Broadcast Status  -->
                     <Border
                         Grid.Column="2"
                         Height="32"
@@ -102,7 +102,7 @@
                 </Grid>
             </Border>
 
-            <!-- ═══════════════ 2. PREMIUM STAT CARDS ═══════════════ -->
+            <!--  ═══════════════ 2. PREMIUM STAT CARDS ═══════════════  -->
             <Grid Grid.Row="1" Margin="0,0,0,24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -111,7 +111,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Card 1: Today's Episodes -->
+                <!--  Card 1: Today's Episodes  -->
                 <Border
                     Margin="6,0"
                     Background="White"
@@ -147,7 +147,10 @@
                                 Foreground="{StaticResource PrimaryMainBrush}"
                                 Kind="CalendarStar" />
                         </Border>
-                        <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="14,0,0,0"
+                            VerticalAlignment="Center">
                             <TextBlock
                                 x:Name="TxtTodayCount"
                                 FontSize="28"
@@ -163,7 +166,7 @@
                     </Grid>
                 </Border>
 
-                <!-- Card 2: Scheduled Guests -->
+                <!--  Card 2: Scheduled Guests  -->
                 <Border
                     Grid.Column="1"
                     Margin="6,0"
@@ -188,7 +191,10 @@
                                 Foreground="{StaticResource SuccessBrush}"
                                 Kind="AccountVoice" />
                         </Border>
-                        <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="14,0,0,0"
+                            VerticalAlignment="Center">
                             <TextBlock
                                 x:Name="TxtGuestCount"
                                 FontSize="28"
@@ -204,7 +210,7 @@
                     </Grid>
                 </Border>
 
-                <!-- Card 3: Pending Execution -->
+                <!--  Card 3: Pending Execution  -->
                 <Border
                     Grid.Column="2"
                     Margin="6,0"
@@ -229,7 +235,10 @@
                                 Foreground="{StaticResource WarningBrush}"
                                 Kind="History" />
                         </Border>
-                        <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="14,0,0,0"
+                            VerticalAlignment="Center">
                             <TextBlock
                                 x:Name="TxtPendingLogs"
                                 FontSize="28"
@@ -245,7 +254,7 @@
                     </Grid>
                 </Border>
 
-                <!-- Card 4: Active Users -->
+                <!--  Card 4: Active Users  -->
                 <Border
                     Grid.Column="3"
                     Margin="6,0"
@@ -270,7 +279,10 @@
                                 Foreground="{StaticResource InfoBrush}"
                                 Kind="ShieldAccount" />
                         </Border>
-                        <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="14,0,0,0"
+                            VerticalAlignment="Center">
                             <TextBlock
                                 x:Name="TxtActiveUsers"
                                 FontSize="28"
@@ -287,14 +299,14 @@
                 </Border>
             </Grid>
 
-            <!-- ═══════════════ 3. CONTENT AREA ═══════════════ -->
+            <!--  ═══════════════ 3. CONTENT AREA ═══════════════  -->
             <Grid Grid.Row="2" Margin="0,0,0,24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- ═══ Right: Today's Episodes Table ═══ -->
+                <!--  ═══ Right: Today's Episodes Table ═══  -->
                 <Border
                     Margin="0,0,12,0"
                     Background="White"
@@ -306,7 +318,7 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <!-- Header -->
+                        <!--  Header  -->
                         <Grid Margin="20,20,20,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -344,7 +356,7 @@
                             </Border>
                         </Grid>
 
-                        <!-- DataGrid -->
+                        <!--  DataGrid  -->
                         <DataGrid
                             x:Name="DgTodayEpisodes"
                             Grid.Row="1"
@@ -353,7 +365,7 @@
                             CellStyle="{StaticResource DataGrid.Cell}"
                             ColumnHeaderStyle="{StaticResource DataGrid.ColumnHeader.Center}"
                             IsReadOnly="True"
-                    Style="{StaticResource DataGrid.Main}">
+                            Style="{StaticResource DataGrid.Main}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn
                                     Width="80"
@@ -430,10 +442,10 @@
                     </Grid>
                 </Border>
 
-                <!-- ═══ Left: Announcement + Active Programs ═══ -->
+                <!--  ═══ Left: Announcement + Active Programs ═══  -->
                 <StackPanel Grid.Column="1" Margin="12,0,0,0">
 
-                    <!-- Announcement Card (Glass) -->
+                    <!--  Announcement Card (Glass)  -->
                     <Border
                         Padding="24"
                         Background="{StaticResource DialogHeaderInfoBrush}"
@@ -444,9 +456,9 @@
                                 Height="80"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
-                                Opacity="0.1"
                                 Foreground="White"
-                                Kind="InformationOutline" />
+                                Kind="InformationOutline"
+                                Opacity="0.1" />
                             <StackPanel>
                                 <TextBlock
                                     FontSize="16"
@@ -463,12 +475,12 @@
                                     Margin="0,14,0,0"
                                     Padding="16,6"
                                     HorizontalAlignment="Right"
+                                    materialDesign:ButtonAssist.CornerRadius="8"
                                     Background="#22FFFFFF"
                                     BorderThickness="0"
                                     Cursor="Hand"
                                     Foreground="White"
-                                    Style="{StaticResource MaterialDesignFlatButton}"
-                                    materialDesign:ButtonAssist.CornerRadius="8">
+                                    Style="{StaticResource MaterialDesignFlatButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
                                             Width="16"
@@ -487,7 +499,7 @@
                         </Grid>
                     </Border>
 
-                    <!-- Active Programs Card -->
+                    <!--  Active Programs Card  -->
                     <Border
                         Margin="0,16,0,0"
                         Padding="20"
@@ -500,7 +512,7 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <!-- Header -->
+                            <!--  Header  -->
                             <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
                                 <materialDesign:PackIcon
                                     VerticalAlignment="Center"
@@ -515,10 +527,8 @@
                                     Text="البرامج النشطة" />
                             </StackPanel>
 
-                            <!-- Programs List -->
-                            <ItemsControl
-                                x:Name="IcActivePrograms"
-                                Grid.Row="1">
+                            <!--  Programs List  -->
+                            <ItemsControl x:Name="IcActivePrograms" Grid.Row="1">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Grid Margin="0,8,0,0">
@@ -548,12 +558,12 @@
                                                 Grid.Row="1"
                                                 Height="5"
                                                 Margin="0,6,0,0"
+                                                materialDesign:TransitionAssist.DisableTransitions="False"
                                                 Background="{StaticResource DividerBrush}"
                                                 BorderThickness="0"
                                                 Foreground="{StaticResource PrimaryMainBrush}"
                                                 Maximum="{Binding TotalEpisodes}"
-                                                Value="{Binding PublishedEpisodes}"
-                                                materialDesign:TransitionAssist.DisableTransitions="False" />
+                                                Value="{Binding PublishedEpisodes}" />
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

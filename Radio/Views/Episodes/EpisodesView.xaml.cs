@@ -1,4 +1,4 @@
-﻿// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // EpisodesView.xaml.cs — المرحلة الثانية: أنماط العرض المتقدمة
 // ═══════════════════════════════════════════════════════════════════════════
 // التحسينات:
@@ -214,16 +214,19 @@ namespace Radio.Views.Episodes
                     ep.CorrespondentItems.Any(c => c.FullName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false));
             }
 
-            // ─── ترتيب ───
             var sortIndex = CmbSortBy.SelectedIndex;
             filtered = sortIndex switch
             {
-                0 => filtered.OrderByDescending(e => e.ScheduledExecutionTime),   // الأحدث
-                1 => filtered.OrderBy(e => e.ScheduledExecutionTime),             // الأقدم
-                2 => filtered.OrderBy(e => e.StatusId).ThenByDescending(e => e.ScheduledExecutionTime), // الحالة
+                0 => filtered.OrderByDescending(e => e.ScheduledExecutionTime.HasValue ? e.ScheduledExecutionTime.Value.Date : DateTime.MinValue)
+                             .ThenBy(e => e.ScheduledExecutionTime),   // الأحدث: التاريخ تنازلياً ثم الوقت تصاعدياً
+                1 => filtered.OrderBy(e => e.ScheduledExecutionTime),             // الأقدم: التاريخ والوقت تصاعدياً
+                2 => filtered.OrderBy(e => e.StatusId)
+                             .ThenByDescending(e => e.ScheduledExecutionTime.HasValue ? e.ScheduledExecutionTime.Value.Date : DateTime.MinValue)
+                             .ThenBy(e => e.ScheduledExecutionTime), // الحالة: تجميع بالحالة ثم التاريخ تنازلي والوقت تصاعدي
                 3 => filtered.OrderBy(e => e.ProgramName, StringComparer.OrdinalIgnoreCase),             // البرنامج
                 4 => filtered.OrderBy(e => e.EpisodeName, StringComparer.OrdinalIgnoreCase),             // الاسم
-                _ => filtered.OrderByDescending(e => e.ScheduledExecutionTime)
+                _ => filtered.OrderByDescending(e => e.ScheduledExecutionTime.HasValue ? e.ScheduledExecutionTime.Value.Date : DateTime.MinValue)
+                             .ThenBy(e => e.ScheduledExecutionTime)
             };
 
             var resultList = filtered.ToList();

@@ -93,8 +93,8 @@
                                 <Border
                                     Width="32"
                                     Height="32"
-                                    CornerRadius="16"
-                                    VerticalAlignment="Center">
+                                    VerticalAlignment="Center"
+                                    CornerRadius="16">
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                             <GradientStop Offset="0" Color="{DynamicResource Primary500Color}" />
@@ -173,17 +173,21 @@
                                 ToolTip="الإشعارات">
                                 <Button.Style>
                                     <Style TargetType="Button">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="BorderThickness" Value="0" />
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="border" CornerRadius="20" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Border
+                                                        x:Name="border"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="20"
+                                                        SnapsToDevicePixels="True">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                     </Border>
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}"/>
+                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
                                                         </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>
@@ -205,8 +209,8 @@
                                 Height="20"
                                 Margin="8,0"
                                 Background="{DynamicResource DividerBrush}"
-                                Opacity="0.6"
-                                CornerRadius="0.5" />
+                                CornerRadius="0.5"
+                                Opacity="0.6" />
 
                             <Border
                                 Margin="4,0"
@@ -267,25 +271,29 @@
                             </Border>
 
                             <Button
-                                Width="160"
                                 x:Name="BtnUserProfile"
+                                Width="160"
                                 Height="40"
                                 Margin="4,0"
                                 Click="BtnUserProfile_Click">
                                 <Button.Style>
                                     <Style TargetType="Button">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Setter Property="BorderThickness" Value="0"/>
-                                        <Setter Property="Padding" Value="8,4"/>
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="BorderThickness" Value="0" />
+                                        <Setter Property="Padding" Value="8,4" />
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="border" CornerRadius="20" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-                                                        <ContentPresenter VerticalAlignment="Center"/>
+                                                    <Border
+                                                        x:Name="border"
+                                                        Padding="{TemplateBinding Padding}"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="20">
+                                                        <ContentPresenter VerticalAlignment="Center" />
                                                     </Border>
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}"/>
+                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
                                                         </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>
@@ -311,9 +319,9 @@
                                             x:Name="UserInitials"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
+                                            FontSize="12"
                                             FontWeight="Bold"
                                             Foreground="White"
-                                            FontSize="12"
                                             Text="MA" />
                                     </Border>
                                     <TextBlock
@@ -338,26 +346,30 @@
                                 Height="20"
                                 Margin="8,0"
                                 Background="{DynamicResource DividerBrush}"
-                                Opacity="0.6"
-                                CornerRadius="0.5" />
+                                CornerRadius="0.5"
+                                Opacity="0.6" />
 
                             <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                 <StackPanel.Resources>
                                     <Style x:Key="WindowControlBtnStyle" TargetType="Button">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-                                        <Setter Property="Width" Value="40"/>
-                                        <Setter Property="Height" Value="32"/>
-                                        <Setter Property="Margin" Value="2,0"/>
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                        <Setter Property="Width" Value="40" />
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Margin" Value="2,0" />
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="border" CornerRadius="6" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Border
+                                                        x:Name="border"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="6"
+                                                        SnapsToDevicePixels="True">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                     </Border>
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}"/>
+                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
                                                         </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>
@@ -365,21 +377,25 @@
                                         </Setter>
                                     </Style>
                                     <Style x:Key="WindowCloseBtnStyle" TargetType="Button">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-                                        <Setter Property="Width" Value="40"/>
-                                        <Setter Property="Height" Value="32"/>
-                                        <Setter Property="Margin" Value="2,0"/>
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                        <Setter Property="Width" Value="40" />
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Margin" Value="2,0" />
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="border" CornerRadius="6" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Border
+                                                        x:Name="border"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="6"
+                                                        SnapsToDevicePixels="True">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                     </Border>
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="border" Property="Background" Value="#FEE2E2"/>
-                                                            <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
+                                                            <Setter TargetName="border" Property="Background" Value="#FEE2E2" />
+                                                            <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
                                                         </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>
@@ -387,26 +403,20 @@
                                         </Setter>
                                     </Style>
                                 </StackPanel.Resources>
-                                <Button
-                                    Style="{StaticResource WindowControlBtnStyle}"
-                                    Click="BtnMinimize_Click">
+                                <Button Click="BtnMinimize_Click" Style="{StaticResource WindowControlBtnStyle}">
                                     <materialDesign:PackIcon
                                         Width="18"
                                         Height="18"
                                         Kind="WindowMinimize" />
                                 </Button>
-                                <Button
-                                    Style="{StaticResource WindowControlBtnStyle}"
-                                    Click="BtnMaximize_Click">
+                                <Button Click="BtnMaximize_Click" Style="{StaticResource WindowControlBtnStyle}">
                                     <materialDesign:PackIcon
                                         x:Name="MaximizeIcon"
                                         Width="18"
                                         Height="18"
                                         Kind="WindowMaximize" />
                                 </Button>
-                                <Button
-                                    Style="{StaticResource WindowCloseBtnStyle}"
-                                    Click="BtnClose_Click">
+                                <Button Click="BtnClose_Click" Style="{StaticResource WindowCloseBtnStyle}">
                                     <materialDesign:PackIcon
                                         Width="18"
                                         Height="18"
@@ -423,7 +433,7 @@
                     Grid.Column="0" />
 
                 <Grid Grid.Row="1" Grid.Column="1">
-                    <!-- Wrapped in a modern container card -->
+                    <!--  Wrapped in a modern container card  -->
                     <Border
                         Margin="24"
                         Background="{DynamicResource SurfaceBrush}"
@@ -490,33 +500,36 @@
                             <TextBlock
                                 x:Name="OnAirProgramName"
                                 FontSize="{DynamicResource FontSize.Label}"
-                                Foreground="#FFE4E6"
                                 FontWeight="Medium"
+                                Foreground="#FFE4E6"
                                 Text="اسم البرنامج الحالي" />
 
                             <Button
-                                Margin="0,20,0,0"
                                 Height="38"
+                                Margin="0,20,0,0"
                                 Click="BtnStopOnAir_Click"
                                 Content="إيقاف البث"
                                 Cursor="Hand">
                                 <Button.Style>
                                     <Style TargetType="Button">
-                                        <Setter Property="Background" Value="#33FFFFFF"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Background" Value="#33FFFFFF" />
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="BorderThickness" Value="0" />
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="bd" CornerRadius="8" Background="{TemplateBinding Background}">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Border
+                                                        x:Name="bd"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="8">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                     </Border>
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="bd" Property="Background" Value="#4DFFFFFF"/>
+                                                            <Setter TargetName="bd" Property="Background" Value="#4DFFFFFF" />
                                                         </Trigger>
                                                         <Trigger Property="IsPressed" Value="True">
-                                                            <Setter TargetName="bd" Property="Background" Value="#66FFFFFF"/>
+                                                            <Setter TargetName="bd" Property="Background" Value="#66FFFFFF" />
                                                         </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>
@@ -579,8 +592,8 @@
                                         Grid.Column="0"
                                         Width="42"
                                         Height="42"
-                                        CornerRadius="21"
-                                        Margin="0,0,12,0">
+                                        Margin="0,0,12,0"
+                                        CornerRadius="21">
                                         <Border.Background>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                                 <GradientStop Offset="0" Color="{DynamicResource Primary500Color}" />
@@ -598,20 +611,18 @@
                                     </Border>
 
                                     <!--  Name & Role  -->
-                                    <StackPanel
-                                        Grid.Column="1"
-                                        VerticalAlignment="Center">
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock
                                             x:Name="PopupUserName"
                                             FontSize="{DynamicResource FontSize.BodyLarge}"
                                             FontWeight="Bold"
                                             Foreground="{DynamicResource PrimaryDarkBrush}"
                                             Text="مستخدم" />
-                                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                        <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
                                             <Border
                                                 Padding="6,2"
-                                                CornerRadius="4"
-                                                Background="{DynamicResource PrimaryXLightBrush}">
+                                                Background="{DynamicResource PrimaryXLightBrush}"
+                                                CornerRadius="4">
                                                 <TextBlock
                                                     x:Name="PopupUserRole"
                                                     FontSize="{DynamicResource FontSize.Caption}"
@@ -637,17 +648,17 @@
                                     x:Name="BtnLogoutStyled"
                                     Height="42"
                                     HorizontalContentAlignment="Center"
+                                    BorderThickness="0"
                                     Click="BtnLogout_Click"
-                                    Cursor="Hand"
-                                    BorderThickness="0">
+                                    Cursor="Hand">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
                                             <Border
                                                 x:Name="LogoutBd"
                                                 Height="{TemplateBinding Height}"
                                                 CornerRadius="10"
-                                                SnapsToDevicePixels="True"
-                                                Cursor="Hand">
+                                                Cursor="Hand"
+                                                SnapsToDevicePixels="True">
                                                 <Border.Background>
                                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                                         <GradientStop Offset="0" Color="#EF4444" />

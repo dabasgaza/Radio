@@ -176,15 +176,53 @@ namespace Radio
             // تسجيل الخطأ كحالة حرجة في السجل مع استثناء التفاصيل كاملة
             Log.Fatal(e.Exception, "حدث خطأ غير متوقع لم يتم معالجته في التطبيق.");
 
-            // عرض رسالة ودية للمستخدم باللغة العربية لمواصلة العمل دون انهيار التطبيق مفاجئاً
-            MessageBox.Show(
-                $"نعتذر عن هذا الخطأ غير المتوقع في النظام.\n\nتفاصيل الخطأ: {e.Exception.Message}\n\nيمكنك الاستمرار في استخدام التطبيق، وإذا استمرت المشكلة، يرجى التواصل مع الدعم الفني.",
-                "خطأ غير متوقع في النظام",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+            // إجبار Serilog على كتابة السجلات للقرص فوراً
+            Log.CloseAndFlush();
+
+            // عرض نافذة الخطأ الحديثة المخصصة بدلاً من MessageBox التقليدية
+            var errorWindow = new SystemErrorWindow(e.Exception);
+            errorWindow.ShowDialog();
+
+            // إعادة تهيئة Logger في حال قرر المستخدم "متابعة العمل" كي يستمر التسجيل
+            ReinitializeLogger();
 
             // منع إغلاق التطبيق المفاجئ
             e.Handled = true;
+        }
+
+        private void ReinitializeLogger()
+        {
+            try
+            {
+                if (AppHost != null)
+                {
+                    var config = AppHost.Services.GetService<IConfiguration>();
+                    if (config != null)
+                    {
+                        var seqUrl = config["Seq:ServerUrl"] ?? "http://localhost:5341";
+                        var apiKey = config["Seq:ApiKey"] ?? string.Empty;
+
+                        Log.Logger = new LoggerConfiguration()
+                            .MinimumLevel.Information()
+                            .Enrich.FromLogContext()
+                            .WriteTo.Console()
+                            .WriteTo.File("logs/radio.log", rollingInterval: RollingInterval.Day)
+                            .WriteTo.Seq(seqUrl, apiKey: string.IsNullOrEmpty(apiKey) ? null : apiKey)
+                            .CreateLogger();
+                        return;
+                    }
+                }
+            }
+            catch
+            {
+                // تجاهل أخطاء إعادة التهيئة
+            }
+
+            // Fallback basic logger
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.File("logs/radio.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
         }
     }
 }

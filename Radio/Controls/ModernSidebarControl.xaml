@@ -8,10 +8,13 @@
     xmlns:models="clr-namespace:Radio.Models"
     d:DesignHeight="700"
     d:DesignWidth="260"
-    mc:Ignorable="d"
-    Style="{StaticResource View.Base}">
+    Style="{StaticResource View.Base}"
+    mc:Ignorable="d">
 
     <UserControl.Resources>
+        <!--  Premium Sidebar Hover Background Brush & Border  -->
+        <SolidColorBrush x:Key="SidebarHoverBg" Color="#126366F1" />
+        <SolidColorBrush x:Key="SidebarHoverBorder" Color="#226366F1" />
 
         <!--  ═══ Glass Nav Item — Expanded ═══  -->
         <Style x:Key="GlassNavItem" TargetType="RadioButton">
@@ -31,6 +34,8 @@
                             Height="{TemplateBinding Height}"
                             Padding="{TemplateBinding Padding}"
                             Background="{TemplateBinding Background}"
+                            BorderBrush="Transparent"
+                            BorderThickness="1"
                             CornerRadius="10"
                             SnapsToDevicePixels="True">
                             <Grid>
@@ -39,26 +44,39 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Active Indicator Line (RTL Right Edge) -->
+                                <!--  Active Indicator Line (RTL Right Edge)  -->
                                 <Border
                                     x:Name="ActiveIndicator"
                                     Grid.Column="0"
-                                    Width="3"
-                                    Height="16"
-                                    Background="Transparent"
-                                    CornerRadius="1.5"
+                                    Width="3.5"
+                                    Height="0"
                                     Margin="0,0,8,0"
-                                    VerticalAlignment="Center" />
+                                    VerticalAlignment="Center"
+                                    Background="{DynamicResource PrimaryMainBrush}"
+                                    CornerRadius="1.75"
+                                    Opacity="0" />
 
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <!-- Icon Wrapper with Optional Background Pill -->
+                                <StackPanel
+                                    x:Name="ContentStack"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <StackPanel.RenderTransform>
+                                        <TranslateTransform x:Name="ContentTrans" X="0" Y="0" />
+                                    </StackPanel.RenderTransform>
+                                    <!--  Icon Wrapper with Optional Background Pill  -->
                                     <Border
                                         x:Name="IconBg"
                                         Width="30"
                                         Height="30"
-                                        CornerRadius="15"
+                                        VerticalAlignment="Center"
                                         Background="Transparent"
-                                        VerticalAlignment="Center">
+                                        CornerRadius="15"
+                                        RenderTransformOrigin="0.5,0.5">
+                                        <Border.RenderTransform>
+                                            <ScaleTransform x:Name="IconScale" ScaleX="1" ScaleY="1" />
+                                        </Border.RenderTransform>
                                         <ContentPresenter
                                             x:Name="IconHost"
                                             Width="18"
@@ -78,17 +96,133 @@
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-                            </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceBrush}" />
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
                                 <Setter TargetName="LabelHost" Property="FontWeight" Value="SemiBold" />
-                                <Setter TargetName="ActiveIndicator" Property="Background" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="ActiveIndicator" Property="Height" Value="20" />
+                                <Setter TargetName="ActiveIndicator" Property="Opacity" Value="1" />
                                 <Setter TargetName="IconBg" Property="Background" Value="{DynamicResource PrimaryContainerBrush}" />
                             </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource SidebarHoverBg}" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SidebarHoverBorder}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                <MultiTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1.15"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1.15"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ContentTrans"
+                                                Storyboard.TargetProperty="X"
+                                                To="4"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ActiveIndicator"
+                                                Storyboard.TargetProperty="Height"
+                                                To="12"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ActiveIndicator"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="0.5"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ContentTrans"
+                                                Storyboard.TargetProperty="X"
+                                                To="0"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ActiveIndicator"
+                                                Storyboard.TargetProperty="Height"
+                                                To="0"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ActiveIndicator"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="0"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.ExitActions>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <MultiTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1.15"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1.15"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ContentTrans"
+                                                Storyboard.TargetProperty="X"
+                                                To="4"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ContentTrans"
+                                                Storyboard.TargetProperty="X"
+                                                To="0"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.ExitActions>
+                            </MultiTrigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.38" />
                             </Trigger>
@@ -116,27 +250,34 @@
                             Width="{TemplateBinding Width}"
                             Height="{TemplateBinding Height}"
                             Background="{TemplateBinding Background}"
+                            BorderBrush="Transparent"
+                            BorderThickness="1"
                             CornerRadius="10"
                             SnapsToDevicePixels="True">
                             <Grid>
-                                <!-- Active Indicator Line (RTL Right Edge) -->
+                                <!--  Active Indicator Line (RTL Right Edge)  -->
                                 <Border
                                     x:Name="ActiveIndicator"
-                                    Width="3"
-                                    Height="16"
+                                    Width="3.5"
+                                    Height="0"
+                                    Margin="0,0,2,0"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Center"
-                                    Background="Transparent"
-                                    CornerRadius="1.5"
-                                    Margin="0,0,2,0" />
+                                    Background="{DynamicResource PrimaryMainBrush}"
+                                    CornerRadius="1.75"
+                                    Opacity="0" />
                                 <Border
                                     x:Name="IconBg"
                                     Width="30"
                                     Height="30"
-                                    CornerRadius="15"
-                                    Background="Transparent"
                                     HorizontalAlignment="Center"
-                                    VerticalAlignment="Center">
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    CornerRadius="15"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform x:Name="IconScale" ScaleX="1" ScaleY="1" />
+                                    </Border.RenderTransform>
                                     <ContentPresenter
                                         x:Name="IconHost"
                                         Width="18"
@@ -147,16 +288,112 @@
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-                            </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceBrush}" />
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
-                                <Setter TargetName="ActiveIndicator" Property="Background" Value="{DynamicResource PrimaryMainBrush}" />
+                                <Setter TargetName="ActiveIndicator" Property="Height" Value="20" />
+                                <Setter TargetName="ActiveIndicator" Property="Opacity" Value="1" />
                                 <Setter TargetName="IconBg" Property="Background" Value="{DynamicResource PrimaryContainerBrush}" />
                             </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource SidebarHoverBg}" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SidebarHoverBorder}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                <MultiTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1.15"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1.15"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ActiveIndicator"
+                                                Storyboard.TargetProperty="Height"
+                                                To="12"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ActiveIndicator"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="0.5"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ActiveIndicator"
+                                                Storyboard.TargetProperty="Height"
+                                                To="0"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ActiveIndicator"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="0"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.ExitActions>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <MultiTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1.15"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1.15"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="IconScale"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.ExitActions>
+                            </MultiTrigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.38" />
                             </Trigger>
@@ -192,7 +429,11 @@
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
                                 <Setter TargetName="Bd" Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect BlurRadius="4" Opacity="0.08" ShadowDepth="1" Color="#0F172A" />
+                                        <DropShadowEffect
+                                            BlurRadius="4"
+                                            Opacity="0.08"
+                                            ShadowDepth="1"
+                                            Color="#0F172A" />
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -239,7 +480,11 @@
                                 <Setter Property="Foreground" Value="{DynamicResource PrimaryMainBrush}" />
                                 <Setter TargetName="Bd" Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect BlurRadius="4" Opacity="0.08" ShadowDepth="1" Color="#0F172A" />
+                                        <DropShadowEffect
+                                            BlurRadius="4"
+                                            Opacity="0.08"
+                                            ShadowDepth="1"
+                                            Color="#0F172A" />
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -262,10 +507,10 @@
         <!--  ═══ Expanded Item XAML DataTemplate ═══  -->
         <DataTemplate x:Key="ExpandedItemTemplate" DataType="{x:Type models:NavigationItem}">
             <RadioButton
-                Style="{StaticResource GlassNavItem}"
-                Tag="{Binding Label}"
+                Click="NavItem_Click"
                 IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                Click="NavItem_Click">
+                Style="{StaticResource GlassNavItem}"
+                Tag="{Binding Label}">
                 <materialDesign:PackIcon
                     Width="18"
                     Height="18"
@@ -277,10 +522,10 @@
         <!--  ═══ Collapsed Item XAML DataTemplate ═══  -->
         <DataTemplate x:Key="CollapsedItemTemplate" DataType="{x:Type models:NavigationItem}">
             <RadioButton
-                Style="{StaticResource GlassNavItemMin}"
-                ToolTip="{Binding Label}"
+                Click="NavItem_Click"
                 IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                Click="NavItem_Click">
+                Style="{StaticResource GlassNavItemMin}"
+                ToolTip="{Binding Label}">
                 <materialDesign:PackIcon
                     Width="18"
                     Height="18"

@@ -29,16 +29,34 @@
                     <Grid x:Name="Root">
                         <ToggleButton
                             x:Name="PART_Toggle"
-                            Padding="{TemplateBinding Padding}"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            Content="{TemplateBinding ToggleContent}"
-                            ContentTemplate="{TemplateBinding ToggleContentTemplate}"
-                            IsChecked="{Binding IsPopupOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                            Style="{StaticResource MaterialDesignFlatToggleButton}" />
+                            IsChecked="{Binding IsPopupOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border
+                                        x:Name="border"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        CornerRadius="15">
+                                        <ContentPresenter
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#15000000" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#25000000" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
 
                         <Popup
                             x:Name="PART_Popup"

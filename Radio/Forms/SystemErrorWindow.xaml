@@ -1,0 +1,159 @@
+<mah:MetroWindow
+    x:Class="Radio.Forms.SystemErrorWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="خطأ غير متوقع في النظام"
+    Width="650"
+    Height="480"
+    AllowsTransparency="True"
+    Background="Transparent"
+    ResizeMode="NoResize"
+    ShowCloseButton="False"
+    ShowTitleBar="False"
+    Style="{StaticResource Window.Dialog}"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None">
+
+    <Grid Margin="16">
+        <Grid.Effect>
+            <DropShadowEffect
+                BlurRadius="25"
+                Opacity="0.25"
+                ShadowDepth="0"
+                Color="Black" />
+        </Grid.Effect>
+
+        <materialDesign:Card Background="White" UniformCornerRadius="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <!--  Top accent bar / header  -->
+                    <RowDefinition Height="*" />
+                    <!--  Content area  -->
+                    <RowDefinition Height="Auto" />
+                    <!--  Bottom Action bar  -->
+                </Grid.RowDefinitions>
+
+                <!--  1. Top Accent/Header Bar (Decorative Red/Pink Accent)  -->
+                <Border
+                    Grid.Row="0"
+                    Height="6"
+                    Background="{StaticResource ErrorBrush}"
+                    CornerRadius="16,16,0,0" />
+
+                <!--  2. Main Content Area  -->
+                <Grid Grid.Row="1" Margin="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <!--  Title & Subtitle  -->
+                        <RowDefinition Height="*" />
+                        <!--  Details / Stack Trace  -->
+                    </Grid.RowDefinitions>
+
+                    <StackPanel
+                        Grid.Row="0"
+                        Margin="0,0,0,16"
+                        Orientation="Horizontal">
+                        <!--  Red Error Icon  -->
+                        <materialDesign:PackIcon
+                            Width="48"
+                            Height="48"
+                            VerticalAlignment="Top"
+                            Foreground="{StaticResource ErrorBrush}"
+                            Kind="AlertOctagon" />
+
+                        <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource Font.Default}"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource ErrorBrush}"
+                                Text="نعتذر عن هذا الخطأ غير المتوقع في النظام" />
+
+                            <TextBlock
+                                MaxWidth="500"
+                                Margin="0,4,0,0"
+                                FontFamily="{StaticResource Font.Default}"
+                                FontSize="12"
+                                Foreground="{StaticResource TextSecondaryBrush}"
+                                Text="لقد واجه النظام خللاً تقنياً مفاجئاً. تم تسجيل تفاصيل هذا الاستثناء لمراجعته ودعم الاستقرار."
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!--  Technical Details Expander  -->
+                    <Expander
+                        Grid.Row="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Background="{StaticResource AppBackgroundBrush}"
+                        BorderBrush="{StaticResource DividerBrush}"
+                        BorderThickness="1"
+                        FontFamily="{StaticResource Font.Default}"
+                        FontSize="12"
+                        Foreground="{StaticResource TextSecondaryBrush}"
+                        Header="تفاصيل الخطأ التقنية (للدعم الفني)">
+                        <ScrollViewer
+                            Margin="8"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalScrollBarVisibility="Auto">
+                            <TextBox
+                                x:Name="TxtExceptionDetails"
+                                AcceptsReturn="True"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                FontFamily="Consolas"
+                                FontSize="11"
+                                Foreground="#D32F2F"
+                                IsReadOnly="True"
+                                TextWrapping="Wrap" />
+                        </ScrollViewer>
+                    </Expander>
+                </Grid>
+
+                <!--  3. Bottom Action Bar  -->
+                <Border
+                    Grid.Row="2"
+                    Padding="16,12"
+                    Background="{StaticResource AppBackgroundBrush}"
+                    CornerRadius="0,0,16,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Copy details button on the left (RTL)  -->
+                        <Button
+                            x:Name="BtnCopy"
+                            Grid.Column="0"
+                            HorizontalAlignment="Left"
+                            Click="BtnCopy_Click"
+                            Content="نسخ تفاصيل الخطأ"
+                            Style="{StaticResource MaterialDesignOutlinedButton}" />
+
+                        <!--  Restart and Continue on the right (RTL)  -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button
+                                x:Name="BtnContinue"
+                                Margin="0,0,8,0"
+                                Click="BtnContinue_Click"
+                                Content="متابعة العمل"
+                                Style="{StaticResource MaterialDesignFlatButton}" />
+
+                            <Button
+                                x:Name="BtnRestart"
+                                Background="{StaticResource ErrorBrush}"
+                                BorderBrush="{StaticResource ErrorBrush}"
+                                Click="BtnRestart_Click"
+                                Content="إعادة تشغيل التطبيق"
+                                Style="{StaticResource MaterialDesignRaisedButton}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</mah:MetroWindow>
