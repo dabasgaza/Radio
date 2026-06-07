@@ -43,6 +43,7 @@ public class ExecutionService(IDbContextFactory<BroadcastWorkflowDBContext> cont
             var log = new ExecutionLog
             {
                 EpisodeId = dto.EpisodeId,
+                DurationMinutes = dto.DurationMinutes,
                 ExecutedByUserId = session.UserId, // هذا حقل أعمال خاص بالتنفيذ، يجب تعبئته
                 ExecutionNotes = dto.ExecutionNotes,
                 IssuesEncountered = dto.IssuesEncountered

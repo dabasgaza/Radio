@@ -212,7 +212,6 @@
                                         <!--  Text Info  -->
                                         <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                                             <TextBlock
-                                                FontWeight="SemiBold"
                                                 Foreground="{StaticResource TextPrimaryBrush}"
                                                 Style="{StaticResource Type.BodyLarge}"
                                                 Text="{Binding FullName}"

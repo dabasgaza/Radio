@@ -158,7 +158,8 @@
                             VerticalAlignment="Center"
                             FontWeight="Medium"
                             Foreground="{DynamicResource TextSecondaryBrush}"
-                            Style="{StaticResource Type.Caption}" />
+                            Style="{StaticResource Type.Caption}"
+                            Visibility="Collapsed" />
 
                         <StackPanel
                             Grid.Column="3"

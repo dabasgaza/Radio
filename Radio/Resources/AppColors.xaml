@@ -189,6 +189,12 @@
         <GradientStop Offset="1.0" Color="#1976D2" />
     </LinearGradientBrush>
 
+    <!--  تدرج النشر الرقمي الخاص (بنفسجي/وردي نابض بالحياة)  -->
+    <LinearGradientBrush x:Key="PublishGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="#8B5CF6" />
+        <GradientStop Offset="1.0" Color="#EC4899" />
+    </LinearGradientBrush>
+
     <!--  ═════════════════════ DIALOG HEADER GRADIENTS ═════════════════════  -->
 
     <!--
