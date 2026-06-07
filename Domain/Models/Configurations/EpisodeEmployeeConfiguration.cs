@@ -44,7 +44,8 @@ public class EpisodeEmployeeConfiguration : IEntityTypeConfiguration<EpisodeEmpl
         builder.HasIndex(e => e.EmployeeId)
                .HasDatabaseName("IX_EpisodeEmployees_EmployeeId");
 
-        // 5. فلتر الحذف المنطقي
-        builder.HasQueryFilter(ee => ee.IsActive);
+        // 5. فلتر الحذف المنطقي (Soft Delete)
+        // ✨ تم إزالة HasQueryFilter — الفلتر يُطبّق مركزياً عبر GenerateSoftDeleteFilter في BroadcastWorkflowDBContext
+        // EpisodeEmployee يرث من BaseEntity لذلك يغطيه الفلتر الديناميكي تلقائياً
     }
 }

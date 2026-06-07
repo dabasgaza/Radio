@@ -23,11 +23,19 @@ namespace Radio
         private DateTime? _broadcastStartTime;
         private DispatcherTimer? _onAirTimer;
 
-        public ModernMainWindow(NavigationService navigationService, CurrentSessionProvider sessionProvider)
+        public ModernMainWindow(NavigationService navigationService, CurrentSessionProvider sessionProvider, DialogHelper dialogHelper)
         {
             _navigationService = navigationService;
             _session = sessionProvider.CurrentSession!;
             _navigationService.ViewChanged += OnViewChanged;
+
+            // ✨ الاشتراك في حدث طلب التنقل من Views الفرعية
+            // يحل مشكلة SecurityRolesView → PermissionMatrix (التنقل المكسور)
+            _navigationService.NavigationRequested += OnNavigationRequested;
+
+            // ✨ الاشتراك في أحداث DialogHelper لعرض/إخفاء الغطاء الشفاف
+            dialogHelper.OverlayShowRequested += async () => await this.ShowOverlayAsync();
+            dialogHelper.OverlayHideRequested += async () => await this.HideOverlayAsync();
 
             InitializeComponent();
             NotificationManager.RegisterHost(NotificationHost);
@@ -256,8 +264,15 @@ namespace Radio
 
         private void BtnLogout_Click(object sender, RoutedEventArgs e)
         {
+            // ✨ تنظيف الذاكرة المؤقتة عند تسجيل الخروج لمنع تسرب الذاكرة
+            _navigationService.ClearCache();
+
             var loginWindow = App.ServiceProvider.GetRequiredService<Forms.LoginWindow>();
             loginWindow.Show();
+
+            // ✅ تعيين MainWindow صراحةً — WPF لا يحدّثها تلقائياً بعد إغلاق ModernMainWindow
+            Application.Current.MainWindow = loginWindow;
+
             Close();
         }
 
@@ -303,7 +318,7 @@ namespace Radio
         private void InitializeFontScaleControls()
         {
             UpdateFontScaleUi();
-            FontScaleService.ScaleChanged += _ => Dispatcher.Invoke(UpdateFontScaleUi);
+            FontScaleService.ScaleChanged += _ => Dispatcher.BeginInvoke(UpdateFontScaleUi);
             PreviewKeyDown += MainWindow_PreviewKeyDown;
         }
 

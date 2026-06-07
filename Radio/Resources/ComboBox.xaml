@@ -53,11 +53,10 @@
 
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusMedium}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
-
-
 
         <!--  الآن هذا السطر سيعمل بشكل مثالي لأن الـ ItemContainer أصبح أعلاه  -->
         <Setter Property="ItemContainerStyle" Value="{StaticResource Input.ComboBoxItem}" />
@@ -113,7 +112,7 @@
 
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusSmall}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
 
         <Setter Property="ItemContainerStyle" Value="{StaticResource Input.ComboBoxItem}" />
@@ -127,6 +126,40 @@
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.55" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        BroadcastComboBox — Legacy alias (moved from AppStyles.xaml)
+        الاستخدام: حقول ComboBox في نماذج البث
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="BroadcastComboBox"
+        BasedOn="{StaticResource MaterialDesignOutlinedComboBox}"
+        TargetType="ComboBox">
+
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusMedium}" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
             </Trigger>
         </Style.Triggers>
     </Style>

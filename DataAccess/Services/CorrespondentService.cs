@@ -18,21 +18,29 @@ namespace DataAccess.Services
     // ✨ استخدام Primary Constructor
     public class CorrespondentService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : ICorrespondentService
     {
+        // ──────────────────────────────────────────────────────────────
+        // Compiled Query — تقليل وقت ترجمة LINQ في المسارات الساخنة
+        // ──────────────────────────────────────────────────────────────
+        private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<CorrespondentDto>> s_compiledGetAllActive =
+            EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+                context.Correspondents
+                    .AsNoTracking()
+                    .Select(c => new CorrespondentDto
+                    (
+                        c.CorrespondentId,
+                        c.FullName,
+                        c.PhoneNumber,
+                        c.AssignedLocations
+                    )));
+
         public async Task<List<CorrespondentDto>> GetAllActiveAsync()
         {
             using var context = await contextFactory.CreateDbContextAsync();
 
-            // ✨ لا نحتاج لكتابة Where(c => c.IsActive) لأن الـ Global Query Filter يعمل تلقائياً
-            return await context.Correspondents
-                .AsNoTracking()
-                .Select(c => new CorrespondentDto
-                (
-                    c.CorrespondentId,
-                    c.FullName,
-                    c.PhoneNumber,
-                    c.AssignedLocations
-                ))
-                .ToListAsync();
+            var result = new List<CorrespondentDto>();
+            await foreach (var dto in s_compiledGetAllActive(context))
+                result.Add(dto);
+            return result;
         }
 
         public async Task<Result> CreateAsync(CorrespondentDto dto, UserSession session)

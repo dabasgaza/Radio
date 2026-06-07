@@ -161,7 +161,7 @@
         BasedOn="{StaticResource Type.BodyMedium}"
         TargetType="TextBlock">
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="Opacity" Value="0.7" />
+        <Setter Property="Opacity" Value="0.85" />
     </Style>
 
     <!--

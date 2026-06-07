@@ -48,6 +48,7 @@
         <!--  Material Design Hints  -->
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusMedium}" />
         <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
@@ -112,6 +113,7 @@
         <!--  أيقونة البحث دائماً مرئية  -->
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="Magnify" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="20" />
@@ -147,6 +149,7 @@
 
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="LockOutline" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="20" />
@@ -186,6 +189,29 @@
                 <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        BroadcastTextBox — Legacy alias (moved from AppStyles.xaml)
+        الاستخدام: حقول TextBox في نماذج البث
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="BroadcastTextBox"
+        BasedOn="{StaticResource MaterialDesignFilledTextBox}"
+        TargetType="TextBox">
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.HasOutlinedTextField" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <!--  الحشوة الداخلية لجعل الحقل أوسع وأريح  -->
+        <Setter Property="Padding" Value="12" />
+        <!--  إزالة الحد السفلي المزدوج الافتراضي لجعله أنظف  -->
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
     </Style>
 
 </ResourceDictionary>

@@ -21,20 +21,35 @@ public interface IEmployeeService
 // ✨ استخدام Primary Constructor
 public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IEmployeeService
 {
+    // ──────────────────────────────────────────────────────────────
+    // Compiled Queries — تقليل وقت ترجمة LINQ في المسارات الساخنة
+    // ──────────────────────────────────────────────────────────────
+    private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<EmployeeDto>> s_compiledGetAllActive =
+        EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+            context.Employees
+                .AsNoTracking()
+                .Select(e => new EmployeeDto(
+                    e.EmployeeId,
+                    e.FullName,
+                    e.StaffRoleId,
+                    e.StaffRole != null ? e.StaffRole.RoleName : null,
+                    e.Notes)));
+
+    private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<StaffRoleDto>> s_compiledGetAllRoles =
+        EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+            context.StaffRoles
+                .AsNoTracking()
+                .Where(r => r.IsActive)
+                .Select(r => new StaffRoleDto(r.StaffRoleId, r.RoleName)));
+
     public async Task<List<EmployeeDto>> GetAllActiveAsync()
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // ── لا حاجة لـ Include مع Select — EF Core يُترجم Select إلى SQL JOIN مباشرة ──
-        return await context.Employees
-            .AsNoTracking()
-            .Select(e => new EmployeeDto(
-                e.EmployeeId,
-                e.FullName,
-                e.StaffRoleId,
-                e.StaffRole != null ? e.StaffRole.RoleName : null,
-                e.Notes))
-            .ToListAsync();
+        var result = new List<EmployeeDto>();
+        await foreach (var dto in s_compiledGetAllActive(context))
+            result.Add(dto);
+        return result;
     }
 
     public async Task<Result<int>> CreateAsync(EmployeeDto dto, UserSession session)
@@ -125,12 +140,10 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // ✅ إضافة AsNoTracking لاستعلام القراءة
-        return await context.StaffRoles
-            .AsNoTracking()
-            .Where(r => r.IsActive)
-            .Select(r => new StaffRoleDto(r.StaffRoleId, r.RoleName))
-            .ToListAsync();
+        var result = new List<StaffRoleDto>();
+        await foreach (var dto in s_compiledGetAllRoles(context))
+            result.Add(dto);
+        return result;
     }
 
     public async Task<Result<int>> CreateRoleAsync(StaffRoleDto dto, UserSession session)

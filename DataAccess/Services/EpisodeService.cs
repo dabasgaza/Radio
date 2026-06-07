@@ -29,6 +29,9 @@ public interface IEpisodeService
     Task<Result> CancelEpisodeAsync(int episodeId, string reason, UserSession session);
     Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session);
     Task<List<ConflictInfo>> GetConflictingEpisodesAsync(int programId, DateTime scheduledTime, int? excludeEpisodeId = null);
+    // ── Batch Operations — حل مشكلة N+1 في العمليات المجمعة ──
+    Task<(int success, int fail)> CancelEpisodesBatchAsync(List<int> episodeIds, string reason, UserSession session);
+    Task<(int success, int fail)> DeleteEpisodesBatchAsync(List<int> episodeIds, UserSession session);
 }
 
 public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory, TelemetryClient telemetryClient) : IEpisodeService
@@ -352,10 +355,20 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
 
             if (episode == null) return Result.Fail("الحلقة غير موجودة.");
 
-            // ── تحميل جميع سجلات الموظفين بما فيها المحذوفة ناعمياً لتجنب تعارض الفهرس الفريد ──
+            // ── تحميل جميع السجلات بما فيها المحذوفة ناعمياً لتجنب تعارض الفهرس الفريد ──
             var allEpisodeEmployees = await context.EpisodeEmployees
                 .IgnoreQueryFilters()
                 .Where(ee => ee.EpisodeId == dto.EpisodeId)
+                .ToListAsync();
+
+            var allEpisodeGuests = await context.EpisodeGuests
+                .IgnoreQueryFilters()
+                .Where(eg => eg.EpisodeId == dto.EpisodeId)
+                .ToListAsync();
+
+            var allEpisodeCorrespondents = await context.EpisodeCorrespondents
+                .IgnoreQueryFilters()
+                .Where(ec => ec.EpisodeId == dto.EpisodeId)
                 .ToListAsync();
 
             episode.ProgramId = dto.ProgramId;
@@ -363,8 +376,8 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             episode.ScheduledExecutionTime = dto.ScheduledDateTime;   // دمج التاريخ + الوقت
             episode.SpecialNotes = dto.SpecialNotes;
 
-            SyncGuests(episode.EpisodeGuests.ToList(), dto.Guests ?? [], episode);
-            SyncCorrespondents(episode.EpisodeCorrespondents.ToList(), dto.Correspondents ?? [], episode);
+            SyncGuests(episode.EpisodeGuests.ToList(), allEpisodeGuests, dto.Guests ?? [], episode);
+            SyncCorrespondents(episode.EpisodeCorrespondents.ToList(), allEpisodeCorrespondents, dto.Correspondents ?? [], episode);
             SyncEmployees(episode.EpisodeEmployees.ToList(), allEpisodeEmployees, dto.Employees ?? [], episode);
 
             await context.SaveChangesAsync();
@@ -548,14 +561,16 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     // Sync Helpers
     // ──────────────────────────────────────────────────────────────
 
-    private static void SyncGuests(List<EpisodeGuest> existing, List<EpisodeGuestDto> newItems, Episode ep)
+    private static void SyncGuests(List<EpisodeGuest> existing, List<EpisodeGuest> allIncludingDeleted, List<EpisodeGuestDto> newItems, Episode ep)
     {
         var existingById = existing.ToDictionary(g => g.EpisodeGuestId);
         var newIds = newItems.Where(i => i.EpisodeGuestId != 0).Select(i => i.EpisodeGuestId).ToHashSet();
 
-        // حذف ناعم للعناصر المحذوفة من الواجهة
+        // ✨ حذف ناعم للعناصر المحذوفة من الواجهة بدلاً من الحذف الصلب
+        // كان يستخدم ep.EpisodeGuests.Remove(ex) مما يحذف السجل نهائياً من قاعدة البيانات
+        // الآن يستخدم IsActive = false للحفاظ على سلامة البيانات وسجل التدقيق
         foreach (var ex in existing.Where(g => !newIds.Contains(g.EpisodeGuestId)))
-            ep.EpisodeGuests.Remove(ex);
+            ex.IsActive = false;
 
         foreach (var dto in newItems)
         {
@@ -569,25 +584,40 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             }
             else
             {
-                // إضافة سجل جديد
-                ep.EpisodeGuests.Add(new EpisodeGuest
+                // ✨ التحقق من وجود سجل محذوف ناعمياً لنفس الضيف وإعادة تفعيله بدلاً من إدراج سجل مكرر
+                // هذا يمنع تعارض الفهرس الفريد UQ_EpisodeGuests على (EpisodeId, GuestId)
+                var softDeleted = allIncludingDeleted.FirstOrDefault(g => g.GuestId == dto.GuestId && !g.IsActive);
+                if (softDeleted != null)
                 {
-                    GuestId = dto.GuestId,
-                    Topic = dto.Topic,
-                    HostingTime = dto.HostingTime,
-                    ClipNotes = dto.ClipNotes
-                });
+                    softDeleted.IsActive = true;
+                    softDeleted.Topic = dto.Topic;
+                    softDeleted.HostingTime = dto.HostingTime;
+                    softDeleted.ClipNotes = dto.ClipNotes;
+                }
+                else
+                {
+                    ep.EpisodeGuests.Add(new EpisodeGuest
+                    {
+                        GuestId = dto.GuestId,
+                        Topic = dto.Topic,
+                        HostingTime = dto.HostingTime,
+                        ClipNotes = dto.ClipNotes
+                    });
+                }
             }
         }
     }
 
-    private static void SyncCorrespondents(List<EpisodeCorrespondent> existing, List<EpisodeCorrespondentDto> newItems, Episode ep)
+    private static void SyncCorrespondents(List<EpisodeCorrespondent> existing, List<EpisodeCorrespondent> allIncludingDeleted, List<EpisodeCorrespondentDto> newItems, Episode ep)
     {
         var existingById = existing.ToDictionary(c => c.EpisodeCorrespondentId);
         var newIds = newItems.Where(i => i.Id != 0).Select(i => i.Id).ToHashSet();
 
+        // ✨ حذف ناعم للعناصر المحذوفة من الواجهة بدلاً من الحذف الصلب
+        // كان يستخدم ep.EpisodeCorrespondents.Remove(ex) مما يحذف السجل نهائياً من قاعدة البيانات
+        // الآن يستخدم IsActive = false للحفاظ على سلامة البيانات وسجل التدقيق
         foreach (var ex in existing.Where(c => !newIds.Contains(c.EpisodeCorrespondentId)))
-            ep.EpisodeCorrespondents.Remove(ex);
+            ex.IsActive = false;
 
         foreach (var dto in newItems)
         {
@@ -599,12 +629,24 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             }
             else
             {
-                ep.EpisodeCorrespondents.Add(new EpisodeCorrespondent
+                // ✨ التحقق من وجود سجل محذوف ناعمياً لنفس المراسل وإعادة تفعيله بدلاً من إدراج سجل مكرر
+                // هذا يمنع تعارض الفهرس الفريد UQ_EpisodeCorrespondents على (EpisodeId, CorrespondentId)
+                var softDeleted = allIncludingDeleted.FirstOrDefault(c => c.CorrespondentId == dto.CorrespondentId && !c.IsActive);
+                if (softDeleted != null)
                 {
-                    CorrespondentId = dto.CorrespondentId,
-                    Topic = dto.Topic,
-                    HostingTime = dto.HostingTime
-                });
+                    softDeleted.IsActive = true;
+                    softDeleted.Topic = dto.Topic;
+                    softDeleted.HostingTime = dto.HostingTime;
+                }
+                else
+                {
+                    ep.EpisodeCorrespondents.Add(new EpisodeCorrespondent
+                    {
+                        CorrespondentId = dto.CorrespondentId,
+                        Topic = dto.Topic,
+                        HostingTime = dto.HostingTime
+                    });
+                }
             }
         }
     }
@@ -637,6 +679,89 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
                     ep.EpisodeEmployees.Add(new EpisodeEmployee { EmployeeId = dto.EmployeeId });
                 }
             }
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Batch Operations — تنفيذ جماعي بجولة DB واحدة بدلاً من N جولات
+    // ──────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// إلغاء مجموعة حلقات دفعة واحدة باستخدام ExecuteUpdateAsync
+    /// بدلاً من استدعاء CancelEpisodeAsync لكل حلقة على حدة (N+1 مشكلة).
+    /// </summary>
+    public async Task<(int success, int fail)> CancelEpisodesBatchAsync(List<int> episodeIds, string reason, UserSession session)
+    {
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
+        if (!permCheck.IsSuccess) return (0, episodeIds.Count);
+
+        try
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
+
+            // ✅ جولة DB واحدة — تحديث جميع الحلقات المحددة بشرط أنها نشطة وغير ملغاة
+            var affected = await context.Episodes
+                .Where(e => episodeIds.Contains(e.EpisodeId) && e.IsActive && e.StatusId != EpisodeStatus.Cancelled)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(e => e.StatusId, EpisodeStatus.Cancelled)
+                    .SetProperty(e => e.CancellationReason, reason)
+                    .SetProperty(e => e.UpdatedAt, DateTime.UtcNow));
+
+            return (affected, episodeIds.Count - affected);
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to batch cancel {Count} episodes", episodeIds.Count);
+            return (0, episodeIds.Count);
+        }
+    }
+
+    /// <summary>
+    /// حذف ناعم لمجموعة حلقات دفعة واحدة باستخدام ExecuteUpdateAsync
+    /// بدلاً من استدعاء DeleteEpisodeAsync لكل حلقة على حدة (N+1 مشكلة).
+    /// </summary>
+    public async Task<(int success, int fail)> DeleteEpisodesBatchAsync(List<int> episodeIds, UserSession session)
+    {
+        var permCheck = session.EnsurePermission(AppPermissions.EpisodeManage);
+        if (!permCheck.IsSuccess) return (0, episodeIds.Count);
+
+        try
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
+
+            // ✅ حذف ناعم جماعي للسجلات الفرعية أولاً
+            await context.EpisodeGuests
+                .Where(eg => episodeIds.Contains(eg.EpisodeId) && eg.IsActive)
+                .ExecuteUpdateAsync(s => s.SetProperty(eg => eg.IsActive, false));
+
+            await context.EpisodeCorrespondents
+                .Where(ec => episodeIds.Contains(ec.EpisodeId) && ec.IsActive)
+                .ExecuteUpdateAsync(s => s.SetProperty(ec => ec.IsActive, false));
+
+            await context.EpisodeEmployees
+                .Where(ee => episodeIds.Contains(ee.EpisodeId) && ee.IsActive)
+                .ExecuteUpdateAsync(s => s.SetProperty(ee => ee.IsActive, false));
+
+            // ✅ حذف ناعم جماعي للحلقات الأساسية
+            var affected = await context.Episodes
+                .Where(e => episodeIds.Contains(e.EpisodeId) && e.IsActive)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(e => e.IsActive, false)
+                    .SetProperty(e => e.UpdatedAt, DateTime.UtcNow)
+                    .SetProperty(e => e.UpdatedByUserId, session.UserId));
+
+            telemetryClient.TrackEvent("EpisodesBatchDeleted", new Dictionary<string, string>
+            {
+                { "Count", affected.ToString() },
+                { "UserId", session.UserId.ToString() }
+            });
+
+            return (affected, episodeIds.Count - affected);
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Failed to batch delete {Count} episodes", episodeIds.Count);
+            return (0, episodeIds.Count);
         }
     }
 

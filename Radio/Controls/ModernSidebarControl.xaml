@@ -13,8 +13,14 @@
 
     <UserControl.Resources>
         <!--  Premium Sidebar Hover Background Brush & Border  -->
-        <SolidColorBrush x:Key="SidebarHoverBg" Color="#126366F1" />
-        <SolidColorBrush x:Key="SidebarHoverBorder" Color="#226366F1" />
+        <SolidColorBrush
+            x:Key="SidebarHoverBg"
+            Opacity="0.07"
+            Color="{StaticResource Primary600Color}" />
+        <SolidColorBrush
+            x:Key="SidebarHoverBorder"
+            Opacity="0.13"
+            Color="{StaticResource Primary600Color}" />
 
         <!--  ═══ Glass Nav Item — Expanded ═══  -->
         <Style x:Key="GlassNavItem" TargetType="RadioButton">
@@ -111,7 +117,7 @@
                                 </MultiTrigger.Conditions>
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource SidebarHoverBg}" />
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SidebarHoverBorder}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                                 <MultiTrigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
@@ -302,7 +308,7 @@
                                 </MultiTrigger.Conditions>
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource SidebarHoverBg}" />
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SidebarHoverBorder}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                                 <MultiTrigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
@@ -433,12 +439,12 @@
                                             BlurRadius="4"
                                             Opacity="0.08"
                                             ShadowDepth="1"
-                                            Color="#0F172A" />
+                                            Color="{StaticResource Neutral900Color}" />
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
@@ -484,12 +490,12 @@
                                             BlurRadius="4"
                                             Opacity="0.08"
                                             ShadowDepth="1"
-                                            Color="#0F172A" />
+                                            Color="{StaticResource Neutral900Color}" />
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
@@ -552,7 +558,7 @@
                 BlurRadius="24"
                 Opacity="0.08"
                 ShadowDepth="2"
-                Color="#0F172A" />
+                Color="{StaticResource Neutral900Color}" />
         </Border.Effect>
 
         <Grid>

@@ -233,18 +233,25 @@ namespace DataAccess.Services
             try
             {
                 await using var context = await contextFactory.CreateDbContextAsync();
-                var role = await context.Roles.FindAsync(roleId);
+                // ✨ استخدام IgnoreQueryFilters لإيجاد الدور حتى لو كان محذوفاً ناعمياً
+                var role = await context.Roles
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(r => r.RoleId == roleId);
                 if (role == null) return Result.Fail("الدور غير موجود");
+                if (!role.IsActive) return Result.Success(); // محذوف ناعمياً بالفعل
 
                 if (await context.Users.AnyAsync(u => u.RoleId == roleId))
                     return Result.Fail("لا يمكن حذف الدور لأنه مرتبط بمستخدمين حاليين");
 
-                // ✅ ExecuteDeleteAsync بدلاً من تحميل السجلات ثم حذفها
+                // ✨ حذف ناعم للدور بدلاً من الحذف الفعلي — للحفاظ على سجل التدقيق
+                role.IsActive = false;
+
+                // ✨ حذف ناعم لصلاحيات الدور المرتبطة
+                // RolePermission لا يرث BaseEntity لذا نستخدم ExecuteDeleteAsync
                 await context.RolePermissions
                     .Where(rp => rp.RoleId == roleId)
                     .ExecuteDeleteAsync();
 
-                context.Roles.Remove(role);
                 await context.SaveChangesAsync();
                 return Result.Success();
             }

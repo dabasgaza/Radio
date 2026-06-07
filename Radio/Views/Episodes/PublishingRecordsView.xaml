@@ -289,13 +289,13 @@
                                         <Setter Property="Background" Value="{StaticResource DividerBrush}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding RecordType}" Value="Execution">
-                                                <Setter Property="Background" Value="#E8F5E9" />
+                                                <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding RecordType}" Value="SocialMedia">
-                                                <Setter Property="Background" Value="#E3F2FD" />
+                                                <Setter Property="Background" Value="{StaticResource InfoLightBrush}" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding RecordType}" Value="Website">
-                                                <Setter Property="Background" Value="#EDE7F6" />
+                                                <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -307,15 +307,15 @@
                                             <Setter Property="Text" Value="—" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding RecordType}" Value="Execution">
-                                                    <Setter Property="Foreground" Value="#2E7D32" />
+                                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
                                                     <Setter Property="Text" Value="تنفيذ الحلقة" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding RecordType}" Value="SocialMedia">
-                                                    <Setter Property="Foreground" Value="#1565C0" />
+                                                    <Setter Property="Foreground" Value="{StaticResource InfoBrush}" />
                                                     <Setter Property="Text" Value="نشر رقمي" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding RecordType}" Value="Website">
-                                                    <Setter Property="Foreground" Value="#6A1B9A" />
+                                                    <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
                                                     <Setter Property="Text" Value="نشر الموقع" />
                                                 </DataTrigger>
                                             </Style.Triggers>

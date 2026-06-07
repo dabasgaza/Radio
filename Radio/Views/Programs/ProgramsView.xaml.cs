@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,13 +16,15 @@ namespace Radio.Views.Programs
     {
         private readonly IProgramService _programService;
         private readonly UserSession _session;
+        private readonly DialogHelper _dialogHelper;
         private List<ProgramDto> _allPrograms = [];
 
-        public ProgramsView(IProgramService programService, UserSession session)
+        public ProgramsView(IProgramService programService, UserSession session, DialogHelper dialogHelper)
         {
             InitializeComponent();
             _programService = programService;
             _session = session;
+            _dialogHelper = dialogHelper;
 
             BtnAddProgram.Visibility = _session.HasPermission(AppPermissions.ProgramManage)
                 ? Visibility.Visible
@@ -86,21 +89,11 @@ namespace Radio.Views.Programs
         /// </summary>
         private async void BtnAddProgram_Click(object sender, RoutedEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new ProgramFormControl(null, _programService, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new ProgramFormControl(null, _programService, _session) { Owner = mainWindow };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "البرنامج"));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "البرنامج"));
+                await LoadDataAsync();
             }
         }
 
@@ -109,21 +102,11 @@ namespace Radio.Views.Programs
             if (sender is not Button btn || btn.DataContext is not ProgramDto prog)
                 return;
 
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new ProgramFormControl(prog, _programService, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new ProgramFormControl(prog, _programService, _session) { Owner = mainWindow };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Updated("البرنامج", prog.ProgramName));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Updated("البرنامج", prog.ProgramName));
+                await LoadDataAsync();
             }
         }
 

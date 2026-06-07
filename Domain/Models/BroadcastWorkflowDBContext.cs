@@ -118,9 +118,9 @@ public partial class BroadcastWorkflowDBContext : DbContext
             .HasForeignKey(e => e.UpdatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // ✨ السطر الجديد: تطبيق الفلترة العالمية لعدم جلب المحذوفات منطقياً أبداً
-        modelBuilder.Entity<T>().HasQueryFilter(e => e.IsActive);
-
+        // ✨ تم إزالة HasQueryFilter من هنا — الفلتر يُطبّق مركزياً عبر حلقة GenerateSoftDeleteFilter أعلاه
+        // تطبيق الفلتر هنا كان يسبب تكراراً: الفلتر يُطبّق مرتين (مرة من الحلقة ومرة من هنا)
+        // المصدر الوحيد للحقيقة الآن هو حلقة GenerateSoftDeleteFilter في سطر 71-79
     }
 
 

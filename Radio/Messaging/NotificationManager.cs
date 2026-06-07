@@ -26,7 +26,7 @@ namespace Radio.Messaging
         /// </summary>
         public static void Show(NotificationType type, string title, string message)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 var host = GetHost();
                 if (host is null) return;

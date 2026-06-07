@@ -215,7 +215,7 @@
                                         x:Name="TxtAvgQueryTime"
                                         HorizontalAlignment="Right"
                                         FontWeight="Bold"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
                                         Text="0.0 ms" />
                                 </Grid>
                                 <ProgressBar
@@ -324,7 +324,7 @@
                                         FontWeight="SemiBold"
                                         Foreground="{DynamicResource TextSecondaryBrush}"
                                         Text="مستوى التسجيل:" />
-                                    <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="Information (أو أعلى)" />
+                                    <TextBlock Foreground="{StaticResource TextPrimaryBrush}" Text="Information (أو أعلى)" />
                                 </StackPanel>
 
                                 <Button
@@ -376,6 +376,7 @@
                                     Text="مستوى السجل" />
                                 <ComboBox
                                     x:Name="ComboLogLevels"
+                                    materialDesign:TextFieldAssist.LeadingIcon="ListBox"
                                     SelectionChanged="ComboLogLevels_SelectionChanged"
                                     Style="{StaticResource Input.ComboBox}">
                                     <ComboBoxItem Content="الكل" Tag="" />
@@ -548,7 +549,7 @@
                                             x:Name="TxtDetailContext"
                                             Margin="0,4,0,12"
                                             FontWeight="SemiBold"
-                                            Foreground="{DynamicResource TextPrimaryBrush}"
+                                            Foreground="{StaticResource TextPrimaryBrush}"
                                             Text="Source"
                                             TextWrapping="Wrap" />
 
@@ -560,7 +561,7 @@
                                         <Border
                                             Margin="0,4,0,12"
                                             Padding="10"
-                                            Background="{DynamicResource SurfaceVariantBrush}"
+                                            Background="{StaticResource SurfaceVariantBrush}"
                                             BorderBrush="{DynamicResource DividerBrush}"
                                             BorderThickness="1"
                                             CornerRadius="8">
@@ -568,7 +569,7 @@
                                                 x:Name="TxtDetailMessage"
                                                 Background="Transparent"
                                                 BorderThickness="0"
-                                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                                Foreground="{StaticResource TextPrimaryBrush}"
                                                 IsReadOnly="True"
                                                 Text="Message"
                                                 TextWrapping="Wrap" />
@@ -583,7 +584,7 @@
                                             <Border
                                                 Margin="0,4,0,12"
                                                 Padding="10"
-                                                Background="{DynamicResource SurfaceVariantBrush}"
+                                                Background="{StaticResource SurfaceVariantBrush}"
                                                 BorderBrush="{DynamicResource DividerBrush}"
                                                 BorderThickness="1"
                                                 CornerRadius="8">
@@ -609,7 +610,7 @@
                                                 <TextBlock
                                                     x:Name="TxtDetailDuration"
                                                     FontWeight="Bold"
-                                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                                    Foreground="{StaticResource TextPrimaryBrush}"
                                                     Text="15ms" />
                                             </StackPanel>
                                         </StackPanel>

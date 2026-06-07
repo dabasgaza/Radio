@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -16,12 +17,15 @@ namespace Radio.Views.Users
     {
         private readonly IUserService _userService;
         private readonly UserSession _session;
+        private readonly DialogHelper _dialogHelper;
+        private List<UserDto> _allUsers = new(); // ✨ تخزين مؤقت للبحث بدون إعادة تحميل
 
-        public UsersView(IUserService userService, UserSession session)
+        public UsersView(IUserService userService, UserSession session, DialogHelper dialogHelper)
         {
             InitializeComponent();
             _userService = userService;
             _session = session;
+            _dialogHelper = dialogHelper;
 
             // ✅ AppPermissions بدلاً من فحص IsAdmin مباشرة
             BtnAddUser.Visibility = _session.HasPermission(AppPermissions.UserManage)
@@ -42,7 +46,8 @@ namespace Radio.Views.Users
             try
             {
                 var users = await _userService.GetAllUsersAsync();
-                DgUsers.ItemsSource = users;
+                _allUsers = users.ToList(); // ✨ تخزين مؤقت للبحث
+                DgUsers.ItemsSource = _allUsers;
                 UpdateStats();
             }
             catch (InvalidOperationException ex)
@@ -56,6 +61,30 @@ namespace Radio.Views.Users
             }
         }
 
+        /// <summary>
+        /// ✨ فلترة قائمة المستخدمين بناءً على نص البحث.
+        /// يبحث في: الاسم الكامل، اسم المستخدم، اسم الدور، البريد الإلكتروني.
+        /// </summary>
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var keyword = TxtSearch.Text?.Trim().ToLower() ?? string.Empty;
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                DgUsers.ItemsSource = _allUsers;
+            }
+            else
+            {
+                var filtered = _allUsers.Where(u =>
+                    (u.FullName?.ToLower().Contains(keyword) == true) ||
+                    (u.Username?.ToLower().Contains(keyword) == true) ||
+                    (u.RoleName?.ToLower().Contains(keyword) == true) ||
+                    (u.EmailAddress?.ToLower().Contains(keyword) == true)
+                ).ToList();
+                DgUsers.ItemsSource = filtered;
+            }
+        }
+
         #endregion
 
         #region CRUD Operations
@@ -65,22 +94,11 @@ namespace Radio.Views.Users
         /// </summary>
         private async void BtnAddUser_Click(object sender, RoutedEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new UserFormDialog(null, _userService, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new UserFormDialog(null, _userService, _session);
-                dialog.Owner = mainWindow;
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المستخدم"));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المستخدم"));
+                await LoadDataAsync();
             }
         }
 
@@ -92,22 +110,11 @@ namespace Radio.Views.Users
             if (sender is not Button btn || btn.DataContext is not UserDto user)
                 return;
 
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new UserFormDialog(user, _userService, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new UserFormDialog(user, _userService, _session);
-                dialog.Owner = mainWindow;
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Updated("المستخدم", user.FullName));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Updated("المستخدم", user.FullName));
+                await LoadDataAsync();
             }
         }
 

@@ -17,21 +17,28 @@ public interface IProgramService
 // ✨ استخدام Primary Constructor
 public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IProgramService
 {
+    // ──────────────────────────────────────────────────────────────
+    // Compiled Query — تقليل وقت ترجمة LINQ في المسارات الساخنة
+    // ──────────────────────────────────────────────────────────────
+    private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<ProgramDto>> s_compiledGetAllActive =
+        EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+            context.Programs
+                .AsNoTracking()
+                .Select(p => new ProgramDto
+                (
+                    p.ProgramId,
+                    p.ProgramName,
+                    p.Category,
+                    p.ProgramDescription)));
+
     public async Task<List<ProgramDto>> GetAllActiveAsync()
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // ✨ استخدام AsNoTracking وإرجاع DTOs
-        return await context.Programs
-            .AsNoTracking()
-            .Select(p => new ProgramDto
-            (
-                p.ProgramId,
-                p.ProgramName,
-                p.Category,
-                p.ProgramDescription
-            ))
-            .ToListAsync();
+        var result = new List<ProgramDto>();
+        await foreach (var dto in s_compiledGetAllActive(context))
+            result.Add(dto);
+        return result;
     }
 
     public async Task<Result> CreateProgramAsync(ProgramDto dto, UserSession session)

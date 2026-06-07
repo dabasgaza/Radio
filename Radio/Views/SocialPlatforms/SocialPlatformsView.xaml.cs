@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -12,13 +13,15 @@ public partial class SocialPlatformsView : UserControl
 {
     private readonly IPlatformService _service;
     private readonly UserSession _session;
+    private readonly DialogHelper _dialogHelper;
     private List<SocialMediaPlatformDto> _allItems = [];
 
-    public SocialPlatformsView(IPlatformService service, UserSession session)
+    public SocialPlatformsView(IPlatformService service, UserSession session, DialogHelper dialogHelper)
     {
         InitializeComponent();
         _service = service;
         _session = session;
+        _dialogHelper = dialogHelper;
         Loaded += async (_, _) => await LoadDataAsync();
     }
 
@@ -52,24 +55,11 @@ public partial class SocialPlatformsView : UserControl
 
     private async void BtnAddNew_Click(object sender, RoutedEventArgs e)
     {
-        var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-        if (mainWindow != null) await mainWindow.ShowOverlay();
-
-        try
+        var dialog = new SocialPlatformFormDialog(null, _service, _session);
+        if (await _dialogHelper.ShowDialogAsync(dialog) == true)
         {
-            var dialog = new SocialPlatformFormDialog(null, _service, _session)
-            {
-                Owner = mainWindow
-            };
-            if (dialog.ShowDialog() == true)
-            {
-                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المنصة"));
-                await LoadDataAsync();
-            }
-        }
-        finally
-        {
-            if (mainWindow != null) await mainWindow.HideOverlay();
+            MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المنصة"));
+            await LoadDataAsync();
         }
     }
 
@@ -77,24 +67,11 @@ public partial class SocialPlatformsView : UserControl
     {
         if (((FrameworkElement)sender).Tag is not SocialMediaPlatformDto dto) return;
 
-        var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-        if (mainWindow != null) await mainWindow.ShowOverlay();
-
-        try
+        var dialog = new SocialPlatformFormDialog(dto, _service, _session);
+        if (await _dialogHelper.ShowDialogAsync(dialog) == true)
         {
-            var dialog = new SocialPlatformFormDialog(dto, _service, _session)
-            {
-                Owner = mainWindow
-            };
-            if (dialog.ShowDialog() == true)
-            {
-                MessageService.Current.ShowSuccess(Messages.Updated("المنصة", dto.Name));
-                await LoadDataAsync();
-            }
-        }
-        finally
-        {
-            if (mainWindow != null) await mainWindow.HideOverlay();
+            MessageService.Current.ShowSuccess(Messages.Updated("المنصة", dto.Name));
+            await LoadDataAsync();
         }
     }
 

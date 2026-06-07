@@ -1,5 +1,6 @@
 ﻿using DataAccess.Common;
 using DataAccess.Services;
+using DataAccess.Services.Messaging;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Models;
@@ -18,7 +19,14 @@ namespace Radio.Views.Database
         private readonly IServiceProvider _serviceProvider;
         private readonly UserSession _session;
         private readonly NavigationService _navigationService;
+
+        // ✨ ذاكرة مؤقتة محدودة الحجم مع آلية LRU للعروض الفرعية
+        // منفصلة عن NavigationService._viewCache لتجنب تضارب الشجرة البصرية (Visual Tree)
+        // لأن العرض قد يكون معروضاً في AdminHubContentArea أو MainContentArea
         private readonly Dictionary<string, UserControl> _cachedViews = new();
+        private readonly LinkedList<string> _subViewAccessOrder = new(); // تتبع ترتيب الوصول لـ LRU
+        private const int MaxSubViewCache = 6; // الحد الأقصى للعروض الفرعية المخزنة
+
         private readonly List<RadioButton> _chips = new();
 
         public AdminHubView(IServiceProvider serviceProvider, UserSession session, NavigationService navigationService)
@@ -134,6 +142,11 @@ namespace Radio.Views.Database
             }
         }
 
+        /// <summary>
+        /// التنقل إلى عرض فرعي داخل لوحة الإدارة.
+        /// ✨ يستخدم NotifySubViewChanged بدلاً من NavigateTo لتجنب إنشاء نسخة مكررة
+        /// من العرض في NavigationService._viewCache (كان يسبب تسرب ذاكرة مزدوج).
+        /// </summary>
         private void NavigateToSubView(string viewName)
         {
             try
@@ -142,40 +155,72 @@ namespace Radio.Views.Database
                 if (view != null)
                 {
                     AdminHubContentArea.Content = view;
-                    _navigationService.NavigateTo(viewName);
+
+                    // ✨ تحديث حالة التنقل (الشريط الجانبي + مسار التنقل)
+                    // دون إنشاء نسخة مكررة من العرض في NavigationService
+                    _navigationService.NotifySubViewChanged(viewName);
                 }
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
-                DataAccess.Services.Messaging.MessageService.Current.ShowError($"خطأ أثناء تحميل لوحة الإدارة الفرعية: {ex.Message}");
+                Serilog.Log.Error(ex, "خطأ أثناء تحميل لوحة الإدارة الفرعية: {ViewName}", viewName);
+                MessageService.Current.ShowError($"خطأ أثناء تحميل لوحة الإدارة الفرعية: {ex.Message}");
             }
         }
 
+        /// <summary>
+        /// الحصول على عرض فرعي من الذاكرة المؤقتة أو إنشائه.
+        /// ✨ آلية LRU: عند تجاوز الحد الأقصى، يُزال العرض الأقل استعمالاً.
+        /// </summary>
         private UserControl GetSubView(string name)
         {
             if (_cachedViews.TryGetValue(name, out var cached))
             {
+                // تحديث ترتيب LRU — نقل العنصر إلى المقدمة
+                _subViewAccessOrder.Remove(name);
+                _subViewAccessOrder.AddFirst(name);
                 return cached;
             }
 
+            // ✨ حل مشكلة عدم تمرير DialogHelper للعروض الفرعية
+            // كان يسبب NullReferenceException عند فتح أي حوار من خلال لوحة الإدارة
+            var dialogHelper = _serviceProvider.GetRequiredService<DialogHelper>();
+
             UserControl view = name switch
             {
-                "Users" => new UsersView(_serviceProvider.GetRequiredService<IUserService>(), _session),
-                "Employees" => new EmployeesView(_serviceProvider.GetRequiredService<IEmployeeService>(), _session),
-                "SocialPlatforms" => new SocialPlatformsView(_serviceProvider.GetRequiredService<IPlatformService>(), _session),
-                "StaffRoles" => new StaffRolesView(_serviceProvider.GetRequiredService<IEmployeeService>(), _session),
-                "SecurityRoles" => new SecurityRolesView(_serviceProvider.GetRequiredService<IUserService>(), _session, _navigationService),
+                "Users" => new UsersView(_serviceProvider.GetRequiredService<IUserService>(), _session, dialogHelper),
+                "Employees" => new EmployeesView(_serviceProvider.GetRequiredService<IEmployeeService>(), _session, dialogHelper),
+                "SocialPlatforms" => new SocialPlatformsView(_serviceProvider.GetRequiredService<IPlatformService>(), _session, dialogHelper),
+                "StaffRoles" => new StaffRolesView(_serviceProvider.GetRequiredService<IEmployeeService>(), _session, dialogHelper),
+                "SecurityRoles" => new SecurityRolesView(_serviceProvider.GetRequiredService<IUserService>(), _session, _navigationService, dialogHelper),
                 "PermissionMatrix" => new PermissionMatrixView(_serviceProvider.GetRequiredService<IUserService>(), _session),
                 "Permissions" => new PermissionsView(_serviceProvider.GetRequiredService<IPermissionService>()),
                 "Database" => new DatabaseManagementView(_serviceProvider.GetRequiredService<IDatabaseManagementService>(), _session),
                 "AuditLogs" => new AuditLogsView(_serviceProvider.GetRequiredService<IAuditLogService>(), _session),
                 "Diagnostics" => new SystemDiagnosticsView(_serviceProvider.GetRequiredService<ISystemDiagnosticsService>(), _session),
-                _ => throw new ArgumentException("Unknown admin sub-view name")
+                _ => throw new ArgumentException($"عرض فرعي غير معروف: {name}")
             };
 
+            // ✨ إزالة الأقل استعمالاً إذا تجاوزنا الحد الأقصى
+            if (_cachedViews.Count >= MaxSubViewCache && _subViewAccessOrder.Count > 0)
+            {
+                var lruViewName = _subViewAccessOrder.Last!.Value;
+                _cachedViews.Remove(lruViewName);
+                _subViewAccessOrder.RemoveLast();
+            }
+
             _cachedViews[name] = view;
+            _subViewAccessOrder.AddFirst(name);
             return view;
+        }
+
+        /// <summary>
+        /// تفريغ الذاكرة المؤقتة للعروض الفرعية — يُستخدم عند تسجيل الخروج.
+        /// </summary>
+        public void ClearSubViewCache()
+        {
+            _cachedViews.Clear();
+            _subViewAccessOrder.Clear();
         }
 
         public void UpdateLayoutForScreenSize(double screenWidth)

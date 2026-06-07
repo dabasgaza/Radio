@@ -57,8 +57,8 @@
                 <Border
                     Margin="0,0,0,24"
                     Padding="6"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource DividerBrush}"
                     BorderThickness="1"
                     CornerRadius="12">
 
@@ -71,7 +71,7 @@
                                     <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                                            <Setter Property="Background" Value="{StaticResource SelectedBrush}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -81,14 +81,14 @@
                                     <Border
                                         Width="40"
                                         Height="40"
-                                        Background="{DynamicResource PrimaryHueLightBrush}"
+                                        Background="{StaticResource PrimaryXLightBrush}"
                                         CornerRadius="10">
                                         <materialDesign:PackIcon
                                             Width="20"
                                             Height="20"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                            Foreground="{StaticResource PrimaryMainBrush}"
                                             Kind="CalendarClock" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
@@ -111,8 +111,8 @@
                                     x:Name="PbPlanned"
                                     Height="4"
                                     Margin="0,8,0,0"
-                                    Background="{DynamicResource MaterialDesignDivider}"
-                                    Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                    Background="{StaticResource DividerBrush}"
+                                    Foreground="{StaticResource PrimaryMainBrush}"
                                     Maximum="100"
                                     Value="0" />
                             </StackPanel>
@@ -125,7 +125,7 @@
                                     <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                                            <Setter Property="Background" Value="{StaticResource SelectedBrush}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -135,14 +135,14 @@
                                     <Border
                                         Width="40"
                                         Height="40"
-                                        Background="#E8F5E9"
+                                        Background="{StaticResource SuccessLightBrush}"
                                         CornerRadius="10">
                                         <materialDesign:PackIcon
                                             Width="20"
                                             Height="20"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Foreground="#2E7D32"
+                                            Foreground="{StaticResource SuccessBrush}"
                                             Kind="CheckDecagramOutline" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
@@ -165,8 +165,8 @@
                                     x:Name="PbExecuted"
                                     Height="4"
                                     Margin="0,8,0,0"
-                                    Background="{DynamicResource MaterialDesignDivider}"
-                                    Foreground="#2E7D32"
+                                    Background="{StaticResource DividerBrush}"
+                                    Foreground="{StaticResource SuccessBrush}"
                                     Maximum="100"
                                     Value="0" />
                             </StackPanel>
@@ -179,7 +179,7 @@
                                     <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                                            <Setter Property="Background" Value="{StaticResource SelectedBrush}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -189,14 +189,14 @@
                                     <Border
                                         Width="40"
                                         Height="40"
-                                        Background="#E3F2FD"
+                                        Background="{StaticResource InfoLightBrush}"
                                         CornerRadius="10">
                                         <materialDesign:PackIcon
                                             Width="20"
                                             Height="20"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Foreground="#1565C0"
+                                            Foreground="{StaticResource InfoBrush}"
                                             Kind="CloudCheckOutline" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
@@ -219,8 +219,8 @@
                                     x:Name="PbPublished"
                                     Height="4"
                                     Margin="0,8,0,0"
-                                    Background="{DynamicResource MaterialDesignDivider}"
-                                    Foreground="#1565C0"
+                                    Background="{StaticResource DividerBrush}"
+                                    Foreground="{StaticResource InfoBrush}"
                                     Maximum="100"
                                     Value="0" />
                             </StackPanel>
@@ -233,7 +233,7 @@
                                     <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                                            <Setter Property="Background" Value="{StaticResource SelectedBrush}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -243,14 +243,14 @@
                                     <Border
                                         Width="40"
                                         Height="40"
-                                        Background="#FCE4EC"
+                                        Background="{StaticResource ErrorLightBrush}"
                                         CornerRadius="10">
                                         <materialDesign:PackIcon
                                             Width="20"
                                             Height="20"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Foreground="#B71C1C"
+                                            Foreground="{StaticResource ErrorBrush}"
                                             Kind="CalendarRemove" />
                                     </Border>
                                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
@@ -273,8 +273,8 @@
                                     x:Name="PbCancelled"
                                     Height="4"
                                     Margin="0,8,0,0"
-                                    Background="{DynamicResource MaterialDesignDivider}"
-                                    Foreground="#B71C1C"
+                                    Background="{StaticResource DividerBrush}"
+                                    Foreground="{StaticResource ErrorBrush}"
                                     Maximum="100"
                                     Value="0" />
                             </StackPanel>
@@ -288,7 +288,7 @@
                     <Border
                         Width="4"
                         Height="20"
-                        Background="{DynamicResource PrimaryHueMidBrush}"
+                        Background="{StaticResource PrimaryMainBrush}"
                         CornerRadius="2" />
                     <TextBlock
                         Margin="10,0,0,0"
@@ -300,15 +300,15 @@
                         Height="18"
                         Margin="8,0,0,0"
                         VerticalAlignment="Center"
-                        Foreground="{DynamicResource PrimaryHueMidBrush}"
+                        Foreground="{StaticResource PrimaryMainBrush}"
                         Kind="Broadcast" />
                 </StackPanel>
 
                 <Border
                     Margin="0,0,0,24"
                     materialDesign:ElevationAssist.Elevation="Dp1"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource DividerBrush}"
                     BorderThickness="0,0,0,0"
                     CornerRadius="12">
                     <Border.Effect>
@@ -346,12 +346,12 @@
                                                 Width="16"
                                                 Height="16"
                                                 VerticalAlignment="Center"
-                                                Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                                Foreground="{StaticResource PrimaryMainBrush}"
                                                 Kind="RadioTower" />
                                             <TextBlock
                                                 Margin="8,0,0,0"
                                                 VerticalAlignment="Center"
-                                                Foreground="{DynamicResource MaterialDesignBody}"
+                                                Foreground="{StaticResource TextPrimaryBrush}"
                                                 Text="{Binding ProgramName}" />
                                         </StackPanel>
                                     </DataTemplate>
@@ -382,28 +382,28 @@
                                             Padding="14,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Background="{DynamicResource MaterialDesignDivider}"
+                                            Background="{StaticResource DividerBrush}"
                                             CornerRadius="13">
                                             <TextBlock
                                                 x:Name="StatusText"
                                                 VerticalAlignment="Center"
                                                 FontWeight="Medium"
-                                                Foreground="{DynamicResource MaterialDesignBody}"
+                                                Foreground="{StaticResource TextPrimaryBrush}"
                                                 Style="{StaticResource Type.Caption}"
                                                 Text="{Binding StatusText}"
                                                 TextAlignment="Center" />
                                         </Border>
                                         <DataTemplate.Triggers>
                                             <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                <Setter TargetName="StatusBorder" Property="Background" Value="#1B5E20" />
+                                                <Setter TargetName="StatusBorder" Property="Background" Value="{StaticResource SuccessBrush}" />
                                                 <Setter TargetName="StatusText" Property="Foreground" Value="White" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
-                                                <Setter TargetName="StatusBorder" Property="Background" Value="#00695C" />
+                                                <Setter TargetName="StatusBorder" Property="Background" Value="{StaticResource SecondaryDarkBrush}" />
                                                 <Setter TargetName="StatusText" Property="Foreground" Value="White" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding StatusText}" Value="مجدولة">
-                                                <Setter TargetName="StatusBorder" Property="Background" Value="#E65100" />
+                                                <Setter TargetName="StatusBorder" Property="Background" Value="{StaticResource WarningBrush}" />
                                                 <Setter TargetName="StatusText" Property="Foreground" Value="White" />
                                             </DataTrigger>
                                         </DataTemplate.Triggers>
@@ -420,7 +420,7 @@
                     <Border
                         Width="4"
                         Height="20"
-                        Background="#00897B"
+                        Background="{StaticResource SecondaryMainBrush}"
                         CornerRadius="2" />
                     <TextBlock
                         Margin="10,0,0,0"
@@ -432,14 +432,14 @@
                         Height="18"
                         Margin="8,0,0,0"
                         VerticalAlignment="Center"
-                        Foreground="#00897B"
+                        Foreground="{StaticResource SecondaryMainBrush}"
                         Kind="ChartBar" />
                 </StackPanel>
 
                 <Border
                     Margin="0,0,0,16"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource DividerBrush}"
                     BorderThickness="0,0,0,0"
                     CornerRadius="12">
                     <Border.Effect>
@@ -486,13 +486,13 @@
                                             Padding="14,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Background="#1B5E20"
+                                            Background="{StaticResource SuccessBrush}"
                                             CornerRadius="13">
                                             <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                                 <materialDesign:PackIcon
                                                     Width="13"
                                                     Height="13"
-                                                    Foreground="#A5D6A7"
+                                                    Foreground="{StaticResource SuccessLightBrush}"
                                                     Kind="Check" />
                                                 <TextBlock
                                                     Margin="5,0,0,0"
@@ -532,7 +532,7 @@
 
                 <Border
                     Margin="0,0,0,24"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    Background="{StaticResource SurfaceBrush}"
                     CornerRadius="12">
                     <Border.Effect>
                         <DropShadowEffect
@@ -656,7 +656,7 @@
 
                 <Border
                     Margin="0,0,0,24"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
+                    Background="{StaticResource SurfaceBrush}"
                     CornerRadius="12">
                     <Border.Effect>
                         <DropShadowEffect
@@ -693,7 +693,7 @@
                                                 Width="15"
                                                 Height="15"
                                                 VerticalAlignment="Center"
-                                                Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                                Foreground="{StaticResource PrimaryMainBrush}"
                                                 Kind="RadioTower" />
                                             <TextBlock
                                                 Margin="6,0,0,0"
@@ -737,7 +737,7 @@
                     <Border
                         Width="4"
                         Height="20"
-                        Background="#7B1FA2"
+                        Background="{StaticResource PrimaryMainBrush}"
                         CornerRadius="2" />
                     <TextBlock
                         Margin="10,0,0,0"
@@ -749,7 +749,7 @@
                         Height="18"
                         Margin="8,0,0,0"
                         VerticalAlignment="Center"
-                        Foreground="#7B1FA2"
+                        Foreground="{StaticResource PrimaryMainBrush}"
                         Kind="CalendarSearch" />
                 </StackPanel>
 
@@ -757,8 +757,8 @@
                 <Border
                     Margin="0,0,0,12"
                     Padding="16,12"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource DividerBrush}"
                     BorderThickness="1"
                     CornerRadius="12">
                     <WrapPanel VerticalAlignment="Center">
@@ -772,7 +772,7 @@
                                 Height="18"
                                 Margin="0,0,6,0"
                                 VerticalAlignment="Center"
-                                Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                Foreground="{StaticResource PrimaryMainBrush}"
                                 Kind="CalendarStart" />
                             <TextBlock
                                 VerticalAlignment="Center"
@@ -795,7 +795,7 @@
                                 Height="18"
                                 Margin="0,0,6,0"
                                 VerticalAlignment="Center"
-                                Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                Foreground="{StaticResource PrimaryMainBrush}"
                                 Kind="CalendarEnd" />
                             <TextBlock
                                 VerticalAlignment="Center"
@@ -853,20 +853,20 @@
                             Visibility="Collapsed">
                             <Border
                                 Padding="10,4"
-                                Background="{DynamicResource PrimaryHueLightBrush}"
+                                Background="{StaticResource PrimaryXLightBrush}"
                                 CornerRadius="12">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon
                                         Width="14"
                                         Height="14"
                                         VerticalAlignment="Center"
-                                        Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                        Foreground="{StaticResource PrimaryMainBrush}"
                                         Kind="Information" />
                                     <TextBlock
                                         x:Name="TxtSearchSummary"
                                         Margin="6,0,0,0"
                                         VerticalAlignment="Center"
-                                        Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                        Foreground="{StaticResource PrimaryMainBrush}"
                                         Style="{StaticResource Type.Caption}" />
                                 </StackPanel>
                             </Border>
@@ -878,8 +878,8 @@
                 <!--  Results Table  -->
                 <Border
                     Margin="0,0,0,24"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource DividerBrush}"
                     BorderThickness="0"
                     CornerRadius="12">
                     <Border.Effect>
@@ -917,7 +917,7 @@
                                                 Width="15"
                                                 Height="15"
                                                 VerticalAlignment="Center"
-                                                Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                                Foreground="{StaticResource PrimaryMainBrush}"
                                                 Kind="RadioTower" />
                                             <TextBlock
                                                 Margin="6,0,0,0"
@@ -952,36 +952,36 @@
                                             Padding="12,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Background="{DynamicResource MaterialDesignDivider}"
+                                            Background="{StaticResource DividerBrush}"
                                             CornerRadius="13">
                                             <TextBlock
                                                 x:Name="StatusText2"
                                                 VerticalAlignment="Center"
                                                 FontWeight="Medium"
-                                                Foreground="{DynamicResource MaterialDesignBody}"
+                                                Foreground="{StaticResource TextPrimaryBrush}"
                                                 Style="{StaticResource Type.Overline}"
                                                 Text="{Binding StatusText}"
                                                 TextAlignment="Center" />
                                         </Border>
                                         <DataTemplate.Triggers>
                                             <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                <Setter TargetName="StatusBorder2" Property="Background" Value="#1B5E20" />
+                                                <Setter TargetName="StatusBorder2" Property="Background" Value="{StaticResource SuccessBrush}" />
                                                 <Setter TargetName="StatusText2" Property="Foreground" Value="White" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
-                                                <Setter TargetName="StatusBorder2" Property="Background" Value="#00695C" />
+                                                <Setter TargetName="StatusBorder2" Property="Background" Value="{StaticResource SecondaryDarkBrush}" />
                                                 <Setter TargetName="StatusText2" Property="Foreground" Value="White" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding StatusText}" Value="مجدولة">
-                                                <Setter TargetName="StatusBorder2" Property="Background" Value="#E65100" />
+                                                <Setter TargetName="StatusBorder2" Property="Background" Value="{StaticResource WarningBrush}" />
                                                 <Setter TargetName="StatusText2" Property="Foreground" Value="White" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
-                                                <Setter TargetName="StatusBorder2" Property="Background" Value="#B71C1C" />
+                                                <Setter TargetName="StatusBorder2" Property="Background" Value="{StaticResource ErrorBrush}" />
                                                 <Setter TargetName="StatusText2" Property="Foreground" Value="White" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding StatusText}" Value="منشورة على الموقع">
-                                                <Setter TargetName="StatusBorder2" Property="Background" Value="#1565C0" />
+                                                <Setter TargetName="StatusBorder2" Property="Background" Value="{StaticResource InfoBrush}" />
                                                 <Setter TargetName="StatusText2" Property="Foreground" Value="White" />
                                             </DataTrigger>
                                         </DataTemplate.Triggers>

@@ -75,7 +75,7 @@
                     <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
                         <materialDesign:PackIcon
                             VerticalAlignment="Center"
-                            Foreground="#4527A0"
+                            Foreground="{StaticResource PrimaryMainBrush}"
                             Kind="ShieldAccount" />
                         <TextBlock
                             Margin="10,0"
@@ -137,19 +137,19 @@
                         x:Name="PwdHintCard"
                         Margin="0,-10,0,30"
                         Padding="15,10"
-                        Background="#104527A0"
+                        Background="{StaticResource PrimaryXLightBrush}"
                         CornerRadius="10"
                         Visibility="Collapsed">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon
                                 Width="16"
-                                Foreground="#4527A0"
+                                Foreground="{StaticResource PrimaryMainBrush}"
                                 Kind="Information" />
                             <TextBlock
                                 x:Name="TxtPwdHint"
                                 Margin="10,0"
                                 VerticalAlignment="Center"
-                                Foreground="#4527A0"
+                                Foreground="{StaticResource PrimaryMainBrush}"
                                 Style="{StaticResource Type.Caption}"
                                 Text="اترك كلمة المرور فارغة إذا كنت لا تريد تغييرها" />
                         </StackPanel>
@@ -160,7 +160,7 @@
                     <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
                         <materialDesign:PackIcon
                             VerticalAlignment="Center"
-                            Foreground="#0097A7"
+                            Foreground="{StaticResource SecondaryMainBrush}"
                             Kind="ContactPhone" />
                         <TextBlock
                             Margin="10,0"

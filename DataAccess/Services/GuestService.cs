@@ -15,24 +15,36 @@ public interface IGuestService
 }
 
 // ✨ استخدام Primary Constructor وإزالة IAuditService
-public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IGuestService
+public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory, ICachedLookupService cachedLookup) : IGuestService
 {
+    // ──────────────────────────────────────────────────────────────
+    // Compiled Query — تقليل وقت ترجمة LINQ في المسارات الساخنة
+    // يُستدعى عند كل فتح لنموذج الحلقات أو شاشة الضيوف
+    // ──────────────────────────────────────────────────────────────
+    private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<GuestDto>> s_compiledGetAllActive =
+        EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+            context.Guests
+                .AsNoTracking()
+                .Where(g => g.IsActive)
+                .Select(g => new GuestDto
+                (
+                    g.GuestId,
+                    g.FullName,
+                    g.Organization,
+                    g.PhoneNumber,
+                    g.EmailAddress,
+                    string.Empty,
+                    string.Empty)));
+
     public async Task<List<GuestDto>> GetAllActiveAsync()
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // ✨ استخدام AsNoTracking وإرجاع DTOs نظيفة للطبقة العليا
-        return await context.Guests
-            .AsNoTracking()
-            .Where(g => g.IsActive) // ضمان إضافي (رغم وجود الـ Global Filter)
-            .Select(g => new GuestDto
-            (
-                 g.GuestId,
-                 g.FullName,
-                 g.Organization,
-                 g.PhoneNumber,
-                 g.EmailAddress, string.Empty, string.Empty))
-            .ToListAsync();
+        // ✨ استخدام Compiled Query — يُجمع مرة واحدة فقط بدلاً من كل استدعاء
+        var result = new List<GuestDto>();
+        await foreach (var dto in s_compiledGetAllActive(context))
+            result.Add(dto);
+        return result;
     }
 
     public async Task<Result> CreateGuestAsync(GuestDto dto, UserSession session)
@@ -58,6 +70,9 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
 
             context.Guests.Add(guest);
             await context.SaveChangesAsync();
+
+            // ✨ إبطال كاش الضيوف بعد الإضافة
+            cachedLookup.InvalidateByEntity("Guest");
 
             return Result.Success();
         }
@@ -88,6 +103,10 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
             try
             {
                 await context.SaveChangesAsync();
+
+                // ✨ إبطال كاش الضيوف بعد التعديل
+                cachedLookup.InvalidateByEntity("Guest");
+
                 return Result.Success();
             }
             catch (DbUpdateConcurrencyException ex)
@@ -142,6 +161,10 @@ public class GuestService(IDbContextFactory<BroadcastWorkflowDBContext> contextF
             guest.IsActive = false;
 
             await context.SaveChangesAsync();
+
+            // ✨ إبطال كاش الضيوف بعد الحذف
+            cachedLookup.InvalidateByEntity("Guest");
+
             return Result.Success();
         }
         catch (Exception ex)

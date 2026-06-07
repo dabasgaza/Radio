@@ -57,7 +57,7 @@ public class EpisodeGuestConfiguration : IEntityTypeConfiguration<EpisodeGuest>
               .OnDelete(DeleteBehavior.Cascade);
 
         // 5. فلتر الحذف المنطقي (Soft Delete)
-        // ✨ إضافته صراحةً لأن هذا الكيان قد لا يرث من BaseEntity أو لأمان إضافي
-        builder.HasQueryFilter(eg => eg.IsActive);
+        // ✨ تم إزالة HasQueryFilter — الفلتر يُطبّق مركزياً عبر GenerateSoftDeleteFilter في BroadcastWorkflowDBContext
+        // EpisodeGuest يرث من BaseEntity لذلك يغطيه الفلتر الديناميكي تلقائياً
     }
 }

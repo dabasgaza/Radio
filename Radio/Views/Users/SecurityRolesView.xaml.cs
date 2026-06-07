@@ -14,13 +14,15 @@ namespace Radio.Views.Users
         private readonly IUserService _userService;
         private readonly UserSession _session;
         private readonly NavigationService _navigationService;
+        private readonly DialogHelper _dialogHelper;
 
-        public SecurityRolesView(IUserService userService, UserSession session, NavigationService navigationService)
+        public SecurityRolesView(IUserService userService, UserSession session, NavigationService navigationService, DialogHelper dialogHelper)
         {
             InitializeComponent();
             _userService = userService;
             _session = session;
             _navigationService = navigationService;
+            _dialogHelper = dialogHelper;
             Loaded += async (_, _) => await LoadDataAsync();
         }
 
@@ -32,24 +34,13 @@ namespace Radio.Views.Users
 
         private async void BtnAddRole_Click(object sender, RoutedEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
+            var dialog = new RoleFormDialog(_userService, _session);
+            await _dialogHelper.ShowDialogAsync(dialog);
 
-            try
+            if (dialog.IsSaved)
             {
-                var dialog = new RoleFormDialog(_userService, _session);
-                dialog.Owner = mainWindow;
-                dialog.ShowDialog();
-
-                if (dialog.IsSaved)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الدور"));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الدور"));
+                await LoadDataAsync();
             }
         }
 
@@ -57,24 +48,13 @@ namespace Radio.Views.Users
         {
             if (sender is Button { DataContext: RoleDto dto })
             {
-                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-                if (mainWindow != null) await mainWindow.ShowOverlay();
+                var dialog = new RoleFormDialog(_userService, _session, dto);
+                await _dialogHelper.ShowDialogAsync(dialog);
 
-                try
+                if (dialog.IsSaved)
                 {
-                    var dialog = new RoleFormDialog(_userService, _session, dto);
-                    dialog.Owner = mainWindow;
-                    dialog.ShowDialog();
-
-                    if (dialog.IsSaved)
-                    {
-                        MessageService.Current.ShowSuccess(Messages.Updated("الدور", dto.RoleName));
-                        await LoadDataAsync();
-                    }
-                }
-                finally
-                {
-                    if (mainWindow != null) await mainWindow.HideOverlay();
+                    MessageService.Current.ShowSuccess(Messages.Updated("الدور", dto.RoleName));
+                    await LoadDataAsync();
                 }
             }
         }
@@ -107,7 +87,10 @@ namespace Radio.Views.Users
         {
             if (sender is Button { DataContext: RoleDto dto })
             {
-                _navigationService.NavigateTo("PermissionMatrix");
+                // ✨ استخدام RequestNavigation بدلاً من NavigateTo مباشرة
+                // NavigateTo يُعيد View لكن لا يُعرضه لأن MainWindow لا يعرف بالطلب
+                // RequestNavigation يُطلق حدث يسمع MainWindow فيُنفذ التنقل الفعلي
+                _navigationService.RequestNavigation("PermissionMatrix");
             }
         }
     }

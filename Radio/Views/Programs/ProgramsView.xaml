@@ -11,7 +11,7 @@
     Style="{StaticResource View.Base}"
     mc:Ignorable="d">
 
-    <Grid Background="{DynamicResource MaterialDesignPaper}">
+    <Grid Background="{StaticResource SurfaceBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -189,7 +189,7 @@
                                         <materialDesign:PackIcon
                                             Width="18"
                                             Height="18"
-                                            Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                            Foreground="{StaticResource PrimaryMainBrush}"
                                             Kind="Pencil" />
                                     </Button>
                                     <Button

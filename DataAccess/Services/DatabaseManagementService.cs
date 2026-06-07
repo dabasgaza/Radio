@@ -1,4 +1,5 @@
 ﻿using DataAccess.Common;
+using DataAccess.Security;
 using Domain.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -22,10 +23,17 @@ namespace DataAccess.Services
             _sessionProvider = sessionProvider;
         }
 
+        /// <summary>
+        /// قراءة نص الاتصال الآمن — يدعم التشفير بـ DPAPI ومتغيرات البيئة.
+        /// </summary>
         private string GetConnectionString()
         {
-            return _configuration.GetConnectionString("DefaultConnection")
-                ?? "Server=.;Database=BroadcastWorkflowDB;Trusted_Connection=True;TrustServerCertificate=True;";
+            var secureValue = SecureConfigurationProvider.GetSecureConnectionString(_configuration);
+            if (!string.IsNullOrWhiteSpace(secureValue))
+                return secureValue;
+
+            // احتياطي آخر (لا يجب أن يُصل إليه في الظروف العادية)
+            return "Server=.;Database=BroadcastWorkflowDB;Trusted_Connection=True;TrustServerCertificate=True;";
         }
 
         private string GetDatabaseName(string connectionString)

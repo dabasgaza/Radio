@@ -40,9 +40,9 @@
                         CornerRadius="32,0,0,32">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Offset="0" Color="#0D0D4F" />
-                                <GradientStop Offset="0.5" Color="#1A237E" />
-                                <GradientStop Offset="1" Color="#303F9F" />
+                                <GradientStop Offset="0" Color="{StaticResource Primary900Color}" />
+                                <GradientStop Offset="0.5" Color="{StaticResource Primary800Color}" />
+                                <GradientStop Offset="1" Color="{StaticResource Primary700Color}" />
                             </LinearGradientBrush>
                         </Border.Background>
 
@@ -56,9 +56,7 @@
                                 VerticalAlignment="Top"
                                 Fill="White"
                                 Opacity="0.03">
-                                <Ellipse.Effect>
-                                    <BlurEffect Radius="100" />
-                                </Ellipse.Effect>
+                                <!--  ✨ إزالة BlurEffect — كان يسبب عرض برمجي مكلف على كل إطار  -->
                             </Ellipse>
                             <Ellipse
                                 Width="200"
@@ -68,9 +66,7 @@
                                 VerticalAlignment="Bottom"
                                 Fill="{StaticResource SecondaryMainBrush}"
                                 Opacity="0.07">
-                                <Ellipse.Effect>
-                                    <BlurEffect Radius="80" />
-                                </Ellipse.Effect>
+                                <!--  ✨ إزالة BlurEffect — كان يسبب عرض برمجي مكلف على كل إطار  -->
                             </Ellipse>
 
                             <StackPanel Margin="40" VerticalAlignment="Center">
@@ -172,7 +168,7 @@
                                 materialDesign:TextFieldAssist.LeadingIcon="AccountCircle"
                                 materialDesign:TextFieldAssist.LeadingIconSize="22"
                                 FontSize="{DynamicResource FontSize.BodyLarge}"
-                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                Style="{StaticResource Input.Text}"
                                 Text="admin" />
 
                             <!--  حقل كلمة المرور  -->
@@ -186,7 +182,7 @@
                                 materialDesign:TextFieldAssist.LeadingIconSize="22"
                                 FontSize="{DynamicResource FontSize.BodyLarge}"
                                 Password="Admin@123"
-                                Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
+                                Style="{StaticResource Input.Password}" />
 
                             <!--  زر الدخول  -->
                             <Button
@@ -195,10 +191,8 @@
                                 Margin="0,12,0,0"
                                 materialDesign:ButtonAssist.CornerRadius="16"
                                 materialDesign:ElevationAssist.Elevation="Dp4"
-                                Background="{StaticResource PrimaryDarkBrush}"
-                                BorderBrush="{StaticResource PrimaryDarkBrush}"
                                 Click="BtnLogin_Click"
-                                Style="{StaticResource MaterialDesignRaisedButton}">
+                                Style="{StaticResource Btn.Primary}">
                                 <Grid>
                                     <StackPanel x:Name="BtnContent" Orientation="Horizontal">
                                         <materialDesign:PackIcon

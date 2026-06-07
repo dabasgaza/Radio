@@ -645,7 +645,7 @@
                                                 Height="16"
                                                 Margin="0,0,8,0"
                                                 VerticalAlignment="Center"
-                                                Foreground="#2196F3"
+                                                Foreground="{StaticResource InfoBrush}"
                                                 Kind="Web" />
                                             <TextBlock
                                                 x:Name="ChipWebPublished"
@@ -656,7 +656,7 @@
                                         <Border
                                             Height="3"
                                             VerticalAlignment="Bottom"
-                                            Background="#2196F3"
+                                            Background="{StaticResource InfoBrush}"
                                             Visibility="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}, Converter={StaticResource BoolToVisConverter}}" />
                                     </Grid>
                                 </RadioButton>
@@ -806,7 +806,7 @@
                                             <Setter Property="Background" Value="{StaticResource WarningBrush}" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                    <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
+                                                    <Setter Property="Background" Value="{StaticResource SecondaryGradientBrush}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
                                                     <Setter Property="Background" Value="{StaticResource SuccessGradientBrush}" />
@@ -886,25 +886,24 @@
                                             CornerRadius="8">
                                             <Border.Style>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="#15FFA726" />
-                                                    <!--  مجدولة  -->
-                                                    <Setter Property="BorderBrush" Value="#40FFA726" />
+                                                    <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                            <Setter Property="Background" Value="#1526A69A" />
-                                                            <Setter Property="BorderBrush" Value="#4026A69A" />
+                                                            <Setter Property="Background" Value="{StaticResource SecondaryLightBrush}" />
+                                                            <Setter Property="BorderBrush" Value="{StaticResource SecondaryMainBrush}" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
-                                                            <Setter Property="Background" Value="#1566BB6A" />
-                                                            <Setter Property="BorderBrush" Value="#4066BB6A" />
+                                                            <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
+                                                            <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding StatusText}" Value="منشورة على الموقع">
-                                                            <Setter Property="Background" Value="#1529B6F6" />
-                                                            <Setter Property="BorderBrush" Value="#4029B6F6" />
+                                                            <Setter Property="Background" Value="{StaticResource InfoLightBrush}" />
+                                                            <Setter Property="BorderBrush" Value="{StaticResource InfoBrush}" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
-                                                            <Setter Property="Background" Value="#15EF5350" />
-                                                            <Setter Property="BorderBrush" Value="#40EF5350" />
+                                                            <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -917,19 +916,19 @@
                                                     VerticalAlignment="Center">
                                                     <Ellipse.Style>
                                                         <Style TargetType="Ellipse">
-                                                            <Setter Property="Fill" Value="#FFA726" />
+                                                            <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                                    <Setter Property="Fill" Value="#26A69A" />
+                                                                    <Setter Property="Fill" Value="{StaticResource SecondaryMainBrush}" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
-                                                                    <Setter Property="Fill" Value="#66BB6A" />
+                                                                    <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة على الموقع">
-                                                                    <Setter Property="Fill" Value="#29B6F6" />
+                                                                    <Setter Property="Fill" Value="{StaticResource InfoBrush}" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
-                                                                    <Setter Property="Fill" Value="#EF5350" />
+                                                                    <Setter Property="Fill" Value="{StaticResource ErrorBrush}" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -941,19 +940,19 @@
                                                     FontWeight="Bold">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
-                                                            <Setter Property="Foreground" Value="#E65100" />
+                                                            <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                                    <Setter Property="Foreground" Value="#004D40" />
+                                                                    <Setter Property="Foreground" Value="{StaticResource SecondaryDarkBrush}" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
-                                                                    <Setter Property="Foreground" Value="#1B5E20" />
+                                                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة على الموقع">
-                                                                    <Setter Property="Foreground" Value="#01579B" />
+                                                                    <Setter Property="Foreground" Value="{StaticResource InfoBrush}" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding StatusText}" Value="ملغاة">
-                                                                    <Setter Property="Foreground" Value="#B71C1C" />
+                                                                    <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -1053,8 +1052,8 @@
                                                     <Border
                                                         Margin="0,2,4,2"
                                                         Padding="6,2"
-                                                        Background="#10673AB7"
-                                                        BorderBrush="#25673AB7"
+                                                        Background="{StaticResource PrimaryXLightBrush}"
+                                                        BorderBrush="{StaticResource PrimaryMainBrush}"
                                                         BorderThickness="1"
                                                         CornerRadius="6"
                                                         ToolTip="ضيف حلقة">
@@ -1064,13 +1063,13 @@
                                                                 Height="12"
                                                                 Margin="0,0,4,0"
                                                                 VerticalAlignment="Center"
-                                                                Foreground="#673AB7"
+                                                                Foreground="{StaticResource PrimaryMainBrush}"
                                                                 Kind="Account" />
                                                             <TextBlock
                                                                 VerticalAlignment="Center"
                                                                 FontSize="10"
                                                                 FontWeight="SemiBold"
-                                                                Foreground="#673AB7"
+                                                                Foreground="{StaticResource PrimaryMainBrush}"
                                                                 Style="{StaticResource Type.Caption}">
                                                                 <Run Text="{Binding Name, Mode=OneWay}" />
                                                                 <Run Text="{Binding Topic, StringFormat=' ({0})', Mode=OneWay}" />
@@ -1102,8 +1101,8 @@
                                                     <Border
                                                         Margin="0,2,4,2"
                                                         Padding="6,2"
-                                                        Background="#1000BCD4"
-                                                        BorderBrush="#2500BCD4"
+                                                        Background="{StaticResource SecondaryLightBrush}"
+                                                        BorderBrush="{StaticResource SecondaryMainBrush}"
                                                         BorderThickness="1"
                                                         CornerRadius="6"
                                                         ToolTip="مراسل">
@@ -1113,13 +1112,13 @@
                                                                 Height="12"
                                                                 Margin="0,0,4,0"
                                                                 VerticalAlignment="Center"
-                                                                Foreground="#0097A7"
+                                                                Foreground="{StaticResource SecondaryMainBrush}"
                                                                 Kind="Microphone" />
                                                             <TextBlock
                                                                 VerticalAlignment="Center"
                                                                 FontSize="10"
                                                                 FontWeight="SemiBold"
-                                                                Foreground="#00838F"
+                                                                Foreground="{StaticResource SecondaryDarkBrush}"
                                                                 Style="{StaticResource Type.Caption}">
                                                                 <Run Text="{Binding FullName, Mode=OneWay}" />
                                                                 <Run Text="{Binding Topic, StringFormat=' ({0})', Mode=OneWay}" />
@@ -1151,8 +1150,8 @@
                                                     <Border
                                                         Margin="0,2,4,2"
                                                         Padding="6,2"
-                                                        Background="#10607D8B"
-                                                        BorderBrush="#25607D8B"
+                                                        Background="{StaticResource SurfaceVariantBrush}"
+                                                        BorderBrush="{StaticResource BorderDefaultBrush}"
                                                         BorderThickness="1"
                                                         CornerRadius="6"
                                                         ToolTip="فريق العمل">
@@ -1162,13 +1161,13 @@
                                                                 Height="12"
                                                                 Margin="0,0,4,0"
                                                                 VerticalAlignment="Center"
-                                                                Foreground="#607D8B"
+                                                                Foreground="{StaticResource TextSecondaryBrush}"
                                                                 Kind="AccountOutline" />
                                                             <TextBlock
                                                                 VerticalAlignment="Center"
                                                                 FontSize="10"
                                                                 FontWeight="SemiBold"
-                                                                Foreground="#37474F"
+                                                                Foreground="{StaticResource TextSecondaryBrush}"
                                                                 Style="{StaticResource Type.Caption}">
                                                                 <Run Text="{Binding FullName, Mode=OneWay}" />
                                                                 <Run Text="{Binding StaffRoleName, StringFormat=' ({0})', Mode=OneWay}" />
@@ -1185,8 +1184,8 @@
                                         Grid.Row="4"
                                         Margin="0,4,0,0"
                                         Padding="10,8"
-                                        Background="#FFFDE7"
-                                        BorderBrush="#FFE082"
+                                        Background="{StaticResource WarningLightBrush}"
+                                        BorderBrush="{StaticResource WarningBrush}"
                                         BorderThickness="1,1,4,1"
                                         CornerRadius="6"
                                         Visibility="{Binding SpecialNotes, Converter={StaticResource NullToCollapsedConverter}}">
@@ -1201,13 +1200,13 @@
                                                 Height="14"
                                                 Margin="0,1,6,0"
                                                 VerticalAlignment="Top"
-                                                Foreground="#F57F17"
+                                                Foreground="{StaticResource WarningBrush}"
                                                 Kind="NoteOutline" />
                                             <TextBlock
                                                 Grid.Column="1"
                                                 MaxHeight="45"
                                                 VerticalAlignment="Center"
-                                                Foreground="#5D4037"
+                                                Foreground="{StaticResource TextSecondaryBrush}"
                                                 Style="{StaticResource Type.Caption}"
                                                 Text="{Binding SpecialNotes}"
                                                 TextTrimming="CharacterEllipsis"
@@ -1286,98 +1285,68 @@
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
                                                 Orientation="Horizontal">
-
-                                                <!--  زر تنفيذ — أخضر / Primary  -->
                                                 <Button
-                                                    Height="32"
-                                                    Padding="12,0"
+                                                    Height="30"
+                                                    Padding="10,0"
+                                                    Background="{StaticResource HeaderGradientBrush}"
                                                     Click="BtnMarkExecuted_Click"
+                                                    Style="{StaticResource Btn.Primary}"
                                                     ToolTip="تنفيذ الحلقة"
                                                     Visibility="{Binding CanMarkExecuted, Converter={StaticResource BoolToVisConverter}}">
-                                                    <Button.Style>
-                                                        <Style BasedOn="{StaticResource Btn.Primary}" TargetType="Button">
-                                                            <Setter Property="Background" Value="{StaticResource HeaderGradientBrush}" />
-                                                            <Setter Property="BorderThickness" Value="0" />
-                                                            <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
-                                                        </Style>
-                                                    </Button.Style>
-                                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                    <StackPanel Orientation="Horizontal">
                                                         <materialDesign:PackIcon
-                                                            Width="15"
-                                                            Height="15"
-                                                            Margin="0,0,6,0"
+                                                            Width="14"
+                                                            Height="14"
+                                                            Margin="0,0,4,0"
                                                             VerticalAlignment="Center"
                                                             Kind="PlayCircleOutline" />
                                                         <TextBlock
                                                             VerticalAlignment="Center"
                                                             FontSize="11"
-                                                            FontWeight="Medium"
                                                             Text="تنفيذ" />
                                                     </StackPanel>
                                                 </Button>
-
-                                                <!--  زر نشر رقمي — بنفسجي/وردي / Primary  -->
                                                 <Button
-                                                    Height="32"
-                                                    Margin="6,0,0,0"
-                                                    Padding="12,0"
+                                                    Height="30"
+                                                    Margin="4,0,0,0"
+                                                    Padding="10,0"
                                                     Click="BtnMarkPublished_Click"
+                                                    Style="{StaticResource Btn.Secondary}"
                                                     ToolTip="نشر رقمي"
                                                     Visibility="{Binding CanMarkPublished, Converter={StaticResource BoolToVisConverter}}">
-                                                    <Button.Style>
-                                                        <Style BasedOn="{StaticResource Btn.Primary}" TargetType="Button">
-                                                            <Setter Property="Background" Value="{StaticResource SuccessGradientBrush}" />
-                                                            <Setter Property="BorderThickness" Value="0" />
-                                                            <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
-                                                        </Style>
-                                                    </Button.Style>
-                                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                    <StackPanel Orientation="Horizontal">
                                                         <materialDesign:PackIcon
-                                                            Width="15"
-                                                            Height="15"
-                                                            Margin="0,0,6,0"
+                                                            Width="14"
+                                                            Height="14"
+                                                            Margin="0,0,4,0"
                                                             VerticalAlignment="Center"
                                                             Kind="CloudUploadOutline" />
                                                         <TextBlock
                                                             VerticalAlignment="Center"
                                                             FontSize="11"
-                                                            FontWeight="Medium"
                                                             Text="نشر" />
                                                     </StackPanel>
                                                 </Button>
-
-                                                <!--  زر نشر الموقع — سماوي / Info  -->
                                                 <Button
-                                                    Height="32"
-                                                    Margin="6,0,0,0"
-                                                    Padding="12,0"
+                                                    Width="30"
+                                                    Height="30"
+                                                    Margin="4,0,0,0"
+                                                    Padding="0"
+                                                    Background="{StaticResource InfoGradientBrush}"
                                                     Click="BtnToggleWebsitePublish_Click"
+                                                    Style="{StaticResource Btn.Primary}"
                                                     ToolTip="نشر على الموقع"
                                                     Visibility="{Binding CanToggleWebsitePublish, Converter={StaticResource BoolToVisConverter}}">
-                                                    <Button.Style>
-                                                        <Style BasedOn="{StaticResource Btn.Primary}" TargetType="Button">
-                                                            <Setter Property="Background" Value="{StaticResource InfoGradientBrush}" />
-                                                            <Setter Property="BorderThickness" Value="0" />
-                                                            <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
-                                                        </Style>
-                                                    </Button.Style>
-                                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                                        <materialDesign:PackIcon
-                                                            Width="15"
-                                                            Height="15"
-                                                            Margin="0,0,6,0"
-                                                            VerticalAlignment="Center"
-                                                            Kind="Web" />
-                                                        <TextBlock
-                                                            VerticalAlignment="Center"
-                                                            FontSize="11"
-                                                            FontWeight="Medium"
-                                                            Text="موقع" />
-                                                    </StackPanel>
+                                                    <materialDesign:PackIcon
+                                                        Width="14"
+                                                        Height="14"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Kind="Web" />
                                                 </Button>
-
                                             </StackPanel>
 
+                                            <!--  قائمة الإجراءات الإضافية الحديثة  -->
                                             <!--  قائمة الإجراءات الإضافية الحديثة  -->
                                             <materialDesign:PopupBox
                                                 Grid.Column="1"
@@ -1548,14 +1517,14 @@
                                                                     Height="32"
                                                                     HorizontalAlignment="Center"
                                                                     VerticalAlignment="Center"
-                                                                    Background="#FFFEF3E0"
+                                                                    Background="{StaticResource WarningLightBrush}"
                                                                     CornerRadius="8">
                                                                     <materialDesign:PackIcon
                                                                         Width="16"
                                                                         Height="16"
                                                                         HorizontalAlignment="Center"
                                                                         VerticalAlignment="Center"
-                                                                        Foreground="#FFF57C00"
+                                                                        Foreground="{StaticResource WarningBrush}"
                                                                         Kind="Undo" />
                                                                 </Border>
 
@@ -1662,14 +1631,14 @@
                                                                     Height="32"
                                                                     HorizontalAlignment="Center"
                                                                     VerticalAlignment="Center"
-                                                                    Background="#FFE3F2FD"
+                                                                    Background="{StaticResource PrimaryXLightBrush}"
                                                                     CornerRadius="8">
                                                                     <materialDesign:PackIcon
                                                                         Width="16"
                                                                         Height="16"
                                                                         HorizontalAlignment="Center"
                                                                         VerticalAlignment="Center"
-                                                                        Foreground="#FF1976D2"
+                                                                        Foreground="{StaticResource PrimaryMainBrush}"
                                                                         Kind="PencilOutline" />
                                                                 </Border>
 
@@ -1820,7 +1789,7 @@
                                             <Setter Property="Background" Value="{StaticResource WarningBrush}" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                    <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
+                                                    <Setter Property="Background" Value="{StaticResource SecondaryGradientBrush}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
                                                     <Setter Property="Background" Value="{StaticResource SuccessGradientBrush}" />
@@ -1894,7 +1863,7 @@
                                                     <Setter Property="Background" Value="{StaticResource WarningBrush}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                    <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
+                                                    <Setter Property="Background" Value="{StaticResource SecondaryGradientBrush}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
                                                     <Setter Property="Background" Value="{StaticResource SuccessGradientBrush}" />
@@ -2273,7 +2242,7 @@
                                             <Setter Property="Background" Value="{StaticResource WarningBrush}" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                    <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
+                                                    <Setter Property="Background" Value="{StaticResource SecondaryGradientBrush}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
                                                     <Setter Property="Background" Value="{StaticResource SuccessGradientBrush}" />
@@ -2337,7 +2306,7 @@
                                                     <Setter Property="Background" Value="{StaticResource WarningBrush}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منفّذة">
-                                                    <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
+                                                    <Setter Property="Background" Value="{StaticResource SecondaryGradientBrush}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding StatusText}" Value="منشورة">
                                                     <Setter Property="Background" Value="{StaticResource SuccessGradientBrush}" />

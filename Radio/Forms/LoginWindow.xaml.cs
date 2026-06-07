@@ -73,6 +73,10 @@ namespace Radio.Forms
 
                 var mainWindow = _serviceProvider.GetRequiredService<ModernMainWindow>();
                 mainWindow.Show();
+
+                // ✅ تعيين MainWindow صراحةً — WPF لا يحدّثها تلقائياً بعد إغلاق LoginWindow
+                Application.Current.MainWindow = mainWindow;
+
                 Close();
             }
             catch (Exception ex)

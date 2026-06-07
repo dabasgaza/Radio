@@ -78,8 +78,10 @@
                         Text="المستخدم" />
                     <ComboBox
                         x:Name="ComboUsers"
+                        materialDesign:TextFieldAssist.LeadingIcon="Account"
                         DisplayMemberPath="FullName"
-                        SelectedValuePath="UserId" />
+                        SelectedValuePath="UserId"
+                        Style="{StaticResource Input.ComboBox}" />
                 </StackPanel>
 
                 <!--  Actions Filter  -->
@@ -89,7 +91,10 @@
                         Foreground="{DynamicResource TextSecondaryBrush}"
                         Style="{StaticResource Type.BodySmall}"
                         Text="نوع الإجراء" />
-                    <ComboBox x:Name="ComboActions">
+                    <ComboBox
+                        x:Name="ComboActions"
+                        materialDesign:TextFieldAssist.LeadingIcon="Settings"
+                        Style="{StaticResource Input.ComboBox}">
                         <ComboBoxItem Content="الكل" Tag="" />
                         <ComboBoxItem Content="إضافة (ADDED)" Tag="ADDED" />
                         <ComboBoxItem Content="تعديل (MODIFIED)" Tag="MODIFIED" />
@@ -105,7 +110,7 @@
                         Foreground="{DynamicResource TextSecondaryBrush}"
                         Style="{StaticResource Type.BodySmall}"
                         Text="من تاريخ" />
-                    <DatePicker x:Name="DpFrom" />
+                    <DatePicker x:Name="DpFrom" Style="{StaticResource Input.DatePicker}" />
                 </StackPanel>
 
                 <!--  Date Range To  -->
@@ -115,7 +120,7 @@
                         Foreground="{DynamicResource TextSecondaryBrush}"
                         Style="{StaticResource Type.BodySmall}"
                         Text="إلى تاريخ" />
-                    <DatePicker x:Name="DpTo" />
+                    <DatePicker x:Name="DpTo" Style="{StaticResource Input.DatePicker}" />
                 </StackPanel>
 
                 <!--  Filter Actions  -->
@@ -127,7 +132,7 @@
                         x:Name="BtnFilter"
                         Margin="0,0,8,0"
                         Click="BtnFilter_Click"
-                        Style="{StaticResource MaterialDesignRaisedButton}">
+                        Style="{StaticResource Btn.Primary}">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon
                                 Width="16"
@@ -140,7 +145,7 @@
                     <Button
                         x:Name="BtnResetFilters"
                         Click="BtnResetFilters_Click"
-                        Style="{StaticResource MaterialDesignOutlinedButton}">
+                        Style="{StaticResource Btn.Icon}">
                         <materialDesign:PackIcon
                             Width="16"
                             Height="16"
@@ -208,16 +213,16 @@
                                                 <Style TargetType="Border">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Action}" Value="ADDED">
-                                                            <Setter Property="Background" Value="#E8F5E9" />
+                                                            <Setter Property="Background" Value="{StaticResource SuccessLightBrush}" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Action}" Value="MODIFIED">
-                                                            <Setter Property="Background" Value="#E3F2FD" />
+                                                            <Setter Property="Background" Value="{StaticResource InfoLightBrush}" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Action}" Value="SOFT_DELETED">
-                                                            <Setter Property="Background" Value="#FFF3E0" />
+                                                            <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Action}" Value="DELETED">
-                                                            <Setter Property="Background" Value="#FFEBEE" />
+                                                            <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -228,19 +233,19 @@
                                                         <Setter Property="FontWeight" Value="SemiBold" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Action}" Value="ADDED">
-                                                                <Setter Property="Foreground" Value="#2E7D32" />
+                                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
                                                                 <Setter Property="Text" Value="إضافة" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Action}" Value="MODIFIED">
-                                                                <Setter Property="Foreground" Value="#1565C0" />
+                                                                <Setter Property="Foreground" Value="{StaticResource InfoBrush}" />
                                                                 <Setter Property="Text" Value="تعديل" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Action}" Value="SOFT_DELETED">
-                                                                <Setter Property="Foreground" Value="#EF6C00" />
+                                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
                                                                 <Setter Property="Text" Value="حذف منطقي" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Action}" Value="DELETED">
-                                                                <Setter Property="Foreground" Value="#C62828" />
+                                                                <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
                                                                 <Setter Property="Text" Value="حذف نهائي" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -354,10 +359,10 @@
                                                 <Border
                                                     Grid.Column="0"
                                                     Padding="6,4"
-                                                    Background="#FFEBEE"
+                                                    Background="{StaticResource ErrorLightBrush}"
                                                     CornerRadius="4">
                                                     <TextBlock
-                                                        Foreground="#C62828"
+                                                        Foreground="{StaticResource ErrorBrush}"
                                                         Style="{StaticResource Type.BodySmall}"
                                                         Text="{Binding OldValue}"
                                                         TextWrapping="Wrap" />
@@ -377,10 +382,10 @@
                                                 <Border
                                                     Grid.Column="2"
                                                     Padding="6,4"
-                                                    Background="#E8F5E9"
+                                                    Background="{StaticResource SuccessLightBrush}"
                                                     CornerRadius="4">
                                                     <TextBlock
-                                                        Foreground="#2E7D32"
+                                                        Foreground="{StaticResource SuccessBrush}"
                                                         Style="{StaticResource Type.BodySmall}"
                                                         Text="{Binding NewValue}"
                                                         TextWrapping="Wrap" />

@@ -180,7 +180,10 @@
             </Grid>
 
             <!--  Main DataGrid  -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" UniformCornerRadius="16">
+            <materialDesign:Card
+                materialDesign:ElevationAssist.Elevation="Dp1"
+                Style="{StaticResource Card.Main}"
+                UniformCornerRadius="16">
                 <DataGrid
                     x:Name="DgCorrespondents"
                     Background="Transparent"
@@ -212,6 +215,7 @@
                                         <!--  Text Info  -->
                                         <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                                             <TextBlock
+                                                FontWeight="SemiBold"
                                                 Foreground="{StaticResource TextPrimaryBrush}"
                                                 Style="{StaticResource Type.BodyLarge}"
                                                 Text="{Binding FullName}"

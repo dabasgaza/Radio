@@ -4,6 +4,7 @@ using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using DataAccess.Validation;
 using Radio.Messaging;
+using Radio.Services;
 using Radio.Views.Common;
 using System.Windows;
 
@@ -18,6 +19,7 @@ namespace Radio.Views.Guests
         private readonly IGuestService _guestService;
         private readonly UserSession _session;
         private readonly GuestDto? _existingGuest;
+        private readonly DialogHelper _dialogHelper;
 
         public GuestFormDialog(GuestDto? guest, IGuestService guestService, UserSession session)
         {
@@ -25,6 +27,7 @@ namespace Radio.Views.Guests
             _existingGuest = guest;
             _guestService = guestService;
             _session = session;
+            _dialogHelper = new DialogHelper(); // ✅ نُنشئ محلياً لأن النافذة لا تملك IServiceProvider
 
             IsWindowDraggable = true;
 
@@ -87,7 +90,7 @@ namespace Radio.Views.Guests
             {
                 var diag = new ConcurrencyDialog(ex.DatabaseValues);
 
-                if (diag.ShowDialog() == true)
+                if (_dialogHelper.ShowDialog(diag) == true)
                 {
                     try
                     {
