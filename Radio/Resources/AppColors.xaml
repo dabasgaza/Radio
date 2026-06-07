@@ -17,30 +17,36 @@
         ═══════════════════════════════════════════════════════════
     -->
 
-    <!--  Primary — Indigo (Modern Premium Indigo)  -->
-    <Color x:Key="Primary900Color">#1E1B4B</Color>
-    <Color x:Key="Primary800Color">#312E81</Color>
-    <Color x:Key="Primary700Color">#3730A3</Color>
-    <Color x:Key="Primary600Color">#4F46E5</Color>
-    <Color x:Key="Primary500Color">#6366F1</Color>
-    <Color x:Key="Primary400Color">#818CF8</Color>
-    <Color x:Key="Primary300Color">#A5B4FC</Color>
-    <Color x:Key="Primary200Color">#C7D2FE</Color>
-    <Color x:Key="Primary100Color">#E0E7FF</Color>
-    <Color x:Key="Primary50Color">#EEF2F6</Color>
+    <!--  Primary — Modern Blue (Tailwind Blue Scale)  -->
+    <Color x:Key="Primary900Color">#1E3A8A</Color>
+    <Color x:Key="Primary800Color">#1E40AF</Color>
+    <Color x:Key="Primary700Color">#1D4ED8</Color>
+    <Color x:Key="Primary600Color">#2563EB</Color>
+    <Color x:Key="Primary500Color">#3B82F6</Color>
+    <Color x:Key="Primary400Color">#60A5FA</Color>
+    <Color x:Key="Primary300Color">#93C5FD</Color>
+    <Color x:Key="Primary200Color">#BFDBFE</Color>
+    <Color x:Key="Primary100Color">#DBEAFE</Color>
+    <Color x:Key="Primary50Color">#EFF6FF</Color>
 
-    <!--  Secondary — Teal/Cyan (Modern Premium Secondary)  -->
-    <Color x:Key="Secondary700Color">#0F766E</Color>
-    <Color x:Key="Secondary500Color">#14B8A6</Color>
-    <Color x:Key="Secondary300Color">#5EEAD4</Color>
-    <Color x:Key="Secondary100Color">#CCFBF1</Color>
-    <Color x:Key="Secondary50Color">#F0FDFA</Color>
+    <!--  Secondary — Sky Blue (Tailwind Sky Scale)  -->
+    <Color x:Key="Secondary800Color">#075985</Color>
+    <Color x:Key="Secondary700Color">#0369A1</Color>
+    <Color x:Key="Secondary600Color">#0284C7</Color>
+    <Color x:Key="Secondary500Color">#0EA5E9</Color>
+    <Color x:Key="Secondary400Color">#38BDF8</Color>
+    <Color x:Key="Secondary300Color">#7DD3FC</Color>
+    <Color x:Key="Secondary200Color">#BAE6FD</Color>
+    <Color x:Key="Secondary100Color">#E0F2FE</Color>
+    <Color x:Key="Secondary50Color">#F0F9FF</Color>
 
     <!--  Neutral — Grey Scale (Slate Grey)  -->
+    <Color x:Key="Neutral950Color">#020617</Color>
     <Color x:Key="Neutral900Color">#0F172A</Color>
     <Color x:Key="Neutral800Color">#1E293B</Color>
     <Color x:Key="Neutral700Color">#334155</Color>
     <Color x:Key="Neutral600Color">#475569</Color>
+    <Color x:Key="Neutral500Color">#64748B</Color>
     <Color x:Key="Neutral400Color">#94A3B8</Color>
     <Color x:Key="Neutral300Color">#CBD5E1</Color>
     <Color x:Key="Neutral200Color">#E2E8F0</Color>
@@ -49,6 +55,11 @@
 
     <!--  Surface / Background  -->
     <Color x:Key="SurfaceColor">#FFFFFF</Color>
+    <Color x:Key="SurfaceDimColor">#F8FAFC</Color>
+    <Color x:Key="SurfaceContainerLowColor">#F8FAFC</Color>
+    <Color x:Key="SurfaceContainerColor">#F1F5F9</Color>
+    <Color x:Key="SurfaceContainerHighColor">#EDF2F7</Color>
+    <Color x:Key="SurfaceContainerHighestColor">#E2E8F0</Color>
     <Color x:Key="SurfaceVariantColor">#F1F5F9</Color>
     <Color x:Key="BackgroundColor">#F8FAFC</Color>
 
@@ -62,24 +73,30 @@
     <Color x:Key="SuccessColor">#10B981</Color>
     <Color x:Key="SuccessLightColor">#ECFDF5</Color>
     <Color x:Key="SuccessDarkColor">#065F46</Color>
+    <Color x:Key="SuccessMediumColor">#D1FAE5</Color>
 
     <!--  Warning — Amber/Orange  -->
     <Color x:Key="WarningColor">#F59E0B</Color>
     <Color x:Key="WarningLightColor">#FFFBEB</Color>
     <Color x:Key="WarningDarkColor">#92400E</Color>
+    <Color x:Key="WarningMediumColor">#FEF3C7</Color>
 
     <!--  Error — Rose Red  -->
     <Color x:Key="ErrorColor">#EF4444</Color>
     <Color x:Key="ErrorLightColor">#FEF2F2</Color>
     <Color x:Key="ErrorDarkColor">#991B1B</Color>
+    <Color x:Key="ErrorMediumColor">#FEE2E2</Color>
 
     <!--  Info — Sky Blue  -->
     <Color x:Key="InfoColor">#0EA5E9</Color>
     <Color x:Key="InfoLightColor">#F0F9FF</Color>
+    <Color x:Key="InfoDarkColor">#0284C7</Color>
+    <Color x:Key="InfoMediumColor">#E0F2FE</Color>
 
     <!--  On-Air — Live Broadcast Red  -->
     <Color x:Key="OnAirColor">#F43F5E</Color>
     <Color x:Key="OnAirGlowColor">#FDA4AF</Color>
+    <Color x:Key="OnAirDarkColor">#B91C1C</Color>
 
     <!--
         ═══════════════════════════════════════════════════════════
@@ -99,6 +116,10 @@
 
     <!--  Surface / Background Brushes  -->
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+    <SolidColorBrush x:Key="SurfaceDimBrush" Color="{StaticResource SurfaceDimColor}" />
+    <SolidColorBrush x:Key="SurfaceContainerLowBrush" Color="{StaticResource SurfaceContainerLowColor}" />
+    <SolidColorBrush x:Key="SurfaceContainerBrush" Color="{StaticResource SurfaceContainerColor}" />
+    <SolidColorBrush x:Key="SurfaceContainerHighBrush" Color="{StaticResource SurfaceContainerHighColor}" />
     <SolidColorBrush x:Key="SurfaceVariantBrush" Color="{StaticResource SurfaceVariantColor}" />
     <SolidColorBrush x:Key="AppBackgroundBrush" Color="{StaticResource BackgroundColor}" />
 
@@ -145,7 +166,7 @@
     <!--  On-Air Brushes  -->
     <SolidColorBrush x:Key="OnAirBrush" Color="{StaticResource OnAirColor}" />
     <SolidColorBrush x:Key="OnAirGlowBrush" Color="{StaticResource OnAirGlowColor}" />
-
+    <SolidColorBrush x:Key="OnAirDarkBrush" Color="{StaticResource OnAirDarkColor}" />
 
     <!--  Row State Brushes (للجداول)  -->
     <SolidColorBrush x:Key="RowAlternateBrush" Color="#F8FAFC" />
@@ -157,21 +178,68 @@
 
     <!--
         ═══════════════════════════════════════════════════════════
-        4. GRADIENT BRUSHES — التدرجات الموحّدة
+        4. CHART / ACCENT COLORS — للرسوم البيانية
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Color x:Key="Violet500Color">#8B5CF6</Color>
+    <Color x:Key="Violet400Color">#A78BFA</Color>
+    <Color x:Key="Violet100Color">#EDE9FE</Color>
+    <Color x:Key="Violet50Color">#F5F3FF</Color>
+    <Color x:Key="Gray500Color">#6B7280</Color>
+
+    <SolidColorBrush x:Key="VioletBrush" Color="{StaticResource Violet500Color}" />
+    <SolidColorBrush x:Key="VioletLightBrush" Color="{StaticResource Violet100Color}" />
+    <SolidColorBrush x:Key="GrayBrush" Color="{StaticResource Gray500Color}" />
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        5. PALETTE ALIASES — مفاتيح مباشرة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary600Color}" />
+    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{StaticResource Primary700Color}" />
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource SurfaceDimColor}" />
+    <SolidColorBrush x:Key="CardBrush" Color="{StaticResource SurfaceColor}" />
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource SurfaceColor}" />
+
+    <!--  Text extra aliases  -->
+    <SolidColorBrush x:Key="TextTertiaryBrush" Color="{StaticResource Neutral500Color}" />
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        6. EPISODE STATUS BRUSHES — حالات الحلقات
+        ═══════════════════════════════════════════════════════════
+    -->
+    <SolidColorBrush x:Key="EpisodeActiveBrush" Color="{StaticResource SuccessColor}" />
+    <SolidColorBrush x:Key="EpisodePendingBrush" Color="{StaticResource WarningColor}" />
+    <SolidColorBrush x:Key="EpisodeCancelledBrush" Color="{StaticResource ErrorColor}" />
+    <SolidColorBrush x:Key="EpisodeCompletedBrush" Color="{StaticResource InfoColor}" />
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        7. GRADIENT BRUSHES — التدرجات الموحّدة
         ═══════════════════════════════════════════════════════════
     -->
 
-    <!--  Gradient أساسي للهيدر والـ ColorZone (موجود مسبقاً)  -->
+    <!--  Gradient أساسي للهيدر والـ ColorZone  -->
     <LinearGradientBrush x:Key="HeaderGradientBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Offset="0.0" Color="{StaticResource Primary800Color}" />
         <GradientStop Offset="1.0" Color="{StaticResource Primary500Color}" />
     </LinearGradientBrush>
 
+    <!--  Gradient أخضر  -->
     <LinearGradientBrush x:Key="HeaderGreenGradientBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0.0" Color="{StaticResource SuccessColor}" />
+        <GradientStop Offset="0.0" Color="{StaticResource SuccessDarkColor}" />
         <GradientStop Offset="1.0" Color="{StaticResource SuccessColor}" />
     </LinearGradientBrush>
 
+    <!--  Gradient ثانوي (Sky Blue)  -->
+    <LinearGradientBrush x:Key="SecondaryGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource Secondary700Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Secondary500Color}" />
+    </LinearGradientBrush>
+
+    <!--  Alias قديم مع الخطأ الإملائي — للتوافق  -->
     <LinearGradientBrush x:Key="SeconderyGradientBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Offset="0.0" Color="{StaticResource Secondary700Color}" />
         <GradientStop Offset="1.0" Color="{StaticResource Secondary500Color}" />
@@ -179,19 +247,25 @@
 
     <!--  تدرج النجاح (الأخضر)  -->
     <LinearGradientBrush x:Key="SuccessGradientBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0.0" Color="#43A047" />
-        <GradientStop Offset="1.0" Color="#2E7D32" />
+        <GradientStop Offset="0.0" Color="{StaticResource SuccessDarkColor}" />
+        <GradientStop Offset="1.0" Color="{StaticResource SuccessColor}" />
     </LinearGradientBrush>
 
     <!--  تدرج المعلومات/النشر (الأزرق)  -->
     <LinearGradientBrush x:Key="InfoGradientBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0.0" Color="#42A5F5" />
-        <GradientStop Offset="1.0" Color="#1976D2" />
+        <GradientStop Offset="0.0" Color="{StaticResource InfoDarkColor}" />
+        <GradientStop Offset="1.0" Color="{StaticResource InfoColor}" />
     </LinearGradientBrush>
 
-    <!--  تدرج النشر الرقمي الخاص (بنفسجي/وردي نابض بالحياة)  -->
+    <!--  تدرج التحذير  -->
+    <LinearGradientBrush x:Key="WarningGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource WarningDarkColor}" />
+        <GradientStop Offset="1.0" Color="{StaticResource WarningColor}" />
+    </LinearGradientBrush>
+
+    <!--  تدرج النشر الرقمي الخاص (بنفسجي/وردي)  -->
     <LinearGradientBrush x:Key="PublishGradientBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0.0" Color="#8B5CF6" />
+        <GradientStop Offset="0.0" Color="{StaticResource Violet500Color}" />
         <GradientStop Offset="1.0" Color="#EC4899" />
     </LinearGradientBrush>
 
@@ -239,8 +313,29 @@
 
     <!--  ═════════════════════ END DIALOG GRADIENTS ═════════════════════  -->
 
+    <!--  ═════════════════════ EPISODE CARD GRADIENTS ═════════════════════  -->
 
-    <!--  Gradient خفيف للبطاقات والخلفيات الفرعية (موجود مسبقاً)  -->
+    <LinearGradientBrush x:Key="EpisodeCardGradient1" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource Primary600Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Primary400Color}" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="EpisodeCardGradient2" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource Secondary600Color}" />
+        <GradientStop Offset="1.0" Color="{StaticResource Secondary400Color}" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="EpisodeCardGradient3" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource OnAirColor}" />
+        <GradientStop Offset="1.0" Color="{StaticResource OnAirGlowColor}" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="EpisodeCardGradient4" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0.0" Color="{StaticResource InfoDarkColor}" />
+        <GradientStop Offset="1.0" Color="{StaticResource InfoColor}" />
+    </LinearGradientBrush>
+
+    <!--  Gradient خفيف للبطاقات والخلفيات الفرعية  -->
     <LinearGradientBrush x:Key="CardGradientBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Offset="0.0" Color="{StaticResource Primary50Color}" />
         <GradientStop Offset="1.0" Color="{StaticResource Secondary50Color}" />
