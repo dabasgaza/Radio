@@ -1,4 +1,4 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
@@ -18,6 +18,21 @@ namespace Radio.Views.Programs
         private readonly UserSession _session;
         private readonly DialogHelper _dialogHelper;
         private List<ProgramDto> _allPrograms = [];
+        private DataGrid? _dgPrograms;
+        private DataGrid DgPrograms => _dgPrograms ??= FindByTag<DataGrid>(SkeletonGrid, "DgPrograms");
+
+        private static T? FindByTag<T>(DependencyObject parent, object tag) where T : DependencyObject
+        {
+            if (parent is T t && parent is FrameworkElement fe && fe.Tag?.Equals(tag) == true)
+                return t;
+            int count = System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < count; i++)
+            {
+                var result = FindByTag<T>(System.Windows.Media.VisualTreeHelper.GetChild(parent, i), tag);
+                if (result is not null) return result;
+            }
+            return null;
+        }
 
         public ProgramsView(IProgramService programService, UserSession session, DialogHelper dialogHelper)
         {
@@ -43,8 +58,13 @@ namespace Radio.Views.Programs
         {
             try
             {
+                SkeletonGrid.IsLoading = true;
                 _allPrograms = (await _programService.GetAllActiveAsync()).ToList();
                 DgPrograms.ItemsSource = _allPrograms;
+
+                // تحديث كروت الإحصائيات
+                TxtTotal.Text = _allPrograms.Count.ToString();
+                TxtCategories.Text = _allPrograms.Select(p => p.Category).Where(c => !string.IsNullOrEmpty(c)).Distinct().Count().ToString();
             }
             catch (InvalidOperationException ex)
             {
@@ -54,6 +74,10 @@ namespace Radio.Views.Programs
             {
                 Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError("حدث خطأ غير متوقع أثناء تحميل البرامج.");
+            }
+            finally
+            {
+                SkeletonGrid.IsLoading = false;
             }
         }
 

@@ -146,6 +146,44 @@ namespace Radio
             }
         }
 
+        /// <summary>
+        /// ✨ تبديل الثيم بين الفاتح والداكن.
+        /// يُحدث BundledTheme ويُبدّل فراشي الألوان السطحية ديناميكياً.
+        /// </summary>
+        public static void ToggleTheme()
+        {
+            var theme = Current.Resources.MergedDictionaries.OfType<BundledTheme>().FirstOrDefault();
+            if (theme == null) return;
+
+            var isDark = theme.BaseTheme == BaseTheme.Dark;
+            theme.BaseTheme = isDark ? BaseTheme.Light : BaseTheme.Dark;
+
+            // تحديث فراشي السطح والخلفية حسب الثيم
+            var isNowDark = !isDark;
+            Current.Resources["SurfaceBrush"] = new System.Windows.Media.SolidColorBrush(
+                isNowDark ? System.Windows.Media.Color.FromRgb(0x1E, 0x29, 0x3B) : System.Windows.Media.Color.FromRgb(0xFF, 0xFF, 0xFF));
+            Current.Resources["AppBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(
+                isNowDark ? System.Windows.Media.Color.FromRgb(0x0F, 0x17, 0x2A) : System.Windows.Media.Color.FromRgb(0xF8, 0xFA, 0xFC));
+            Current.Resources["SurfaceVariantBrush"] = new System.Windows.Media.SolidColorBrush(
+                isNowDark ? System.Windows.Media.Color.FromRgb(0x33, 0x41, 0x55) : System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
+            Current.Resources["DividerBrush"] = new System.Windows.Media.SolidColorBrush(
+                isNowDark ? System.Windows.Media.Color.FromRgb(0x33, 0x41, 0x55) : System.Windows.Media.Color.FromRgb(0xE2, 0xE8, 0xF0));
+            Current.Resources["CardBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(
+                isNowDark ? System.Windows.Media.Color.FromRgb(0x1E, 0x29, 0x3B) : System.Windows.Media.Color.FromRgb(0xFF, 0xFF, 0xFF));
+        }
+
+        /// <summary>
+        /// ✨ الثيم الحالي — هل هو داكن؟
+        /// </summary>
+        public static bool IsDarkTheme
+        {
+            get
+            {
+                var theme = Current.Resources.MergedDictionaries.OfType<BundledTheme>().FirstOrDefault();
+                return theme?.BaseTheme == BaseTheme.Dark;
+            }
+        }
+
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -351,8 +389,7 @@ namespace Radio
                 return true;
 
             // ✅ أخطاء الاتصال بالخادم — قابلة للاستعادة
-            if (exception is SqlException ||
-                exception is SqlException)
+            if (exception is SqlException)
                 return true;
 
             // ✅ Timeout — قابل للاستعادة
@@ -400,8 +437,7 @@ namespace Radio
                 return $"حدث خطأ أثناء حفظ البيانات في قاعدة البيانات.\n{dbEx.InnerException?.Message ?? dbEx.Message}";
 
             // أخطاء SQL Server
-            if (exception is SqlException ||
-                exception is SqlException)
+            if (exception is SqlException)
             {
                 var sqlMessage = exception.Message;
                 if (sqlMessage.Contains("timeout", StringComparison.OrdinalIgnoreCase) ||

@@ -46,18 +46,11 @@
                     Grid.ColumnSpan="2"
                     Height="48"
                     Panel.ZIndex="10"
+                    materialDesign:ElevationAssist.Elevation="Dp1"
                     Background="{DynamicResource SurfaceBrush}"
                     BorderThickness="0"
                     MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
                     SnapsToDevicePixels="True">
-                    <Border.Effect>
-                        <DropShadowEffect
-                            BlurRadius="8"
-                            Direction="270"
-                            Opacity="0.06"
-                            ShadowDepth="2"
-                            Color="{StaticResource Neutral900Color}" />
-                    </Border.Effect>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -148,6 +141,7 @@
                             <materialDesign:PackIcon
                                 Width="20"
                                 Height="20"
+                                FlowDirection="LeftToRight"
                                 Kind="ArrowRight" />
                         </Button>
 
@@ -180,6 +174,31 @@
                                         Foreground="{StaticResource TextPrimaryBrush}"
                                         Kind="BellOutline" />
                                 </materialDesign:Badged>
+                            </Button>
+
+                            <Border
+                                Width="1"
+                                Height="20"
+                                Margin="8,0"
+                                Background="{DynamicResource DividerBrush}"
+                                CornerRadius="0.5"
+                                Opacity="0.6" />
+
+                            <Button
+                                x:Name="BtnThemeToggle"
+                                Width="40"
+                                Height="40"
+                                Margin="4,0"
+                                Click="BtnThemeToggle_Click"
+                                Style="{StaticResource Btn.ChromeButton}"
+                                ToolTip="تبديل الثيم"
+                                Visibility="Collapsed">
+                                <materialDesign:PackIcon
+                                    x:Name="ThemeIcon"
+                                    Width="20"
+                                    Height="20"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    Kind="WeatherSunny" />
                             </Button>
 
                             <Border
@@ -338,18 +357,11 @@
                     <!--  Wrapped in a modern container card  -->
                     <Border
                         Margin="24"
+                        materialDesign:ElevationAssist.Elevation="Dp1"
                         Background="{DynamicResource SurfaceBrush}"
                         BorderBrush="{DynamicResource DividerBrush}"
                         BorderThickness="1"
                         CornerRadius="16">
-                        <Border.Effect>
-                            <DropShadowEffect
-                                BlurRadius="16"
-                                Direction="270"
-                                Opacity="0.03"
-                                ShadowDepth="4"
-                                Color="{StaticResource Neutral900Color}" />
-                        </Border.Effect>
                         <ContentControl x:Name="MainContentArea" Margin="0" />
                     </Border>
 
@@ -360,6 +372,7 @@
                         Padding="20"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
+                        materialDesign:ElevationAssist.Elevation="Dp4"
                         BorderThickness="0"
                         CornerRadius="16"
                         Visibility="Collapsed">
@@ -369,21 +382,18 @@
                                 <GradientStop Offset="1" Color="{StaticResource OnAirDarkColor}" />
                             </LinearGradientBrush>
                         </Border.Background>
-                        <Border.Effect>
-                            <DropShadowEffect
-                                BlurRadius="20"
-                                Direction="270"
-                                Opacity="0.3"
-                                ShadowDepth="6"
-                                Color="{StaticResource OnAirColor}" />
-                        </Border.Effect>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse
                                     x:Name="LivePulse"
                                     Width="12"
                                     Height="12"
-                                    Fill="White" />
+                                    Fill="White"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Ellipse.RenderTransform>
+                                        <ScaleTransform ScaleX="1.0" ScaleY="1.0" />
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
                                 <TextBlock
                                     Margin="8,0"
                                     FontSize="{DynamicResource FontSize.Button}"
@@ -429,19 +439,12 @@
                     StaysOpen="False">
                     <Border
                         Margin="8"
+                        materialDesign:ElevationAssist.Elevation="Dp4"
                         Background="{DynamicResource SurfaceBrush}"
                         BorderBrush="{DynamicResource DividerBrush}"
                         BorderThickness="1"
                         CornerRadius="14"
                         SnapsToDevicePixels="True">
-                        <Border.Effect>
-                            <DropShadowEffect
-                                BlurRadius="32"
-                                Direction="270"
-                                Opacity="0.14"
-                                ShadowDepth="8"
-                                Color="{StaticResource Neutral900Color}" />
-                        </Border.Effect>
                         <StackPanel Width="260">
 
                             <!--  ── Profile Header with Gradient ──  -->

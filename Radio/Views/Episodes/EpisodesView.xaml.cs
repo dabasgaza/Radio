@@ -28,6 +28,30 @@ namespace Radio.Views.Episodes
         private bool _isUpdatingBatchBar;
         private readonly IProgramService _programService;
         private readonly IGuestService _guestService;
+
+        private ListBox? _cardsView;
+        private ListBox? _compactView;
+        private DataGrid? _tableView;
+        private Border? _batchActionBar;
+
+        private ListBox CardsView => _cardsView ??= FindByTag<ListBox>(SkeletonLoaderControl, "CardsView");
+        private ListBox CompactView => _compactView ??= FindByTag<ListBox>(SkeletonLoaderControl, "CompactView");
+        private DataGrid TableView => _tableView ??= FindByTag<DataGrid>(SkeletonLoaderControl, "TableView");
+        private Border BatchActionBar => _batchActionBar ??= FindByTag<Border>(SkeletonLoaderControl, "BatchActionBar");
+
+        private static T? FindByTag<T>(DependencyObject parent, object tag) where T : DependencyObject
+        {
+            if (parent is T t && parent is FrameworkElement fe && fe.Tag?.Equals(tag) == true)
+                return t;
+            int count = System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < count; i++)
+            {
+                var result = FindByTag<T>(System.Windows.Media.VisualTreeHelper.GetChild(parent, i), tag);
+                if (result is not null) return result;
+            }
+            return null;
+        }
+
         private readonly ICorrespondentService _correspondentService;
         private readonly IEmployeeService _employeeService;
         private readonly UserSession _session;
@@ -135,8 +159,9 @@ namespace Radio.Views.Episodes
         {
             try
             {
-                LoadingOverlay.Visibility = Visibility.Visible;
-                EmptyStateOverlay.Visibility = Visibility.Collapsed;
+                SkeletonLoaderControl.IsLoading = true;
+                var emptyOverlay = FindByTag<Grid>(SkeletonLoaderControl, "EmptyStateOverlay");
+                if (emptyOverlay is not null) emptyOverlay.Visibility = Visibility.Collapsed;
                 CardsView.Visibility = Visibility.Collapsed;
                 TableView.Visibility = Visibility.Collapsed;
                 CompactView.Visibility = Visibility.Collapsed;
@@ -152,7 +177,7 @@ namespace Radio.Views.Episodes
             }
             finally
             {
-                LoadingOverlay.Visibility = Visibility.Collapsed;
+                SkeletonLoaderControl.IsLoading = false;
             }
         }
 
@@ -244,16 +269,17 @@ namespace Radio.Views.Episodes
             UpdateActiveFilterChips();
             TxtResultsCount.Text = $"{resultList.Count} حلقة";
 
+            var emptyOverlay = FindByTag<Grid>(SkeletonLoaderControl, "EmptyStateOverlay");
             if (resultList.Count == 0)
             {
-                EmptyStateOverlay.Visibility = Visibility.Visible;
+                if (emptyOverlay is not null) emptyOverlay.Visibility = Visibility.Visible;
                 CardsView.Visibility = Visibility.Collapsed;
                 TableView.Visibility = Visibility.Collapsed;
                 CompactView.Visibility = Visibility.Collapsed;
             }
             else
             {
-                EmptyStateOverlay.Visibility = Visibility.Collapsed;
+                if (emptyOverlay is not null) emptyOverlay.Visibility = Visibility.Collapsed;
                 ApplyViewMode();
             }
         }
@@ -454,7 +480,8 @@ namespace Radio.Views.Episodes
             int count = selected.Count;
 
             BatchActionBar.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            TxtSelectedCount.Text = $"{count} محددة";
+            var txt = FindByTag<TextBlock>(SkeletonLoaderControl, "TxtSelectedCount");
+            if (txt is not null) txt.Text = $"{count} محددة";
 
             // الإجراءات المشتركة (intersection logic)
             bool canExecuted = selected.Count > 0 && selected.All(e => e.CanMarkExecuted);
@@ -462,10 +489,14 @@ namespace Radio.Views.Episodes
             bool canCancel = selected.Count > 0 && selected.All(e => e.CanCancel);
             bool canDelete = selected.Count > 0;
 
-            BtnBatchExecuted.Visibility = canExecuted ? Visibility.Visible : Visibility.Collapsed;
-            BtnBatchPublished.Visibility = canPublished ? Visibility.Visible : Visibility.Collapsed;
-            BtnBatchCancel.Visibility = canCancel ? Visibility.Visible : Visibility.Collapsed;
-            BtnBatchDelete.Visibility = canDelete ? Visibility.Visible : Visibility.Collapsed;
+            var btnExec = FindByTag<Button>(SkeletonLoaderControl, "BtnBatchExecuted");
+            if (btnExec is not null) btnExec.Visibility = canExecuted ? Visibility.Visible : Visibility.Collapsed;
+            var btnPub = FindByTag<Button>(SkeletonLoaderControl, "BtnBatchPublished");
+            if (btnPub is not null) btnPub.Visibility = canPublished ? Visibility.Visible : Visibility.Collapsed;
+            var btnCancel = FindByTag<Button>(SkeletonLoaderControl, "BtnBatchCancel");
+            if (btnCancel is not null) btnCancel.Visibility = canCancel ? Visibility.Visible : Visibility.Collapsed;
+            var btnDelete = FindByTag<Button>(SkeletonLoaderControl, "BtnBatchDelete");
+            if (btnDelete is not null) btnDelete.Visibility = canDelete ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void SelectAllCheckbox_Checked(object sender, RoutedEventArgs e)

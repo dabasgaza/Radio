@@ -21,6 +21,16 @@
     <!--  لضمان ظهور أخطاء التحقق بشكل أنيق يتناسب مع MDIX  -->
     <Style TargetType="TextBox">
         <Setter Property="Validation.ErrorTemplate" Value="{StaticResource MaterialDesignValidationErrorTemplate}" />
+        <Setter Property="materialDesign:ValidationAssist.UsePopup" Value="True" />
+        <Setter Property="materialDesign:ValidationAssist.OnlyShowOnFocus" Value="True" />
+        <Setter Property="materialDesign:ValidationAssist.Background" Value="{StaticResource ErrorBrush}" />
+    </Style>
+
+    <Style TargetType="PasswordBox">
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource MaterialDesignValidationErrorTemplate}" />
+        <Setter Property="materialDesign:ValidationAssist.UsePopup" Value="True" />
+        <Setter Property="materialDesign:ValidationAssist.OnlyShowOnFocus" Value="True" />
+        <Setter Property="materialDesign:ValidationAssist.Background" Value="{StaticResource ErrorBrush}" />
     </Style>
 
     <!--

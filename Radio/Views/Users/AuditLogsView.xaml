@@ -375,6 +375,7 @@
                                                     Height="16"
                                                     Margin="8,0"
                                                     VerticalAlignment="Center"
+                                                    FlowDirection="LeftToRight"
                                                     Foreground="{DynamicResource TextDisabledBrush}"
                                                     Kind="ArrowLeft" />
 

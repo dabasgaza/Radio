@@ -8,6 +8,7 @@ using Radio.Services;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
@@ -17,16 +18,30 @@ namespace Radio
     {
         private readonly NavigationService _navigationService;
         private readonly UserSession _session;
+        private readonly DialogHelper _dialogHelper;
         private NavigationMode _navigationMode = NavigationMode.Expanded;
         private bool _isDrawerOpen = false;
+        private bool _isClosed = false;
 
         private DateTime? _broadcastStartTime;
         private DispatcherTimer? _onAirTimer;
 
+        // ✨ تخزين مراجع الـ handlers لإلغاء الاشتراك لاحقاً
+        private readonly Action _overlayShowHandler;
+        private readonly Action _overlayHideHandler;
+        private readonly Action<double> _fontScaleHandler;
+
         public ModernMainWindow(NavigationService navigationService, CurrentSessionProvider sessionProvider, DialogHelper dialogHelper)
         {
             _navigationService = navigationService;
+            _dialogHelper = dialogHelper;
             _session = sessionProvider.CurrentSession!;
+
+            // ✨ تعريف handlers قبل الاشتراك حتى نتمكن من إلغاء الاشتراك لاحقاً
+            _overlayShowHandler = () => { _ = this.ShowOverlayAsync(); };
+            _overlayHideHandler = () => { _ = this.HideOverlayAsync(); };
+            _fontScaleHandler = _ => Dispatcher.BeginInvoke(UpdateFontScaleUi);
+
             _navigationService.ViewChanged += OnViewChanged;
 
             // ✨ الاشتراك في حدث طلب التنقل من Views الفرعية
@@ -34,11 +49,14 @@ namespace Radio
             _navigationService.NavigationRequested += OnNavigationRequested;
 
             // ✨ الاشتراك في أحداث DialogHelper لعرض/إخفاء الغطاء الشفاف
-            dialogHelper.OverlayShowRequested += async () => await this.ShowOverlayAsync();
-            dialogHelper.OverlayHideRequested += async () => await this.HideOverlayAsync();
+            _dialogHelper.OverlayShowRequested += _overlayShowHandler;
+            _dialogHelper.OverlayHideRequested += _overlayHideHandler;
 
             InitializeComponent();
             NotificationManager.RegisterHost(NotificationHost);
+
+            // ✨ تنظيف الموارد عند إغلاق النافذة
+            Closed += ModernMainWindow_Closed;
 
             PopupUserName.Text = _session.FullName;
             PopupUserRole.Text = _session.RoleName;
@@ -234,12 +252,25 @@ namespace Radio
                 }
             };
 
-            var pulse = new DoubleAnimation(1.0, 0.4, new Duration(TimeSpan.FromSeconds(1)))
+            var pulseScale = new DoubleAnimation(1.0, 1.4, new Duration(TimeSpan.FromSeconds(0.8)))
             {
                 AutoReverse = true,
-                RepeatBehavior = RepeatBehavior.Forever
+                RepeatBehavior = RepeatBehavior.Forever,
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
             };
-            LivePulse.BeginAnimation(OpacityProperty, pulse);
+            var pulseOpacity = new DoubleAnimation(1.0, 0.4, new Duration(TimeSpan.FromSeconds(0.8)))
+            {
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever,
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
+
+            if (LivePulse.RenderTransform is ScaleTransform scaleTransform)
+            {
+                scaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, pulseScale);
+                scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, pulseScale);
+            }
+            LivePulse.BeginAnimation(OpacityProperty, pulseOpacity);
         }
 
         public void StartBroadcast(string programName)
@@ -247,19 +278,68 @@ namespace Radio
             _broadcastStartTime = DateTime.Now;
             OnAirProgramName.Text = programName;
             OnAirWidget.Visibility = Visibility.Visible;
+
+            // تأثير ظهور حركي مميز (Slide + Fade In)
+            OnAirWidget.Opacity = 0;
+            var translate = new TranslateTransform(0, -24);
+            OnAirWidget.RenderTransform = translate;
+
+            var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(350))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+            var slideIn = new DoubleAnimation(-24, 0, TimeSpan.FromMilliseconds(350))
+            {
+                EasingFunction = new BackEase { EasingMode = EasingMode.EaseOut, Amplitude = 0.4 }
+            };
+
+            OnAirWidget.BeginAnimation(OpacityProperty, fadeIn);
+            translate.BeginAnimation(TranslateTransform.YProperty, slideIn);
+
             _onAirTimer?.Start();
         }
 
-        private void BtnStopOnAir_Click(object sender, RoutedEventArgs e)
+        private async void BtnStopOnAir_Click(object sender, RoutedEventArgs e)
         {
             _onAirTimer?.Stop();
-            OnAirWidget.Visibility = Visibility.Collapsed;
             _broadcastStartTime = null;
+
+            var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(250))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+            };
+            
+            var translate = OnAirWidget.RenderTransform as TranslateTransform ?? new TranslateTransform();
+            OnAirWidget.RenderTransform = translate;
+            
+            var slideOut = new DoubleAnimation(translate.Y, -24, TimeSpan.FromMilliseconds(250))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+            };
+
+            OnAirWidget.BeginAnimation(OpacityProperty, fadeOut);
+            translate.BeginAnimation(TranslateTransform.YProperty, slideOut);
+
+            await System.Threading.Tasks.Task.Delay(250);
+
+            if (_broadcastStartTime == null)
+            {
+                OnAirWidget.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void BtnUserProfile_Click(object sender, RoutedEventArgs e)
         {
             UserProfilePopup.IsOpen = !UserProfilePopup.IsOpen;
+        }
+
+        /// <summary>
+        /// ✨ تبديل الثيم بين الفاتح والداكن مع تحديث الأيقونة.
+        /// </summary>
+        private void BtnThemeToggle_Click(object sender, RoutedEventArgs e)
+        {
+            App.ToggleTheme();
+            ThemeIcon.Kind = App.IsDarkTheme ? PackIconKind.WeatherNight : PackIconKind.WeatherSunny;
         }
 
         private void BtnLogout_Click(object sender, RoutedEventArgs e)
@@ -310,6 +390,38 @@ namespace Radio
             }
         }
 
+        /// <summary>
+        /// ✨ تنظيف الموارد وإلغاء الاشتراك في الأحداث عند إغلاق النافذة.
+        /// يمنع تسرب الذاكرة (memory leaks) الناتج عن الأحداث المعلقة.
+        /// </summary>
+        private void ModernMainWindow_Closed(object? sender, EventArgs e)
+        {
+            if (_isClosed) return;
+            _isClosed = true;
+
+            // إيقاف مؤقت البث المباشر
+            _onAirTimer?.Stop();
+            _onAirTimer = null;
+
+            // إلغاء اشتراك أحداث NavigationService
+            _navigationService.ViewChanged -= OnViewChanged;
+            _navigationService.NavigationRequested -= OnNavigationRequested;
+
+            // إلغاء اشتراك أحداث عناصر التحكم
+            SidebarNav.NavigationRequested -= OnNavigationRequested;
+            BottomNav.NavigationRequested -= OnNavigationRequested;
+
+            // إلغاء اشتراك أحداث DialogHelper
+            _dialogHelper.OverlayShowRequested -= _overlayShowHandler;
+            _dialogHelper.OverlayHideRequested -= _overlayHideHandler;
+
+            // إلغاء اشتراك FontScaleService
+            FontScaleService.ScaleChanged -= _fontScaleHandler;
+
+            // إفراغ ذاكرة التخزين المؤقت
+            _navigationService.ClearCache();
+        }
+
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
@@ -318,7 +430,7 @@ namespace Radio
         private void InitializeFontScaleControls()
         {
             UpdateFontScaleUi();
-            FontScaleService.ScaleChanged += _ => Dispatcher.BeginInvoke(UpdateFontScaleUi);
+            FontScaleService.ScaleChanged += _fontScaleHandler;
             PreviewKeyDown += MainWindow_PreviewKeyDown;
         }
 

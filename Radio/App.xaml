@@ -165,6 +165,8 @@
                 Global Converters
                 ══════════════════════════════════════════════════
             -->
+            <converter:PlatformColorConverter x:Key="PlatformColorConverter" />
+
             <converter:PermissionVisibilityConverter x:Key="PermissionVisibilityConverter" />
 
             <converter:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
