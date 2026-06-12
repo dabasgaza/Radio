@@ -51,9 +51,9 @@ public class CorrespondentConfiguration : IEntityTypeConfiguration<Correspondent
 
         // 5. Seed Data
         builder.HasData(
-            new Correspondent { CorrespondentId = 1, FullName = "مثنى النجار", PhoneNumber = "0550000001", AssignedLocations = "الجنوب", CreatedByUserId = 1, CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc) },
-            new Correspondent { CorrespondentId = 2, FullName = "محمد أبو مرسة", PhoneNumber = "0550000002", AssignedLocations = "الشمال", CreatedByUserId = 1, CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc) },
-            new Correspondent { CorrespondentId = 3, FullName = "خميس أبو حصيرة", PhoneNumber = "0550000003", AssignedLocations = "غزة", CreatedByUserId = 1, CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc) }
+            new Correspondent { CorrespondentId = 1, FullName = "محمد الحربي", PhoneNumber = "0550000001", AssignedLocations = "الرياض", CreatedByUserId = 1, CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc) },
+            new Correspondent { CorrespondentId = 2, FullName = "فهد المطيري", PhoneNumber = "0550000002", AssignedLocations = "جدة", CreatedByUserId = 1, CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc) },
+            new Correspondent { CorrespondentId = 3, FullName = "عبدالله العنزي", PhoneNumber = "0550000003", AssignedLocations = "الدمام", CreatedByUserId = 1, CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, DateTimeKind.Utc) }
         );
     }
 }

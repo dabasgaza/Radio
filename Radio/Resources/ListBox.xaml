@@ -234,7 +234,7 @@
         x:Key="StatusChip.Executed"
         BasedOn="{StaticResource StatusChip.Base}"
         TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource SeconderyGradientBrush}" />
+        <Setter Property="Background" Value="{StaticResource SecondaryGradientBrush}" />
     </Style>
 
     <Style

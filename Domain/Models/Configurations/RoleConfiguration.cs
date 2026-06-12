@@ -36,7 +36,9 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
               .IsUnique()
               .HasDatabaseName("UQ_Roles_RoleName");
 
-        // 4. الفلتر العالمي للحذف المنطقي (لأن Role لا يرث من BaseEntity)
+        // 4. الفلتر العالمي للحذف المنطقي
+        // ✨ Role لا يرث من BaseEntity لذلك يجب تعريف الفلتر هنا يدوياً
+        // حلقة GenerateSoftDeleteFilter في BroadcastWorkflowDBContext تغطي فقط الكيانات التي ترث من BaseEntity
         builder.HasQueryFilter(r => r.IsActive);
 
         // 5. Seed Data

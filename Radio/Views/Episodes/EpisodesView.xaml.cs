@@ -13,6 +13,7 @@ using DataAccess.Services.Messaging;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Messaging;
+using Radio.Services;
 using Radio.Views.Common;
 using Radio.Views.Publishing;
 using System.Windows;
@@ -27,10 +28,35 @@ namespace Radio.Views.Episodes
         private bool _isUpdatingBatchBar;
         private readonly IProgramService _programService;
         private readonly IGuestService _guestService;
+
+        private ListBox? _cardsView;
+        private ListBox? _compactView;
+        private DataGrid? _tableView;
+        private Border? _batchActionBar;
+
+        private ListBox CardsView => _cardsView ??= FindByTag<ListBox>(SkeletonLoaderControl, "CardsView");
+        private ListBox CompactView => _compactView ??= FindByTag<ListBox>(SkeletonLoaderControl, "CompactView");
+        private DataGrid TableView => _tableView ??= FindByTag<DataGrid>(SkeletonLoaderControl, "TableView");
+        private Border BatchActionBar => _batchActionBar ??= FindByTag<Border>(SkeletonLoaderControl, "BatchActionBar");
+
+        private static T? FindByTag<T>(DependencyObject parent, object tag) where T : DependencyObject
+        {
+            if (parent is T t && parent is FrameworkElement fe && fe.Tag?.Equals(tag) == true)
+                return t;
+            int count = System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < count; i++)
+            {
+                var result = FindByTag<T>(System.Windows.Media.VisualTreeHelper.GetChild(parent, i), tag);
+                if (result is not null) return result;
+            }
+            return null;
+        }
+
         private readonly ICorrespondentService _correspondentService;
         private readonly IEmployeeService _employeeService;
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
+        private readonly DialogHelper _dialogHelper;
         private List<ActiveEpisodeDto> _allEpisodes = [];
 
         // ─── تفضيلات العرض المحفوظة ───
@@ -69,6 +95,7 @@ namespace Radio.Views.Episodes
             _programService = progService;
             _session = session;
             _serviceProvider = serviceProvider;
+            _dialogHelper = serviceProvider.GetRequiredService<DialogHelper>();
             _guestService = guestService;
             _correspondentService = correspondentService;
             _employeeService = employeeService;
@@ -132,15 +159,16 @@ namespace Radio.Views.Episodes
         {
             try
             {
-                LoadingOverlay.Visibility = Visibility.Visible;
-                EmptyStateOverlay.Visibility = Visibility.Collapsed;
+                SkeletonLoaderControl.IsLoading = true;
+                var emptyOverlay = FindByTag<Grid>(SkeletonLoaderControl, "EmptyStateOverlay");
+                if (emptyOverlay is not null) emptyOverlay.Visibility = Visibility.Collapsed;
                 CardsView.Visibility = Visibility.Collapsed;
                 TableView.Visibility = Visibility.Collapsed;
                 CompactView.Visibility = Visibility.Collapsed;
 
                 _allEpisodes = (await _episodeService.GetActiveEpisodesAsync()).ToList();
-                PopulateProgramFilter();
                 RebindAndUpdateStats();
+                _ = PopulateProgramFilterAsync();
             }
             catch (Exception ex)
             {
@@ -149,21 +177,22 @@ namespace Radio.Views.Episodes
             }
             finally
             {
-                LoadingOverlay.Visibility = Visibility.Collapsed;
+                SkeletonLoaderControl.IsLoading = false;
             }
         }
 
         // ═══════════════════════════════════════════════════════════
         // تعبئة تصفية البرامج
         // ═══════════════════════════════════════════════════════════
-        private void PopulateProgramFilter()
+        private async Task PopulateProgramFilterAsync()
         {
-            var programs = _allEpisodes
-                .Select(e => e.ProgramName)
-                .Where(p => !string.IsNullOrWhiteSpace(p))
-                .Distinct()
-                .OrderBy(p => p)
-                .ToList();
+            var programs = await Task.Run(() =>
+                _allEpisodes
+                    .Select(e => e.ProgramName)
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .Distinct()
+                    .OrderBy(p => p)
+                    .ToList());
 
             CmbProgramFilter.ItemsSource = programs;
         }
@@ -241,16 +270,17 @@ namespace Radio.Views.Episodes
             UpdateActiveFilterChips();
             TxtResultsCount.Text = $"{resultList.Count} حلقة";
 
+            var emptyOverlay = FindByTag<Grid>(SkeletonLoaderControl, "EmptyStateOverlay");
             if (resultList.Count == 0)
             {
-                EmptyStateOverlay.Visibility = Visibility.Visible;
+                if (emptyOverlay is not null) emptyOverlay.Visibility = Visibility.Visible;
                 CardsView.Visibility = Visibility.Collapsed;
                 TableView.Visibility = Visibility.Collapsed;
                 CompactView.Visibility = Visibility.Collapsed;
             }
             else
             {
-                EmptyStateOverlay.Visibility = Visibility.Collapsed;
+                if (emptyOverlay is not null) emptyOverlay.Visibility = Visibility.Collapsed;
                 ApplyViewMode();
             }
         }
@@ -451,7 +481,8 @@ namespace Radio.Views.Episodes
             int count = selected.Count;
 
             BatchActionBar.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            TxtSelectedCount.Text = $"{count} محددة";
+            var txt = FindByTag<TextBlock>(SkeletonLoaderControl, "TxtSelectedCount");
+            if (txt is not null) txt.Text = $"{count} محددة";
 
             // الإجراءات المشتركة (intersection logic)
             bool canExecuted = selected.Count > 0 && selected.All(e => e.CanMarkExecuted);
@@ -459,10 +490,14 @@ namespace Radio.Views.Episodes
             bool canCancel = selected.Count > 0 && selected.All(e => e.CanCancel);
             bool canDelete = selected.Count > 0;
 
-            BtnBatchExecuted.Visibility = canExecuted ? Visibility.Visible : Visibility.Collapsed;
-            BtnBatchPublished.Visibility = canPublished ? Visibility.Visible : Visibility.Collapsed;
-            BtnBatchCancel.Visibility = canCancel ? Visibility.Visible : Visibility.Collapsed;
-            BtnBatchDelete.Visibility = canDelete ? Visibility.Visible : Visibility.Collapsed;
+            var btnExec = FindByTag<Button>(SkeletonLoaderControl, "BtnBatchExecuted");
+            if (btnExec is not null) btnExec.Visibility = canExecuted ? Visibility.Visible : Visibility.Collapsed;
+            var btnPub = FindByTag<Button>(SkeletonLoaderControl, "BtnBatchPublished");
+            if (btnPub is not null) btnPub.Visibility = canPublished ? Visibility.Visible : Visibility.Collapsed;
+            var btnCancel = FindByTag<Button>(SkeletonLoaderControl, "BtnBatchCancel");
+            if (btnCancel is not null) btnCancel.Visibility = canCancel ? Visibility.Visible : Visibility.Collapsed;
+            var btnDelete = FindByTag<Button>(SkeletonLoaderControl, "BtnBatchDelete");
+            if (btnDelete is not null) btnDelete.Visibility = canDelete ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void SelectAllCheckbox_Checked(object sender, RoutedEventArgs e)
@@ -516,15 +551,9 @@ namespace Radio.Views.Episodes
             int success = 0, fail = 0;
             foreach (var ep in selected)
             {
-                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-                if (mainWindow != null) await mainWindow.ShowOverlay();
-                try
-                {
-                    var execService = _serviceProvider.GetRequiredService<IExecutionService>();
-                    var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session) { Owner = mainWindow };
-                    if (dialog.ShowDialog() == true) success++; else fail++;
-                }
-                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
+                var execService = _serviceProvider.GetRequiredService<IExecutionService>();
+                var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
+                if (await _dialogHelper.ShowDialogAsync(dialog) == true) success++; else fail++;
             }
 
             await LoadDataAsync();
@@ -543,16 +572,10 @@ namespace Radio.Views.Episodes
             int success = 0, fail = 0;
             foreach (var ep in selected)
             {
-                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-                if (mainWindow != null) await mainWindow.ShowOverlay();
-                try
-                {
-                    var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
-                    var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
-                    var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests) { Owner = mainWindow };
-                    if (dialog.ShowDialog() == true) success++; else fail++;
-                }
-                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
+                var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
+                var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
+                var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests);
+                if (await _dialogHelper.ShowDialogAsync(dialog) == true) success++; else fail++;
             }
 
             await LoadDataAsync();
@@ -565,15 +588,13 @@ namespace Radio.Views.Episodes
             if (selected.Count == 0) return;
 
             var reasonDialog = new ReasonInputDialog("إلغاء جماعي", "سبب الإلغاء (سيُطبّق على الجميع):");
-            if (reasonDialog.ShowDialog() != true) return;
+            if (_dialogHelper.ShowDialog(reasonDialog) != true) return;
 
-            int success = 0, fail = 0;
-            foreach (var ep in selected)
-            {
-                var res = await _episodeService.CancelEpisodeAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
-                if (res.IsSuccess) success++; else fail++;
-            }
+            // ✅ استخدام Batch Operation بدلاً من N استدعاء منفصل (حل مشكلة N+1)
+            var ids = selected.Select(ep => ep.EpisodeId).ToList();
+            var (success, fail) = await _episodeService.CancelEpisodesBatchAsync(ids, reasonDialog.Reason!, _session);
 
+            DeselectAll();
             await LoadDataAsync();
             MessageService.Current.ShowSuccess(Messages.BatchActioned("إلغاء", success, fail));
         }
@@ -590,13 +611,11 @@ namespace Radio.Views.Episodes
                 $"حذف {selected.Count} حلقة؟\n{names}\n\nهذا الإجراء لا يمكن التراجع عنه.", "تأكيد الحذف الجماعي");
             if (!confirm) return;
 
-            int success = 0, fail = 0;
-            foreach (var ep in selected)
-            {
-                var res = await _episodeService.DeleteEpisodeAsync(ep.EpisodeId, _session);
-                if (res.IsSuccess) success++; else fail++;
-            }
+            // ✅ استخدام Batch Operation بدلاً من N استدعاء منفصل (حل مشكلة N+1)
+            var ids = selected.Select(ep => ep.EpisodeId).ToList();
+            var (success, fail) = await _episodeService.DeleteEpisodesBatchAsync(ids, _session);
 
+            DeselectAll();
             await LoadDataAsync();
             MessageService.Current.ShowSuccess(Messages.BatchActioned("حذف", success, fail));
         }
@@ -778,38 +797,24 @@ namespace Radio.Views.Episodes
         // ═══════════════════════════════════════════════════════════
         private async void BtnAddEpisode_Click(object sender, RoutedEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-            try
+            var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session)
-                { Owner = mainWindow };
-                if (dialog.ShowDialog() == true)
-                {
-                    await LoadDataAsync();
-                    MessageService.Current.ShowSuccess("تم جدولة الحلقة بنجاح.");
-                }
+                await LoadDataAsync();
+                MessageService.Current.ShowSuccess("تم جدولة الحلقة بنجاح.");
             }
-            finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
         }
 
         private async void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-                if (mainWindow != null) await mainWindow.ShowOverlay();
-                try
+                var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session, ep.EpisodeId);
+                if (await _dialogHelper.ShowDialogAsync(dialog) == true)
                 {
-                    var dialog = new EpisodeFormControl(_episodeService, _programService, _guestService, _correspondentService, _employeeService, _session, ep.EpisodeId)
-                    { Owner = mainWindow };
-                    if (dialog.ShowDialog() == true)
-                    {
-                        await LoadDataAsync();
-                        MessageService.Current.ShowSuccess(Messages.Updated("بيانات الحلقة", ep.EpisodeName));
-                    }
+                    await LoadDataAsync();
+                    MessageService.Current.ShowSuccess(Messages.Updated("بيانات الحلقة", ep.EpisodeName));
                 }
-                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
             }
         }
 
@@ -838,19 +843,13 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-                if (mainWindow != null) await mainWindow.ShowOverlay();
-                try
+                var execService = _serviceProvider.GetRequiredService<IExecutionService>();
+                var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session);
+                if (await _dialogHelper.ShowDialogAsync(dialog) == true)
                 {
-                    var execService = _serviceProvider.GetRequiredService<IExecutionService>();
-                    var dialog = new ExecutionLogDialog(ep.EpisodeId, execService, _session) { Owner = mainWindow };
-                    if (dialog.ShowDialog() == true)
-                    {
-                        MessageService.Current.ShowSuccess(Messages.ActionedWithName("تسجيل تنفيذ", "الحلقة", ep.EpisodeName));
-                        await LoadDataAsync();
-                    }
+                    MessageService.Current.ShowSuccess(Messages.ActionedWithName("تسجيل تنفيذ", "الحلقة", ep.EpisodeName));
+                    await LoadDataAsync();
                 }
-                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
             }
         }
 
@@ -858,20 +857,14 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-                if (mainWindow != null) await mainWindow.ShowOverlay();
-                try
+                var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
+                var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
+                var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests);
+                if (await _dialogHelper.ShowDialogAsync(dialog) == true)
                 {
-                    var pubService = _serviceProvider.GetRequiredService<IPublishingService>();
-                    var guests = await _episodeService.GetEpisodeGuestsAsync(ep.EpisodeId);
-                    var dialog = new PublishingLogDialog(pubService, _session, ep.EpisodeId, guests) { Owner = mainWindow };
-                    if (dialog.ShowDialog() == true)
-                    {
-                        MessageService.Current.ShowSuccess(Messages.ActionedWithName("تسجيل النشر الرقمي لـ", "الحلقة", ep.EpisodeName));
-                        await LoadDataAsync();
-                    }
+                    MessageService.Current.ShowSuccess(Messages.ActionedWithName("تسجيل النشر الرقمي لـ", "الحلقة", ep.EpisodeName));
+                    await LoadDataAsync();
                 }
-                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
             }
         }
 
@@ -879,19 +872,13 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-                if (mainWindow != null) await mainWindow.ShowOverlay();
-                try
+                var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
+                var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId);
+                if (await _dialogHelper.ShowDialogAsync(dialog) == true)
                 {
-                    var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
-                    var dialog = new WebsitePublishDialog(publishingService, _session, ep.EpisodeId) { Owner = mainWindow };
-                    if (dialog.ShowDialog() == true)
-                    {
-                        MessageService.Current.ShowSuccess(Messages.ActionedWithName("نشر", "الحلقة على الموقع", ep.EpisodeName));
-                        await LoadDataAsync();
-                    }
+                    MessageService.Current.ShowSuccess(Messages.ActionedWithName("نشر", "الحلقة على الموقع", ep.EpisodeName));
+                    await LoadDataAsync();
                 }
-                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
             }
         }
 
@@ -899,19 +886,12 @@ namespace Radio.Views.Episodes
         {
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
-                var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-                if (mainWindow != null) await mainWindow.ShowOverlay();
-                try
-                {
-                    var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
-                    var executionService = _serviceProvider.GetRequiredService<IExecutionService>();
-                    var dialog = new EpisodeRecordsView(
-                        publishingService, executionService, _session, _serviceProvider,
-                        ep.EpisodeId, ep.EpisodeName ?? string.Empty)
-                    { Owner = mainWindow };
-                    dialog.ShowDialog();
-                }
-                finally { if (mainWindow != null) await mainWindow.HideOverlay(); }
+                var publishingService = _serviceProvider.GetRequiredService<IPublishingService>();
+                var executionService = _serviceProvider.GetRequiredService<IExecutionService>();
+                var dialog = new EpisodeRecordsView(
+                    publishingService, executionService, _session, _serviceProvider,
+                    ep.EpisodeId, ep.EpisodeName ?? string.Empty);
+                await _dialogHelper.ShowDialogAsync(dialog);
             }
         }
 
@@ -920,7 +900,7 @@ namespace Radio.Views.Episodes
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
                 var reasonDialog = new ReasonInputDialog("تراجع", "السبب:");
-                if (reasonDialog.ShowDialog() == true)
+                if (_dialogHelper.ShowDialog(reasonDialog) == true)
                 {
                     var res = await _episodeService.RevertEpisodeStatusAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
                     if (res.IsSuccess)
@@ -938,7 +918,7 @@ namespace Radio.Views.Episodes
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
                 var reasonDialog = new ReasonInputDialog("إلغاء", "السبب:");
-                if (reasonDialog.ShowDialog() == true)
+                if (_dialogHelper.ShowDialog(reasonDialog) == true)
                 {
                     var res = await _episodeService.CancelEpisodeAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
                     if (res.IsSuccess)
@@ -956,7 +936,7 @@ namespace Radio.Views.Episodes
             if (sender is Button btn && btn.DataContext is ActiveEpisodeDto ep)
             {
                 var reasonDialog = new ReasonInputDialog("تعديل سبب الإلغاء", "السبب:", ep.CancellationReason);
-                if (reasonDialog.ShowDialog() == true)
+                if (_dialogHelper.ShowDialog(reasonDialog) == true)
                 {
                     var res = await _episodeService.UpdateCancellationReasonAsync(ep.EpisodeId, reasonDialog.Reason!, _session);
                     if (res.IsSuccess)

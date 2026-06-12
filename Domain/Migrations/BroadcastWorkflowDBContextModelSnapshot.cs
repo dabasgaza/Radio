@@ -142,10 +142,10 @@ namespace Domain.Migrations
                         new
                         {
                             CorrespondentId = 1,
-                            AssignedLocations = "الجنوب",
+                            AssignedLocations = "الرياض",
                             CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = 1,
-                            FullName = "مثنى النجار",
+                            FullName = "محمد الحربي",
                             IsActive = true,
                             PhoneNumber = "0550000001",
                             UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc)
@@ -153,10 +153,10 @@ namespace Domain.Migrations
                         new
                         {
                             CorrespondentId = 2,
-                            AssignedLocations = "الشمال",
+                            AssignedLocations = "جدة",
                             CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = 1,
-                            FullName = "محمد أبو مرسة",
+                            FullName = "فهد المطيري",
                             IsActive = true,
                             PhoneNumber = "0550000002",
                             UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc)
@@ -164,10 +164,10 @@ namespace Domain.Migrations
                         new
                         {
                             CorrespondentId = 3,
-                            AssignedLocations = "غزة",
+                            AssignedLocations = "الدمام",
                             CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = 1,
-                            FullName = "خميس أبو حصيرة",
+                            FullName = "عبدالله العنزي",
                             IsActive = true,
                             PhoneNumber = "0550000003",
                             UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc)
@@ -836,9 +836,9 @@ namespace Domain.Migrations
                             CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = 1,
                             EmailAddress = "ahmed@example.com",
-                            FullName = "صائب عريقات",
+                            FullName = "د. أحمد العمري",
                             IsActive = true,
-                            Organization = "منظمة التحرير",
+                            Organization = "جامعة الملك سعود",
                             PhoneNumber = "0500000001",
                             UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -848,9 +848,9 @@ namespace Domain.Migrations
                             CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = 1,
                             EmailAddress = "sara@example.com",
-                            FullName = "يحيى السراج",
+                            FullName = "أ. سارة القحطاني",
                             IsActive = true,
-                            Organization = "بلدية غزة",
+                            Organization = "وزارة الثقافة",
                             PhoneNumber = "0500000002",
                             UpdatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -860,7 +860,7 @@ namespace Domain.Migrations
                             CreatedAt = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = 1,
                             EmailAddress = "khalid@example.com",
-                            FullName = "م. خالد",
+                            FullName = "م. خالد الشهري",
                             IsActive = true,
                             Organization = "هيئة الرياضة",
                             PhoneNumber = "0500000003",

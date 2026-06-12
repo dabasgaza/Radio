@@ -46,18 +46,11 @@
                     Grid.ColumnSpan="2"
                     Height="48"
                     Panel.ZIndex="10"
+                    materialDesign:ElevationAssist.Elevation="Dp1"
                     Background="{DynamicResource SurfaceBrush}"
                     BorderThickness="0"
                     MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
                     SnapsToDevicePixels="True">
-                    <Border.Effect>
-                        <DropShadowEffect
-                            BlurRadius="8"
-                            Direction="270"
-                            Opacity="0.06"
-                            ShadowDepth="2"
-                            Color="#0F172A" />
-                    </Border.Effect>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -148,6 +141,7 @@
                             <materialDesign:PackIcon
                                 Width="20"
                                 Height="20"
+                                FlowDirection="LeftToRight"
                                 Kind="ArrowRight" />
                         </Button>
 
@@ -171,38 +165,40 @@
                                 Width="40"
                                 Height="40"
                                 Margin="4,0"
+                                Style="{StaticResource Btn.ChromeButton}"
                                 ToolTip="الإشعارات">
-                                <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="BorderThickness" Value="0" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border
-                                                        x:Name="border"
-                                                        Background="{TemplateBinding Background}"
-                                                        CornerRadius="20"
-                                                        SnapsToDevicePixels="True">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Button.Style>
                                 <materialDesign:Badged Badge="3" BadgeBackground="{DynamicResource ErrorBrush}">
                                     <materialDesign:PackIcon
                                         Width="20"
                                         Height="20"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
                                         Kind="BellOutline" />
                                 </materialDesign:Badged>
+                            </Button>
+
+                            <Border
+                                Width="1"
+                                Height="20"
+                                Margin="8,0"
+                                Background="{DynamicResource DividerBrush}"
+                                CornerRadius="0.5"
+                                Opacity="0.6" />
+
+                            <Button
+                                x:Name="BtnThemeToggle"
+                                Width="40"
+                                Height="40"
+                                Margin="4,0"
+                                Click="BtnThemeToggle_Click"
+                                Style="{StaticResource Btn.ChromeButton}"
+                                ToolTip="تبديل الثيم"
+                                Visibility="Collapsed">
+                                <materialDesign:PackIcon
+                                    x:Name="ThemeIcon"
+                                    Width="20"
+                                    Height="20"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    Kind="WeatherSunny" />
                             </Button>
 
                             <Border
@@ -217,7 +213,7 @@
                                 Margin="4,0"
                                 Padding="2"
                                 VerticalAlignment="Center"
-                                Background="{DynamicResource SurfaceVariantBrush}"
+                                Background="{StaticResource SurfaceVariantBrush}"
                                 BorderBrush="{DynamicResource DividerBrush}"
                                 BorderThickness="1"
                                 CornerRadius="10"
@@ -229,7 +225,7 @@
                                         Height="32"
                                         Padding="0"
                                         Click="BtnZoomOut_Click"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
                                         Style="{StaticResource MaterialDesignFlatButton}"
                                         ToolTip="تصغير الخط (Ctrl+-)">
                                         <TextBlock
@@ -260,7 +256,7 @@
                                         Height="32"
                                         Padding="0"
                                         Click="BtnZoomIn_Click"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
                                         Style="{StaticResource MaterialDesignFlatButton}"
                                         ToolTip="تكبير الخط (Ctrl++)">
                                         <TextBlock
@@ -271,37 +267,14 @@
                                 </StackPanel>
                             </Border>
 
+
                             <Button
                                 x:Name="BtnUserProfile"
                                 Width="160"
                                 Height="40"
                                 Margin="4,0"
-                                Click="BtnUserProfile_Click">
-                                <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="BorderThickness" Value="0" />
-                                        <Setter Property="Padding" Value="8,4" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border
-                                                        x:Name="border"
-                                                        Padding="{TemplateBinding Padding}"
-                                                        Background="{TemplateBinding Background}"
-                                                        CornerRadius="20">
-                                                        <ContentPresenter VerticalAlignment="Center" />
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Button.Style>
+                                Click="BtnUserProfile_Click"
+                                Style="{StaticResource Btn.ChromeButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <Border
                                         Width="32"
@@ -330,7 +303,7 @@
                                         Margin="8,0,4,0"
                                         VerticalAlignment="Center"
                                         FontWeight="SemiBold"
-                                        Foreground="{DynamicResource TextPrimaryBrush}"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
                                         Style="{StaticResource Type.BodyMedium}"
                                         Text="مستخدم" />
                                     <materialDesign:PackIcon
@@ -351,73 +324,20 @@
                                 Opacity="0.6" />
 
                             <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                <StackPanel.Resources>
-                                    <Style x:Key="WindowControlBtnStyle" TargetType="Button">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-                                        <Setter Property="Width" Value="40" />
-                                        <Setter Property="Height" Value="32" />
-                                        <Setter Property="Margin" Value="2,0" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border
-                                                        x:Name="border"
-                                                        Background="{TemplateBinding Background}"
-                                                        CornerRadius="6"
-                                                        SnapsToDevicePixels="True">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                    <Style x:Key="WindowCloseBtnStyle" TargetType="Button">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-                                        <Setter Property="Width" Value="40" />
-                                        <Setter Property="Height" Value="32" />
-                                        <Setter Property="Margin" Value="2,0" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border
-                                                        x:Name="border"
-                                                        Background="{TemplateBinding Background}"
-                                                        CornerRadius="6"
-                                                        SnapsToDevicePixels="True">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="border" Property="Background" Value="#FEE2E2" />
-                                                            <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </StackPanel.Resources>
-                                <Button Click="BtnMinimize_Click" Style="{StaticResource WindowControlBtnStyle}">
+                                <Button Click="BtnMinimize_Click" Style="{StaticResource Btn.WindowControl}">
                                     <materialDesign:PackIcon
                                         Width="18"
                                         Height="18"
                                         Kind="WindowMinimize" />
                                 </Button>
-                                <Button Click="BtnMaximize_Click" Style="{StaticResource WindowControlBtnStyle}">
+                                <Button Click="BtnMaximize_Click" Style="{StaticResource Btn.WindowControl}">
                                     <materialDesign:PackIcon
                                         x:Name="MaximizeIcon"
                                         Width="18"
                                         Height="18"
                                         Kind="WindowMaximize" />
                                 </Button>
-                                <Button Click="BtnClose_Click" Style="{StaticResource WindowCloseBtnStyle}">
+                                <Button Click="BtnClose_Click" Style="{StaticResource Btn.WindowClose}">
                                     <materialDesign:PackIcon
                                         Width="18"
                                         Height="18"
@@ -437,18 +357,11 @@
                     <!--  Wrapped in a modern container card  -->
                     <Border
                         Margin="24"
+                        materialDesign:ElevationAssist.Elevation="Dp1"
                         Background="{DynamicResource SurfaceBrush}"
                         BorderBrush="{DynamicResource DividerBrush}"
                         BorderThickness="1"
                         CornerRadius="16">
-                        <Border.Effect>
-                            <DropShadowEffect
-                                BlurRadius="16"
-                                Direction="270"
-                                Opacity="0.03"
-                                ShadowDepth="4"
-                                Color="#0F172A" />
-                        </Border.Effect>
                         <ContentControl x:Name="MainContentArea" Margin="0" />
                     </Border>
 
@@ -459,30 +372,28 @@
                         Padding="20"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
+                        materialDesign:ElevationAssist.Elevation="Dp4"
                         BorderThickness="0"
                         CornerRadius="16"
                         Visibility="Collapsed">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Offset="0" Color="#F43F5E" />
-                                <GradientStop Offset="1" Color="#BE123C" />
+                                <GradientStop Offset="0" Color="{StaticResource OnAirColor}" />
+                                <GradientStop Offset="1" Color="{StaticResource OnAirDarkColor}" />
                             </LinearGradientBrush>
                         </Border.Background>
-                        <Border.Effect>
-                            <DropShadowEffect
-                                BlurRadius="20"
-                                Direction="270"
-                                Opacity="0.3"
-                                ShadowDepth="6"
-                                Color="#F43F5E" />
-                        </Border.Effect>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse
                                     x:Name="LivePulse"
                                     Width="12"
                                     Height="12"
-                                    Fill="White" />
+                                    Fill="White"
+                                    RenderTransformOrigin="0.5,0.5">
+                                    <Ellipse.RenderTransform>
+                                        <ScaleTransform ScaleX="1.0" ScaleY="1.0" />
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
                                 <TextBlock
                                     Margin="8,0"
                                     FontSize="{DynamicResource FontSize.Button}"
@@ -510,35 +421,7 @@
                                 Margin="0,20,0,0"
                                 Click="BtnStopOnAir_Click"
                                 Content="إيقاف البث"
-                                Cursor="Hand">
-                                <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Background" Value="#33FFFFFF" />
-                                        <Setter Property="Foreground" Value="White" />
-                                        <Setter Property="BorderThickness" Value="0" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border
-                                                        x:Name="bd"
-                                                        Background="{TemplateBinding Background}"
-                                                        CornerRadius="8">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="bd" Property="Background" Value="#4DFFFFFF" />
-                                                        </Trigger>
-                                                        <Trigger Property="IsPressed" Value="True">
-                                                            <Setter TargetName="bd" Property="Background" Value="#66FFFFFF" />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
+                                Style="{StaticResource Btn.StopBroadcast}" />
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -556,19 +439,12 @@
                     StaysOpen="False">
                     <Border
                         Margin="8"
+                        materialDesign:ElevationAssist.Elevation="Dp4"
                         Background="{DynamicResource SurfaceBrush}"
                         BorderBrush="{DynamicResource DividerBrush}"
                         BorderThickness="1"
                         CornerRadius="14"
                         SnapsToDevicePixels="True">
-                        <Border.Effect>
-                            <DropShadowEffect
-                                BlurRadius="32"
-                                Direction="270"
-                                Opacity="0.14"
-                                ShadowDepth="8"
-                                Color="#0F172A" />
-                        </Border.Effect>
                         <StackPanel Width="260">
 
                             <!--  ── Profile Header with Gradient ──  -->
@@ -662,8 +538,8 @@
                                                 SnapsToDevicePixels="True">
                                                 <Border.Background>
                                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                                        <GradientStop Offset="0" Color="#EF4444" />
-                                                        <GradientStop Offset="1" Color="#DC2626" />
+                                                        <GradientStop Offset="0" Color="{StaticResource OnAirColor}" />
+                                                        <GradientStop Offset="1" Color="{StaticResource OnAirDarkColor}" />
                                                     </LinearGradientBrush>
                                                 </Border.Background>
                                                 <StackPanel
@@ -690,8 +566,8 @@
                                                     <Setter TargetName="LogoutBd" Property="Background">
                                                         <Setter.Value>
                                                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                                                <GradientStop Offset="0" Color="#DC2626" />
-                                                                <GradientStop Offset="1" Color="#B91C1C" />
+                                                                <GradientStop Offset="0" Color="{StaticResource OnAirDarkColor}" />
+                                                                <GradientStop Offset="1" Color="{StaticResource OnAirDarkColor}" />
                                                             </LinearGradientBrush>
                                                         </Setter.Value>
                                                     </Setter>
@@ -701,7 +577,7 @@
                                                                 BlurRadius="12"
                                                                 Opacity="0.25"
                                                                 ShadowDepth="3"
-                                                                Color="#EF4444" />
+                                                                Color="{StaticResource OnAirColor}" />
                                                         </Setter.Value>
                                                     </Setter>
                                                 </Trigger>
@@ -709,8 +585,8 @@
                                                     <Setter TargetName="LogoutBd" Property="Background">
                                                         <Setter.Value>
                                                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                                                <GradientStop Offset="0" Color="#B91C1C" />
-                                                                <GradientStop Offset="1" Color="#991B1B" />
+                                                                <GradientStop Offset="0" Color="{StaticResource OnAirDarkColor}" />
+                                                                <GradientStop Offset="1" Color="{StaticResource ErrorDarkColor}" />
                                                             </LinearGradientBrush>
                                                         </Setter.Value>
                                                     </Setter>

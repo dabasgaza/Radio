@@ -1,3 +1,4 @@
+using DataAccess.Services.Messaging;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -24,11 +25,12 @@ namespace Radio.Forms
             try
             {
                 Clipboard.SetText(TxtExceptionDetails.Text);
-                MessageBox.Show("تم نسخ تفاصيل الخطأ إلى الحافظة بنجاح.", "تم النسخ", MessageBoxButton.OK, MessageBoxImage.Information);
+                // ✨ استخدام نظام الإشعارات المركزي بدلاً من MessageBox التقليدية
+                MessageService.Current.ShowSuccess("تم نسخ تفاصيل الخطأ إلى الحافظة بنجاح.", "تم النسخ");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"فشل النسخ إلى الحافظة: {ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageService.Current.ShowError($"فشل النسخ إلى الحافظة: {ex.Message}", "خطأ");
             }
         }
 
@@ -50,7 +52,7 @@ namespace Radio.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"فشل إعادة تشغيل التطبيق: {ex.Message}", "خطأ في إعادة التشغيل", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageService.Current.ShowError($"فشل إعادة تشغيل التطبيق: {ex.Message}", "خطأ في إعادة التشغيل");
             }
             finally
             {

@@ -82,14 +82,14 @@
                                 Width="40"
                                 Height="40"
                                 VerticalAlignment="Top"
-                                Background="#E8F5E9"
+                                Background="{StaticResource SuccessLightBrush}"
                                 CornerRadius="10">
                                 <materialDesign:PackIcon
                                     Width="22"
                                     Height="22"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    Foreground="#4CAF50"
+                                    Foreground="{StaticResource SuccessBrush}"
                                     Kind="PlayCircleOutline" />
                             </Border>
 
@@ -143,14 +143,14 @@
                                 Width="40"
                                 Height="40"
                                 VerticalAlignment="Top"
-                                Background="#E3F2FD"
+                                Background="{StaticResource InfoLightBrush}"
                                 CornerRadius="10">
                                 <materialDesign:PackIcon
                                     Width="22"
                                     Height="22"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    Foreground="#2196F3"
+                                    Foreground="{StaticResource InfoBrush}"
                                     Kind="ShareVariant" />
                             </Border>
 
@@ -202,14 +202,14 @@
                                 Width="40"
                                 Height="40"
                                 VerticalAlignment="Top"
-                                Background="#EDE7F6"
+                                Background="{StaticResource PrimaryXLightBrush}"
                                 CornerRadius="10">
                                 <materialDesign:PackIcon
                                     Width="22"
                                     Height="22"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    Foreground="#5C6BC0"
+                                    Foreground="{StaticResource PrimaryMainBrush}"
                                     Kind="Web" />
                             </Border>
 
@@ -246,7 +246,7 @@
                     <Border
                         x:Name="PnlNoRecords"
                         Padding="24,20"
-                        Background="#FFF8E1"
+                        Background="{StaticResource WarningLightBrush}"
                         CornerRadius="10"
                         Visibility="Collapsed">
                         <StackPanel HorizontalAlignment="Center">
@@ -254,12 +254,12 @@
                                 Width="40"
                                 Height="40"
                                 HorizontalAlignment="Center"
-                                Foreground="#FFB300"
+                                Foreground="{StaticResource WarningBrush}"
                                 Kind="InformationOutline" />
                             <TextBlock
                                 Margin="0,10,0,0"
                                 HorizontalAlignment="Center"
-                                Foreground="#795548"
+                                Foreground="{StaticResource TextSecondaryBrush}"
                                 Style="{StaticResource Type.Caption}"
                                 Text="لا توجد سجلات لهذه الحلقة بعد." />
                         </StackPanel>

@@ -23,6 +23,33 @@ namespace DataAccess.Validation
             return BuildResult(errors);
         }
 
+        public static Result ValidatePlatform(SocialMediaPlatformDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return Result.Fail("اسم المنصة مطلوب.");
+
+            return Result.Success();
+        }
+
+        public static Result ValidateEmployee(EmployeeDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.FullName))
+                return Result.Fail("اسم الموظف مطلوب.");
+
+            if (dto.StaffRoleId is null or <= 0)
+                return Result.Fail("يرجى اختيار دور وظيفي للموظف.");
+
+            return Result.Success();
+        }
+
+        public static Result ValidateStaffRole(StaffRoleDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.RoleName))
+                return Result.Fail("اسم الدور الوظيفي مطلوب.");
+
+            return Result.Success();
+        }
+
         public static Result ValidateUser(User dto, bool isNew)
         {
             var errors = new List<string>();
@@ -240,13 +267,10 @@ namespace DataAccess.Validation
             return true;
         }
 
-        private static Result BuildResult(List<string> errors)
-        {
-            if (errors.Count > 0)
-                return Result.Fail(string.Join(Environment.NewLine, errors));
-
-            return Result.Success();
-        }
+        private static Result BuildResult(List<string> errors) =>
+            errors.Count > 0
+                ? Result.Fail(string.Join(Environment.NewLine, [.. errors]))
+                : Result.Success();
 
         #endregion
     }

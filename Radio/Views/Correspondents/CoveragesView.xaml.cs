@@ -4,6 +4,7 @@ using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -18,6 +19,7 @@ namespace Radio.Views.Correspondents
         private readonly ICoverageService _coverageService;
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
+        private readonly DialogHelper _dialogHelper;
         private List<CoverageDto> _allCoverages = [];
 
         public CoverageView(ICoverageService coverageService, UserSession session, IServiceProvider serviceProvider)
@@ -25,6 +27,7 @@ namespace Radio.Views.Correspondents
             _coverageService = coverageService;
             _session = session;
             _serviceProvider = serviceProvider;
+            _dialogHelper = serviceProvider.GetRequiredService<DialogHelper>();
 
             InitializeComponent();
 
@@ -73,7 +76,7 @@ namespace Radio.Views.Correspondents
                 _serviceProvider.GetRequiredService<IGuestService>(),
                 _session);
 
-            if (dialog.ShowDialog() == true)
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
                 MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "التغطية الميدانية"));
                 await LoadDataAsync();
@@ -94,7 +97,7 @@ namespace Radio.Views.Correspondents
                 _serviceProvider.GetRequiredService<IGuestService>(),
                 _session, dto);
 
-            if (dialog.ShowDialog() == true)
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
                 MessageService.Current.ShowSuccess(Messages.Updated("التغطية الميدانية", dto.Topic));
                 await LoadDataAsync();

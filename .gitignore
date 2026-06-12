@@ -373,6 +373,7 @@ FodyWeavers.xsd
 .gemini/
 ..kilocode/skills/
 .github/
+.opencode/
 .kiro/
 
 

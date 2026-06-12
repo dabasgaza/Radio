@@ -177,8 +177,35 @@
     -->
     <Style x:Key="Footer.Form" TargetType="Border">
         <Setter Property="Padding" Value="28,20" />
-        <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource DividerBrush}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
         <Setter Property="CornerRadius" Value="0,0,20,20" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Card.Main — البطاقة الرئيسية (مستوى أساسي)
+        الاستخدام: ملف CorrespondentsView.xaml
+        الإطارات والـ CornerRadius تُضبط محلياً في كل View
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Card.Main" TargetType="materialDesign:Card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        BroadcastCard — Legacy alias (moved from AppStyles.xaml)
+        الاستخدام: بطاقات العرض في نماذج البث
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="BroadcastCard" TargetType="materialDesign:Card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+        <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp3" />
+        <Setter Property="materialDesign:ShadowAssist.Darken" Value="True" />
     </Style>
 
 </ResourceDictionary>

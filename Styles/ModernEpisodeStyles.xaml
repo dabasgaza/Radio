@@ -2,25 +2,25 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
-    <!-- Gradient Brushes for Dynamic Episode Cards -->
+    <!-- Gradient Brushes for Dynamic Episode Cards (from AppColors) -->
     <LinearGradientBrush x:Key="EpisodeCardGradient1" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#FF6B8DD6" Offset="0"/>
-        <GradientStop Color="#FF8E37CE" Offset="1"/>
+        <GradientStop Color="{StaticResource Primary600Color}" Offset="0"/>
+        <GradientStop Color="{StaticResource Primary400Color}" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="EpisodeCardGradient2" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#FF11998E" Offset="0"/>
-        <GradientStop Color="#FF38EF7D" Offset="1"/>
+        <GradientStop Color="{StaticResource Secondary600Color}" Offset="0"/>
+        <GradientStop Color="{StaticResource Secondary400Color}" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="EpisodeCardGradient3" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#FFF093FB" Offset="0"/>
-        <GradientStop Color="#FFF5576C" Offset="1"/>
+        <GradientStop Color="{StaticResource SuccessDarkColor}" Offset="0"/>
+        <GradientStop Color="{StaticResource SuccessColor}" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="EpisodeCardGradient4" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#FF4FACFE" Offset="0"/>
-        <GradientStop Color="#FF00F2FE" Offset="1"/>
+        <GradientStop Color="{StaticResource InfoColor}" Offset="0"/>
+        <GradientStop Color="{StaticResource InfoDarkColor}" Offset="1"/>
     </LinearGradientBrush>
 
     <!-- Modern Glass Effect Card Style -->
@@ -29,7 +29,7 @@
         <Setter Property="CornerRadius" Value="16"/>
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect BlurRadius="20" ShadowDepth="2" Opacity="0.15" Color="#000000"/>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="2" Opacity="0.12" Color="#000000"/>
             </Setter.Value>
         </Setter>
     </Style>
@@ -53,12 +53,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryMainBrush}"/>
-                            <Setter TargetName="border" Property="Opacity" Value="0.1"/>
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource HoverOverlayBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryMainBrush}"/>
-                            <Setter TargetName="border" Property="Opacity" Value="0.2"/>
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource PressedOverlayBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -80,10 +78,10 @@
     <Style x:Key="StatusPulse" TargetType="Ellipse">
         <Setter Property="Width" Value="8"/>
         <Setter Property="Height" Value="8"/>
-        <Setter Property="Fill" Value="#FF4CAF50"/>
+        <Setter Property="Fill" Value="{StaticResource EpisodeActiveBrush}"/>
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect BlurRadius="8" ShadowDepth="0" Opacity="0.6" Color="#FF4CAF50"/>
+                <DropShadowEffect BlurRadius="8" ShadowDepth="0" Opacity="0.5" Color="{StaticResource SuccessColor}"/>
             </Setter.Value>
         </Setter>
     </Style>

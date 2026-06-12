@@ -51,6 +51,7 @@ public class EpisodeCorrespondentConfiguration : IEntityTypeConfiguration<Episod
                .HasDatabaseName("IX_EpisodeCorrespondents_CorrespondentId");
 
         // 5. فلتر الحذف المنطقي (Soft Delete)
-        builder.HasQueryFilter(ec => ec.IsActive);
+        // ✨ تم إزالة HasQueryFilter — الفلتر يُطبّق مركزياً عبر GenerateSoftDeleteFilter في BroadcastWorkflowDBContext
+        // EpisodeCorrespondent يرث من BaseEntity لذلك يغطيه الفلتر الديناميكي تلقائياً
     }
 }

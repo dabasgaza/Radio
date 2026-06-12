@@ -1,5 +1,6 @@
 using DataAccess.Common;
 using DataAccess.DTOs;
+using DataAccess.Validation;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,28 +20,48 @@ public interface IEmployeeService
 }
 
 // ✨ استخدام Primary Constructor
-public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IEmployeeService
+public class EmployeeService(
+    IDbContextFactory<BroadcastWorkflowDBContext> contextFactory,
+    ICachedLookupService cachedLookup) : IEmployeeService
 {
+    // ──────────────────────────────────────────────────────────────
+    // Compiled Queries — تقليل وقت ترجمة LINQ في المسارات الساخنة
+    // ──────────────────────────────────────────────────────────────
+    private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<EmployeeDto>> s_compiledGetAllActive =
+        EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+            context.Employees
+                .AsNoTracking()
+                .Select(e => new EmployeeDto(
+                    e.EmployeeId,
+                    e.FullName,
+                    e.StaffRoleId,
+                    e.StaffRole != null ? e.StaffRole.RoleName : null,
+                    e.Notes)));
+
+    private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<StaffRoleDto>> s_compiledGetAllRoles =
+        EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+            context.StaffRoles
+                .AsNoTracking()
+                .Where(r => r.IsActive)
+                .Select(r => new StaffRoleDto(r.StaffRoleId, r.RoleName)));
+
     public async Task<List<EmployeeDto>> GetAllActiveAsync()
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // ── لا حاجة لـ Include مع Select — EF Core يُترجم Select إلى SQL JOIN مباشرة ──
-        return await context.Employees
-            .AsNoTracking()
-            .Select(e => new EmployeeDto(
-                e.EmployeeId,
-                e.FullName,
-                e.StaffRoleId,
-                e.StaffRole != null ? e.StaffRole.RoleName : null,
-                e.Notes))
-            .ToListAsync();
+        var result = new List<EmployeeDto>();
+        await foreach (var dto in s_compiledGetAllActive(context))
+            result.Add(dto);
+        return result;
     }
 
     public async Task<Result<int>> CreateAsync(EmployeeDto dto, UserSession session)
     {
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
+
+        var validation = ValidationPipeline.ValidateEmployee(dto);
+        if (!validation.IsSuccess) return Result<int>.Fail(validation.ErrorMessage!);
 
         try
         {
@@ -58,6 +79,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
             context.Employees.Add(employee);
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Employee");
             return Result<int>.Success(employee.EmployeeId);
         }
         catch (Exception ex)
@@ -71,6 +93,9 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
     {
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+        var validation = ValidationPipeline.ValidateEmployee(dto);
+        if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
 
         try
         {
@@ -86,6 +111,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             employee.UpdatedAt = DateTime.UtcNow;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Employee");
             return Result.Success();
         }
         catch (Exception ex)
@@ -112,6 +138,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             employee.UpdatedAt = DateTime.UtcNow;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Employee");
             return Result.Success();
         }
         catch (Exception ex)
@@ -125,18 +152,19 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
     {
         using var context = await contextFactory.CreateDbContextAsync();
 
-        // ✅ إضافة AsNoTracking لاستعلام القراءة
-        return await context.StaffRoles
-            .AsNoTracking()
-            .Where(r => r.IsActive)
-            .Select(r => new StaffRoleDto(r.StaffRoleId, r.RoleName))
-            .ToListAsync();
+        var result = new List<StaffRoleDto>();
+        await foreach (var dto in s_compiledGetAllRoles(context))
+            result.Add(dto);
+        return result;
     }
 
     public async Task<Result<int>> CreateRoleAsync(StaffRoleDto dto, UserSession session)
     {
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
+
+        var validation = ValidationPipeline.ValidateStaffRole(dto);
+        if (!validation.IsSuccess) return Result<int>.Fail(validation.ErrorMessage!);
 
         try
         {
@@ -152,6 +180,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
             context.StaffRoles.Add(role);
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("StaffRole");
             return Result<int>.Success(role.StaffRoleId);
         }
         catch (Exception ex)
@@ -166,6 +195,9 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
+        var validation = ValidationPipeline.ValidateStaffRole(dto);
+        if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
+
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -178,6 +210,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             role.UpdatedAt = DateTime.UtcNow;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("StaffRole");
             return Result.Success();
         }
         catch (Exception ex)
@@ -204,6 +237,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             role.UpdatedAt = DateTime.UtcNow;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("StaffRole");
             return Result.Success();
         }
         catch (Exception ex)

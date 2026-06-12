@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,13 +16,15 @@ namespace Radio.Views.Guests
     {
         private readonly IGuestService _guestService;
         private readonly UserSession _session;
+        private readonly DialogHelper _dialogHelper;
         private List<GuestDto> _allGuests = [];
 
-        public GuestsView(IGuestService guestService, UserSession session)
+        public GuestsView(IGuestService guestService, UserSession session, DialogHelper dialogHelper)
         {
             InitializeComponent();
             _guestService = guestService;
             _session = session;
+            _dialogHelper = dialogHelper;
 
             // ✅ AppPermissions بدلاً من نص ثابت
             BtnAddGuest.Visibility = _session.HasPermission(AppPermissions.GuestManage)
@@ -88,24 +91,11 @@ namespace Radio.Views.Guests
         /// </summary>
         private async void BtnAddGuest_Click(object sender, RoutedEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new GuestFormDialog(null, _guestService, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new GuestFormDialog(null, _guestService, _session)
-                {
-                    Owner = mainWindow
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الضيف"));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الضيف"));
+                await LoadDataAsync();
             }
         }
 
@@ -118,24 +108,11 @@ namespace Radio.Views.Guests
             if (sender is not Button btn || btn.DataContext is not GuestDto guest)
                 return;
 
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new GuestFormDialog(guest, _guestService, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new GuestFormDialog(guest, _guestService, _session)
-                {
-                    Owner = mainWindow
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Updated("الضيف", guest.FullName));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Updated("الضيف", guest.FullName));
+                await LoadDataAsync();
             }
         }
 

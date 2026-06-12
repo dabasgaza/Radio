@@ -1,5 +1,6 @@
 using DataAccess.Common;
 using DataAccess.DTOs;
+using DataAccess.Validation;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,29 +17,42 @@ namespace DataAccess.Services
     }
 
     // ✨ استخدام Primary Constructor
-    public class CorrespondentService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : ICorrespondentService
+    public class CorrespondentService(
+        IDbContextFactory<BroadcastWorkflowDBContext> contextFactory,
+        ICachedLookupService cachedLookup) : ICorrespondentService
     {
+        // ──────────────────────────────────────────────────────────────
+        // Compiled Query — تقليل وقت ترجمة LINQ في المسارات الساخنة
+        // ──────────────────────────────────────────────────────────────
+        private static readonly Func<BroadcastWorkflowDBContext, IAsyncEnumerable<CorrespondentDto>> s_compiledGetAllActive =
+            EF.CompileAsyncQuery((BroadcastWorkflowDBContext context) =>
+                context.Correspondents
+                    .AsNoTracking()
+                    .Select(c => new CorrespondentDto
+                    (
+                        c.CorrespondentId,
+                        c.FullName,
+                        c.PhoneNumber,
+                        c.AssignedLocations
+                    )));
+
         public async Task<List<CorrespondentDto>> GetAllActiveAsync()
         {
             using var context = await contextFactory.CreateDbContextAsync();
 
-            // ✨ لا نحتاج لكتابة Where(c => c.IsActive) لأن الـ Global Query Filter يعمل تلقائياً
-            return await context.Correspondents
-                .AsNoTracking()
-                .Select(c => new CorrespondentDto
-                (
-                    c.CorrespondentId,
-                    c.FullName,
-                    c.PhoneNumber,
-                    c.AssignedLocations
-                ))
-                .ToListAsync();
+            var result = new List<CorrespondentDto>();
+            await foreach (var dto in s_compiledGetAllActive(context))
+                result.Add(dto);
+            return result;
         }
 
         public async Task<Result> CreateAsync(CorrespondentDto dto, UserSession session)
         {
             var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+            var validation = ValidationPipeline.ValidateCorrespondent(dto);
+            if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
 
             try
             {
@@ -52,6 +66,7 @@ namespace DataAccess.Services
                 });
 
                 await context.SaveChangesAsync();
+                cachedLookup.InvalidateByEntity("Correspondent");
                 return Result.Success();
             }
             catch (Exception ex)
@@ -66,6 +81,9 @@ namespace DataAccess.Services
             var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
             if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
+            var validation = ValidationPipeline.ValidateCorrespondent(dto);
+            if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
+
             try
             {
                 using var context = await contextFactory.CreateDbContextAsync();
@@ -78,6 +96,7 @@ namespace DataAccess.Services
                 cor.AssignedLocations = dto.AssignedLocations;
 
                 await context.SaveChangesAsync();
+                cachedLookup.InvalidateByEntity("Correspondent");
                 return Result.Success();
             }
             catch (Exception ex)
@@ -102,6 +121,7 @@ namespace DataAccess.Services
                 cor.IsActive = false;
 
                 await context.SaveChangesAsync();
+                cachedLookup.InvalidateByEntity("Correspondent");
                 return Result.Success();
             }
             catch (Exception ex)

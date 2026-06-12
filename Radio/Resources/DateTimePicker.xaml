@@ -40,7 +40,8 @@
         <!--  Floating Hint  -->
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusMedium}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
 
@@ -89,7 +90,7 @@
 
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusSmall}" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="CalendarRange" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="18" />
@@ -131,7 +132,8 @@
 
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="10" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusMedium}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource PrimaryMainBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
 
@@ -176,7 +178,7 @@
 
         <Setter Property="materialDesign:HintAssist.IsFloating" Value="False" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource TextHintBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="8" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusSmall}" />
         <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="Clock" />
         <Setter Property="materialDesign:TextFieldAssist.LeadingIconSize" Value="18" />
@@ -192,6 +194,43 @@
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.55" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        BroadcastDatePicker — Legacy alias (moved from AppStyles.xaml)
+        الاستخدام: حقول DatePicker في نماذج البث
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style
+        x:Key="BroadcastDatePicker"
+        BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}"
+        TargetType="DatePicker">
+
+        <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
+        <Setter Property="Height" Value="52" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource HintBackgroundBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.TextFieldCornerRadius" Value="{StaticResource RadiusMedium}" />
+        <Setter Property="materialDesign:TextFieldAssist.HasLeadingIcon" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.LeadingIcon" Value="CalendarMonthOutline" />
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
+
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp1" />
+                <Setter Property="BorderThickness" Value="2" />
             </Trigger>
         </Style.Triggers>
     </Style>

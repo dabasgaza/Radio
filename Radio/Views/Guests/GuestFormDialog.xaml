@@ -118,7 +118,7 @@
 
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon
-                                Foreground="#1565C0"
+                                Foreground="{StaticResource InfoBrush}"
                                 Kind="Information"
                                 Opacity="0.7" />
                             <TextBlock

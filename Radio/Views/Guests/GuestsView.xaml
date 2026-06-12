@@ -175,7 +175,7 @@
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         FontWeight="Medium"
-                                        Foreground="{DynamicResource MaterialDesignBody}"
+                                        Foreground="{StaticResource TextPrimaryBrush}"
                                         Style="{StaticResource Type.Caption}"
                                         Text="{Binding Organization}" />
                                 </Border>
@@ -207,7 +207,7 @@
                                         <materialDesign:PackIcon
                                             Width="18"
                                             Height="18"
-                                            Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                            Foreground="{StaticResource PrimaryMainBrush}"
                                             Kind="PencilOutline" />
                                     </Button>
                                     <Button

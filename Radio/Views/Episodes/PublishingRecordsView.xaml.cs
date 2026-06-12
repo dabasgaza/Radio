@@ -1,9 +1,10 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Messaging;
+using Radio.Services;
 using Radio.Views.Publishing;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,6 +23,7 @@ namespace Radio.Views.Episodes
         private readonly IExecutionService _executionService;
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
+        private readonly DialogHelper _dialogHelper;
         private List<PublishingRecordDto> _allRecords = [];
 
         /// <summary>
@@ -43,6 +45,7 @@ namespace Radio.Views.Episodes
             _executionService = executionService;
             _session = session;
             _serviceProvider = serviceProvider;
+            _dialogHelper = serviceProvider.GetRequiredService<DialogHelper>();
 
             Loaded += async (_, _) => await LoadDataAsync();
         }
@@ -171,25 +174,20 @@ namespace Radio.Views.Episodes
         /// </summary>
         private async void OpenEditDialog(PublishingRecordDto record)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
             try
             {
-                var ownerWindow = Window.GetWindow(this);
-
                 switch (record.RecordType)
                 {
                     case "Execution":
-                        await OpenExecutionEditDialog(record, ownerWindow);
+                        await OpenExecutionEditDialog(record);
                         break;
 
                     case "SocialMedia":
-                        await OpenSocialEditDialog(record, ownerWindow);
+                        await OpenSocialEditDialog(record);
                         break;
 
                     case "Website":
-                        await OpenWebsiteEditDialog(record, ownerWindow);
+                        await OpenWebsiteEditDialog(record);
                         break;
                 }
             }
@@ -198,17 +196,13 @@ namespace Radio.Views.Episodes
                 Serilog.Log.Error(ex, "An unexpected error occurred during processing");
                 MessageService.Current.ShowError($"خطأ في فتح نافذة التعديل: {ex.Message}");
             }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
-            }
         }
 
         /// <summary>
         /// فتح نافذة تعديل سجل التنفيذ
         /// يحمل بيانات السجل من الخدمة ثم يفتح ExecutionLogDialog في وضع التعديل
         /// </summary>
-        private async Task OpenExecutionEditDialog(PublishingRecordDto record, Window? ownerWindow)
+        private async Task OpenExecutionEditDialog(PublishingRecordDto record)
         {
             // تحميل بيانات سجل التنفيذ الكاملة من الخدمة
             var executionLog = await _executionService.GetExecutionLogAsync(record.EpisodeId);
@@ -219,13 +213,10 @@ namespace Radio.Views.Episodes
             }
 
             // فتح النافذة في وضع التعديل
-            var dialog = new ExecutionLogDialog(record.EpisodeId, _executionService, _session, executionLog)
-            {
-                Owner = ownerWindow
-            };
+            var dialog = new ExecutionLogDialog(record.EpisodeId, _executionService, _session, executionLog);
 
             // إذا تم الحفظ بنجاح، نعيد تحميل البيانات
-            if (dialog.ShowDialog() == true)
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
                 MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل سجل التنفيذ لـ", "الحلقة", record.EpisodeName ?? string.Empty));
                 await LoadDataAsync();
@@ -235,10 +226,10 @@ namespace Radio.Views.Episodes
         /// <summary>
         /// فتح نافذة تعديل سجل النشر الرقمي
         /// </summary>
-        private async Task OpenSocialEditDialog(PublishingRecordDto record, Window? ownerWindow)
+        private async Task OpenSocialEditDialog(PublishingRecordDto record)
         {
             // استرجاع قائمة الضيوف (مطلوبة لـ PublishingLogDialog)
-            var episodeService = _serviceProvider.GetRequiredService<IEpisodeService>();
+            var episodeService = _serviceProvider.GetRequiredService<IEpisodeQueryService>();
             var guests = await episodeService.GetEpisodeGuestsAsync(record.EpisodeId);
 
             // استرجاع سجلات النشر الرقمي للحلقة
@@ -251,12 +242,9 @@ namespace Radio.Views.Episodes
             }
 
             // فتح النافذة في وضع التعديل مع تمرير السجلات الموجودة
-            var dialog = new PublishingLogDialog(_publishingService, _session, record.EpisodeId, guests, socialLogs)
-            {
-                Owner = ownerWindow
-            };
+            var dialog = new PublishingLogDialog(_publishingService, _session, record.EpisodeId, guests, socialLogs);
 
-            if (dialog.ShowDialog() == true)
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
                 MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات النشر الرقمي لـ", "الحلقة", record.EpisodeName ?? string.Empty));
                 await LoadDataAsync();
@@ -266,7 +254,7 @@ namespace Radio.Views.Episodes
         /// <summary>
         /// فتح نافذة تعديل سجل نشر الموقع الإلكتروني
         /// </summary>
-        private async Task OpenWebsiteEditDialog(PublishingRecordDto record, Window? ownerWindow)
+        private async Task OpenWebsiteEditDialog(PublishingRecordDto record)
         {
             // تحميل بيانات سجل نشر الموقع من الخدمة
             var websiteLog = await _publishingService.GetWebsitePublishingLogAsync(record.EpisodeId);
@@ -277,12 +265,9 @@ namespace Radio.Views.Episodes
             }
 
             // فتح النافذة في وضع التعديل
-            var dialog = new WebsitePublishDialog(_publishingService, _session, record.EpisodeId, websiteLog)
-            {
-                Owner = ownerWindow
-            };
+            var dialog = new WebsitePublishDialog(_publishingService, _session, record.EpisodeId, websiteLog);
 
-            if (dialog.ShowDialog() == true)
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
                 MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات نشر الموقع لـ", "الحلقة", record.EpisodeName ?? string.Empty));
                 await LoadDataAsync();

@@ -29,8 +29,8 @@
     -->
     <Style x:Key="Window.Main" TargetType="{x:Type mah:MetroWindow}">
         <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="GlowBrush" Value="{StaticResource PrimaryMainBrush}" />
         <Setter Property="WindowTitleBrush" Value="{StaticResource PrimaryDarkBrush}" />
         <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource MaterialDesignPaper}" />
@@ -63,8 +63,8 @@
         <Setter Property="FlowDirection" Value="RightToLeft" />
         <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
         <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{StaticResource TextPrimaryBrush}" />
 
         <!--  ✨ السطر السحري لتحديد الحواف بأناقة  -->
         <Setter Property="BorderThickness" Value="0" />
@@ -85,7 +85,7 @@
         <Setter Property="FlowDirection" Value="RightToLeft" />
         <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
         <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
     </Style>
 
     <!--
@@ -96,8 +96,8 @@
     -->
     <Style x:Key="View.Base" TargetType="{x:Type UserControl}">
         <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="FlowDirection" Value="RightToLeft" />
         <Setter Property="FontFamily" Value="{StaticResource Font.Default}" />
         <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
@@ -220,7 +220,7 @@
         <Setter Property="FlowDirection" Value="RightToLeft" />
         <Setter Property="TextElement.FontFamily" Value="{StaticResource Font.Default}" />
         <Setter Property="TextElement.FontSize" Value="{DynamicResource FontSize.Dialog}" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="TextElement.Foreground" Value="{StaticResource TextPrimaryBrush}" />
     </Style>
 
 </ResourceDictionary>

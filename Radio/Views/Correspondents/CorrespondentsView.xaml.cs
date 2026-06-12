@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,12 +16,14 @@ namespace Radio.Views.Correspondents
     {
         private readonly ICorrespondentService _service;
         private readonly UserSession _session;
+        private readonly DialogHelper _dialogHelper;
 
-        public CorrespondentsView(ICorrespondentService service, UserSession session)
+        public CorrespondentsView(ICorrespondentService service, UserSession session, DialogHelper dialogHelper)
         {
             InitializeComponent();
             _service = service;
             _session = session;
+            _dialogHelper = dialogHelper;
 
             BtnAdd.Visibility = _session.HasPermission(AppPermissions.CoordinationManage)
                 ? Visibility.Visible
@@ -67,24 +70,11 @@ namespace Radio.Views.Correspondents
         /// </summary>
         private async void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new CorrespondentFormDialog(null, _service, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new CorrespondentFormDialog(null, _service, _session)
-                {
-                    Owner = mainWindow
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المراسل"));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "المراسل"));
+                await LoadDataAsync();
             }
         }
 
@@ -96,24 +86,11 @@ namespace Radio.Views.Correspondents
             if (sender is not Button btn || btn.DataContext is not CorrespondentDto cor)
                 return;
 
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new CorrespondentFormDialog(cor, _service, _session);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new CorrespondentFormDialog(cor, _service, _session)
-                {
-                    Owner = mainWindow
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Updated("المراسل", cor.FullName));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Updated("المراسل", cor.FullName));
+                await LoadDataAsync();
             }
         }
 

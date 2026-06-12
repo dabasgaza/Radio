@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,12 +16,14 @@ namespace Radio.Views.StaffRoles
     {
         private readonly IEmployeeService _employeeService;
         private readonly UserSession _session;
+        private readonly DialogHelper _dialogHelper;
 
-        public StaffRolesView(IEmployeeService employeeService, UserSession session)
+        public StaffRolesView(IEmployeeService employeeService, UserSession session, DialogHelper dialogHelper)
         {
             InitializeComponent();
             _employeeService = employeeService;
             _session = session;
+            _dialogHelper = dialogHelper;
 
             BtnAdd.Visibility = _session.HasPermission(AppPermissions.StaffManage)
                 ? Visibility.Visible
@@ -46,24 +49,11 @@ namespace Radio.Views.StaffRoles
 
         private async void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new StaffRoleFormDialog(_employeeService, _session, roleId: 0);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new StaffRoleFormDialog(_employeeService, _session, roleId: 0)
-                {
-                    Owner = mainWindow
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الدور"));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الدور"));
+                await LoadDataAsync();
             }
         }
 
@@ -74,24 +64,11 @@ namespace Radio.Views.StaffRoles
             var role = btn.DataContext as StaffRoleDto;
             if (role == null) return;
 
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new StaffRoleFormDialog(_employeeService, _session, role.StaffRoleId);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new StaffRoleFormDialog(_employeeService, _session, role.StaffRoleId)
-                {
-                    Owner = mainWindow
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Updated("الدور", role.RoleName));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Updated("الدور", role.RoleName));
+                await LoadDataAsync();
             }
         }
 

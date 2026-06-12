@@ -3,6 +3,7 @@ using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Radio.Messaging;
+using Radio.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,13 +16,15 @@ namespace Radio.Views.Employees
     {
         private readonly IEmployeeService _employeeService;
         private readonly UserSession _session;
+        private readonly DialogHelper _dialogHelper;
         private List<EmployeeDto> _allEmployees = [];
 
-        public EmployeesView(IEmployeeService employeeService, UserSession session)
+        public EmployeesView(IEmployeeService employeeService, UserSession session, DialogHelper dialogHelper)
         {
             InitializeComponent();
             _employeeService = employeeService;
             _session = session;
+            _dialogHelper = dialogHelper;
 
             BtnAdd.Visibility = _session.HasPermission(AppPermissions.StaffManage)
                 ? Visibility.Visible
@@ -69,24 +72,11 @@ namespace Radio.Views.Employees
 
         private async void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new EmployeeFormDialog(_employeeService, _session, employeeId: 0);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new EmployeeFormDialog(_employeeService, _session, employeeId: 0)
-                {
-                    Owner = mainWindow
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الموظف"));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Actioned("إضافة", "الموظف"));
+                await LoadDataAsync();
             }
         }
 
@@ -94,24 +84,11 @@ namespace Radio.Views.Employees
         {
             if (sender is not Button btn || btn.DataContext is not EmployeeDto emp) return;
 
-            var mainWindow = Window.GetWindow(this) as ModernMainWindow;
-            if (mainWindow != null) await mainWindow.ShowOverlay();
-
-            try
+            var dialog = new EmployeeFormDialog(_employeeService, _session, emp.EmployeeId);
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                var dialog = new EmployeeFormDialog(_employeeService, _session, emp.EmployeeId)
-                {
-                    Owner = mainWindow
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.Updated("الموظف", emp.FullName));
-                    await LoadDataAsync();
-                }
-            }
-            finally
-            {
-                if (mainWindow != null) await mainWindow.HideOverlay();
+                MessageService.Current.ShowSuccess(Messages.Updated("الموظف", emp.FullName));
+                await LoadDataAsync();
             }
         }
 

@@ -486,6 +486,7 @@
                                             Width="16"
                                             Height="16"
                                             VerticalAlignment="Center"
+                                            FlowDirection="LeftToRight"
                                             Kind="ArrowLeft" />
                                         <TextBlock
                                             Margin="6,0,0,0"

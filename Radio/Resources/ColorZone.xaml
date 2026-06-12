@@ -35,7 +35,7 @@
         <Setter Property="Background">
             <Setter.Value>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0.0" Color="{StaticResource Primary800Color}" />
+                    <GradientStop Offset="0.0" Color="{StaticResource Primary700Color}" />
                     <GradientStop Offset="1.0" Color="{StaticResource Primary500Color}" />
                 </LinearGradientBrush>
             </Setter.Value>
@@ -57,7 +57,7 @@
             <Setter.Value>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Offset="0.0" Color="{StaticResource Secondary700Color}" />
-                    <GradientStop Offset="1.0" Color="{StaticResource Secondary500Color}" />
+                    <GradientStop Offset="1.0" Color="{StaticResource Secondary400Color}" />
                 </LinearGradientBrush>
             </Setter.Value>
         </Setter>
@@ -79,7 +79,7 @@
             <Setter.Value>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Offset="0.0" Color="{StaticResource Primary900Color}" />
-                    <GradientStop Offset="1.0" Color="{StaticResource Primary700Color}" />
+                    <GradientStop Offset="1.0" Color="{StaticResource Primary800Color}" />
                 </LinearGradientBrush>
             </Setter.Value>
         </Setter>
@@ -101,8 +101,8 @@
         <Setter Property="Background">
             <Setter.Value>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0.0" Color="#37474F" />
-                    <GradientStop Offset="1.0" Color="#546E7A" />
+                    <GradientStop Offset="0.0" Color="{StaticResource Neutral800Color}" />
+                    <GradientStop Offset="1.0" Color="{StaticResource Neutral600Color}" />
                 </LinearGradientBrush>
             </Setter.Value>
         </Setter>
@@ -146,7 +146,7 @@
     <Style x:Key="Zone.Banner.Warning" TargetType="materialDesign:ColorZone">
         <Setter Property="Padding" Value="20,12" />
         <Setter Property="Mode" Value="Custom" />
-        <Setter Property="Foreground" Value="{StaticResource WarningDarkColor}" />
+        <Setter Property="Foreground" Value="{StaticResource WarningDarkBrush}" />
         <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
     </Style>
 
@@ -210,7 +210,7 @@
     -->
     <Style x:Key="ClockDisplay" TargetType="Border">
         <Setter Property="Padding" Value="14,8" />
-        <Setter Property="Background" Value="{StaticResource BackgroundColor}" />
+        <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}" />
         <Setter Property="CornerRadius" Value="8" />
     </Style>
 

@@ -1,9 +1,10 @@
-﻿using DataAccess.Common;
+using DataAccess.Common;
 using DataAccess.DTOs;
 using DataAccess.Services;
 using DataAccess.Services.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Radio.Messaging;
+using Radio.Services;
 using Radio.Views.Publishing;
 using System.Windows;
 
@@ -19,6 +20,7 @@ namespace Radio.Views.Episodes
         private readonly IExecutionService _executionService;
         private readonly UserSession _session;
         private readonly IServiceProvider _serviceProvider;
+        private readonly DialogHelper _dialogHelper;
         private readonly int _episodeId;
         private readonly string _episodeName;
 
@@ -41,6 +43,7 @@ namespace Radio.Views.Episodes
             _executionService = executionService;
             _session = session;
             _serviceProvider = serviceProvider;
+            _dialogHelper = serviceProvider.GetRequiredService<DialogHelper>();
             _episodeId = episodeId;
             _episodeName = episodeName;
 
@@ -180,23 +183,13 @@ namespace Radio.Views.Episodes
         {
             if (_executionLog is null) return;
 
-            await this.ShowOverlayAsync();
-            try
-            {
-                var dialog = new ExecutionLogDialog(_episodeId, _executionService, _session, _executionLog)
-                {
-                    Owner = this
-                };
+            var dialog = new ExecutionLogDialog(_episodeId, _executionService, _session, _executionLog);
 
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل سجل التنفيذ لـ", "الحلقة", _episodeName));
-                    await LoadRecordsAsync();
-                }
-            }
-            finally
+            // ✅ استخدام DialogHelper المركزي — يُعين Owner تلقائياً + Overlay + حماية من الأخطاء
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                await this.HideOverlayAsync();
+                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل سجل التنفيذ لـ", "الحلقة", _episodeName));
+                await LoadRecordsAsync();
             }
         }
 
@@ -208,19 +201,16 @@ namespace Radio.Views.Episodes
         {
             if (!_socialLogs.Any()) return;
 
-            await this.ShowOverlayAsync();
             try
             {
                 // استرجاع قائمة الضيوف (مطلوبة لـ PublishingLogDialog)
-                var episodeService = _serviceProvider.GetRequiredService<IEpisodeService>();
+                var episodeService = _serviceProvider.GetRequiredService<IEpisodeQueryService>();
                 var guests = await episodeService.GetEpisodeGuestsAsync(_episodeId);
 
-                var dialog = new PublishingLogDialog(_publishingService, _session, _episodeId, guests, _socialLogs)
-                {
-                    Owner = this
-                };
+                var dialog = new PublishingLogDialog(_publishingService, _session, _episodeId, guests, _socialLogs);
 
-                if (dialog.ShowDialog() == true)
+                // ✅ استخدام DialogHelper المركزي — يُعين Owner تلقائياً + Overlay + حماية من الأخطاء
+                if (await _dialogHelper.ShowDialogAsync(dialog) == true)
                 {
                     MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات النشر الرقمي لـ", "الحلقة", _episodeName));
                     await LoadRecordsAsync();
@@ -228,12 +218,8 @@ namespace Radio.Views.Episodes
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex, "An unexpected error occurred during processing");
-                MessageService.Current.ShowError($"خطأ: {ex.Message}");
-            }
-            finally
-            {
-                await this.HideOverlayAsync();
+                Serilog.Log.Error(ex, "خطأ أثناء فتح نافذة تعديل النشر الرقمي");
+                MessageService.Current.ShowError("حدث خطأ أثناء تحميل بيانات النشر الرقمي.");
             }
         }
 
@@ -244,23 +230,13 @@ namespace Radio.Views.Episodes
         {
             if (_websiteLog is null) return;
 
-            await this.ShowOverlayAsync();
-            try
-            {
-                var dialog = new WebsitePublishDialog(_publishingService, _session, _episodeId, _websiteLog)
-                {
-                    Owner = this
-                };
+            var dialog = new WebsitePublishDialog(_publishingService, _session, _episodeId, _websiteLog);
 
-                if (dialog.ShowDialog() == true)
-                {
-                    MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات نشر الموقع لـ", "الحلقة", _episodeName));
-                    await LoadRecordsAsync();
-                }
-            }
-            finally
+            // ✅ استخدام DialogHelper المركزي — يُعين Owner تلقائياً + Overlay + حماية من الأخطاء
+            if (await _dialogHelper.ShowDialogAsync(dialog) == true)
             {
-                await this.HideOverlayAsync();
+                MessageService.Current.ShowSuccess(Messages.ActionedWithName("تعديل بيانات نشر الموقع لـ", "الحلقة", _episodeName));
+                await LoadRecordsAsync();
             }
         }
 

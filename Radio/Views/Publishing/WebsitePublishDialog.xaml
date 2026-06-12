@@ -62,7 +62,7 @@
                     <TextBlock
                         Margin="0,0,0,8"
                         FontWeight="Bold"
-                        Foreground="#616161"
+                        Foreground="{StaticResource TextSecondaryBrush}"
                         Style="{StaticResource Type.Caption}"
                         Text="نوع الوسيط *" />
                     <ComboBox
@@ -81,7 +81,7 @@
                     <TextBlock
                         Margin="0,0,0,8"
                         FontWeight="Bold"
-                        Foreground="#616161"
+                        Foreground="{StaticResource TextSecondaryBrush}"
                         Style="{StaticResource Type.Caption}"
                         Text="عنوان النشر *" />
                     <TextBox
@@ -96,7 +96,7 @@
                     <TextBlock
                         Margin="0,0,0,8"
                         FontWeight="Bold"
-                        Foreground="#616161"
+                        Foreground="{StaticResource TextSecondaryBrush}"
                         Style="{StaticResource Type.Caption}"
                         Text="ملاحظات (اختياري)" />
                     <TextBox
@@ -112,13 +112,13 @@
                 <TextBlock
                     Margin="0,12,0,0"
                     FontStyle="Italic"
-                    Foreground="#999"
+                    Foreground="{StaticResource TextTertiaryBrush}"
                     Style="{StaticResource Type.Overline}"
                     Text="سيتم النشر فوراً في:" />
                 <TextBlock
                     x:Name="TxtPublishTime"
                     Margin="0,4,0,0"
-                    Foreground="#616161"
+                    Foreground="{StaticResource TextSecondaryBrush}"
                     Style="{StaticResource Type.Caption}"
                     Text="" />
             </StackPanel>

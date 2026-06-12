@@ -86,17 +86,17 @@
         <Setter Property="FontSize" Value="{DynamicResource FontSize.Button}" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="1.5" />
+        <!--  مطابق للصورة: Secondary Button #E2E8F0  -->
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
+        <Setter Property="Background" Value="{StaticResource DividerBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="{StaticResource RadiusMedium}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <!--  الأزرار المحاطة بإطار تحتاج لتغيير الخلفية عند التمرير لأنها شفافة  -->
-                <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
-                <!--  تم تعديل لون الإطار ليبقى متناسقاً ولا يحدث قفزة لونية حادة  -->
-                <Setter Property="BorderBrush" Value="{StaticResource PrimaryMainBrush}" />
+                <!--  مطابق للصورة: Secondary Hover #CBD5E1  -->
+                <Setter Property="Background" Value="{StaticResource BorderDefaultBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.42" />
@@ -119,12 +119,14 @@
         <Setter Property="FontSize" Value="{DynamicResource FontSize.Input}" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
+        <!--  مطابق للصورة: Text Button #64748B  -->
+        <Setter Property="Foreground" Value="{StaticResource TextTertiaryBrush}" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="6" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="{StaticResource RadiusSmall}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{StaticResource PrimaryXLightBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource PrimaryMainBrush}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.42" />
@@ -181,7 +183,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
         <Setter Property="BorderThickness" Value="1.5" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="{StaticResource RadiusSmall}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{StaticResource ErrorLightBrush}" />
@@ -448,6 +450,133 @@
                 <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp4" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.ChromeButton — زر شفاف مع خلفية دائرية
+        الاستخدام: زر الإشعارات وزر الملف الشخصي في شريط العنوان
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Btn.ChromeButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="20"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.WindowControl — زر التحكم في النافذة (تصغير / تكبير)
+        الاستخدام: أزرار تصغير وتكبير النافذة
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Btn.WindowControl" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Margin" Value="2,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceVariantBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.WindowClose — زر إغلاق النافذة
+        الاستخدام: زر إغلاق النافذة (يظهر باللون الأحمر عند التمرير)
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Btn.WindowClose" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Margin" Value="2,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource ErrorLightBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ═══════════════════════════════════════════════════════════
+        Btn.StopBroadcast — زر إيقاف البث
+        الاستخدام: زر إيقاف البث المباشر (شفاف أبيض على خلفية حمراء)
+        ═══════════════════════════════════════════════════════════
+    -->
+    <Style x:Key="Btn.StopBroadcast" TargetType="Button">
+        <Setter Property="Background" Value="#33FFFFFF" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="bd"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="8">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="bd" Property="Background" Value="#4DFFFFFF" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="bd" Property="Background" Value="#66FFFFFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

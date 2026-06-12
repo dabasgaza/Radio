@@ -41,10 +41,10 @@
                             Height="45"
                             Padding="20,0"
                             materialDesign:ButtonAssist.CornerRadius="10"
-                            Background="#FFB300"
+                            Background="{StaticResource WarningBrush}"
                             BorderThickness="0"
                             Click="BtnSavePermissions_Click"
-                            Foreground="#1B5E20">
+                            Foreground="{StaticResource TextPrimaryBrush}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon VerticalAlignment="Center" Kind="ShieldCheck" />
                                 <TextBlock
@@ -144,7 +144,7 @@
                                             Margin="8"
                                             Padding="18"
                                             Background="Transparent"
-                                            BorderBrush="#C8E6C9"
+                                            BorderBrush="{StaticResource DividerBrush}"
                                             BorderThickness="1"
                                             CornerRadius="12">
                                             <Grid>
@@ -155,7 +155,7 @@
 
                                                 <StackPanel VerticalAlignment="Center">
                                                     <TextBlock
-                                                        Foreground="{DynamicResource MaterialDesignBody}"
+                                                        Foreground="{StaticResource TextPrimaryBrush}"
                                                         Style="{StaticResource Type.BodyMedium}"
                                                         Text="{Binding DisplayName}" />
                                                     <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
@@ -174,7 +174,7 @@
 
                                                 <ToggleButton
                                                     Grid.Column="1"
-                                                    Foreground="#2E7D32"
+                                                    Foreground="{StaticResource SuccessBrush}"
                                                     IsChecked="{Binding IsAssigned, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                     Style="{StaticResource MaterialDesignSwitchToggleButton}"
                                                     ToolTip="منح الصلاحية لهذا الدور" />

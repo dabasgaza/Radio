@@ -68,7 +68,8 @@
             <TextBox
                 x:Name="TxtSearch"
                 Grid.Column="0"
-                Style="{StaticResource Input.Search}" />
+                Style="{StaticResource Input.Search}"
+                TextChanged="TxtSearch_TextChanged" />
 
             <UniformGrid Grid.Column="1" Columns="3">
                 <materialDesign:Card
@@ -80,12 +81,12 @@
                         <Border
                             Width="38"
                             Height="38"
-                            Background="#104527A0"
+                            Background="{StaticResource PrimaryXLightBrush}"
                             CornerRadius="8">
                             <materialDesign:PackIcon
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                Foreground="#4527A0"
+                                Foreground="{StaticResource PrimaryMainBrush}"
                                 Kind="AccountGroup" />
                         </Border>
                         <StackPanel Margin="12,0">
@@ -107,19 +108,19 @@
                         <Border
                             Width="38"
                             Height="38"
-                            Background="#1000C853"
+                            Background="{StaticResource SuccessLightBrush}"
                             CornerRadius="8">
                             <materialDesign:PackIcon
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                Foreground="#00C853"
+                                Foreground="{StaticResource SuccessBrush}"
                                 Kind="AccountCheck" />
                         </Border>
                         <StackPanel Margin="12,0">
                             <TextBlock Style="{StaticResource Type.Caption}" Text="نشط الآن" />
                             <TextBlock
                                 x:Name="TxtActiveUsers"
-                                Foreground="#00C853"
+                                Foreground="{StaticResource SuccessBrush}"
                                 Style="{StaticResource Type.Numeric.Medium}"
                                 Text="0" />
                         </StackPanel>
@@ -135,19 +136,19 @@
                         <Border
                             Width="38"
                             Height="38"
-                            Background="#10D50000"
+                            Background="{DynamicResource ErrorLightBrush}"
                             CornerRadius="8">
                             <materialDesign:PackIcon
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                Foreground="#D50000"
+                                Foreground="{DynamicResource ErrorBrush}"
                                 Kind="AccountCancel" />
                         </Border>
                         <StackPanel Margin="12,0">
                             <TextBlock Style="{StaticResource Type.Caption}" Text="معطل" />
                             <TextBlock
                                 x:Name="TxtInactiveUsers"
-                                Foreground="#D50000"
+                                Foreground="{DynamicResource ErrorBrush}"
                                 Style="{StaticResource Type.Numeric.Medium}"
                                 Text="0" />
                         </StackPanel>
@@ -177,7 +178,7 @@
                                         Width="38"
                                         Height="38"
                                         Padding="2"
-                                        BorderBrush="{DynamicResource PrimaryHueMidBrush}"
+                                        BorderBrush="{StaticResource PrimaryMainBrush}"
                                         BorderThickness="1"
                                         CornerRadius="19">
                                         <Border Background="{DynamicResource MaterialDesignDivider}" CornerRadius="18">
@@ -214,29 +215,29 @@
                                     <materialDesign:Chip.Style>
                                         <Style BasedOn="{StaticResource {x:Type materialDesign:Chip}}" TargetType="materialDesign:Chip">
                                             <Setter Property="Background" Value="{DynamicResource MaterialDesignDivider}" />
-                                            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
 
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding RoleName}" Value="Admin">
-                                                    <Setter Property="Background" Value="#1B5E20" />
+                                                    <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
                                                     <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="IconBackground" Value="#2E7D32" />
+                                                    <Setter Property="IconBackground" Value="{StaticResource SuccessDarkBrush}" />
                                                 </DataTrigger>
 
                                                 <DataTrigger Binding="{Binding RoleName}" Value="التنسيق">
-                                                    <Setter Property="Background" Value="#4527A0" />
+                                                    <Setter Property="Background" Value="{StaticResource PrimaryMainBrush}" />
                                                     <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="IconBackground" Value="#5E35B1" />
+                                                    <Setter Property="IconBackground" Value="{StaticResource PrimaryLightBrush}" />
                                                 </DataTrigger>
 
                                                 <DataTrigger Binding="{Binding RoleName}" Value="الإنتاج">
-                                                    <Setter Property="Background" Value="#006064" />
+                                                    <Setter Property="Background" Value="{StaticResource SecondaryDarkBrush}" />
                                                     <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="IconBackground" Value="#00838F" />
+                                                    <Setter Property="IconBackground" Value="{StaticResource InfoBrush}" />
                                                 </DataTrigger>
 
                                                 <DataTrigger Binding="{Binding RoleName}" Value="النشر الرقمي">
-                                                    <Setter Property="Background" Value="#37474F" />
+                                                    <Setter Property="Background" Value="{StaticResource TextPrimaryBrush}" />
                                                     <Setter Property="Foreground" Value="White" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -276,7 +277,7 @@
                                         <materialDesign:PackIcon
                                             Width="20"
                                             Height="20"
-                                            Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                            Foreground="{StaticResource PrimaryMainBrush}"
                                             Kind="AccountEditOutline" />
                                     </Button>
                                     <Button

@@ -379,8 +379,8 @@
                             x:Name="PnlValidationErrors"
                             Margin="0,16,0,0"
                             Padding="16,12"
-                            Background="#FFFDE7"
-                            BorderBrush="#FFB300"
+                            Background="{StaticResource WarningLightBrush}"
+                            BorderBrush="{StaticResource WarningBrush}"
                             BorderThickness="1"
                             CornerRadius="8"
                             Visibility="Collapsed">
@@ -389,7 +389,7 @@
                                     x:Name="LblValidationHeader"
                                     Margin="0,0,0,8"
                                     FontWeight="SemiBold"
-                                    Foreground="#E65100"
+                                    Foreground="{StaticResource WarningBrush}"
                                     Style="{StaticResource Type.Caption}" />
                                 <ItemsControl x:Name="LstValidationMessages">
                                     <ItemsControl.ItemTemplate>
@@ -400,11 +400,11 @@
                                                     Height="16"
                                                     Margin="0,0,6,0"
                                                     VerticalAlignment="Center"
-                                                    Foreground="#E65100"
+                                                    Foreground="{StaticResource WarningBrush}"
                                                     Kind="AlertCircleOutline" />
                                                 <TextBlock
                                                     VerticalAlignment="Center"
-                                                    Foreground="#BF360C"
+                                                    Foreground="{StaticResource WarningDarkBrush}"
                                                     Style="{StaticResource Type.Overline}"
                                                     Text="{Binding}" />
                                             </StackPanel>

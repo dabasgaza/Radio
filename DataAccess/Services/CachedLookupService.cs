@@ -8,6 +8,7 @@ namespace DataAccess.Services;
 /// <summary>
 /// خدمة موحّدة للتخزين المؤقت لبيانات القوائم الثابتة (lookup tables)
 /// تقلل استعلامات SQL المتكررة على جداول نادراً ما تتغير.
+/// ✨ تدعم إبطال الكاش عند تغيير البيانات (InvalidateByEntity)
 /// </summary>
 public interface ICachedLookupService
 {
@@ -18,6 +19,11 @@ public interface ICachedLookupService
     Task<Dictionary<byte, string>> GetEpisodeStatusesAsync();
     void Invalidate(string key);
     void InvalidateAll();
+    /// <summary>
+    /// ✨ إبطال الكاش المرتبط بكيان محدد بعد عمليات الكتابة.
+    /// مثال: InvalidateByEntity("Guest") بعد إضافة/تعديل/حذف ضيف.
+    /// </summary>
+    void InvalidateByEntity(string entityName);
 }
 
 public class CachedLookupService(
@@ -102,5 +108,27 @@ public class CachedLookupService(
         cache.Remove("lookup:guests");
         cache.Remove("lookup:correspondents");
         cache.Remove("lookup:episodestatuses");
+        cache.Remove("platforms");
+    }
+
+    // ✨ ربط أسماء الكيانات بمفاتيح الكاش لإبطال تلقائي بعد عمليات الكتابة
+    private static readonly Dictionary<string, string[]> EntityCacheMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Guest"] = ["lookup:guests"],
+        ["Correspondent"] = ["lookup:correspondents"],
+        ["Program"] = ["lookup:programs"],
+        ["StaffRole"] = ["lookup:staffroles"],
+        ["SocialMediaPlatform"] = ["platforms"],
+        ["Employee"] = ["lookup:staffroles"],
+        ["Episode"] = ["lookup:episodestatuses"],
+    };
+
+    public void InvalidateByEntity(string entityName)
+    {
+        if (EntityCacheMap.TryGetValue(entityName, out var keys))
+        {
+            foreach (var key in keys)
+                cache.Remove(key);
+        }
     }
 }

@@ -106,7 +106,7 @@
                                 BorderThickness="0"
                                 FontFamily="Consolas"
                                 FontSize="11"
-                                Foreground="#D32F2F"
+                                Foreground="{StaticResource ErrorBrush}"
                                 IsReadOnly="True"
                                 TextWrapping="Wrap" />
                         </ScrollViewer>

@@ -17,6 +17,7 @@
     ║   11. DateTimePicker.xaml ← منتقيات التاريخ والوقت                    ║
     ║   12. DataGrid.xaml       ← جداول البيانات                             ║
     ║   13. Cards.xaml          ← بطاقات العرض والتغليف                      ║
+    ║   13b. EpisodeCards.xaml  ← بطاقات الحلقات والأنيميشن (من Styles/)    ║
     ║   14. ColorZone.xaml      ← ترويسات النوافذ والـ Header               ║
     ╚══════════════════════════════════════════════════════════════════════════╝
 -->
@@ -44,13 +45,13 @@
                 <!--
                     ══════════════════════════════════════════════
                     2. BundledTheme — الثيم الأساسي
-                    Primary: Indigo | Secondary: LightBlue | Base: Light
+                    Primary: Blue | Secondary: Cyan | Base: Light
                     ══════════════════════════════════════════════
                 -->
                 <materialDesign:BundledTheme
                     BaseTheme="Light"
-                    PrimaryColor="Indigo"
-                    SecondaryColor="LightBlue" />
+                    PrimaryColor="Blue"
+                    SecondaryColor="Cyan" />
 
                 <!--
                     ══════════════════════════════════════════════
@@ -133,6 +134,14 @@
 
                 <!--
                     ══════════════════════════════════════════════
+                    13b. Episode Cards & Animations
+                    (consolidated from Styles/ directory)
+                    ══════════════════════════════════════════════
+                -->
+                <ResourceDictionary Source="Resources/EpisodeCards.xaml" />
+
+                <!--
+                    ══════════════════════════════════════════════
                     14. ColorZone & Header Zones
                     ══════════════════════════════════════════════
                 -->
@@ -156,7 +165,7 @@
                 Global Converters
                 ══════════════════════════════════════════════════
             -->
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converter:PlatformColorConverter x:Key="PlatformColorConverter" />
 
             <converter:PermissionVisibilityConverter x:Key="PermissionVisibilityConverter" />
 
