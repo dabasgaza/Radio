@@ -1,5 +1,6 @@
 using DataAccess.Common;
 using DataAccess.DTOs;
+using DataAccess.Validation;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,9 @@ public interface IProgramService
 }
 
 // ✨ استخدام Primary Constructor
-public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IProgramService
+public class ProgramService(
+    IDbContextFactory<BroadcastWorkflowDBContext> contextFactory,
+    ICachedLookupService cachedLookup) : IProgramService
 {
     // ──────────────────────────────────────────────────────────────
     // Compiled Query — تقليل وقت ترجمة LINQ في المسارات الساخنة
@@ -46,6 +49,9 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
+        var validation = ValidationPipeline.ValidateProgram(dto);
+        if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
+
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -58,6 +64,7 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             });
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Program");
             return Result.Success();
         }
         catch (Exception ex)
@@ -72,6 +79,9 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
         var permCheck = session.EnsurePermission(AppPermissions.CoordinationManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
+        var validation = ValidationPipeline.ValidateProgram(dto);
+        if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
+
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -85,6 +95,7 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             prog.ProgramDescription = dto.ProgramDescription;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Program");
             return Result.Success();
         }
         catch (Exception ex)
@@ -121,6 +132,7 @@ public class ProgramService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             program.IsActive = false;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Program");
             return Result.Success();
         }
         catch (Exception ex)

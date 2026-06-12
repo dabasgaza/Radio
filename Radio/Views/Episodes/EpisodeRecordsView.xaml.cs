@@ -204,7 +204,7 @@ namespace Radio.Views.Episodes
             try
             {
                 // استرجاع قائمة الضيوف (مطلوبة لـ PublishingLogDialog)
-                var episodeService = _serviceProvider.GetRequiredService<IEpisodeService>();
+                var episodeService = _serviceProvider.GetRequiredService<IEpisodeQueryService>();
                 var guests = await episodeService.GetEpisodeGuestsAsync(_episodeId);
 
                 var dialog = new PublishingLogDialog(_publishingService, _session, _episodeId, guests, _socialLogs);

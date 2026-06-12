@@ -108,6 +108,7 @@ public class CachedLookupService(
         cache.Remove("lookup:guests");
         cache.Remove("lookup:correspondents");
         cache.Remove("lookup:episodestatuses");
+        cache.Remove("platforms");
     }
 
     // ✨ ربط أسماء الكيانات بمفاتيح الكاش لإبطال تلقائي بعد عمليات الكتابة
@@ -117,6 +118,7 @@ public class CachedLookupService(
         ["Correspondent"] = ["lookup:correspondents"],
         ["Program"] = ["lookup:programs"],
         ["StaffRole"] = ["lookup:staffroles"],
+        ["SocialMediaPlatform"] = ["platforms"],
         ["Employee"] = ["lookup:staffroles"],
         ["Episode"] = ["lookup:episodestatuses"],
     };

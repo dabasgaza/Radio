@@ -7,55 +7,26 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace DataAccess.Services;
 
-public interface IPublishingService
+public interface IPublishingQueryService
 {
-    Task<Result> LogWebsitePublishingAsync(int episodeId, string title, MediaType mediaType, string notes, UserSession session);
-
-    /// <summary>
-    /// تسجيل النشر الاجتماعي لكل ضيف في الحلقة مع المنصات والروابط
-    /// </summary>
-    Task<Result> LogSocialPublishingAsync(int episodeId, List<SocialMediaPublishingLogDto> guestLogs, UserSession session);
-
-    // المتطلبات الجديدة من الـ Dialogs
     Task<List<SocialMediaPlatformDto>> GetAllPlatformsAsync();
-    Task<Result<int>> SavePublishingLogAsync(SocialMediaPublishingLogDto dto, UserSession session);
-    Task<Result<int>> PublishToWebsiteAsync(WebsitePublishingLogDto dto, UserSession session);
-
-    // ═══════════════════════════════════════════
-    //  دوال استرجاع وتعديل سجلات النشر
-    // ═══════════════════════════════════════════
-
-    /// <summary>
-    /// استرجاع سجلات النشر الرقمي لضيف معيّن في حلقة
-    /// </summary>
     Task<SocialMediaPublishingLogDto?> GetSocialPublishingLogAsync(int episodeGuestId);
-
-    /// <summary>
-    /// استرجاع جميع سجلات النشر الرقمي لحلقة معيّنة (ضيف لكل سجل)
-    /// </summary>
     Task<List<SocialMediaPublishingLogDto>> GetEpisodeSocialLogsAsync(int episodeId);
-
-    /// <summary>
-    /// تعديل سجل نشر رقمي موجود (عنوان المقطع، المدة، نوع الوسائط، المنصات والروابط)
-    /// </summary>
-    Task<Result> UpdateSocialPublishingLogAsync(SocialMediaPublishingLogDto dto, UserSession session);
-
-    /// <summary>
-    /// استرجاع سجل نشر الموقع الإلكتروني لحلقة معيّنة
-    /// </summary>
     Task<WebsitePublishingLogDto?> GetWebsitePublishingLogAsync(int episodeId);
-
-    /// <summary>
-    /// تعديل سجل نشر الموقع الإلكتروني
-    /// </summary>
-    Task<Result> UpdateWebsitePublishingLogAsync(WebsitePublishingLogDto dto, UserSession session);
-
-    /// <summary>
-    /// استرجاع قائمة موحّدة من جميع سجلات النشر (أنواعها الثلاثة)
-    /// يُستخدم في شاشة العرض الشامل مع دعم الفلترة حسب الحلقة
-    /// </summary>
     Task<List<PublishingRecordDto>> GetAllPublishingRecordsAsync(int? episodeId = null);
 }
+
+public interface IPublishingCommandService
+{
+    Task<Result> LogWebsitePublishingAsync(int episodeId, string title, MediaType mediaType, string notes, UserSession session);
+    Task<Result> LogSocialPublishingAsync(int episodeId, List<SocialMediaPublishingLogDto> guestLogs, UserSession session);
+    Task<Result<int>> SavePublishingLogAsync(SocialMediaPublishingLogDto dto, UserSession session);
+    Task<Result<int>> PublishToWebsiteAsync(WebsitePublishingLogDto dto, UserSession session);
+    Task<Result> UpdateSocialPublishingLogAsync(SocialMediaPublishingLogDto dto, UserSession session);
+    Task<Result> UpdateWebsitePublishingLogAsync(WebsitePublishingLogDto dto, UserSession session);
+}
+
+public interface IPublishingService : IPublishingQueryService, IPublishingCommandService { }
 
 // ✨ استخدام Primary Constructor
 public class PublishingService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory, IMemoryCache cache, TelemetryClient telemetryClient) : IPublishingService

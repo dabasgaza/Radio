@@ -106,9 +106,13 @@ namespace Radio
             builder.Services.AddTransient<IGuestService, GuestService>();
             builder.Services.AddTransient<ICorrespondentService, CorrespondentService>();
             builder.Services.AddTransient<IEpisodeService, EpisodeService>();
+            builder.Services.AddTransient<IEpisodeQueryService, EpisodeService>();
+            builder.Services.AddTransient<IEpisodeCommandService, EpisodeService>();
             builder.Services.AddTransient<IProgramService, ProgramService>();
             builder.Services.AddTransient<IExecutionService, ExecutionService>();
             builder.Services.AddTransient<IPublishingService, PublishingService>();
+            builder.Services.AddTransient<IPublishingQueryService, PublishingService>();
+            builder.Services.AddTransient<IPublishingCommandService, PublishingService>();
             builder.Services.AddTransient<IReportsService, ReportsService>();
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<ICoverageService, CoverageService>();

@@ -167,8 +167,8 @@ namespace Radio.Views.Episodes
                 CompactView.Visibility = Visibility.Collapsed;
 
                 _allEpisodes = (await _episodeService.GetActiveEpisodesAsync()).ToList();
-                PopulateProgramFilter();
                 RebindAndUpdateStats();
+                _ = PopulateProgramFilterAsync();
             }
             catch (Exception ex)
             {
@@ -184,14 +184,15 @@ namespace Radio.Views.Episodes
         // ═══════════════════════════════════════════════════════════
         // تعبئة تصفية البرامج
         // ═══════════════════════════════════════════════════════════
-        private void PopulateProgramFilter()
+        private async Task PopulateProgramFilterAsync()
         {
-            var programs = _allEpisodes
-                .Select(e => e.ProgramName)
-                .Where(p => !string.IsNullOrWhiteSpace(p))
-                .Distinct()
-                .OrderBy(p => p)
-                .ToList();
+            var programs = await Task.Run(() =>
+                _allEpisodes
+                    .Select(e => e.ProgramName)
+                    .Where(p => !string.IsNullOrWhiteSpace(p))
+                    .Distinct()
+                    .OrderBy(p => p)
+                    .ToList());
 
             CmbProgramFilter.ItemsSource = programs;
         }

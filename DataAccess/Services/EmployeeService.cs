@@ -1,5 +1,6 @@
 using DataAccess.Common;
 using DataAccess.DTOs;
+using DataAccess.Validation;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,9 @@ public interface IEmployeeService
 }
 
 // ✨ استخدام Primary Constructor
-public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IEmployeeService
+public class EmployeeService(
+    IDbContextFactory<BroadcastWorkflowDBContext> contextFactory,
+    ICachedLookupService cachedLookup) : IEmployeeService
 {
     // ──────────────────────────────────────────────────────────────
     // Compiled Queries — تقليل وقت ترجمة LINQ في المسارات الساخنة
@@ -57,6 +60,9 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
+        var validation = ValidationPipeline.ValidateEmployee(dto);
+        if (!validation.IsSuccess) return Result<int>.Fail(validation.ErrorMessage!);
+
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -73,6 +79,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
             context.Employees.Add(employee);
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Employee");
             return Result<int>.Success(employee.EmployeeId);
         }
         catch (Exception ex)
@@ -86,6 +93,9 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
     {
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
+
+        var validation = ValidationPipeline.ValidateEmployee(dto);
+        if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
 
         try
         {
@@ -101,6 +111,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             employee.UpdatedAt = DateTime.UtcNow;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Employee");
             return Result.Success();
         }
         catch (Exception ex)
@@ -127,6 +138,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             employee.UpdatedAt = DateTime.UtcNow;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("Employee");
             return Result.Success();
         }
         catch (Exception ex)
@@ -151,6 +163,9 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
+        var validation = ValidationPipeline.ValidateStaffRole(dto);
+        if (!validation.IsSuccess) return Result<int>.Fail(validation.ErrorMessage!);
+
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -165,6 +180,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
             context.StaffRoles.Add(role);
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("StaffRole");
             return Result<int>.Success(role.StaffRoleId);
         }
         catch (Exception ex)
@@ -179,6 +195,9 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
+        var validation = ValidationPipeline.ValidateStaffRole(dto);
+        if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
+
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -191,6 +210,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             role.UpdatedAt = DateTime.UtcNow;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("StaffRole");
             return Result.Success();
         }
         catch (Exception ex)
@@ -217,6 +237,7 @@ public class EmployeeService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             role.UpdatedAt = DateTime.UtcNow;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("StaffRole");
             return Result.Success();
         }
         catch (Exception ex)

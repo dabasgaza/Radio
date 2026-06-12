@@ -229,7 +229,7 @@ namespace Radio.Views.Episodes
         private async Task OpenSocialEditDialog(PublishingRecordDto record)
         {
             // استرجاع قائمة الضيوف (مطلوبة لـ PublishingLogDialog)
-            var episodeService = _serviceProvider.GetRequiredService<IEpisodeService>();
+            var episodeService = _serviceProvider.GetRequiredService<IEpisodeQueryService>();
             var guests = await episodeService.GetEpisodeGuestsAsync(record.EpisodeId);
 
             // استرجاع سجلات النشر الرقمي للحلقة

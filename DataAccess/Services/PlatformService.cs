@@ -1,11 +1,14 @@
 using DataAccess.Common;
 using DataAccess.DTOs;
+using DataAccess.Validation;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Services;
 
-public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory) : IPlatformService
+public class PlatformService(
+    IDbContextFactory<BroadcastWorkflowDBContext> contextFactory,
+    ICachedLookupService cachedLookup) : IPlatformService
 {
     public async Task<List<SocialMediaPlatformDto>> GetAllActiveAsync()
     {
@@ -23,6 +26,9 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result<int>.Fail(permCheck.ErrorMessage!);
 
+        var validation = ValidationPipeline.ValidatePlatform(dto);
+        if (!validation.IsSuccess) return Result<int>.Fail(validation.ErrorMessage!);
+
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -35,6 +41,7 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
             context.SocialMediaPlatforms.Add(platform);
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("SocialMediaPlatform");
 
             return Result<int>.Success(platform.SocialMediaPlatformId);
         }
@@ -50,6 +57,9 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
         var permCheck = session.EnsurePermission(AppPermissions.StaffManage);
         if (!permCheck.IsSuccess) return Result.Fail(permCheck.ErrorMessage!);
 
+        var validation = ValidationPipeline.ValidatePlatform(dto);
+        if (!validation.IsSuccess) return Result.Fail(validation.ErrorMessage!);
+
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -62,6 +72,7 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
             platform.Icon = dto.Icon;
 
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("SocialMediaPlatform");
             return Result.Success();
         }
         catch (Exception ex)
@@ -86,6 +97,7 @@ public class PlatformService(IDbContextFactory<BroadcastWorkflowDBContext> conte
 
             platform.IsActive = false;
             await context.SaveChangesAsync();
+            cachedLookup.InvalidateByEntity("SocialMediaPlatform");
             return Result.Success();
         }
         catch (Exception ex)

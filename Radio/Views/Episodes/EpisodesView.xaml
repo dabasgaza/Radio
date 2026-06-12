@@ -746,17 +746,22 @@
 
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel Margin="0,0,-12,0" IsItemsHost="True" />
+                                <WrapPanel Margin="8,0,4,0" IsItemsHost="True" />
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
 
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
-                                <Setter Property="Margin" Value="0,0,12,12" />
+                                <Setter Property="Margin" Value="0,0,8,10" />
                                 <Setter Property="Background" Value="Transparent" />
                                 <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </Setter.Value>
+                                </Setter>
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="ListBoxItem">
@@ -764,6 +769,42 @@
                                         </ControlTemplate>
                                     </Setter.Value>
                                 </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                                        Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                        To="1.008"
+                                                        Duration="0:0:0.12"
+                                                        DecelerationRatio="0.8" />
+                                                    <DoubleAnimation
+                                                        Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                        To="1.008"
+                                                        Duration="0:0:0.12"
+                                                        DecelerationRatio="0.8" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                                        Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                        To="1"
+                                                        Duration="0:0:0.12"
+                                                        DecelerationRatio="0.8" />
+                                                    <DoubleAnimation
+                                                        Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                        To="1"
+                                                        Duration="0:0:0.12"
+                                                        DecelerationRatio="0.8" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </Style.Triggers>
                             </Style>
                         </ListBox.ItemContainerStyle>
 
@@ -775,14 +816,14 @@
                                     ═══════════════════════════════════════════════════════════
                                 -->
                                 <materialDesign:Card
-                                    Width="330"
+                                    Width="320"
                                     Padding="0"
                                     materialDesign:ElevationAssist.Elevation="Dp1"
                                     Background="{StaticResource SurfaceBrush}"
-                                    UniformCornerRadius="12">
+                                    UniformCornerRadius="10">
                                     <materialDesign:Card.Style>
                                         <Style TargetType="materialDesign:Card">
-                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderDefaultBrush}" />
                                             <Setter Property="BorderThickness" Value="1" />
                                             <Style.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
@@ -802,7 +843,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <!--  ═══ شريط الحالة الجانبي الملون ═══  -->
-                                        <Border Grid.Column="1" CornerRadius="0,12,12,0">
+                                        <Border Grid.Column="1" CornerRadius="0,10,10,0">
                                             <Border.Style>
                                                 <Style TargetType="Border">
                                                     <Setter Property="Background" Value="{StaticResource WarningBrush}" />
@@ -825,26 +866,18 @@
                                         </Border>
 
                                         <!--  ═══ المحتوى الرئيسي ═══  -->
-                                        <Grid Grid.Column="0" Margin="14,12,12,10">
+                                        <Grid Grid.Column="0" Margin="10,8,8,6">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
-                                                <!--  الصف 0: شريحة الحالة + البرنامج + CheckBox  -->
                                                 <RowDefinition Height="Auto" />
-                                                <!--  الصف 1: اسم الحلقة  -->
                                                 <RowDefinition Height="Auto" />
-                                                <!--  الصف 2: التاريخ والوقت  -->
                                                 <RowDefinition Height="Auto" />
-                                                <!--  الصف 3: تفاصيل الضيوف وفريق العمل والمراسلين  -->
                                                 <RowDefinition Height="Auto" />
-                                                <!--  الصف 4: ملاحظات خاصة  -->
                                                 <RowDefinition Height="Auto" />
-                                                <!--  الصف 5: سبب الإلغاء  -->
                                                 <RowDefinition Height="Auto" />
-                                                <!--  الصف 6: شريط الإجراءات والعمليات  -->
                                             </Grid.RowDefinitions>
 
-                                            <!--  ═══ الصف 0: شريحة البرنامج + شريحة الحالة + CheckBox ═══  -->
-                                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                            <Grid Grid.Row="0" Margin="0,0,0,4">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
@@ -853,20 +886,20 @@
 
                                                 <!--  وسم البرنامج  -->
                                                 <Border
-                                                    Padding="8,4"
+                                                    Padding="6,2"
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
                                                     Background="{StaticResource PrimaryXLightBrush}"
-                                                    CornerRadius="6">
+                                                    CornerRadius="5">
                                                     <StackPanel Orientation="Horizontal">
                                                         <materialDesign:PackIcon
-                                                            Width="13"
-                                                            Height="13"
+                                                            Width="11"
+                                                            Height="11"
                                                             VerticalAlignment="Center"
                                                             Foreground="{StaticResource SecondaryMainBrush}"
                                                             Kind="RadioFm" />
                                                         <TextBlock
-                                                            MaxWidth="110"
+                                                            MaxWidth="100"
                                                             Margin="6,0,0,0"
                                                             VerticalAlignment="Center"
                                                             FontWeight="SemiBold"
@@ -877,15 +910,15 @@
                                                     </StackPanel>
                                                 </Border>
 
-                                                <!--  شريحة الحالة المبتكرة بلمسة إبداعية  -->
+                                                <!--  شريحة الحالة  -->
                                                 <Border
                                                     Grid.Column="1"
-                                                    Margin="6,0"
-                                                    Padding="8,3"
+                                                    Margin="4,0"
+                                                    Padding="6,2"
                                                     HorizontalAlignment="Right"
                                                     VerticalAlignment="Center"
                                                     BorderThickness="1"
-                                                    CornerRadius="8">
+                                                    CornerRadius="6">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Setter Property="Background" Value="{StaticResource WarningLightBrush}" />
@@ -912,9 +945,9 @@
                                                     </Border.Style>
                                                     <StackPanel Orientation="Horizontal">
                                                         <Ellipse
-                                                            Width="6"
-                                                            Height="6"
-                                                            Margin="0,0,5,0"
+                                                            Width="5"
+                                                            Height="5"
+                                                            Margin="0,0,4,0"
                                                             VerticalAlignment="Center">
                                                             <Ellipse.Style>
                                                                 <Style TargetType="Ellipse">
@@ -938,7 +971,7 @@
                                                         </Ellipse>
                                                         <TextBlock
                                                             VerticalAlignment="Center"
-                                                            FontSize="10"
+                                                            FontSize="9"
                                                             FontWeight="Bold">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
@@ -976,12 +1009,11 @@
                                                     Unchecked="ItemCheckBox_CheckedChanged" />
                                             </Grid>
 
-                                            <!--  ═══ الصف 1: اسم الحلقة (بسيط ومحدود بحد أقصى سطرين) ═══  -->
                                             <TextBlock
                                                 Grid.Row="1"
-                                                MaxHeight="42"
-                                                Margin="0,0,0,8"
-                                                FontSize="14"
+                                                MaxHeight="36"
+                                                Margin="0,0,0,4"
+                                                FontSize="13"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource TextPrimaryBrush}"
                                                 Style="{StaticResource Type.TitleMedium}"
@@ -989,13 +1021,11 @@
                                                 TextTrimming="WordEllipsis"
                                                 TextWrapping="Wrap" />
 
-                                            <!--  ═══ الصف 2: التاريخ والوقت مدمجين أفقياً ═══  -->
-                                            <Grid Grid.Row="2" Margin="0,0,0,8">
+                                            <Grid Grid.Row="2" Margin="0,0,0,4">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <!--  التاريخ  -->
                                                     <materialDesign:PackIcon
-                                                        Width="14"
-                                                        Height="14"
+                                                        Width="12"
+                                                        Height="12"
                                                         VerticalAlignment="Center"
                                                         Foreground="{StaticResource TextHintBrush}"
                                                         Kind="CalendarMonthOutline" />
@@ -1009,15 +1039,14 @@
 
                                                     <!--  فاصل  -->
                                                     <TextBlock
-                                                        Margin="8,0"
+                                                        Margin="5,0"
                                                         VerticalAlignment="Center"
                                                         Foreground="{StaticResource DividerBrush}"
                                                         Text="|" />
 
-                                                    <!--  الوقت  -->
                                                     <materialDesign:PackIcon
-                                                        Width="14"
-                                                        Height="14"
+                                                        Width="12"
+                                                        Height="12"
                                                         VerticalAlignment="Center"
                                                         Foreground="{StaticResource SecondaryMainBrush}"
                                                         Kind="ClockOutline" />
@@ -1181,11 +1210,10 @@
                                                 </ItemsControl>
                                             </StackPanel>
 
-                                            <!--  ═══ الصف 4: ملاحظات خاصة (تظهر مباشرة داخل صندوق أصفر ناعم شبه ورقة الملاحظات) ═══  -->
                                             <Border
                                                 Grid.Row="4"
-                                                Margin="0,4,0,0"
-                                                Padding="10,8"
+                                                Margin="0,2,0,0"
+                                                Padding="8,5"
                                                 Background="{StaticResource WarningLightBrush}"
                                                 BorderBrush="{StaticResource WarningBrush}"
                                                 BorderThickness="1,1,4,1"
@@ -1198,9 +1226,9 @@
                                                     </Grid.ColumnDefinitions>
                                                     <materialDesign:PackIcon
                                                         Grid.Column="0"
-                                                        Width="14"
-                                                        Height="14"
-                                                        Margin="0,1,6,0"
+                                                        Width="12"
+                                                        Height="12"
+                                                        Margin="0,1,4,0"
                                                         VerticalAlignment="Top"
                                                         Foreground="{StaticResource WarningBrush}"
                                                         Kind="NoteOutline" />
@@ -1216,11 +1244,10 @@
                                                 </Grid>
                                             </Border>
 
-                                            <!--  ═══ الصف 5: سبب الإلغاء (يظهر للحلقات الملغاة فقط) ═══  -->
                                             <Border
                                                 Grid.Row="5"
-                                                Margin="0,4,0,0"
-                                                Padding="10,8"
+                                                Margin="0,2,0,0"
+                                                Padding="8,5"
                                                 Background="{StaticResource ErrorLightBrush}"
                                                 BorderBrush="{StaticResource ErrorBrush}"
                                                 BorderThickness="1,1,4,1"
@@ -1269,11 +1296,10 @@
                                                 </Grid>
                                             </Border>
 
-                                            <!--  ═══ الصف 6: شريط الإجراءات والعمليات ═══  -->
                                             <Border
                                                 Grid.Row="6"
-                                                Margin="0,10,0,0"
-                                                Padding="0,8,0,0"
+                                                Margin="0,6,0,0"
+                                                Padding="0,6,0,0"
                                                 BorderBrush="{StaticResource DividerBrush}"
                                                 BorderThickness="0,1,0,0">
                                                 <Grid>
@@ -1288,10 +1314,10 @@
                                                         VerticalAlignment="Center"
                                                         Orientation="Horizontal">
 
-                                                        <!--  زر تنفيذ — أخضر / Primary  -->
+                                                        <!--  زر تنفيذ  -->
                                                         <Button
-                                                            Height="32"
-                                                            Padding="12,0"
+                                                            Height="28"
+                                                            Padding="10,0"
                                                             Click="BtnMarkExecuted_Click"
                                                             ToolTip="تنفيذ الحلقة"
                                                             Visibility="{Binding CanMarkExecuted, Converter={StaticResource BoolToVisConverter}}">
@@ -1317,11 +1343,10 @@
                                                             </StackPanel>
                                                         </Button>
 
-                                                        <!--  زر نشر رقمي — بنفسجي/وردي / Primary  -->
                                                         <Button
-                                                            Height="32"
-                                                            Margin="6,0,0,0"
-                                                            Padding="12,0"
+                                                            Height="28"
+                                                            Margin="4,0,0,0"
+                                                            Padding="10,0"
                                                             Click="BtnMarkPublished_Click"
                                                             ToolTip="نشر رقمي"
                                                             Visibility="{Binding CanMarkPublished, Converter={StaticResource BoolToVisConverter}}">
@@ -1347,11 +1372,10 @@
                                                             </StackPanel>
                                                         </Button>
 
-                                                        <!--  زر نشر الموقع — سماوي / Info  -->
                                                         <Button
-                                                            Height="32"
-                                                            Margin="6,0,0,0"
-                                                            Padding="12,0"
+                                                            Height="28"
+                                                            Margin="4,0,0,0"
+                                                            Padding="10,0"
                                                             Click="BtnToggleWebsitePublish_Click"
                                                             ToolTip="نشر على الموقع"
                                                             Visibility="{Binding CanToggleWebsitePublish, Converter={StaticResource BoolToVisConverter}}">

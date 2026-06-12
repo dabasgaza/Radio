@@ -27,23 +27,29 @@ public static class EpisodeStatus
     };
 }
 
-public interface IEpisodeService
+public interface IEpisodeQueryService
 {
     Task<List<ActiveEpisodeDto>> GetActiveEpisodesAsync();
+    Task<ActiveEpisodeDto?> GetActiveEpisodeByIdAsync(int episodeId);
+    Task<List<EpisodeGuestDto>> GetEpisodeGuestsAsync(int episodeId);
+    Task<List<ConflictInfo>> GetConflictingEpisodesAsync(int programId, DateTime scheduledTime, int? excludeEpisodeId = null);
+}
+
+public interface IEpisodeCommandService
+{
     Task<Result<int>> CreateEpisodeAsync(EpisodeDto dto, UserSession session);
     Task<Result> UpdateEpisodeAsync(EpisodeDto dto, UserSession session);
     Task<Result> UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session);
     Task<Result> DeleteEpisodeAsync(int episodeId, UserSession session);
     Task<Result> ToggleWebsitePublishAsync(int episodeId, bool isPublished, UserSession session);
-    Task<List<EpisodeGuestDto>> GetEpisodeGuestsAsync(int episodeId);
-    Task<ActiveEpisodeDto?> GetActiveEpisodeByIdAsync(int episodeId);
     Task<Result> RevertEpisodeStatusAsync(int episodeId, string reason, UserSession session);
     Task<Result> CancelEpisodeAsync(int episodeId, string reason, UserSession session);
     Task<Result> UpdateCancellationReasonAsync(int episodeId, string newReason, UserSession session);
-    Task<List<ConflictInfo>> GetConflictingEpisodesAsync(int programId, DateTime scheduledTime, int? excludeEpisodeId = null);
     Task<(int success, int fail)> CancelEpisodesBatchAsync(List<int> episodeIds, string reason, UserSession session);
     Task<(int success, int fail)> DeleteEpisodesBatchAsync(List<int> episodeIds, UserSession session);
 }
+
+public interface IEpisodeService : IEpisodeQueryService, IEpisodeCommandService { }
 
 public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contextFactory, TelemetryClient telemetryClient) : IEpisodeService
 {
@@ -363,9 +369,35 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
             episode.ScheduledExecutionTime = dto.ScheduledDateTime;
             episode.SpecialNotes = dto.SpecialNotes;
 
-            SyncGuests(episode.EpisodeGuests.ToList(), allEpisodeGuests, dto.Guests ?? [], episode);
-            SyncCorrespondents(episode.EpisodeCorrespondents.ToList(), allEpisodeCorrespondents, dto.Correspondents ?? [], episode);
-            SyncEmployees(episode.EpisodeEmployees.ToList(), allEpisodeEmployees, dto.Employees ?? [], episode);
+            CollectionSyncHelper.Sync(
+                episode.EpisodeGuests.ToList(), allEpisodeGuests, dto.Guests ?? [], episode,
+                entityIdSelector: g => g.EpisodeGuestId,
+                dtoIdSelector: d => d.EpisodeGuestId,
+                entityFkSelector: g => g.GuestId,
+                dtoFkSelector: d => d.GuestId,
+                updater: (g, d) => { g.GuestId = d.GuestId; g.Topic = d.Topic; g.HostingTime = d.HostingTime; g.ClipNotes = d.ClipNotes; },
+                factory: d => new EpisodeGuest { GuestId = d.GuestId, Topic = d.Topic, HostingTime = d.HostingTime, ClipNotes = d.ClipNotes },
+                addToParent: (ep, g) => ep.EpisodeGuests.Add(g));
+
+            CollectionSyncHelper.Sync(
+                episode.EpisodeCorrespondents.ToList(), allEpisodeCorrespondents, dto.Correspondents ?? [], episode,
+                entityIdSelector: c => c.EpisodeCorrespondentId,
+                dtoIdSelector: d => d.Id,
+                entityFkSelector: c => c.CorrespondentId,
+                dtoFkSelector: d => d.CorrespondentId,
+                updater: (c, d) => { c.CorrespondentId = d.CorrespondentId; c.Topic = d.Topic; c.HostingTime = d.HostingTime; },
+                factory: d => new EpisodeCorrespondent { CorrespondentId = d.CorrespondentId, Topic = d.Topic, HostingTime = d.HostingTime },
+                addToParent: (ep, c) => ep.EpisodeCorrespondents.Add(c));
+
+            CollectionSyncHelper.Sync(
+                episode.EpisodeEmployees.ToList(), allEpisodeEmployees, dto.Employees ?? [], episode,
+                entityIdSelector: e => e.EpisodeEmployeeId,
+                dtoIdSelector: d => d.Id,
+                entityFkSelector: e => e.EmployeeId,
+                dtoFkSelector: d => d.EmployeeId,
+                updater: (e, d) => { e.EmployeeId = d.EmployeeId; },
+                factory: d => new EpisodeEmployee { EmployeeId = d.EmployeeId },
+                addToParent: (ep, e) => ep.EpisodeEmployees.Add(e));
 
             await context.SaveChangesAsync();
             return Result.Success();
@@ -380,21 +412,6 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     // ──────────────────────────────────────────────────────────────
     // Commands — Status
     // ──────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// 🆕 خريطة الانتقالات المسموحة للحالات — تمنع القفز العشوائي بين الحالات.
-    /// المفتاح = الحالة الحالية، القيمة = مجموعة الحالات المسموح الانتقال إليها.
-    /// التسلسل: مخططة ← تم التنفيذ ← منشورة رقمياً ← منشورة على الموقع
-    /// ويمكن في أي مرحلة (ما عدا الملغاة) الانتقال إلى: ملغاة
-    /// </summary>
-    private static readonly Dictionary<byte, HashSet<byte>> s_validTransitions = new()
-    {
-        [EpisodeStatus.Planned] = [EpisodeStatus.Executed, EpisodeStatus.Cancelled],
-        [EpisodeStatus.Executed] = [EpisodeStatus.Published, EpisodeStatus.Cancelled],
-        [EpisodeStatus.Published] = [EpisodeStatus.WebsitePublished, EpisodeStatus.Cancelled],
-        [EpisodeStatus.WebsitePublished] = [EpisodeStatus.Cancelled],
-        [EpisodeStatus.Cancelled] = []  // الحالة النهائية — لا رجعة منها عبر UpdateStatus
-    };
 
     public async Task<Result> UpdateStatusAsync(int episodeId, byte newStatusId, UserSession session)
     {
@@ -630,118 +647,6 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     }
 
     // ──────────────────────────────────────────────────────────────
-    // Sync Helpers
-    // ──────────────────────────────────────────────────────────────
-
-    private static void SyncGuests(List<EpisodeGuest> existing, List<EpisodeGuest> allIncludingDeleted, List<EpisodeGuestDto> newItems, Episode ep)
-    {
-        var existingById = existing.ToDictionary(g => g.EpisodeGuestId);
-        var newIds = newItems.Where(i => i.EpisodeGuestId != 0).Select(i => i.EpisodeGuestId).ToHashSet();
-
-        foreach (var ex in existing.Where(g => !newIds.Contains(g.EpisodeGuestId)))
-            ex.IsActive = false;
-
-        foreach (var dto in newItems)
-        {
-            if (dto.EpisodeGuestId != 0 && existingById.TryGetValue(dto.EpisodeGuestId, out var ex))
-            {
-                ex.GuestId = dto.GuestId;
-                ex.Topic = dto.Topic;
-                ex.HostingTime = dto.HostingTime;
-                ex.ClipNotes = dto.ClipNotes;
-            }
-            else
-            {
-                var softDeleted = allIncludingDeleted.FirstOrDefault(g => g.GuestId == dto.GuestId && !g.IsActive);
-                if (softDeleted != null)
-                {
-                    softDeleted.IsActive = true;
-                    softDeleted.Topic = dto.Topic;
-                    softDeleted.HostingTime = dto.HostingTime;
-                    softDeleted.ClipNotes = dto.ClipNotes;
-                }
-                else
-                {
-                    ep.EpisodeGuests.Add(new EpisodeGuest
-                    {
-                        GuestId = dto.GuestId,
-                        Topic = dto.Topic,
-                        HostingTime = dto.HostingTime,
-                        ClipNotes = dto.ClipNotes
-                    });
-                }
-            }
-        }
-    }
-
-    private static void SyncCorrespondents(List<EpisodeCorrespondent> existing, List<EpisodeCorrespondent> allIncludingDeleted, List<EpisodeCorrespondentDto> newItems, Episode ep)
-    {
-        var existingById = existing.ToDictionary(c => c.EpisodeCorrespondentId);
-        var newIds = newItems.Where(i => i.Id != 0).Select(i => i.Id).ToHashSet();
-
-        foreach (var ex in existing.Where(c => !newIds.Contains(c.EpisodeCorrespondentId)))
-            ex.IsActive = false;
-
-        foreach (var dto in newItems)
-        {
-            if (dto.Id != 0 && existingById.TryGetValue(dto.Id, out var ex))
-            {
-                ex.CorrespondentId = dto.CorrespondentId;
-                ex.Topic = dto.Topic;
-                ex.HostingTime = dto.HostingTime;
-            }
-            else
-            {
-                var softDeleted = allIncludingDeleted.FirstOrDefault(c => c.CorrespondentId == dto.CorrespondentId && !c.IsActive);
-                if (softDeleted != null)
-                {
-                    softDeleted.IsActive = true;
-                    softDeleted.Topic = dto.Topic;
-                    softDeleted.HostingTime = dto.HostingTime;
-                }
-                else
-                {
-                    ep.EpisodeCorrespondents.Add(new EpisodeCorrespondent
-                    {
-                        CorrespondentId = dto.CorrespondentId,
-                        Topic = dto.Topic,
-                        HostingTime = dto.HostingTime
-                    });
-                }
-            }
-        }
-    }
-
-    private static void SyncEmployees(List<EpisodeEmployee> existing, List<EpisodeEmployee> allIncludingDeleted, List<EpisodeEmployeeDto> newItems, Episode ep)
-    {
-        var existingById = existing.ToDictionary(e => e.EpisodeEmployeeId);
-        var newIds = newItems.Where(i => i.Id != 0).Select(i => i.Id).ToHashSet();
-
-        foreach (var ex in existing.Where(e => !newIds.Contains(e.EpisodeEmployeeId)))
-            ex.IsActive = false;
-
-        foreach (var dto in newItems)
-        {
-            if (dto.Id != 0 && existingById.TryGetValue(dto.Id, out var ex))
-            {
-                ex.EmployeeId = dto.EmployeeId;
-            }
-            else
-            {
-                var softDeleted = allIncludingDeleted.FirstOrDefault(e => e.EmployeeId == dto.EmployeeId && !e.IsActive);
-                if (softDeleted != null)
-                {
-                    softDeleted.IsActive = true;
-                }
-                else
-                {
-                    ep.EpisodeEmployees.Add(new EpisodeEmployee { EmployeeId = dto.EmployeeId });
-                }
-            }
-        }
-    }
-
-    // ──────────────────────────────────────────────────────────────
     // Batch Operations
     // ──────────────────────────────────────────────────────────────
 
@@ -844,13 +749,9 @@ public class EpisodeService(IDbContextFactory<BroadcastWorkflowDBContext> contex
     // 🆕 مساعدات التحقق والتدقيق
     // ═══════════════════════════════════════════════════════
 
-    /// <summary>
-    /// 🆕 يتحقق من أن الانتقال من حالة إلى أخرى مسموح وفق خريطة الانتقالات
-    /// </summary>
     private static bool IsValidTransition(byte fromStatus, byte toStatus)
     {
-        if (fromStatus == toStatus) return false;
-        return s_validTransitions.TryGetValue(fromStatus, out var allowed) && allowed.Contains(toStatus);
+        return EpisodeStatusTransition.IsValid(fromStatus, toStatus);
     }
 
     /// <summary>
