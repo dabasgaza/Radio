@@ -23,109 +23,23 @@
         <SolidColorBrush x:Key="PlatFg.TikTok" Color="#010101" />
 
         <Style x:Key="PlatformBarStyle" TargetType="Border">
-            <Setter Property="Background" Value="#EEF2F6" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Name}" Value="Facebook">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.Facebook}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="Twitter">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.Twitter}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="X">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.X}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="YouTube">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.YouTube}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="Instagram">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.Instagram}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="TikTok">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.TikTok}" />
-                </DataTrigger>
-            </Style.Triggers>
+            <Setter Property="Background" Value="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Background}" />
         </Style>
 
         <Style x:Key="PlatformCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="#EEF2F6" />
-            <Setter Property="BorderBrush" Value="#6366F1" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Name}" Value="Facebook">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.Facebook}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource PlatFg.Facebook}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="Twitter">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.Twitter}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource PlatFg.Twitter}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="X">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.X}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource PlatFg.X}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="YouTube">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.YouTube}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource PlatFg.YouTube}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="Instagram">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.Instagram}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource PlatFg.Instagram}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="TikTok">
-                    <Setter Property="Background" Value="{StaticResource PlatBg.TikTok}" />
-                    <Setter Property="BorderBrush" Value="{StaticResource PlatFg.TikTok}" />
-                </DataTrigger>
-            </Style.Triggers>
+            <Setter Property="Background" Value="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Background}" />
+            <Setter Property="BorderBrush" Value="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}" />
         </Style>
 
         <Style x:Key="PlatformIconFgStyle" TargetType="materialDesign:PackIcon">
-            <Setter Property="Foreground" Value="#6366F1" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Name}" Value="فيس بوك">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.Facebook}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="Twitter">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.Twitter}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="X">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.X}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="YouTube">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.YouTube}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="Instagram">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.Instagram}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="TikTok">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.TikTok}" />
-                </DataTrigger>
-            </Style.Triggers>
+            <Setter Property="Foreground" Value="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}" />
         </Style>
 
         <Style
             x:Key="PlatformBadgeFgStyle"
             BasedOn="{StaticResource Type.Caption}"
             TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#6366F1" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Name}" Value="Facebook">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.Facebook}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="Twitter">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.Twitter}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="X">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.X}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="YouTube">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.YouTube}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="Instagram">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.Instagram}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Name}" Value="TikTok">
-                    <Setter Property="Foreground" Value="{StaticResource PlatFg.TikTok}" />
-                </DataTrigger>
-            </Style.Triggers>
+            <Setter Property="Foreground" Value="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}" />
         </Style>
 
         <Style
@@ -153,7 +67,7 @@
                                     Width="5"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Stretch"
-                                    Style="{StaticResource PlatformBarStyle}" />
+                                    Background="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}" />
                                 <SelectiveScrollingGrid Grid.Column="1">
                                     <SelectiveScrollingGrid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
@@ -337,22 +251,23 @@
                                         Margin="0,0,0,0"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
-                                        CornerRadius="2"
-                                        Style="{StaticResource PlatformBarStyle}" />
+                                        Background="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}"
+                                        CornerRadius="2" />
                                     <StackPanel Margin="16,0,0,0" Orientation="Horizontal">
                                         <Border
                                             Width="34"
                                             Height="34"
+                                            Background="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Background}"
+                                            BorderBrush="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}"
                                             BorderThickness="1.5"
-                                            CornerRadius="8"
-                                            Style="{StaticResource PlatformCardStyle}">
+                                            CornerRadius="8">
                                             <materialDesign:PackIcon
                                                 Width="18"
                                                 Height="18"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
-                                                Kind="{Binding Icon, TargetNullValue=ShareVariant, FallbackValue=ShareVariant}"
-                                                Style="{StaticResource PlatformIconFgStyle}" />
+                                                Foreground="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}"
+                                                Kind="{Binding Icon, TargetNullValue=ShareVariant, FallbackValue=ShareVariant}" />
                                         </Border>
                                         <TextBlock
                                             Margin="12,0"
@@ -376,13 +291,15 @@
                                     MinWidth="80"
                                     Padding="12,5"
                                     HorizontalAlignment="Center"
+                                    Background="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Background}"
+                                    BorderBrush="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}"
                                     BorderThickness="1"
-                                    CornerRadius="14"
-                                    Style="{StaticResource PlatformCardStyle}">
+                                    CornerRadius="14">
                                     <TextBlock
                                         HorizontalAlignment="Center"
                                         FontWeight="Medium"
-                                        Style="{StaticResource PlatformBadgeFgStyle}"
+                                        Foreground="{Binding Name, Converter={StaticResource PlatformColorConverter}, ConverterParameter=Foreground}"
+                                        Style="{StaticResource Type.Caption}"
                                         Text="{Binding Icon, TargetNullValue=—}" />
                                 </Border>
                             </DataTemplate>
@@ -424,6 +341,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+
                 </DataGrid.Columns>
             </DataGrid>
         </materialDesign:Card>
